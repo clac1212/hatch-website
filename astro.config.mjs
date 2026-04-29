@@ -24,12 +24,11 @@ export default defineConfig({
     plugins: [tailwindcss()],
   },
 
-  // Web Analytics + Speed Insights are injected automatically by the Vercel
-  // adapter at deploy time — no extra package, no client-side code needed.
+  // Web Analytics is injected automatically by the Vercel adapter at deploy time.
+  // Speed Insights is now handled by the @vercel/speed-insights package.
   // Only active in production deployments (Preview + Production), not local dev.
   adapter: vercel({
     webAnalytics: { enabled: true },
-    speedInsights: { enabled: true },
   }),
 
   integrations: [
