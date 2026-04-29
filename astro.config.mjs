@@ -2,8 +2,8 @@
 import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 import vercel from '@astrojs/vercel';
-
 import react from '@astrojs/react';
+import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
@@ -24,10 +24,21 @@ export default defineConfig({
     plugins: [tailwindcss()],
   },
 
+  // Web Analytics + Speed Insights are injected automatically by the Vercel
+  // adapter at deploy time — no extra package, no client-side code needed.
+  // Only active in production deployments (Preview + Production), not local dev.
   adapter: vercel({
-    webAnalytics: {
-      enabled: true,
-    },
+    webAnalytics: { enabled: true },
+    speedInsights: { enabled: true },
   }),
-  integrations: [react()],
+
+  integrations: [
+    react(),
+    sitemap({
+      i18n: {
+        defaultLocale: 'fr',
+        locales: { fr: 'fr-FR', en: 'en-US' },
+      },
+    }),
+  ],
 });
