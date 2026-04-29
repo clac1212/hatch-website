@@ -1,0 +1,205 @@
+---
+import type { Locale } from '../i18n/ui';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  locale: Locale;
+  data: CollectionEntry<'landing'>['data']['hiw'];
+}
+
+const { data } = Astro.props;
+---
+
+<section class="hiw bg-white py-0" id="how">
+  <div class="container-site">
+    <div class="hiw-header mb-16 text-center">
+      <div
+        class="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-hatch-pill-bg-strong bg-hatch-pill-bg px-4 py-1.5 pl-2.5 text-xs font-semibold tracking-[0.04em] text-hatch-primary"
+      >
+        <span
+          class="pulse-dot h-1.5 w-1.5 flex-shrink-0 rounded-full bg-hatch-primary-bright shadow-[0_0_8px_rgba(90,173,110,0.7)]"
+        ></span>
+        <span>{data.label}</span>
+      </div>
+      <h2
+        class="mb-4 mt-2 font-display font-normal text-slate-900"
+        style="font-size: clamp(26px, 3.6vw, 40px); line-height: 1.08; letter-spacing: -0.02em;"
+        set:html={data.h2}
+      />
+      <p class="mx-auto max-w-[460px] text-base text-slate-500">{data.sub}</p>
+    </div>
+
+    <div class="hiw-scene-wrap pb-16 pt-2 overflow-visible">
+      <div
+        class="hiw-scene flex justify-center gap-5"
+        style="transform: perspective(1400px) rotateX(6deg) rotateY(-4deg) scale(0.96); transform-origin: center top;"
+      >
+        <!-- CARD 1 -->
+        <div
+          class="hiw-fc hiw-fc-1 relative w-[285px] flex-shrink-0 rounded-3xl border border-amber-300/25 px-5 pb-5 pt-5 transition"
+          style="background:#fffbeb; box-shadow: var(--shadow-hiw-card); transform: translateY(48px);"
+        >
+          <div
+            class="hiw-fc-num absolute right-4 top-4 flex h-[30px] w-[30px] items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-xs font-extrabold text-slate-500"
+          >
+            1
+          </div>
+          <div
+            class="hiw-fc-avatar mb-3.5 flex h-[46px] w-[46px] items-center justify-center rounded-full border border-amber-200 bg-amber-100 text-xl"
+          >
+            📁
+          </div>
+          <div
+            class="hiw-fc-title mb-2 text-[19px] font-extrabold leading-tight tracking-[-0.03em] text-slate-900"
+          >
+            {data.step1Title}
+          </div>
+          <div class="hiw-fc-desc mb-4 text-[11.5px] leading-[1.65] text-slate-500">
+            {data.step1Desc}
+          </div>
+          <div class="hiw-fc-footer flex flex-col gap-2">
+            <div
+              class="hiw-fc-source-label text-[9px] font-bold uppercase tracking-[0.08em] text-slate-400"
+            >
+              {data.sourceLabel}
+            </div>
+            <div class="hiw-fc-chips flex flex-wrap gap-[5px]">
+              <span
+                class="hiw-fc-chip rounded-full border border-amber-200 bg-amber-100 px-2.5 py-[3px] text-[10px] font-semibold text-amber-800"
+                >Google Drive</span
+              >
+              <span
+                class="hiw-fc-chip rounded-full border border-amber-200 bg-amber-100 px-2.5 py-[3px] text-[10px] font-semibold text-amber-800"
+                >Notion</span
+              >
+              <span
+                class="hiw-fc-chip rounded-full border border-amber-200 bg-amber-100 px-2.5 py-[3px] text-[10px] font-semibold text-amber-800"
+                >PDF</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 2 -->
+        <div
+          class="hiw-fc hiw-fc-2 relative w-[285px] flex-shrink-0 rounded-3xl border border-amber-300/25 px-5 pb-5 pt-5 transition"
+          style="background:#fffbeb; box-shadow: var(--shadow-hiw-card); transform: translateY(0px);"
+        >
+          <div
+            class="hiw-fc-num absolute right-4 top-4 flex h-[30px] w-[30px] items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-xs font-extrabold text-slate-500"
+          >
+            2
+          </div>
+          <div
+            class="hiw-fc-avatar mb-3.5 flex h-[46px] w-[46px] items-center justify-center rounded-full border border-amber-200 bg-amber-100 text-xl"
+          >
+            ⚡
+          </div>
+          <div
+            class="hiw-fc-title mb-2 text-[19px] font-extrabold leading-tight tracking-[-0.03em] text-slate-900"
+          >
+            {data.step2Title}
+          </div>
+          <div class="hiw-fc-desc mb-4 text-[11.5px] leading-[1.65] text-slate-500">
+            {data.step2Desc}
+          </div>
+          <div class="hiw-fc-footer flex flex-col gap-2">
+            <div
+              class="hiw-fc-source-label text-[9px] font-bold uppercase tracking-[0.08em] text-slate-400"
+            >
+              {data.agentsLabel}
+            </div>
+            <div class="flex items-center gap-1.5">
+              <div class="hiw-fc-dot h-4 w-4 rounded-full" style="background:#fbbf24"></div>
+              <div class="hiw-fc-dot h-4 w-4 rounded-full" style="background:#6366f1"></div>
+              <div class="hiw-fc-dot h-4 w-4 rounded-full" style="background:#34d399"></div>
+              <div class="hiw-fc-dot h-4 w-4 rounded-full bg-slate-200"></div>
+              <div class="hiw-fc-dot h-4 w-4 rounded-full bg-slate-200"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 3 -->
+        <div
+          class="hiw-fc hiw-fc-3 relative w-[285px] flex-shrink-0 rounded-3xl border border-amber-300/25 px-5 pb-5 pt-5 transition"
+          style="background:#fffbeb; box-shadow: var(--shadow-hiw-card); transform: translateY(28px);"
+        >
+          <div
+            class="hiw-fc-num absolute right-4 top-4 flex h-[30px] w-[30px] items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-xs font-extrabold text-slate-500"
+          >
+            3
+          </div>
+          <div
+            class="hiw-fc-avatar mb-3.5 flex h-[46px] w-[46px] items-center justify-center rounded-full border border-amber-200 bg-amber-100 text-xl"
+          >
+            📈
+          </div>
+          <div
+            class="hiw-fc-title mb-2 text-[19px] font-extrabold leading-tight tracking-[-0.03em] text-slate-900"
+          >
+            {data.step3Title}
+          </div>
+          <div class="hiw-fc-desc mb-4 text-[11.5px] leading-[1.65] text-slate-500">
+            {data.step3Desc}
+          </div>
+          <div class="hiw-fc-footer flex flex-col gap-2">
+            <div
+              class="hiw-fc-stat flex items-center justify-between rounded-lg border border-amber-200 bg-amber-100 px-2.5 py-2"
+            >
+              <span class="hiw-fc-stat-label text-[10px] text-slate-500">{data.stat1}</span>
+              <div class="flex items-center gap-1.5">
+                <span class="hiw-fc-stat-val text-xs font-extrabold text-slate-900">847</span>
+                <span
+                  class="hiw-fc-stat-delta rounded-full bg-green-100 px-1.5 py-px text-[9px] font-bold text-green-700"
+                  >↑12%</span
+                >
+              </div>
+            </div>
+            <div
+              class="hiw-fc-stat flex items-center justify-between rounded-lg border border-amber-200 bg-amber-100 px-2.5 py-2"
+            >
+              <span class="hiw-fc-stat-label text-[10px] text-slate-500">{data.stat2}</span>
+              <div class="flex items-center gap-1.5">
+                <span class="hiw-fc-stat-val text-xs font-extrabold text-slate-900">48h</span>
+                <span
+                  class="hiw-fc-stat-delta rounded-full bg-green-100 px-1.5 py-px text-[9px] font-bold text-green-700"
+                  >↑20%</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hiw-fc {
+    transition:
+      transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+      box-shadow 0.35s;
+  }
+  .hiw-fc:hover {
+    transform: translateY(-10px) scale(1.02) !important;
+    box-shadow: var(--shadow-hiw-card-hover);
+  }
+  @media (max-width: 640px) {
+    .hiw-scene-wrap {
+      padding: 0;
+      overflow: visible;
+    }
+    .hiw-scene {
+      flex-direction: column;
+      gap: 16px;
+      transform: none !important;
+    }
+    .hiw-fc {
+      width: 100% !important;
+      transform: none !important;
+    }
+    .hiw-fc:hover {
+      transform: none !important;
+    }
+  }
+</style>

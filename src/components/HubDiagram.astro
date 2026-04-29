@@ -1,0 +1,214 @@
+---
+import type { Locale } from '../i18n/ui';
+import type { CollectionEntry } from 'astro:content';
+import { Peep, Jay, Sparrow, Rook, Piper, Kite } from './birds/Birds.tsx';
+
+interface Props {
+  locale: Locale;
+  data: CollectionEntry<'landing'>['data']['hub'];
+}
+
+const { data } = Astro.props;
+
+// 7 sources distributed evenly along the left column.
+// Icons are real brand PNG/JPG/WebP files in /public/logos (extracted from
+// the reference HTML so we ship the same artwork as the original landing).
+const sources = [
+  { i: 0, top: '7%', label: 'PDF', src: '/logos/src-pdf.jpg' },
+  { i: 1, top: '21.3%', label: 'Notion', src: '/logos/src-notion.png' },
+  { i: 2, top: '35.65%', label: 'Google Drive', src: '/logos/src-google-drive.png' },
+  { i: 3, top: '50%', label: 'OneDrive', src: '/logos/src-onedrive.png' },
+  { i: 4, top: '64.35%', label: 'Word', src: '/logos/src-word.webp' },
+  { i: 5, top: '78.7%', label: 'Excel', src: '/logos/src-excel.png' },
+  { i: 6, top: '93%', label: 'Airtable', src: '/logos/src-airtable.png' },
+];
+
+// 6 agents in a quincunx pattern (alternating columns).
+const agents = [
+  { key: 'peep', name: 'Peep', top: '9%', left: '88%' },
+  { key: 'jay', name: 'Jay', top: '26%', left: '95%' },
+  { key: 'sparrow', name: 'Sparrow', top: '43%', left: '88%' },
+  { key: 'legal', name: 'Rook', top: '60%', left: '95%' },
+  { key: 'marketing', name: 'Piper', top: '77%', left: '88%' },
+  { key: 'innovation', name: 'Kite', top: '93%', left: '95%' },
+];
+---
+
+<section class="hub-sec border-t-0 bg-white pb-14 pt-12" id="hub">
+  <div class="container-site">
+    <div class="hub-header mb-14 text-center">
+      <div
+        class="hub-pill mb-5 inline-flex items-center gap-[7px] rounded-full border border-hatch-pill-bg-strong bg-hatch-pill-bg px-3.5 py-[5px] text-xs font-semibold tracking-[0.03em] text-hatch-primary"
+      >
+        <span
+          class="hub-pill-dot pulse-dot h-1.5 w-1.5 rounded-full bg-hatch-primary-bright shadow-[0_0_8px_rgba(90,173,110,0.7)]"
+        ></span>
+        <span>{data.pill}</span>
+      </div>
+      <h2
+        class="mb-4 mt-2 font-display font-normal text-slate-900"
+        style="font-size: clamp(26px, 3.6vw, 40px); line-height: 1.08; letter-spacing: -0.02em;"
+        set:html={data.h2}
+      />
+      <p class="mx-auto max-w-[560px] text-base text-slate-500">{data.sub}</p>
+    </div>
+
+    <div
+      class="hub-diagram relative mx-auto h-[480px] w-full max-w-[1280px] overflow-hidden rounded-[32px] hidden md:block"
+      style="background: var(--hub-gradient);"
+      aria-hidden="true"
+    >
+      <div
+        class="pointer-events-none absolute inset-0"
+        style="background: radial-gradient(40% 60% at 20% 30%, rgba(254,215,170,0.45), transparent 60%), radial-gradient(40% 60% at 80% 70%, rgba(253,186,116,0.25), transparent 60%);"
+      >
+      </div>
+
+      <!-- SVG: connections + animated dots -->
+      <svg
+        viewBox="0 0 1080 920"
+        preserveAspectRatio="none"
+        style="position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:0;"
+        aria-hidden="true"
+      >
+        <defs>
+          <filter id="hub-glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="2.4" result="blur"></feGaussianBlur>
+            <feMerge>
+              <feMergeNode in="blur"></feMergeNode>
+              <feMergeNode in="SourceGraphic"></feMergeNode>
+            </feMerge>
+          </filter>
+        </defs>
+        <g fill="none" stroke="#e2c9a8" stroke-width="1.5">
+          <path id="p-s0" d="M 162 64.4  C 300 64.4,  370 460, 446 460"></path>
+          <path id="p-s1" d="M 162 196   C 300 196,   370 460, 446 460"></path>
+          <path id="p-s2" d="M 162 328   C 300 328,   370 460, 446 460"></path>
+          <path id="p-s3" d="M 162 460   C 300 460,   370 460, 446 460"></path>
+          <path id="p-s4" d="M 162 592   C 300 592,   370 460, 446 460"></path>
+          <path id="p-s5" d="M 162 724   C 300 724,   370 460, 446 460"></path>
+          <path id="p-s6" d="M 162 855.6 C 300 855.6, 370 460, 446 460"></path>
+          <path id="p-a0" d="M 634 460 C 750 460, 830 82.8,  950 82.8"></path>
+          <path id="p-a1" d="M 634 460 C 750 460, 860 239.2, 1026 239.2"></path>
+          <path id="p-a2" d="M 634 460 C 750 460, 830 395.6, 950 395.6"></path>
+          <path id="p-a3" d="M 634 460 C 750 460, 860 552,   1026 552"></path>
+          <path id="p-a4" d="M 634 460 C 750 460, 830 708.4, 950 708.4"></path>
+          <path id="p-a5" d="M 634 460 C 750 460, 860 856,   1026 856"></path>
+        </g>
+        <g filter="url(#hub-glow)">
+          {
+            [0, 1, 2, 3, 4, 5, 6].map((i) => (
+              <circle r="3.5" fill="#ea580c">
+                <animateMotion dur="2.4s" begin={`${0.4 + i * 0.32}s`} repeatCount="indefinite">
+                  <mpath href={`#p-s${i}`} />
+                </animateMotion>
+              </circle>
+            ))
+          }
+          {
+            [0, 1, 2, 3, 4, 5].map((i) => (
+              <circle r="3.5" fill="#fbbf24">
+                <animateMotion dur="1.9s" begin={`${1.6 + i * 0.32}s`} repeatCount="indefinite">
+                  <mpath href={`#p-a${i}`} />
+                </animateMotion>
+              </circle>
+            ))
+          }
+        </g>
+      </svg>
+
+      <div class="absolute inset-0 pointer-events-none">
+        <!-- SOURCES -->
+        {
+          sources.map(({ i, top, label, src }) => (
+            <div
+              class="hub-src-card absolute flex h-[50px] w-[50px] items-center justify-center overflow-hidden rounded-xl bg-white"
+              data-i={i}
+              style={`left:10%; top:${top}; transform: translate(-50%,-50%); box-shadow: var(--shadow-hub-src);`}
+              title={label}
+            >
+              <img
+                src={src}
+                alt={label}
+                class="h-[34px] w-[34px] object-contain"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+          ))
+        }
+
+        <!-- CENTER -->
+        <div
+          class="hub-ring-el r1 absolute rounded-[42px] border-[1.5px] border-hatch-accent/[0.22]"
+          style="left:50%; top:50%; transform: translate(-50%,-50%); width:100px; height:100px; animation: hubRingPulse 3s ease-out infinite;"
+        >
+        </div>
+        <div
+          class="hub-ring-el r2 absolute rounded-[42px] border-[1.5px] border-hatch-accent/[0.22]"
+          style="left:50%; top:50%; transform: translate(-50%,-50%); width:100px; height:100px; animation: hubRingPulse 3s ease-out 1.5s infinite;"
+        >
+        </div>
+        <div
+          class="hub-center-card absolute flex h-[100px] w-[100px] items-center justify-center rounded-[22px] bg-white p-2"
+          style="left:50%; top:50%; transform: translate(-50%,-50%); z-index:5; box-shadow: var(--shadow-hub-center);"
+        >
+          <div class="hub-center-inner h-full w-full overflow-hidden rounded-2xl">
+            <img src="/logos/src-hatch.png" alt="Hatch" class="h-full w-full object-cover" />
+          </div>
+          <div
+            class="hub-center-name absolute left-1/2 top-[calc(100%+18px)] -translate-x-1/2 whitespace-nowrap text-center"
+          >
+            <strong class="block text-[15px] font-bold tracking-[-0.02em] text-slate-900"
+              >Hatch</strong
+            >
+            <span
+              class="mt-[3px] block font-mono text-[8px] uppercase tracking-[0.14em] text-hatch-accent-deep"
+              >{data.centerLabel}</span
+            >
+          </div>
+        </div>
+
+        <!-- AGENTS -->
+        {
+          agents.map(({ key, name, top, left }) => (
+            <div
+              class="hub-agent-card absolute flex flex-col items-center justify-center"
+              data-i={key}
+              style={`left:${left}; top:${top}; transform: translate(-50%,-50%); width:64px; pointer-events: auto;`}
+            >
+              <div class="h-[46px] w-[46px]">
+                {key === 'peep' && <Peep size={46} showLabel={false} feet={false} />}
+                {key === 'jay' && <Jay size={46} showLabel={false} feet={false} />}
+                {key === 'sparrow' && <Sparrow size={46} showLabel={false} feet={false} />}
+                {key === 'legal' && <Rook size={46} showLabel={false} feet={false} />}
+                {key === 'marketing' && <Piper size={46} showLabel={false} feet={false} />}
+                {key === 'innovation' && <Kite size={46} showLabel={false} feet={false} />}
+              </div>
+              <span class="hub-agent-name -mt-[6px] block whitespace-nowrap text-center font-display text-[10px] font-medium tracking-[-0.01em] text-slate-900">
+                {name}
+              </span>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hub-src-card {
+    transition:
+      transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1),
+      box-shadow 0.3s;
+  }
+  .hub-src-card:hover {
+    transform: translate(-50%, -50%) scale(1.06) !important;
+  }
+  .hub-agent-card {
+    transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .hub-agent-card:hover {
+    transform: translate(-50%, -50%) scale(1.1) !important;
+  }
+</style>

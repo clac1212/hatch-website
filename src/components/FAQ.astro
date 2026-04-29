@@ -1,0 +1,67 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  data: CollectionEntry<'landing'>['data']['faq'];
+}
+
+const { data } = Astro.props;
+---
+
+<section class="bg-white px-0 py-6 pb-14" id="faq">
+  <div class="container-site max-w-[720px]">
+    <div class="mb-10 text-center">
+      <div class="mb-5 flex justify-center">
+        <div
+          class="inline-flex items-center gap-2 rounded-full border border-hatch-accent-bg-strong bg-hatch-accent-bg px-4 py-1.5 pl-2.5 text-xs font-semibold tracking-[0.04em] text-hatch-accent"
+        >
+          <span
+            class="pulse-dot h-1.5 w-1.5 flex-shrink-0 rounded-full bg-hatch-accent shadow-[0_0_8px_rgba(234,88,12,0.5)]"
+          ></span>
+          <span>FAQ</span>
+        </div>
+      </div>
+      <h2
+        class="font-display font-normal"
+        style="font-size: clamp(26px, 3.6vw, 40px); line-height: 1.08;"
+        set:html={data.h2}
+      />
+    </div>
+
+    <div class="flex flex-col gap-0">
+      {
+        data.items.map((item, i) => (
+          <div
+            class:list={[
+              'faq-item cursor-pointer border-b border-slate-100',
+              i === 0 && 'border-t border-slate-100',
+            ]}
+          >
+            <div class="faq-q flex items-center justify-between gap-4 px-1 py-5 text-base font-semibold text-slate-900">
+              <span set:html={item.q} />
+              <span class="faq-arrow flex-shrink-0 text-2xl font-light leading-none text-slate-400">
+                +
+              </span>
+            </div>
+            <div class="faq-a text-[15px] leading-[1.7] text-slate-600">{item.a}</div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<script>
+  // FAQ accordion: clicking an item toggles its `.open` class. CSS does the
+  // max-height transition + arrow rotation. Only one item may be open at a
+  // time to keep the layout tidy.
+  document.querySelectorAll<HTMLElement>('.faq-item').forEach((item) => {
+    item.addEventListener('click', () => {
+      const wasOpen = item.classList.contains('open');
+      document
+        .querySelectorAll<HTMLElement>('.faq-item.open')
+        .forEach((o) => o.classList.remove('open'));
+      if (!wasOpen) item.classList.add('open');
+    });
+  });
+</script>

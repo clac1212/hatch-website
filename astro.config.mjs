@@ -3,10 +3,11 @@ import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 import vercel from '@astrojs/vercel';
 
+import react from '@astrojs/react';
+
 // https://astro.build/config
 export default defineConfig({
-  // TODO: replace with your real production URL once the domain is set up.
-  site: 'https://hatch.example.com',
+  site: 'https://gethatch.io',
 
   // Native i18n routing — see https://docs.astro.build/en/guides/internationalization/
   // FR is the default locale → served at "/" (no prefix).
@@ -24,4 +25,5 @@ export default defineConfig({
   },
 
   adapter: vercel(),
+  integrations: [react()],
 });

@@ -1,6 +1,6 @@
 ---
 import '../styles/global.css';
-import { ui, type Locale } from '../i18n/ui';
+import { type Locale } from '../i18n/ui';
 
 interface Props {
   /** Page <title>. */
@@ -12,11 +12,10 @@ interface Props {
 }
 
 const { title, description, locale } = Astro.props;
-const t = ui[locale];
 ---
 
 <!doctype html>
-<html lang={locale}>
+<html lang={locale} id="html-root">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -43,10 +42,13 @@ const t = ui[locale];
     />
   </head>
   <body class="bg-white text-hatch-text">
+    <!-- Decorative paw-print trail (hidden on mobile via CSS). -->
+    <svg id="bird-trail" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"></svg>
+
     <slot />
 
-    <footer class="border-t border-slate-200 py-8 text-center text-sm text-slate-500">
-      <p>{t.footer.copyright.replace('{year}', String(new Date().getFullYear()))}</p>
-    </footer>
+    <script>
+      import '../scripts/paw-trail.ts';
+    </script>
   </body>
 </html>

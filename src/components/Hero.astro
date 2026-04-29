@@ -1,0 +1,116 @@
+---
+import { externalUrls, type Locale } from '../i18n/ui';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  locale: Locale;
+  data: CollectionEntry<'landing'>['data']['hero'];
+}
+
+const { data } = Astro.props;
+---
+
+<section
+  class="hero relative flex min-h-screen items-center justify-center overflow-hidden bg-hatch-bg p-0 text-white"
+  id="hero"
+>
+  <div class="hero-glow pointer-events-none absolute inset-0" aria-hidden="true"></div>
+
+  <div
+    class="container-site relative z-[1] flex w-full flex-col items-center pb-20 pt-[130px] text-center sm:pt-[110px] md:pb-20"
+  >
+    <div
+      class="hero-eyebrow mb-11 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 pl-2.5 text-xs font-semibold tracking-[0.04em] text-white/55"
+    >
+      <span
+        class="pulse-dot block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-hatch-primary-bright shadow-[0_0_8px_rgba(90,173,110,0.7)]"
+      ></span>
+      <span set:html={data.eyebrow} />
+    </div>
+
+    <h1
+      class="hero-h1 mx-auto mb-[30px] max-w-[860px] font-display font-normal text-white"
+      style="font-size: clamp(52px, 7.5vw, 92px); line-height: 0.97; letter-spacing: -0.025em;"
+      set:html={data.h1}
+    />
+
+    <p
+      class="hero-sub mx-auto mb-12 max-w-[460px] text-lg leading-[1.75] text-white/65"
+      set:html={data.sub}
+    />
+
+    <div class="hero-actions mb-[60px] flex flex-wrap justify-center gap-3">
+      <a
+        href={externalUrls.demoForm}
+        target="_blank"
+        rel="noopener"
+        id="hero-cta-demo"
+        class="btn-primary inline-flex items-center gap-[7px] whitespace-nowrap rounded-[9px] bg-hatch-cta px-5 py-2.5 text-sm font-semibold text-hatch-text transition hover:-translate-y-px hover:bg-hatch-cta-hover hover:shadow-[0_6px_22px_rgba(255,244,164,0.28)]"
+      >
+        {data.ctaDemo}
+        <svg
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+        >
+          <path d="M5 12h14M12 5l7 7-7 7"></path>
+        </svg>
+      </a>
+      <a
+        href="#agents"
+        id="hero-cta-product"
+        class="btn-ghost inline-flex items-center gap-[7px] whitespace-nowrap rounded-[9px] border-[1.5px] border-white/30 bg-transparent px-5 py-2.5 text-sm font-semibold text-white/90 transition hover:border-white/60 hover:bg-white/10 hover:text-white"
+      >
+        {data.ctaProduct}
+      </a>
+    </div>
+
+    <div class="hero-trust w-full max-w-[600px]">
+      <div
+        class="hero-trust-label mb-7 text-[11px] font-semibold uppercase tracking-[0.12em] text-white/45"
+      >
+        {data.trustLabel}
+      </div>
+      <div
+        class="hero-trust-logos overflow-hidden"
+        style="mask-image: linear-gradient(90deg, transparent, black 14%, black 86%, transparent); -webkit-mask-image: linear-gradient(90deg, transparent, black 14%, black 86%, transparent);"
+      >
+        <div class="ticker-track">
+          {
+            // Each customer logo is a PNG in /public/logos. Listed twice so the
+            // CSS ticker animation (translate -50%) loops without a visible seam.
+            Array.from({ length: 2 }).flatMap((_, cycle) =>
+              [
+                { src: '/logos/nobinobi.png', alt: 'Nobinobi' },
+                { src: '/logos/pny.png', alt: 'PNY' },
+                { src: '/logos/la-meulerie.png', alt: 'La Meulerie' },
+                { src: '/logos/crousty-one.png', alt: 'Crousty One' },
+              ].map(({ src, alt }) => (
+                <>
+                  <img
+                    class="hero-trust-logo h-8 w-auto flex-shrink-0 mix-blend-screen opacity-35 transition-opacity hover:opacity-60"
+                    style="filter: grayscale(1) invert(1) brightness(1.3);"
+                    src={src}
+                    alt={alt}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <span class="hero-trust-sep h-[3px] w-[3px] flex-shrink-0 rounded-full bg-white/10" />
+                </>
+              )),
+            )
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero-glow {
+    background: var(--hero-glow);
+  }
+</style>

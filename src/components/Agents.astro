@@ -1,0 +1,316 @@
+---
+import type { Locale } from '../i18n/ui';
+import type { CollectionEntry } from 'astro:content';
+import { Peep, Jay, Sparrow, Rook, Piper, Kite } from './birds/Birds.tsx';
+
+interface Props {
+  locale: Locale;
+  data: CollectionEntry<'landing'>['data']['agents'];
+  agents: CollectionEntry<'agents'>[];
+}
+
+const { locale, data, agents } = Astro.props;
+const sorted = [...agents].sort((a, b) => a.data.order - b.data.order);
+
+const birdComponents = {
+  peep: Peep,
+  jay: Jay,
+  sparrow: Sparrow,
+  legal: Rook,
+  marketing: Piper,
+  innovation: Kite,
+} as const;
+
+// Serialize agents data so the inline switching script can read it without a
+// second network request. Strip out fields the client doesn't need.
+const agentsClient = sorted.map((a) => {
+  const loc = a.data[locale];
+  return {
+    key: a.data.key,
+    num: a.data.num,
+    name: a.data.name,
+    species: a.data.species,
+    status: a.data.status,
+    bg: a.data.bg,
+    role: loc.role,
+    desc: loc.desc,
+    features: loc.features,
+  };
+});
+
+const labels = {
+  panelSectionLabel: data.panelSectionLabel,
+  comingBadge: data.comingBadge,
+  comingText: data.comingText,
+  statusLive: data.statusLive,
+  statusSoon: data.statusSoon,
+  tabSoon: data.tabSoon,
+  featureNew: data.featureNew,
+};
+---
+
+<section class="agents-section relative overflow-hidden bg-hatch-bg py-14" id="agents">
+  <div
+    class="pointer-events-none absolute inset-0"
+    style="background: radial-gradient(ellipse 65% 45% at 50% -5%, rgba(56,102,65,0.3) 0%, transparent 62%);"
+    aria-hidden="true"
+  >
+  </div>
+
+  <div class="container-site relative">
+    <div class="agents-header relative mb-14 text-center">
+      <div
+        class="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-hatch-accent-bg-strong bg-hatch-accent-bg px-4 py-1.5 pl-2.5 text-xs font-semibold tracking-[0.04em] text-hatch-accent"
+      >
+        <span
+          class="pulse-dot h-1.5 w-1.5 flex-shrink-0 rounded-full bg-hatch-accent shadow-[0_0_8px_rgba(234,88,12,0.5)]"
+        ></span>
+        <span>{data.label}</span>
+      </div>
+      <h2
+        class="mb-4 mt-2 font-display font-normal text-white"
+        style="font-size: clamp(26px, 3.6vw, 40px); line-height: 1.08; letter-spacing: -0.02em;"
+        set:html={data.h2}
+      />
+      <p class="mx-auto max-w-[440px] text-base text-white/70">{data.sub}</p>
+    </div>
+
+    <div
+      class="agent-tabs relative mb-8 flex flex-nowrap justify-center gap-1.5 overflow-x-auto md:overflow-visible"
+    >
+      {
+        sorted.map((agent, i) => {
+          const a = agent.data;
+          const role = a[locale].role;
+          const isComing = a.status === 'soon';
+          return (
+            <button
+              type="button"
+              class:list={[
+                'agent-tab flex flex-shrink-0 items-center gap-2 rounded-2xl border-[1.5px] border-white/[0.07] bg-white/[0.04] px-3 py-2 transition relative',
+                'hover:border-white/[0.15] hover:bg-white/[0.07]',
+                isComing && 'coming opacity-40 cursor-default',
+                i === 0 && 'active border-white/[0.22] bg-white/[0.09]',
+              ]}
+              data-agent={a.key}
+              aria-label={a.name}
+            >
+              <span class="tab-active-dot pointer-events-none absolute -bottom-2.5 left-1/2 h-[5px] w-[5px] -translate-x-1/2 rounded-full bg-white/60 opacity-0 transition-opacity" />
+              {isComing && (
+                <span class="tab-soon absolute -right-1 -top-2 rounded-full border border-white/15 bg-white/10 px-[7px] py-px text-[9px] font-bold uppercase tracking-[0.08em] text-white/65">
+                  {labels.tabSoon}
+                </span>
+              )}
+              <span class="tab-bird-wrap flex h-11 w-11 items-center justify-center">
+                {a.key === 'peep' && <Peep size={44} showLabel={false} feet={false} />}
+                {a.key === 'jay' && <Jay size={44} showLabel={false} feet={false} />}
+                {a.key === 'sparrow' && <Sparrow size={44} showLabel={false} feet={false} />}
+                {a.key === 'legal' && <Rook size={44} showLabel={false} feet={false} />}
+                {a.key === 'marketing' && <Piper size={44} showLabel={false} feet={false} />}
+                {a.key === 'innovation' && <Kite size={44} showLabel={false} feet={false} />}
+              </span>
+              <div class="text-left">
+                <div class="tab-name text-[13px] font-bold leading-none text-white">{a.name}</div>
+                <div class="tab-role mt-0.5 whitespace-nowrap text-[10px] text-white/60">
+                  {role}
+                </div>
+              </div>
+            </button>
+          );
+        })
+      }
+    </div>
+
+    <div
+      class="agent-panel relative overflow-hidden rounded-[28px] border border-white/[0.08] bg-white/[0.03]"
+      id="agent-panel"
+    >
+      <div class="agent-panel-inner grid min-h-[500px] md:grid-cols-[360px_1fr]">
+        <div
+          class="panel-left relative flex flex-col items-start overflow-hidden border-b border-white/[0.07] px-11 py-13 md:border-b-0 md:border-r"
+          id="panel-left"
+        >
+          <div
+            class="absolute inset-0 pointer-events-none transition"
+            id="panel-bg"
+            style="background: rgba(251,191,36,0.04);"
+          >
+          </div>
+          <div
+            class="panel-agent-num relative z-10 mb-6 font-mono text-[10px] font-bold uppercase tracking-[0.15em] text-white/45"
+            id="panel-num"
+          >
+            AGT·01
+          </div>
+
+          <div
+            class="panel-bird-wrap relative z-10 mb-5 flex items-center justify-center"
+            id="panel-bird"
+          >
+            <div data-bird="peep">
+              <Peep size={200} showLabel={false} feet={false} />
+            </div>
+            <div data-bird="jay" hidden>
+              <Jay size={200} showLabel={false} feet={false} />
+            </div>
+            <div data-bird="sparrow" hidden>
+              <Sparrow size={200} showLabel={false} feet={false} />
+            </div>
+            <div data-bird="legal" hidden>
+              <Rook size={200} showLabel={false} feet={false} />
+            </div>
+            <div data-bird="marketing" hidden>
+              <Piper size={200} showLabel={false} feet={false} />
+            </div>
+            <div data-bird="innovation" hidden>
+              <Kite size={200} showLabel={false} feet={false} />
+            </div>
+          </div>
+
+          <div
+            class="panel-agent-name relative z-10 mb-1 text-[38px] font-extrabold tracking-[-0.03em] text-white"
+            id="panel-name"
+          >
+            Peep
+          </div>
+          <div
+            class="panel-agent-species mb-4 font-mono text-[11px] italic text-white/55"
+            id="panel-species"
+          >
+            Phasianus poussin operatus
+          </div>
+          <div
+            class="panel-agent-desc relative z-10 text-sm leading-[1.65] text-white/75"
+            id="panel-desc"
+          >
+            {sorted[0]?.data[locale].desc}
+          </div>
+          <div
+            class="panel-status relative z-10 mt-6 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em]"
+            id="panel-status"
+            style="background: rgba(56,102,65,0.25); color: #a7f3c0; border: 1px solid rgba(56,102,65,0.4);"
+          >
+            <span
+              class="status-live-dot h-[5px] w-[5px] rounded-full bg-hatch-cta"
+              style="animation: blink 2s infinite;"></span>
+            <span id="panel-status-text">{labels.statusLive}</span>
+          </div>
+        </div>
+
+        <div class="panel-right p-11 pl-12">
+          <div
+            class="panel-section-label mb-6 font-mono text-[10px] font-bold uppercase tracking-[0.15em] text-white/55"
+          >
+            {labels.panelSectionLabel}
+          </div>
+          <div class="feature-list flex flex-col" id="panel-features"></div>
+        </div>
+      </div>
+
+      <div
+        class="panel-coming-overlay absolute inset-0 flex-col items-center justify-center gap-3"
+        id="coming-overlay"
+        style="background: rgba(5,19,9,0.88); backdrop-filter: blur(3px);"
+      >
+        <div
+          class="coming-badge-large rounded-full border border-white/20 bg-white/10 px-6 py-2 text-[11px] font-bold uppercase tracking-[0.12em] text-white/75"
+        >
+          {labels.comingBadge}
+        </div>
+        <div class="coming-text text-[15px] text-white/65">{labels.comingText}</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script is:inline define:vars={{ agentsData: agentsClient, labels: labels }}>
+  // Tab switching: updates the panel content and toggles bird visibility.
+  // No React state — birds are pre-rendered server-side; we just hide/show.
+  (() => {
+    const tabs = document.querySelectorAll('.agent-tab');
+    const panel = document.getElementById('agent-panel');
+    const panelLeft = document.getElementById('panel-left');
+    const panelBg = document.getElementById('panel-bg');
+    const panelNum = document.getElementById('panel-num');
+    const panelName = document.getElementById('panel-name');
+    const panelSpecies = document.getElementById('panel-species');
+    const panelDesc = document.getElementById('panel-desc');
+    const panelStatus = document.getElementById('panel-status');
+    const panelStatusText = document.getElementById('panel-status-text');
+    const panelFeatures = document.getElementById('panel-features');
+    const comingOverlay = document.getElementById('coming-overlay');
+    const birdContainer = document.getElementById('panel-bird');
+
+    if (!panel || !panelFeatures || !birdContainer) return;
+
+    const select = (key) => {
+      const data = agentsData.find((a) => a.key === key);
+      if (!data) return;
+
+      // Update tab active state.
+      tabs.forEach((t) => {
+        t.classList.toggle('active', t.dataset.agent === key);
+      });
+
+      // Toggle bird visibility (all 6 are pre-rendered).
+      birdContainer.querySelectorAll('[data-bird]').forEach((b) => {
+        b.toggleAttribute('hidden', b.dataset.bird !== key);
+      });
+
+      // Update panel-left fields.
+      if (panelNum) panelNum.textContent = data.num;
+      if (panelName) panelName.textContent = data.name;
+      if (panelSpecies) panelSpecies.textContent = data.species;
+      if (panelDesc) panelDesc.textContent = data.desc;
+      if (panelBg) panelBg.style.background = data.bg;
+
+      // Status badge.
+      if (panelStatus && panelStatusText) {
+        if (data.status === 'live') {
+          panelStatus.style.background = 'rgba(56,102,65,0.25)';
+          panelStatus.style.color = '#a7f3c0';
+          panelStatus.style.borderColor = 'rgba(56,102,65,0.4)';
+          panelStatusText.textContent = labels.statusLive;
+        } else {
+          panelStatus.style.background = 'rgba(148,163,184,0.1)';
+          panelStatus.style.color = '#94a3b8';
+          panelStatus.style.borderColor = 'rgba(148,163,184,0.15)';
+          panelStatusText.textContent = labels.statusSoon;
+        }
+      }
+
+      // Features list (or coming overlay).
+      panelFeatures.innerHTML = '';
+      if (data.status === 'soon' || !data.features.length) {
+        comingOverlay?.classList.add('visible');
+      } else {
+        comingOverlay?.classList.remove('visible');
+        for (const f of data.features) {
+          const item = document.createElement('div');
+          item.className =
+            'feature-item flex items-start gap-4 border-b border-white/[0.05] py-[18px] last:border-b-0';
+          item.innerHTML = `
+            <div class="feature-item-icon flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[10px] border border-white/[0.07] bg-white/[0.06] text-[17px]">${f.icon}</div>
+            <div>
+              <div class="feature-item-name mb-1 text-sm font-semibold text-slate-200">
+                ${f.name}${f.isNew ? `<span class="feature-item-new ml-2 inline-block rounded-full border border-orange-400/20 bg-orange-400/15 px-2 py-px text-[9px] font-bold uppercase tracking-[0.08em] text-orange-400">${labels.featureNew}</span>` : ''}
+              </div>
+              <div class="feature-item-desc text-[13px] leading-[1.55] text-white/65">${f.desc}</div>
+            </div>
+          `;
+          panelFeatures.appendChild(item);
+        }
+      }
+    };
+
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const key = tab.dataset.agent;
+        if (key) select(key);
+      });
+    });
+
+    // Initial render of feature list for default-active tab.
+    select(agentsData[0]?.key || 'peep');
+  })();
+</script>

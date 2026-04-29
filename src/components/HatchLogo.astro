@@ -1,0 +1,54 @@
+---
+/**
+ * Hatch wordmark — green rounded square + cream "h" glyph.
+ *
+ * Inline SVG (no network request, scales perfectly). Used by the hub
+ * center, footer, and any other surface that needs the brand logo.
+ * For nav, prefer the PNG variants in /public/logos so the bitmap matches
+ * the original raster trim.
+ */
+
+interface Props {
+  size?: number;
+  class?: string;
+}
+
+const { size = 48, class: className } = Astro.props;
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 48 48"
+  width={size}
+  height={size}
+  class={className}
+  aria-hidden="true"
+>
+  <defs>
+    <linearGradient id="hatch-logo-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4ea860"></stop>
+      <stop offset="100%" stop-color="#264d2e"></stop>
+    </linearGradient>
+    <radialGradient id="hatch-logo-gloss" cx="35%" cy="18%" r="55%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.45)"></stop>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"></stop>
+    </radialGradient>
+  </defs>
+  <rect width="48" height="48" rx="11" fill="url(#hatch-logo-bg)"></rect>
+  <g transform="scale(0.085) translate(-257,-257)">
+    <path
+      fill="#fff4a4"
+      d="M518.89,659.49V607.25l-38.18,11.3-39.32-27.47v68.41c0,16.44-19.17,17.25-19.17,31.21,0,12.72,11.75,14.36,26.12,14.36h63.15c14.82,0,26.57-1.64,26.57-14.36C538.06,676.74,518.89,675.93,518.89,659.49Z"
+    ></path>
+    <path
+      fill="#fff4a4"
+      d="M656.06,659.49V587.67c0-7.23-.27-14.14-.9-20.69L578,589.79c.1,2.23.14,4.52.14,6.93v62.77c0,16.44-19.17,17.25-19.17,31.62,0,12.31,12.19,13.95,26.57,13.95h63.15c14.37,0,26.57-1.64,26.57-13.95C675.24,676.74,656.06,675.93,656.06,659.49Z"
+    ></path>
+    <path
+      fill="#fff4a4"
+      d="M575.43,469.79c-33,2.2-54.49,20.63-66.44,44.57l-2.18.14L499,396.32c-1-15.64-6.26-22.29-21.49-21.28-22.57,1.5-73.67,20.6-72.69,35.39.66,10,7.78,12.14,16.44,17.68,5.9,3.53,11.09,9.3,12.07,24.06l8.93,115.63,39.16,28,36.47-13.4-.19-3c-1.79-26.93,7.76-47.79,29-49.21,16.38-1.09,25.46,9.35,29.66,29.86l75-29.09C642.27,490.47,620.26,466.82,575.43,469.79Z"
+    ></path>
+  </g>
+  <rect width="48" height="48" rx="11" fill="url(#hatch-logo-gloss)"></rect>
+  <rect x="9" y="4" width="30" height="5" rx="2.5" fill="rgba(255,255,255,0.20)"></rect>
+</svg>

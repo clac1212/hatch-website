@@ -1,42 +1,408 @@
 @import 'tailwindcss';
 
 /* ───────────────────────────────────────────────────────────────────────────
- * Hatch design tokens
- * Tailwind v4 reads custom properties under `@theme` to generate utility
- * classes. Examples:
- *   bg-hatch-bg, text-hatch-cta, border-hatch-primary, ring-hatch-accent,
- *   font-display (Fraunces), font-sans (Inter)
- * Tokens were extracted from the existing _reference/hatch_landing_page.html.
+ * Hatch design tokens — extracted from _reference/hatch_landing_page.html.
+ * Tailwind v4 reads custom properties under @theme to generate utilities.
  * Do NOT add raw hex values in components — extend tokens here instead.
  * ─────────────────────────────────────────────────────────────────────────── */
 @theme {
-  /* Brand colors — Hatch */
+  /* ── Brand greens ── */
   --color-hatch-bg: #051309;
+  --color-hatch-bg-2: #0a1a0c;
+  --color-hatch-bg-3: #060e07;
   --color-hatch-text: #0f1f10;
   --color-hatch-primary: #386641;
   --color-hatch-primary-soft: #4a6350;
   --color-hatch-primary-bright: #5aad6e;
+  --color-hatch-nav: #1a2e1c;
+  --color-hatch-pill-bg: rgba(56, 102, 65, 0.08);
+  --color-hatch-pill-bg-strong: rgba(56, 102, 65, 0.18);
+
+  /* ── CTA yellow ── */
   --color-hatch-cta: #fff4a4;
   --color-hatch-cta-hover: #f0e882;
-  --color-hatch-accent: #ea580c;
-  --color-hatch-nav: #1a2e1c;
 
-  /* Typography */
+  /* ── Accent orange ── */
+  --color-hatch-accent: #ea580c;
+  --color-hatch-accent-soft: #e07b2a;
+  --color-hatch-accent-deep: #c2410c;
+  --color-hatch-accent-bg: rgba(234, 88, 12, 0.08);
+  --color-hatch-accent-bg-strong: rgba(234, 88, 12, 0.18);
+
+  /* ── WhatsApp greens (mockup) ── */
+  --color-wa-green: #25d366;
+  --color-wa-dark: #075e54;
+  --color-wa-bubble: #dcf8c6;
+  --color-wa-bg: #ece5dd;
+  --color-wa-dark-bg: #0b141a;
+  --color-wa-dark-bubble: #202c33;
+  --color-wa-dark-sent: #005c4b;
+
+  /* ── Typography ── */
   --font-display: 'Fraunces', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', ui-monospace, Menlo, Monaco, monospace;
 
-  /* Layout — site container */
+  /* ── Layout ── */
   --container-site: 1120px;
+
+  /* ── Shadows ── */
+  --shadow-cta-hover: 0 6px 22px rgba(255, 244, 164, 0.28);
+  --shadow-card-hover: 0 16px 40px rgba(0, 0, 0, 0.09);
+  --shadow-card-hover-strong: 0 20px 44px rgba(0, 0, 0, 0.1);
+  --shadow-phone:
+    0 50px 120px rgba(0, 0, 0, 0.22), 0 0 0 1px rgba(255, 255, 255, 0.07), inset 0 0 0 2px #1e293b;
+  --shadow-pq-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 20px 48px -12px rgba(0, 0, 0, 0.14);
+  --shadow-hub-src:
+    0 1px 2px rgba(15, 23, 42, 0.04), 0 16px 36px -12px rgba(15, 23, 42, 0.18),
+    0 6px 14px -4px rgba(15, 23, 42, 0.08);
+  --shadow-hub-center:
+    0 0 0 1px rgba(234, 88, 12, 0.08), 0 1px 2px rgba(234, 88, 12, 0.06),
+    0 28px 70px -12px rgba(234, 88, 12, 0.36), 0 10px 28px -6px rgba(234, 88, 12, 0.22);
+  --shadow-hiw-card: 0 16px 56px rgba(251, 191, 36, 0.18), 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-hiw-card-hover: 0 28px 72px rgba(251, 191, 36, 0.28), 0 4px 16px rgba(0, 0, 0, 0.06);
+
+  /* ── Hero radial gradients (for ::before overlay) ── */
+  --hero-glow:
+    radial-gradient(ellipse 90% 55% at 50% -5%, rgba(56, 102, 65, 0.4) 0%, transparent 62%),
+    radial-gradient(ellipse 35% 40% at 10% 90%, rgba(56, 102, 65, 0.1) 0%, transparent 55%),
+    radial-gradient(ellipse 35% 40% at 90% 85%, rgba(56, 102, 65, 0.08) 0%, transparent 55%);
+
+  /* ── Hub diagram gradient (orange wash) ── */
+  --hub-gradient: linear-gradient(135deg, #fff7ed 0%, #fef3e2 50%, #fff7ed 100%);
+
+  /* ── Footer gradient ── */
+  --footer-gradient: linear-gradient(to bottom, #051309 0%, #060e07 100%);
 }
 
-/* Smooth scroll for anchor navigation (parity with the reference HTML). */
-html {
-  scroll-behavior: smooth;
+/* ───────────────────────────────────────────────────────────────────────────
+ * Global reset / base — wrapped in @layer base so any per-component
+ * Tailwind utility (e.g. `text-hatch-text` on the demo CTA) wins over these
+ * defaults. Without the layer, an element selector like `nav { color: #fff }`
+ * would override every utility class on its descendants.
+ * ─────────────────────────────────────────────────────────────────────────── */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: #fff;
+    color: #0f172a;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    position: relative;
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+  }
 }
 
-body {
-  font-family: var(--font-sans);
-  color: var(--color-hatch-text);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* ───────────────────────────────────────────────────────────────────────────
+ * Component utilities reused across .astro components.
+ * Tailwind utilities cover most cases; these handle markup that's hard to
+ * express purely via classes (animations, complex selectors, inline-rich-text).
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+/* Container width helper */
+.container-site {
+  max-width: var(--container-site);
+  margin-inline: auto;
+  padding-inline: 32px;
+}
+@media (max-width: 640px) {
+  .container-site {
+    padding-inline: 20px;
+  }
+}
+
+/* ── Inline badges (Hatch + WhatsApp icons inside hero subtitle) ── */
+.inline-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  vertical-align: middle;
+  margin: 0 5px;
+  flex-shrink: 0;
+  position: relative;
+  top: -2px;
+  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.5)) drop-shadow(0 1px 3px rgba(0, 0, 0, 0.25));
+}
+.inline-badge.badge-hatch {
+  transform: rotate(-10deg);
+}
+.inline-badge.badge-whatsapp {
+  transform: rotate(8deg);
+}
+.inline-badge svg {
+  display: block;
+}
+
+/* ── Pulsing dot (used in eyebrows, pills, status indicators) ── */
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.75);
+  }
+}
+.pulse-dot {
+  animation: pulse-dot 2.4s ease-in-out infinite;
+}
+
+/* ── Hero trust logo carousel (infinite ticker) ── */
+@keyframes ticker {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+.ticker-track {
+  display: flex;
+  align-items: center;
+  gap: 44px;
+  width: max-content;
+  animation: ticker 20s linear infinite;
+}
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
+/* ── Pourquoi floating cards (3 cards floating with subtle Y movement) ── */
+@keyframes pqFloat1 {
+  0%,
+  100% {
+    transform: rotate(-2deg) translateY(0px);
+  }
+  50% {
+    transform: rotate(-2deg) translateY(-7px);
+  }
+}
+@keyframes pqFloat2 {
+  0%,
+  100% {
+    transform: rotate(2deg) translateY(0px);
+  }
+  50% {
+    transform: rotate(2deg) translateY(-8px);
+  }
+}
+@keyframes pqFloat3 {
+  0%,
+  100% {
+    transform: rotate(1deg) translateY(0px);
+  }
+  50% {
+    transform: rotate(1deg) translateY(-6px);
+  }
+}
+
+/* ── Hub center pulse rings ── */
+@keyframes hubRingPulse {
+  0% {
+    width: 100px;
+    height: 100px;
+    opacity: 0.7;
+    border-radius: 22px;
+  }
+  100% {
+    width: 180px;
+    height: 180px;
+    opacity: 0;
+    border-radius: 36px;
+  }
+}
+
+/* ── Status live blinker ── */
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* ── Paw trail (decorative bird trail SVG) ── */
+/* The trail sits at z-index 1 on top of section backgrounds, while each
+ * section's text content lifts itself to z-index 2 via the global rule below.
+ * This matches the watermark-like effect from the reference HTML where paws
+ * appear "between" section bg and section text. */
+#bird-trail {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: visible;
+}
+/* Section content (anything wrapped in .container-site) renders above the
+ * paw trail. Section backgrounds remain below, so paws read as a watermark.
+ * If a card has a semi-transparent background and you want to hide the
+ * watermark inside it, give that card an opaque background color. */
+.container-site {
+  position: relative;
+  z-index: 2;
+}
+.paw-step {
+  opacity: 0;
+}
+@keyframes pawPulse {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  35%,
+  65% {
+    opacity: var(--paw-op, 0.25);
+  }
+}
+.paw-step.pulsing {
+  animation: pawPulse var(--paw-dur, 2.8s) ease-in-out infinite;
+  animation-delay: var(--paw-delay, 0s);
+}
+@media (max-width: 640px) {
+  #bird-trail {
+    display: none;
+  }
+}
+
+/* ── FAQ accordion (max-height transition + arrow rotation) ── */
+.faq-item .faq-a {
+  max-height: 0;
+  overflow: hidden;
+  transition:
+    max-height 0.3s ease,
+    padding 0.3s ease;
+  padding: 0 4px;
+}
+.faq-item.open .faq-a {
+  max-height: 200px;
+  padding: 0 4px 20px;
+}
+.faq-item .faq-arrow {
+  transition: transform 0.25s;
+}
+.faq-item.open .faq-arrow {
+  transform: rotate(45deg);
+  color: var(--color-hatch-primary);
+}
+
+/* ── Agent panel: coming-soon overlay ── */
+.panel-coming-overlay {
+  display: none;
+}
+.panel-coming-overlay.visible {
+  display: flex;
+}
+
+/* ── Pricing toggle: hide/show grid ── */
+.price-grids {
+  display: none;
+}
+.price-grids.show {
+  display: block;
+}
+
+/* ── Problem sticky-scroll states (legacy CSS — kept harmless if section returns) ── */
+.prob-step {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease;
+  pointer-events: none;
+}
+.prob-step.active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.prob-visual {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.prob-visual.active {
+  opacity: 1;
+}
+
+/* ── Nav: sticky on top, glassmorphism kicks in once scrolled ──
+ * Wrapped in @layer base so Tailwind utility classes on nav children
+ * (e.g. text-hatch-text on the demo CTA, text-white/85 on links) win.
+ * Default color: #fff serves as a fallback for any unstyled child. */
+@layer base {
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(5, 19, 9, 0);
+    backdrop-filter: blur(0);
+    border-bottom: 1px solid transparent;
+    color: #fff;
+    transition:
+      background 0.3s,
+      border-color 0.3s,
+      backdrop-filter 0.3s;
+  }
+}
+nav.scrolled {
+  background: rgba(5, 19, 9, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+nav.scrolled.nav-on-light {
+  background: rgba(255, 255, 255, 0.85);
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+nav.scrolled.nav-on-light .nav-link {
+  color: var(--color-hatch-nav);
+}
+nav.scrolled.nav-on-light .nav-link:hover {
+  color: var(--color-hatch-primary);
+}
+nav.scrolled.nav-on-light .lang-switcher {
+  background: rgba(0, 0, 0, 0.06);
+}
+nav.scrolled.nav-on-light .lang-btn {
+  color: var(--color-hatch-primary-soft);
+}
+nav.scrolled.nav-on-light .lang-btn.active {
+  background: #fff;
+  color: var(--color-hatch-nav);
+}
+nav.scrolled.nav-on-light .btn-ghost {
+  color: var(--color-hatch-nav);
+  border-color: rgba(0, 0, 0, 0.22);
+}
+nav.scrolled.nav-on-light .btn-ghost:hover {
+  background: rgba(0, 0, 0, 0.05);
 }
