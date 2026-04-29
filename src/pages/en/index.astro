@@ -1,0 +1,45 @@
+---
+import { getEntry, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+const entry = await getEntry('landing', 'en');
+if (!entry) throw new Error('Missing landing/en content collection entry.');
+
+const { data } = entry;
+const { Content } = await render(entry);
+---
+
+<Base title={data.title} description={data.description} locale="en">
+  <main class="mx-auto max-w-[var(--container-site)] px-8 py-32">
+    {
+      data.heroEyebrow && (
+        <p class="mb-6 inline-block rounded-full bg-hatch-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-hatch-primary">
+          {data.heroEyebrow}
+        </p>
+      )
+    }
+    <h1
+      class="font-display text-5xl font-normal leading-tight tracking-tight text-hatch-bg sm:text-6xl md:text-7xl"
+    >
+      {data.heroHeadline}
+    </h1>
+    <div class="mt-10 flex items-center gap-4">
+      <a
+        href="#demo"
+        class="inline-flex items-center gap-2 rounded-lg bg-hatch-cta px-5 py-3 text-sm font-semibold text-hatch-text transition hover:bg-hatch-cta-hover"
+      >
+        {data.heroCtaLabel}
+      </a>
+      <a
+        href="/"
+        class="text-sm font-medium text-slate-500 underline-offset-4 hover:text-hatch-primary hover:underline"
+      >
+        Version française →
+      </a>
+    </div>
+
+    <article class="prose prose-slate mt-20 max-w-2xl">
+      <Content />
+    </article>
+  </main>
+</Base>

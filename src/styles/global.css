@@ -1,0 +1,42 @@
+@import 'tailwindcss';
+
+/* ───────────────────────────────────────────────────────────────────────────
+ * Hatch design tokens
+ * Tailwind v4 reads custom properties under `@theme` to generate utility
+ * classes. Examples:
+ *   bg-hatch-bg, text-hatch-cta, border-hatch-primary, ring-hatch-accent,
+ *   font-display (Fraunces), font-sans (Inter)
+ * Tokens were extracted from the existing _reference/hatch_landing_page.html.
+ * Do NOT add raw hex values in components — extend tokens here instead.
+ * ─────────────────────────────────────────────────────────────────────────── */
+@theme {
+  /* Brand colors — Hatch */
+  --color-hatch-bg: #051309;
+  --color-hatch-text: #0f1f10;
+  --color-hatch-primary: #386641;
+  --color-hatch-primary-soft: #4a6350;
+  --color-hatch-primary-bright: #5aad6e;
+  --color-hatch-cta: #fff4a4;
+  --color-hatch-cta-hover: #f0e882;
+  --color-hatch-accent: #ea580c;
+  --color-hatch-nav: #1a2e1c;
+
+  /* Typography */
+  --font-display: 'Fraunces', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Layout — site container */
+  --container-site: 1120px;
+}
+
+/* Smooth scroll for anchor navigation (parity with the reference HTML). */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-hatch-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

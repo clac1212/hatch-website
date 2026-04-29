@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(rtk pnpm install)",
+      "Bash(rtk pnpm dev)",
+      "Bash(rtk pnpm build)",
+      "Bash(rtk pnpm preview)",
+      "Bash(rtk pnpm format)",
+      "Bash(rtk pnpm format:check)",
+      "Bash(rtk pnpm astro:*)",
+      "Bash(rtk pnpm add:*)",
+      "Bash(rtk pnpm remove:*)",
+      "Bash(rtk pnpm list)",
+      "Bash(rtk pnpm outdated)",
+      "Bash(rtk git status)",
+      "Bash(rtk git diff)",
+      "Bash(rtk git diff:*)",
+      "Bash(rtk git log)",
+      "Bash(rtk git log:*)",
+      "Bash(rtk git branch)",
+      "Bash(rtk git branch:*)",
+      "Bash(rtk git checkout:*)",
+      "Bash(rtk git add:*)",
+      "Bash(rtk git stash:*)",
+      "Bash(rtk git fetch:*)",
+      "Bash(rtk git pull:*)",
+      "Bash(rtk ls:*)",
+      "Bash(rtk grep:*)",
+      "Bash(rtk find:*)",
+      "Bash(rtk read:*)"
+    ],
+    "ask": [
+      "Bash(rtk git commit:*)",
+      "Bash(rtk git push:*)",
+      "Bash(rtk git reset:*)",
+      "Bash(rtk git rebase:*)"
+    ],
+    "deny": [
+      "Bash(rtk git push --force:*)",
+      "Bash(rtk git push -f:*)",
+      "Bash(rtk git reset --hard:*)",
+      "Bash(rm -rf:*)"
+    ]
+  }
+}

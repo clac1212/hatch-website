@@ -1,0 +1,52 @@
+---
+import '../styles/global.css';
+import { ui, type Locale } from '../i18n/ui';
+
+interface Props {
+  /** Page <title>. */
+  title: string;
+  /** Meta description (SEO + OG). */
+  description: string;
+  /** Locale of the current page — drives <html lang> and the locale switcher. */
+  locale: Locale;
+}
+
+const { title, description, locale } = Astro.props;
+const t = ui[locale];
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content={locale === 'fr' ? 'fr_FR' : 'en_US'} />
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Fonts (Hatch design tokens) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-white text-hatch-text">
+    <slot />
+
+    <footer class="border-t border-slate-200 py-8 text-center text-sm text-slate-500">
+      <p>{t.footer.copyright.replace('{year}', String(new Date().getFullYear()))}</p>
+    </footer>
+  </body>
+</html>
