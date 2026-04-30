@@ -77,7 +77,7 @@ const labels = {
     </div>
 
     <div
-      class="agent-tabs relative mb-8 flex flex-nowrap justify-center gap-1.5 overflow-x-auto md:overflow-visible"
+      class="agent-tabs relative mb-8 flex flex-nowrap justify-center gap-1.5 overflow-x-auto overflow-y-hidden pt-3 pb-4 md:overflow-visible md:pt-0 md:pb-0"
     >
       {
         sorted.map((agent, i) => {
@@ -209,7 +209,7 @@ const labels = {
       </div>
 
       <div
-        class="panel-coming-overlay absolute inset-0 flex-col items-center justify-center gap-3"
+        class="panel-coming-overlay absolute inset-0 z-20 flex-col items-center justify-center gap-3"
         id="coming-overlay"
         style="background: rgba(5,19,9,0.88); backdrop-filter: blur(3px);"
       >
