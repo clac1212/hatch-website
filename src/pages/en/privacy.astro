@@ -1,0 +1,252 @@
+---
+import LegalLayout from '../../components/LegalLayout.astro';
+---
+
+<LegalLayout
+  locale="en"
+  title="Privacy Policy — Hatch"
+  description="Hatch OS privacy policy: how we collect, use and protect your personal data."
+>
+  <h1>Privacy Policy</h1>
+  <p class="meta">Last updated: April 22, 2026 &nbsp;·&nbsp; Effective date: April 22, 2026</p>
+
+  <h2>1. Data Controller Identity</h2>
+  <p>
+    Hatch OS, a simplified joint-stock company (SAS) with a capital of €1,000, headquartered at
+    104 rue de la Folie-Méricourt, 75011 Paris, France (Paris Commercial Registry: 930 893).
+    President: Patrick Rakotondrajao. Data Protection Officer (DPO):
+    <a href="mailto:cesar@gethatch.io">cesar@gethatch.io</a>.
+  </p>
+  <p>
+    The company publishes and operates a SaaS platform accessible via gethatch.io and its
+    subdomains, designed for franchise networks and their teams.
+  </p>
+
+  <h2>2. Personal Data Collected</h2>
+
+  <h3>2.1 User-Provided Data</h3>
+  <ul>
+    <li>Full name and professional email address</li>
+    <li>Phone number (optional)</li>
+    <li>Company or franchise details (name, role, location)</li>
+    <li>Content created on the platform (messages, templates, uploaded documents)</li>
+  </ul>
+
+  <h3>2.2 Data Collected via Google OAuth</h3>
+  <p>When you connect your Google Drive account, Hatch OS requests access to the following scopes:</p>
+  <div class="legal-table-wrap">
+    <table class="legal-table">
+      <thead>
+        <tr>
+          <th>Scope</th>
+          <th>Data accessed</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>email</code></td>
+          <td>Primary Google account email address</td>
+        </tr>
+        <tr>
+          <td><code>profile</code></td>
+          <td>First name, last name, profile photo</td>
+        </tr>
+        <tr>
+          <td><code>drive.readonly</code></td>
+          <td>Selected Google Drive files</td>
+        </tr>
+        <tr>
+          <td><code>drive.metadata.readonly</code></td>
+          <td>File names, types, dates and structure</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>2.3 Technical Data</h3>
+  <ul>
+    <li>IP address, browser type, operating system</li>
+    <li>Connection and platform usage logs</li>
+    <li>Technical and session cookies</li>
+  </ul>
+
+  <h2>3. Processing Purposes</h2>
+  <p>Your data is processed for the following purposes:</p>
+  <ul>
+    <li>
+      <strong>Service delivery:</strong> account creation, authentication, access to features
+    </li>
+    <li>
+      <strong>AI agent:</strong> indexing documents for assistant responses (RAG)
+    </li>
+    <li><strong>Customer support</strong></li>
+    <li>
+      <strong>Service improvement:</strong> aggregated and anonymized analysis
+    </li>
+    <li><strong>Security:</strong> fraud and abuse detection</li>
+    <li>
+      <strong>Legal obligations:</strong> billing, accounting and regulatory compliance
+    </li>
+  </ul>
+
+  <h2>4. Google Data Usage &amp; Limited Use Policy</h2>
+  <p>
+    Hatch OS complies with the Google API Services User Data Policy. In particular:
+  </p>
+  <ul>
+    <li>
+      Google Drive files are used <strong>exclusively</strong> to power your AI agent (RAG) and are
+      not shared with any third party except where required by law
+    </li>
+    <li>Google data is never used for advertising purposes</li>
+    <li>Google data is never used to train general or third-party AI models</li>
+  </ul>
+
+  <h2>5. GDPR Legal Basis</h2>
+  <div class="legal-table-wrap">
+    <table class="legal-table">
+      <thead>
+        <tr>
+          <th>Purpose</th>
+          <th>Legal basis</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Service delivery</td>
+          <td>Contract performance</td>
+        </tr>
+        <tr>
+          <td>Google OAuth connection</td>
+          <td>Explicit consent</td>
+        </tr>
+        <tr>
+          <td>Customer support</td>
+          <td>Contract performance</td>
+        </tr>
+        <tr>
+          <td>Billing</td>
+          <td>Legal obligation</td>
+        </tr>
+        <tr>
+          <td>Analytics and security</td>
+          <td>Legitimate interest</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    You may withdraw your consent at any time via your Hatch OS account settings or directly at{' '}
+    <a href="https://myaccount.google.com/permissions" rel="noopener noreferrer"
+      >myaccount.google.com/permissions</a
+    >.
+  </p>
+
+  <h2>6. Recipients and Sub-processors</h2>
+  <p>
+    Your data may be shared with the following sub-processors, strictly for service delivery
+    purposes:
+  </p>
+  <div class="legal-table-wrap">
+    <table class="legal-table">
+      <thead>
+        <tr>
+          <th>Sub-processor</th>
+          <th>Role</th>
+          <th>Location</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Supabase Inc.</td>
+          <td>Database</td>
+          <td>EU</td>
+        </tr>
+        <tr>
+          <td>Vercel Inc.</td>
+          <td>Hosting</td>
+          <td>EU / United States</td>
+        </tr>
+        <tr>
+          <td>Google LLC</td>
+          <td>OAuth, AI models</td>
+          <td>United States</td>
+        </tr>
+        <tr>
+          <td>Anthropic PBC</td>
+          <td>Claude models</td>
+          <td>United States</td>
+        </tr>
+        <tr>
+          <td>Meta / WhatsApp</td>
+          <td>Messaging</td>
+          <td>EU / United States</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    We never sell your personal data. International data transfers outside the European Union are
+    governed by Standard Contractual Clauses.
+  </p>
+
+  <h2>7. Data Retention</h2>
+  <ul>
+    <li>Account data: contract duration + 3 years after termination</li>
+    <li>
+      Indexed Google Drive documents: until Google account disconnection, then deleted within 30
+      days
+    </li>
+    <li>Technical logs: 12 months</li>
+    <li>Billing data: 10 years (legal requirement)</li>
+  </ul>
+
+  <h2>8. User Rights (GDPR)</h2>
+  <p>
+    In accordance with GDPR, you have the following rights: access, rectification, erasure,
+    restriction of processing, portability, objection and withdrawal of consent. To exercise these
+    rights, contact our DPO at:
+    <a href="mailto:cesar@gethatch.io">cesar@gethatch.io</a>. We are committed to responding
+    within one month.
+  </p>
+
+  <h3>8.1 Revoking Google Access</h3>
+  <p>
+    You can revoke Hatch OS access to your Google account at any time, either through your Hatch OS
+    account settings or directly on the Google permissions page:{' '}
+    <a href="https://myaccount.google.com/permissions" rel="noopener noreferrer"
+      >myaccount.google.com/permissions</a
+    >.
+  </p>
+
+  <h2>9. Cookies</h2>
+  <p>
+    The platform uses only strictly necessary cookies for its operation. No advertising cookies or
+    third-party tracking tools are used without your explicit consent.
+  </p>
+
+  <h2>10. Security</h2>
+  <p>
+    Hatch OS implements appropriate technical and organizational measures, including: TLS 1.2+
+    encryption, strict access controls, access logging, regular backups and the least-privilege
+    principle.
+  </p>
+
+  <h2>11. Minors</h2>
+  <p>
+    The service is designed for professional use and is not intended for persons under 16 years of
+    age. We do not knowingly collect data relating to minors.
+  </p>
+
+  <h2>12. Modifications</h2>
+  <p>
+    Any substantial changes to this policy will be notified to you by email at least 30 days before
+    they take effect.
+  </p>
+
+  <h2>13. Contact</h2>
+  <p>
+    DPO: <a href="mailto:cesar@gethatch.io">cesar@gethatch.io</a><br />
+    Postal address: 104 rue de la Folie-Méricourt, 75011 Paris, France
+  </p>
+</LegalLayout>

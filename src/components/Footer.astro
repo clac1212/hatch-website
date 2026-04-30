@@ -1,12 +1,18 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import type { Locale } from '../i18n/ui';
 import HatchLogo from './HatchLogo.astro';
 
 interface Props {
   data: CollectionEntry<'landing'>['data']['footer'];
+  locale: Locale;
 }
 
-const { data } = Astro.props;
+const { data, locale } = Astro.props;
+const privacyUrl = locale === 'en' ? '/en/privacy' : '/privacy';
+const termsUrl = locale === 'en' ? '/en/terms' : '/terms';
+const privacyLabel = locale === 'en' ? 'Privacy' : 'Confidentialité';
+const termsLabel = locale === 'en' ? 'Terms' : 'CGU';
 ---
 
 <footer class="px-0 py-8 pb-12" style="background: var(--footer-gradient);">
@@ -38,6 +44,18 @@ const { data } = Astro.props;
       </svg>
       <div class="footer-tagline text-xs text-white/55">{data.tagline}</div>
     </div>
-    <div class="footer-copy text-xs text-white/55">{data.copyright}</div>
+    <div class="flex flex-col items-end gap-2">
+      <div class="flex items-center gap-5">
+        <a
+          href={privacyUrl}
+          class="text-xs text-white/35 transition-colors hover:text-white/65"
+        >{privacyLabel}</a>
+        <a
+          href={termsUrl}
+          class="text-xs text-white/35 transition-colors hover:text-white/65"
+        >{termsLabel}</a>
+      </div>
+      <div class="footer-copy text-xs text-white/35">{data.copyright}</div>
+    </div>
   </div>
 </footer>
