@@ -13,10 +13,12 @@ export const defaultLocale: Locale = 'fr';
  * Defined here so a non-technical editor only touches one place.
  */
 export const externalUrls = {
-  /** Demo request form (Notion). Replace with the real URL when available. */
-  demoForm: 'https://hatch.notion.site/demo',
   login: 'https://app.hatch.example.com',
 };
+
+export function demoUrl(locale: Locale): string {
+  return locale === 'en' ? '/en/demo' : '/demo';
+}
 
 export const ui = {
   fr: {

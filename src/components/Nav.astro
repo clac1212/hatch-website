@@ -1,5 +1,5 @@
 ---
-import { ui, externalUrls, type Locale } from '../i18n/ui';
+import { ui, externalUrls, demoUrl, type Locale } from '../i18n/ui';
 import type { CollectionEntry } from 'astro:content';
 
 interface Props {
@@ -20,6 +20,7 @@ const otherLocaleUrl = otherLocale === 'fr' ? '/' : '/en/';
         class="logo-img logo-img-light block h-7 w-auto"
         src="/logos/hatch-light.png"
         alt="Hatch"
+        style="filter: brightness(0) saturate(100%) invert(50%) sepia(100%) saturate(380%) hue-rotate(348deg) brightness(91%);"
       />
       <img
         class="logo-img logo-img-dark hidden h-7 w-auto"
@@ -30,50 +31,30 @@ const otherLocaleUrl = otherLocale === 'fr' ? '/' : '/en/';
 
     <ul class="nav-links hidden gap-8 md:flex" aria-label={t.ariaLabels.primaryNav}>
       <li>
-        <a
-          class="nav-link text-sm font-medium text-white/85 transition hover:text-white"
-          href="#pourquoi"
-        >
-          {data.why}
-        </a>
+        <a class="nav-link text-sm font-medium transition" href="#pourquoi">{data.why}</a>
       </li>
       <li>
-        <a
-          class="nav-link text-sm font-medium text-white/85 transition hover:text-white"
-          href="#agents"
-        >
-          {data.product}
-        </a>
+        <a class="nav-link text-sm font-medium transition" href="#agents">{data.product}</a>
       </li>
       <li>
-        <a
-          class="nav-link text-sm font-medium text-white/85 transition hover:text-white"
-          href="#pricing"
-        >
-          {data.pricing}
-        </a>
+        <a class="nav-link text-sm font-medium transition" href="#pricing">{data.pricing}</a>
       </li>
       <li>
-        <a
-          class="nav-link text-sm font-medium text-white/85 transition hover:text-white"
-          href="#faq"
-        >
-          {data.faq}
-        </a>
+        <a class="nav-link text-sm font-medium transition" href="#faq">{data.faq}</a>
       </li>
     </ul>
 
     <div class="nav-right flex items-center gap-2.5">
       <div
-        class="lang-switcher flex items-center gap-[3px] rounded-lg bg-white/10 p-[3px] transition"
+        class="lang-switcher flex items-center gap-[3px] rounded-lg p-[3px] transition"
         role="group"
         aria-label={t.languageSwitcher.ariaLabel}
       >
         <a
           href="/"
           class:list={[
-            'lang-btn rounded-md border-none bg-transparent px-2.5 py-1 text-[11px] font-bold tracking-[0.08em] text-white/70 transition',
-            locale === 'fr' && 'active bg-white/15 text-white shadow-[0_1px_4px_rgba(0,0,0,0.12)]',
+            'lang-btn rounded-md border-none px-2.5 py-1 text-[11px] font-bold tracking-[0.08em] transition',
+            locale === 'fr' && 'active shadow-[0_1px_4px_rgba(0,0,0,0.12)]',
           ]}
         >
           {t.languageSwitcher.fr}
@@ -81,8 +62,8 @@ const otherLocaleUrl = otherLocale === 'fr' ? '/' : '/en/';
         <a
           href="/en/"
           class:list={[
-            'lang-btn rounded-md border-none bg-transparent px-2.5 py-1 text-[11px] font-bold tracking-[0.08em] text-white/70 transition',
-            locale === 'en' && 'active bg-white/15 text-white shadow-[0_1px_4px_rgba(0,0,0,0.12)]',
+            'lang-btn rounded-md border-none px-2.5 py-1 text-[11px] font-bold tracking-[0.08em] transition',
+            locale === 'en' && 'active shadow-[0_1px_4px_rgba(0,0,0,0.12)]',
           ]}
         >
           {t.languageSwitcher.en}
@@ -91,12 +72,12 @@ const otherLocaleUrl = otherLocale === 'fr' ? '/' : '/en/';
       <a
         href={externalUrls.login}
         id="nav-btn-login"
-        class="btn-ghost hidden items-center gap-[7px] whitespace-nowrap rounded-[9px] border-[1.5px] border-white/30 bg-transparent px-[18px] py-2.5 text-sm font-semibold text-white/95 transition hover:border-white/60 hover:bg-white/10 hover:text-white sm:inline-flex"
+        class="btn-ghost hidden items-center gap-[7px] whitespace-nowrap rounded-[9px] border-[1.5px] px-[18px] py-2.5 text-sm font-semibold transition sm:inline-flex"
       >
         {t.nav.login}
       </a>
       <a
-        href={externalUrls.demoForm}
+        href={demoUrl(locale)}
         id="nav-btn-demo"
         target="_blank"
         rel="noopener"
@@ -108,25 +89,31 @@ const otherLocaleUrl = otherLocale === 'fr' ? '/' : '/en/';
   </div>
 </nav>
 
-<script>
-  // Sticky nav behavior — adds .scrolled when past 60px, then probes the
-  // element under the nav at y=32 to decide if we're over a "dark section"
-  // (in which case nav stays dark) or a "light section" (nav goes light).
+<script is:inline>
+  // Sticky nav: adds .scrolled past 60px, uses getBoundingClientRect on
+  // actual sections to decide dark/light theme — avoids hitting nav itself.
   const DARK_SECTIONS = ['hero', 'agents', 'agents-section'];
 
   const navEl = document.querySelector('nav');
   if (navEl) {
     const updateNavTheme = () => {
-      const probe = document.elementFromPoint(window.innerWidth / 2, 32);
-      if (!probe) return;
-      const section = probe.closest('section, footer, nav');
-      const id = section?.id || '';
-      const cls = section?.className || '';
-      const isDark =
-        DARK_SECTIONS.includes(id) ||
-        DARK_SECTIONS.some((d) => (typeof cls === 'string' ? cls.includes(d) : false)) ||
-        section?.tagName === 'FOOTER';
-      navEl.classList.toggle('nav-on-light', !isDark);
+      if (!navEl.classList.contains('scrolled')) {
+        navEl.classList.remove('nav-on-light');
+        return;
+      }
+      const probeY = 32;
+      const sections = document.querySelectorAll('section');
+      for (const section of sections) {
+        const rect = section.getBoundingClientRect();
+        if (rect.top <= probeY && rect.bottom > probeY) {
+          const id = section.id || '';
+          const cls = section.className || '';
+          const isDark = DARK_SECTIONS.includes(id) || DARK_SECTIONS.some((d) => cls.includes(d));
+          navEl.classList.toggle('nav-on-light', !isDark);
+          return;
+        }
+      }
+      navEl.classList.remove('nav-on-light');
     };
 
     const onScroll = () => {
@@ -134,11 +121,13 @@ const otherLocaleUrl = otherLocale === 'fr' ? '/' : '/en/';
         navEl.classList.add('scrolled');
       } else {
         navEl.classList.remove('scrolled');
+        navEl.classList.remove('nav-on-light');
       }
       updateNavTheme();
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('load', onScroll);
     onScroll();
   }
 </script>

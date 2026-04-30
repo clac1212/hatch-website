@@ -72,6 +72,7 @@ const landing = defineCollection({
       pipePhase3: richString,
       pipePhase4: richString,
       pipeEmpty: richString,
+      pipeFooter: richString,
     }),
 
     hiw: z.object({
@@ -106,6 +107,7 @@ const landing = defineCollection({
       comingText: richString,
       statusLive: richString,
       statusSoon: richString,
+      statusDev: richString,
       tabSoon: richString,
       featureNew: richString,
     }),
@@ -158,7 +160,7 @@ const agents = defineCollection({
     num: z.string(), // "AGT·01"
     name: z.string(), // "Peep"
     species: z.string(), // "Phasianus poussin operatus"
-    status: z.enum(['live', 'soon']),
+    status: z.enum(['live', 'soon', 'dev']),
     bg: z.string(), // CSS color string for panel-left ::before background
     fr: z.object({
       role: z.string(), // tab-role short label, e.g. "Opérations"

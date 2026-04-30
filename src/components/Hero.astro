@@ -1,5 +1,5 @@
 ---
-import { externalUrls, type Locale } from '../i18n/ui';
+import { demoUrl, type Locale } from '../i18n/ui';
 import type { CollectionEntry } from 'astro:content';
 
 interface Props {
@@ -7,7 +7,7 @@ interface Props {
   data: CollectionEntry<'landing'>['data']['hero'];
 }
 
-const { data } = Astro.props;
+const { locale, data } = Astro.props;
 ---
 
 <section
@@ -29,7 +29,7 @@ const { data } = Astro.props;
     </div>
 
     <h1
-      class="hero-h1 mx-auto mb-[30px] max-w-[860px] font-display font-normal text-white"
+      class="hero-h1 mx-auto mb-[30px] max-w-[860px] font-display font-bold text-white"
       style="font-size: clamp(52px, 7.5vw, 92px); line-height: 0.97; letter-spacing: -0.025em;"
       set:html={data.h1}
     />
@@ -41,7 +41,7 @@ const { data } = Astro.props;
 
     <div class="hero-actions mb-[60px] flex flex-wrap justify-center gap-3">
       <a
-        href={externalUrls.demoForm}
+        href={demoUrl(locale)}
         target="_blank"
         rel="noopener"
         id="hero-cta-demo"

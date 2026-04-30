@@ -44,6 +44,7 @@ const labels = {
   comingText: data.comingText,
   statusLive: data.statusLive,
   statusSoon: data.statusSoon,
+  statusDev: data.statusDev,
   tabSoon: data.tabSoon,
   featureNew: data.featureNew,
 };
@@ -68,11 +69,11 @@ const labels = {
         <span>{data.label}</span>
       </div>
       <h2
-        class="mb-4 mt-2 font-display font-normal text-white"
+        class="mb-4 mt-2 font-display font-bold text-white"
         style="font-size: clamp(26px, 3.6vw, 40px); line-height: 1.08; letter-spacing: -0.02em;"
         set:html={data.h2}
       />
-      <p class="mx-auto max-w-[440px] text-base text-white/70">{data.sub}</p>
+      <p class="mx-auto max-w-[440px] text-base" style="color:#5a8566;">{data.sub}</p>
     </div>
 
     <div
@@ -111,7 +112,7 @@ const labels = {
               </span>
               <div class="text-left">
                 <div class="tab-name text-[13px] font-bold leading-none text-white">{a.name}</div>
-                <div class="tab-role mt-0.5 whitespace-nowrap text-[10px] text-white/60">
+                <div class="tab-role mt-0.5 whitespace-nowrap text-[10px] text-white/[0.38]">
                   {role}
                 </div>
               </div>
@@ -137,7 +138,7 @@ const labels = {
           >
           </div>
           <div
-            class="panel-agent-num relative z-10 mb-6 font-mono text-[10px] font-bold uppercase tracking-[0.15em] text-white/45"
+            class="panel-agent-num relative z-10 mb-6 font-mono text-[10px] font-bold tracking-[0.15em] text-white/[0.14]"
             id="panel-num"
           >
             AGT·01
@@ -174,13 +175,13 @@ const labels = {
             Peep
           </div>
           <div
-            class="panel-agent-species mb-4 font-mono text-[11px] italic text-white/55"
+            class="panel-agent-species mb-4 font-mono text-[11px] italic text-white/[0.18]"
             id="panel-species"
           >
             Phasianus poussin operatus
           </div>
           <div
-            class="panel-agent-desc relative z-10 text-sm leading-[1.65] text-white/75"
+            class="panel-agent-desc relative z-10 text-sm leading-[1.65] text-white/[0.46]"
             id="panel-desc"
           >
             {sorted[0]?.data[locale].desc}
@@ -197,9 +198,9 @@ const labels = {
           </div>
         </div>
 
-        <div class="panel-right p-11 pl-12">
+        <div class="panel-right py-13 pr-13 pl-12">
           <div
-            class="panel-section-label mb-6 font-mono text-[10px] font-bold uppercase tracking-[0.15em] text-white/55"
+            class="panel-section-label mb-6 text-[10px] font-bold uppercase tracking-[0.15em] text-white/[0.18]"
           >
             {labels.panelSectionLabel}
           </div>
@@ -271,6 +272,11 @@ const labels = {
           panelStatus.style.color = '#a7f3c0';
           panelStatus.style.borderColor = 'rgba(56,102,65,0.4)';
           panelStatusText.textContent = labels.statusLive;
+        } else if (data.status === 'dev') {
+          panelStatus.style.background = 'rgba(251,146,60,0.12)';
+          panelStatus.style.color = '#fb923c';
+          panelStatus.style.borderColor = 'rgba(251,146,60,0.25)';
+          panelStatusText.textContent = labels.statusDev;
         } else {
           panelStatus.style.background = 'rgba(148,163,184,0.1)';
           panelStatus.style.color = '#94a3b8';
@@ -295,7 +301,7 @@ const labels = {
               <div class="feature-item-name mb-1 text-sm font-semibold text-slate-200">
                 ${f.name}${f.isNew ? `<span class="feature-item-new ml-2 inline-block rounded-full border border-orange-400/20 bg-orange-400/15 px-2 py-px text-[9px] font-bold uppercase tracking-[0.08em] text-orange-400">${labels.featureNew}</span>` : ''}
               </div>
-              <div class="feature-item-desc text-[13px] leading-[1.55] text-white/65">${f.desc}</div>
+              <div class="feature-item-desc text-[13px] leading-[1.55] text-white/[0.35]">${f.desc}</div>
             </div>
           `;
           panelFeatures.appendChild(item);

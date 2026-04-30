@@ -1,0 +1,380 @@
+---
+import type { Locale } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const backUrl = locale === 'en' ? '/en/' : '/';
+const heroH1 =
+  locale === 'en'
+    ? 'Your teams deserve better. <em style="color:#ea580c;font-style:italic;">See how.</em>'
+    : 'Vos équipes méritent mieux. <em style="color:#ea580c;font-style:italic;">Voyez comment.</em>';
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;1,9..144,600&display=swap"
+      rel="stylesheet"
+    />
+    <title>{locale === 'en' ? 'Request a demo — Hatch' : 'Demander une démo — Hatch'}</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family:
+          'Inter',
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          sans-serif;
+        background: #fff;
+        color: #0f172a;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+
+      /* NAV */
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        background: rgba(5, 19, 9, 0.85);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      }
+      .nav-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 64px;
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 0 32px;
+      }
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .nav-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.55);
+        transition: color 0.15s;
+        cursor: pointer;
+      }
+      .nav-back:hover {
+        color: #fff;
+      }
+      .nav-back svg {
+        transition: transform 0.15s;
+      }
+      .nav-back:hover svg {
+        transform: translateX(-3px);
+      }
+
+      /* HERO */
+      .hero {
+        background: #051309;
+        padding: 120px 32px 72px;
+        position: relative;
+        overflow: hidden;
+      }
+      .hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(ellipse 80% 60% at 50% -10%, rgba(56, 102, 65, 0.35) 0%, transparent 65%),
+          radial-gradient(ellipse 40% 50% at 5% 100%, rgba(56, 102, 65, 0.08) 0%, transparent 55%);
+      }
+      .hero-inner {
+        max-width: 680px;
+        margin: 0 auto;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+      }
+      .hero-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 6px 16px 6px 10px;
+        border-radius: 100px;
+        font-size: 12px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.5);
+        letter-spacing: 0.04em;
+        margin-bottom: 32px;
+      }
+      .eyebrow-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #5aad6e;
+        box-shadow: 0 0 8px rgba(90, 173, 110, 0.7);
+        animation: pulse-dot 2.4s ease-in-out infinite;
+        flex-shrink: 0;
+      }
+      @keyframes pulse-dot {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.5;
+          transform: scale(0.75);
+        }
+      }
+      .hero h1 {
+        font-family: 'Fraunces', Georgia, serif;
+        font-size: clamp(38px, 5.5vw, 64px);
+        font-weight: 400;
+        line-height: 1.05;
+        letter-spacing: -0.025em;
+        color: #fff;
+        margin-bottom: 20px;
+      }
+      .hero-sub {
+        font-size: 16px;
+        color: rgba(255, 255, 255, 0.6);
+        line-height: 1.7;
+        max-width: 480px;
+        margin: 0 auto;
+      }
+
+      /* CAL SECTION */
+      .cal-section {
+        background: #fff;
+        padding: 28px 32px 80px;
+      }
+      .cal-wrap {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+      .cal-intro {
+        text-align: center;
+        margin-bottom: 12px;
+      }
+      .cal-intro-title {
+        font-family: 'Fraunces', Georgia, serif;
+        font-size: 26px;
+        font-weight: 400;
+        color: #0f1f10;
+        letter-spacing: -0.02em;
+        margin-bottom: 10px;
+      }
+      .cal-intro-sub {
+        font-size: 15px;
+        color: #6b8572;
+        line-height: 1.6;
+      }
+      #cal-inline {
+        width: 100%;
+        min-height: 650px;
+        overflow: hidden;
+        border-radius: 12px;
+      }
+
+      /* FOOTER */
+      footer {
+        background: #051309;
+        padding: 28px 32px;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      .footer-inner {
+        max-width: 1120px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      .footer-copy {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.3);
+      }
+
+      @media (max-width: 600px) {
+        .nav-inner {
+          padding: 0 20px;
+        }
+        .hero {
+          padding: 100px 20px 56px;
+        }
+        .hero h1 {
+          font-size: 36px;
+        }
+        .cal-section {
+          padding: 48px 20px 64px;
+        }
+        footer {
+          padding: 24px 20px;
+        }
+        .footer-inner {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <div class="nav-inner">
+        <a href={backUrl} class="logo">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="280 270 520 560"
+            width="30"
+            height="30"
+            style="display:block;border-radius:7px;"
+          >
+            <rect fill="#ea580c" x="0" y="0" width="1080" height="1080" rx="80"></rect>
+            <path
+              fill="#fff4a4"
+              d="M518.89,659.49V607.25l-38.18,11.3-39.32-27.47v68.41c0,16.44-19.17,17.25-19.17,31.21,0,12.72,11.75,14.36,26.12,14.36h63.15c14.82,0,26.57-1.64,26.57-14.36C538.06,676.74,518.89,675.93,518.89,659.49Z"
+            ></path>
+            <path
+              fill="#fff4a4"
+              d="M656.06,659.49V587.67c0-7.23-.27-14.14-.9-20.69L578,589.79c.1,2.23.14,4.52.14,6.93v62.77c0,16.44-19.17,17.25-19.17,31.62,0,12.31,12.19,13.95,26.57,13.95h63.15c14.37,0,26.57-1.64,26.57-13.95C675.24,676.74,656.06,675.93,656.06,659.49Z"
+            ></path>
+            <path
+              fill="#fff4a4"
+              d="M575.43,469.79c-33,2.2-54.49,20.63-66.44,44.57l-2.18.14L499,396.32c-1-15.64-6.26-22.29-21.49-21.28-22.57,1.5-73.67,20.6-72.69,35.39.66,10,7.78,12.14,16.44,17.68,5.9,3.53,11.09,9.3,12.07,24.06l8.93,115.63,39.16,28,36.47-13.4-.19-3c-1.79-26.93,7.76-47.79,29-49.21,16.38-1.09,25.46,9.35,29.66,29.86l75-29.09C642.27,490.47,620.26,466.82,575.43,469.79Z"
+            ></path>
+          </svg>
+        </a>
+        <a href={backUrl} class="nav-back">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"></path></svg
+          >
+          <span>{locale === 'en' ? 'Back to site' : 'Retour au site'}</span>
+        </a>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <div class="hero-inner">
+        <div class="hero-eyebrow">
+          <span class="eyebrow-dot"></span>
+          <span
+            >{
+              locale === 'en' ? 'Personalized demo · 45 minutes' : 'Démo personnalisée · 45 minutes'
+            }</span
+          >
+        </div>
+        <h1 set:html={heroH1} />
+      </div>
+    </section>
+
+    <section class="cal-section">
+      <div class="cal-wrap">
+        <div class="cal-intro">
+          <h2 class="cal-intro-title">
+            {
+              locale === 'en'
+                ? 'Book your slot with Patrick'
+                : 'Réservez votre créneau avec Patrick'
+            }
+          </h2>
+          <p class="cal-intro-sub">
+            {
+              locale === 'en'
+                ? 'Choose a time below, fill in your details and confirm your appointment directly.'
+                : 'Choisissez un horaire ci-dessous, renseignez vos informations et confirmez votre rendez-vous directement.'
+            }
+          </p>
+        </div>
+        <div id="cal-inline"></div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="footer-inner">
+        <span class="footer-copy">© 2026 Hatch · gethatch.io</span>
+        <a
+          href={backUrl}
+          style="font-size:13px;color:rgba(255,255,255,0.35);transition:color 0.15s;"
+          onmouseover="this.style.color='rgba(255,255,255,0.7)'"
+          onmouseout="this.style.color='rgba(255,255,255,0.35)'"
+        >
+          {locale === 'en' ? '← Back to site' : '← Retour au site'}
+        </a>
+      </div>
+    </footer>
+
+    <script type="text/javascript">
+      (function (C, A, L) {
+        let p = function (a, ar) {
+          a.q.push(ar);
+        };
+        let d = C.document;
+        C.Cal =
+          C.Cal ||
+          function () {
+            let cal = C.Cal;
+            let ar = arguments;
+            if (!cal.loaded) {
+              cal.ns = {};
+              cal.q = cal.q || [];
+              d.head.appendChild(d.createElement('script')).src = A;
+              cal.loaded = true;
+            }
+            if (ar[0] === L) {
+              const api = function () {
+                p(api, arguments);
+              };
+              const namespace = ar[1];
+              api.q = api.q || [];
+              typeof namespace === 'string' ? (cal.ns[namespace] = api) && p(api, ar) : p(cal, ar);
+              return;
+            }
+            p(cal, ar);
+          };
+      })(window, 'https://app.cal.com/embed/embed.js', 'init');
+      Cal('init', { origin: 'https://cal.com' });
+      Cal('inline', {
+        elementOrSelector: '#cal-inline',
+        calLink: 'patrick-rakotondrajao-bjremk/presentation-hatch',
+        config: { layout: 'month_view' },
+      });
+    </script>
+  </body>
+</html>
