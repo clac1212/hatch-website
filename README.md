@@ -111,10 +111,8 @@ Cette commande lance le build local et vérifie qu'il n'y a pas d'erreur cachée
 ## 🆘 Ça casse, qu'est-ce que je fais ?
 
 1. **Erreur dans le terminal `pnpm dev`** : copie-colle le message à Claude Code, il diagnostique.
-2. **Le build échoue dans la PR** : ouvre l'onglet "Checks" de la PR sur GitHub, lis l'erreur, copie-la à Claude.
-3. **Le rendu est cassé visuellement** : ne mergue pas, montre-moi la preview Vercel sur Slack.
-
-Sinon ping-moi (Cesar) sur Slack. Pas de honte à demander, c'est plus rapide à deux.
+2. **Le build échoue dans la PR** : ouvre l'onglet "Checks" de la PR sur GitHub, lire l'erreur, la copier à Claude.
+3. **Le rendu est cassé visuellement** : regarder la preview Vercel sur Slack.
 
 ---
 
