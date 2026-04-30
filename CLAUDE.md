@@ -2,6 +2,21 @@
 
 Static bilingual marketing site. French at `/`, English at `/en`. The visual source of truth for phase 2 component conversion is `_reference/hatch_landing_page.html` (frozen, read-only).
 
+## Public repository — never commit secrets
+
+**This repo is PUBLIC on GitHub.** Anything pushed to any branch, including the full git history, is visible to the world.
+
+Never commit:
+
+- API keys, tokens, deploy hooks, webhook URLs, OAuth client secrets
+- Database connection strings, credentials, `.env*` files (already gitignored — keep it that way)
+- Internal URLs (admin panels, staging hosts, internal APIs), private subdomains
+- Customer data, prospect lists, internal emails, Slack/Notion/Linear links
+- Unreleased product info, pricing not yet public, draft announcements, internal roadmaps
+- Personal data (anyone's address, phone, etc.)
+
+Anything sensitive belongs in **Vercel Environment Variables** (Settings → Environment Variables), or in `.env` locally (gitignored). If you ever accidentally commit a secret, treat it as compromised — rotate it immediately, then scrub the history.
+
 ## Stack
 
 Astro 6 + TypeScript strict + Tailwind v4 (via `@tailwindcss/vite`) + `@astrojs/vercel` (static). pnpm, Node ≥ 22.
