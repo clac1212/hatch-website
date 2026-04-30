@@ -111,6 +111,7 @@
   h2,
   h3 {
     font-family: var(--font-display);
+    font-weight: 700;
   }
 }
 
@@ -352,6 +353,18 @@
   opacity: 1;
 }
 
+/* ── WhyHatch h2 em (orange italic accent) ── */
+.pourquoi-left h2 em {
+  color: #ea580c;
+  font-style: italic;
+}
+
+/* ── WhyHatch feature bold labels ── */
+.pq-feature strong {
+  color: #0f172a;
+  font-weight: 600;
+}
+
 /* ── Nav: sticky on top, glassmorphism kicks in once scrolled ──
  * Wrapped in @layer base so Tailwind utility classes on nav children
  * (e.g. text-hatch-text on the demo CTA, text-white/85 on links) win.
@@ -372,6 +385,32 @@
       border-color 0.3s,
       backdrop-filter 0.3s;
   }
+}
+/* Nav default link/button colors (no Tailwind utility competition) */
+nav .nav-link {
+  color: rgba(255, 255, 255, 0.65);
+}
+nav .nav-link:hover {
+  color: #fff;
+}
+nav .btn-ghost {
+  color: rgba(255, 255, 255, 0.7);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+nav .btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #fff;
+}
+nav .lang-switcher {
+  background: rgba(255, 255, 255, 0.1);
+}
+nav .lang-btn {
+  color: rgba(255, 255, 255, 0.5);
+}
+nav .lang-btn.active {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
 }
 nav.scrolled {
   background: rgba(5, 19, 9, 0.75);

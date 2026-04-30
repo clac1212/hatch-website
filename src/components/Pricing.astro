@@ -1,5 +1,5 @@
 ---
-import type { Locale } from '../i18n/ui';
+import { demoUrl, type Locale } from '../i18n/ui';
 import type { CollectionEntry } from 'astro:content';
 
 interface Props {
@@ -7,7 +7,8 @@ interface Props {
   data: CollectionEntry<'landing'>['data']['pricing'];
 }
 
-const { data } = Astro.props;
+const { locale, data } = Astro.props;
+const demo = demoUrl(locale);
 ---
 
 <section class="pricing bg-white py-14" id="pricing">
@@ -22,19 +23,11 @@ const { data } = Astro.props;
         <span>{data.label}</span>
       </div>
       <h2
-        class="mb-4 mt-2 font-display font-normal"
+        class="mb-4 mt-2 font-display font-bold"
         style="font-size: clamp(26px, 3.6vw, 40px); line-height: 1.08; letter-spacing: -0.02em;"
         set:html={data.h2}
       />
       <p class="mx-auto max-w-[420px] text-base text-slate-600">{data.sub}</p>
-    </div>
-
-    <div class="annual-note mb-7 flex justify-center">
-      <span
-        class="annual-pill inline-flex items-center gap-[7px] rounded-full border border-amber-200 bg-yellow-50 px-4 py-1.5 text-[13px] font-semibold text-amber-800"
-      >
-        ⓘ {data.annualPill}
-      </span>
     </div>
 
     <div class="toggle-wrap mb-11 flex justify-center">
@@ -83,9 +76,10 @@ const { data } = Astro.props;
             {data.franchise.core.desc}
           </div>
           <hr class="plan-divider my-6 border-t border-slate-100" />
-          <button
-            class="plan-btn outline-btn w-full rounded-[10px] border-[1.5px] border-slate-200 bg-transparent py-3 text-sm font-semibold text-slate-900 transition hover:border-slate-300 hover:bg-slate-50"
-            >{data.franchise.core.btn}</button
+          <a
+            href={demo}
+            class="plan-btn outline-btn w-full rounded-[10px] border-[1.5px] border-slate-200 bg-transparent py-3 text-sm font-semibold text-slate-900 transition hover:border-slate-300 hover:bg-slate-50 text-center block"
+            >{data.franchise.core.btn}</a
           >
         </div>
 
@@ -116,9 +110,10 @@ const { data } = Astro.props;
             {data.franchise.scale.desc}
           </div>
           <hr class="plan-divider my-6 border-t border-slate-100" />
-          <button
-            class="plan-btn orange-btn w-full rounded-[10px] border-none bg-hatch-accent py-3 text-sm font-semibold text-white transition hover:bg-hatch-accent-deep"
-            >{data.franchise.scale.btn}</button
+          <a
+            href={demo}
+            class="plan-btn orange-btn w-full rounded-[10px] border-none bg-hatch-accent py-3 text-sm font-semibold text-white transition hover:bg-hatch-accent-deep text-center block"
+            >{data.franchise.scale.btn}</a
           >
         </div>
 
@@ -145,9 +140,10 @@ const { data } = Astro.props;
             {data.franchise.enterprise.desc}
           </div>
           <hr class="plan-divider my-6 border-t border-slate-100" />
-          <button
-            class="plan-btn outline-btn w-full rounded-[10px] border-[1.5px] border-slate-200 bg-transparent py-3 text-sm font-semibold text-slate-900 transition hover:border-slate-300 hover:bg-slate-50"
-            >{data.franchise.enterprise.btn}</button
+          <a
+            href={demo}
+            class="plan-btn outline-btn w-full rounded-[10px] border-[1.5px] border-slate-200 bg-transparent py-3 text-sm font-semibold text-slate-900 transition hover:border-slate-300 hover:bg-slate-50 text-center block"
+            >{data.franchise.enterprise.btn}</a
           >
         </div>
       </div>
@@ -181,9 +177,10 @@ const { data } = Astro.props;
             {data.darkKitchen.core.desc}
           </div>
           <hr class="plan-divider my-6 border-t border-slate-100" />
-          <button
-            class="plan-btn outline-btn w-full rounded-[10px] border-[1.5px] border-slate-200 bg-transparent py-3 text-sm font-semibold text-slate-900 transition hover:border-slate-300 hover:bg-slate-50"
-            >{data.darkKitchen.core.btn}</button
+          <a
+            href={demo}
+            class="plan-btn outline-btn w-full rounded-[10px] border-[1.5px] border-slate-200 bg-transparent py-3 text-sm font-semibold text-slate-900 transition hover:border-slate-300 hover:bg-slate-50 text-center block"
+            >{data.darkKitchen.core.btn}</a
           >
         </div>
 
@@ -214,9 +211,10 @@ const { data } = Astro.props;
             {data.darkKitchen.scale.desc}
           </div>
           <hr class="plan-divider my-6 border-t border-slate-100" />
-          <button
-            class="plan-btn green-btn w-full rounded-[10px] border-none bg-hatch-primary py-3 text-sm font-semibold text-white transition hover:bg-hatch-primary-soft"
-            >{data.darkKitchen.scale.btn}</button
+          <a
+            href={demo}
+            class="plan-btn green-btn w-full rounded-[10px] border-none bg-hatch-primary py-3 text-sm font-semibold text-white transition hover:bg-hatch-primary-soft text-center block"
+            >{data.darkKitchen.scale.btn}</a
           >
         </div>
 
@@ -243,9 +241,10 @@ const { data } = Astro.props;
             {data.darkKitchen.enterprise.desc}
           </div>
           <hr class="plan-divider my-6 border-t border-slate-100" />
-          <button
-            class="plan-btn outline-btn w-full rounded-[10px] border-[1.5px] border-slate-200 bg-transparent py-3 text-sm font-semibold text-slate-900 transition hover:border-slate-300 hover:bg-slate-50"
-            >{data.darkKitchen.enterprise.btn}</button
+          <a
+            href={demo}
+            class="plan-btn outline-btn w-full rounded-[10px] border-[1.5px] border-slate-200 bg-transparent py-3 text-sm font-semibold text-slate-900 transition hover:border-slate-300 hover:bg-slate-50 text-center block"
+            >{data.darkKitchen.enterprise.btn}</a
           >
         </div>
       </div>

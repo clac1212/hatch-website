@@ -4,3 +4,5 @@ dist
 .vercel
 pnpm-lock.yaml
 _reference
+public/ref.html
+package-lock.json

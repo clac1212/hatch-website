@@ -4,7 +4,7 @@ order: 3
 num: 'AGT·03'
 name: 'Sparrow'
 species: 'Passer developmentalis'
-status: 'live'
+status: 'dev'
 bg: 'rgba(52,211,153,0.05)'
 fr:
   role: 'Développement'
@@ -12,7 +12,7 @@ fr:
   features:
     - icon: '💬'
       name: 'Présentation & Q&A prospect'
-      desc: 'Sparrow présente votre concept et répond aux interrogations des prospects en temps réel — adapté à votre enseigne, disponible 24h/24.'
+      desc: 'Sparrow présente votre concept et répond aux interrogations des prospects en temps réel, adapté à votre enseigne, disponible 24h/24.'
     - icon: '🔍'
       name: 'Qualification des candidats'
       desc: 'Scoring automatique des dossiers entrants. Critères personnalisés, analyse des profils, recommandations priorisées.'
@@ -21,7 +21,7 @@ fr:
       desc: 'Sparrow construit et suit votre pipeline de candidats. Chaque étape est tracée, chaque prospect relancé au bon moment.'
     - icon: '🚀'
       name: "Onboarding jusqu'à l'ouverture"
-      desc: "De la signature du contrat à l'ouverture du point de vente — Sparrow pilote et documente l'intégralité du processus."
+      desc: "De la signature du contrat à l'ouverture du point de vente, Sparrow pilote et documente l'intégralité du processus."
 en:
   role: 'Development'
   desc: 'The explorer of new territories. It drives the entire development chain, from first contact to opening day.'

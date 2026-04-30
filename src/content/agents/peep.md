@@ -8,7 +8,7 @@ status: 'live'
 bg: 'rgba(251,191,36,0.05)'
 fr:
   role: 'Opérations'
-  desc: "L'assistant terrain de votre réseau. Il connaît chaque procédure, répond à chaque question, 24/7 sur WhatsApp — dans la langue du demandeur."
+  desc: "L'assistant terrain de votre réseau. Il connaît chaque procédure, répond à chaque question, 24/7 sur WhatsApp, dans la langue du demandeur."
   features:
     - icon: '💬'
       name: 'Assistant WhatsApp IA'

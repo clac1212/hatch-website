@@ -26,7 +26,7 @@ const { data } = Astro.props;
         </div>
 
         <h2
-          class="pourquoi-h2 mb-4 font-display text-[40px] font-normal leading-[1.15] tracking-[-0.02em] text-slate-900"
+          class="pourquoi-h2 mb-4 font-display text-[40px] font-bold leading-[1.15] tracking-[-0.02em] text-slate-900"
           set:html={data.h2}
         />
 
@@ -253,6 +253,21 @@ const { data } = Astro.props;
               </div>
             </div>
           </div>
+          <div
+            class="pq-pipe-footer flex items-center gap-[5px] border-t px-3.5 py-2 text-[9px] font-semibold"
+            style="background:#fff8f0;color:#e07b2a;border-color:#fde8cc;"
+          >
+            <svg width="10" height="10" viewBox="0 0 10 10">
+              <circle cx="5" cy="5" r="4" fill="#22c55e"></circle>
+              <path
+                d="M2.5 5l1.8 1.8 3.2-3.2"
+                stroke="#fff"
+                stroke-width="1"
+                fill="none"
+                stroke-linecap="round"></path>
+            </svg>
+            {data.pipeFooter}
+          </div>
         </div>
       </div>
     </div>
@@ -263,6 +278,24 @@ const { data } = Astro.props;
   /* Card-specific transforms (the keyframes themselves are global). */
   .pq-card-chat {
     transform: rotate(-2deg);
+  }
+  /* Dark WhatsApp body background + subtle tile pattern (matches reference). */
+  .pq-wa-dark {
+    background: #0b141a;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Crect width='200' height='200' fill='%230b141a'/%3E%3Ccircle cx='20' cy='20' r='2' fill='none' stroke='%23ffffff0d' stroke-width='1'/%3E%3Crect x='40' y='10' width='16' height='12' rx='1' fill='none' stroke='%23ffffff0d' stroke-width='1'/%3E%3Ccircle cx='80' cy='30' r='6' fill='none' stroke='%23ffffff0d' stroke-width='1'/%3E%3Cpath d='M100 15 L110 25 L100 35' fill='none' stroke='%23ffffff0d' stroke-width='1'/%3E%3Crect x='130' y='15' width='14' height='18' rx='2' fill='none' stroke='%23ffffff0d' stroke-width='1'/%3E%3Ccircle cx='170' cy='25' r='8' fill='none' stroke='%23ffffff0d' stroke-width='1'/%3E%3Cpath d='M10 70 Q20 60 30 70 Q40 80 50 70' fill='none' stroke='%23ffffff0d' stroke-width='1'/%3E%3Crect x='60' y='60' width='12' height='12' rx='2' fill='none' stroke='%23ffffff0d' stroke-width='1'/%3E%3Ccircle cx='100' cy='80' r='4' fill='none' stroke='%23ffffff0d' stroke-width='1'/%3E%3Cpath d='M120 65 L125 75 L115 75 Z' fill='none' stroke='%23ffffff0d' stroke-width='1'/%3E%3Ccircle cx='160' cy='70' r='10' fill='none' stroke='%23ffffff0d' stroke-width='1'/%3E%3Crect x='10' y='110' width='20' height='14' rx='1' fill='none' stroke='%23ffffff0d' stroke-width='1'/%3E%3Ccircle cx='90' cy='170' r='6' fill='none' stroke='%23ffffff0d' stroke-width='1'/%3E%3C/svg%3E");
+  }
+  /* Gradient fade at bottom of WA card. */
+  .pq-card-chat::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 48px;
+    background: linear-gradient(to bottom, transparent, #0b141a);
+    pointer-events: none;
+    z-index: 5;
+    border-radius: 0 0 16px 16px;
   }
   .pq-card-report {
     transform: rotate(2deg);
