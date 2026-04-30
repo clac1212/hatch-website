@@ -1,5 +1,5 @@
 ---
-import { ui, externalUrls, demoUrl, type Locale } from '../i18n/ui';
+import { ui, demoUrl, type Locale } from '../i18n/ui';
 import type { CollectionEntry } from 'astro:content';
 
 interface Props {
@@ -69,14 +69,7 @@ const otherLocaleUrl = otherLocale === 'fr' ? '/' : '/en/';
           {t.languageSwitcher.en}
         </a>
       </div>
-      <a
-        href={externalUrls.login}
-        id="nav-btn-login"
-        class="btn-ghost hidden items-center gap-[7px] whitespace-nowrap rounded-[9px] border-[1.5px] px-[18px] py-2.5 text-sm font-semibold transition sm:inline-flex"
-      >
-        {t.nav.login}
-      </a>
-      <a
+<a
         href={demoUrl(locale)}
         id="nav-btn-demo"
         target="_blank"

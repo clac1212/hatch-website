@@ -8,13 +8,6 @@ export type Locale = (typeof locales)[number];
 
 export const defaultLocale: Locale = 'fr';
 
-/**
- * URLs that may need to be swapped without code changes (Notion form, login).
- * Defined here so a non-technical editor only touches one place.
- */
-export const externalUrls = {
-  login: 'https://app.hatch.example.com',
-};
 
 export function demoUrl(locale: Locale): string {
   return locale === 'en' ? '/en/demo' : '/demo';
@@ -23,7 +16,6 @@ export function demoUrl(locale: Locale): string {
 export const ui = {
   fr: {
     nav: {
-      login: 'Se connecter',
       demo: 'Demander une démo',
     },
     languageSwitcher: {
@@ -38,7 +30,6 @@ export const ui = {
   },
   en: {
     nav: {
-      login: 'Log in',
       demo: 'Request a demo',
     },
     languageSwitcher: {
