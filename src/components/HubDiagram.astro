@@ -328,33 +328,33 @@ const agents = [
         })
       }
 
-      <!-- HUB center card: centered at (50%, 50%) -->
+      <!-- HUB pulse rings: centered exactly at (50%, 50%) of the container -->
       <div
         class="absolute"
-        style="left:50%; top:50%; transform:translate(-50%,-50%); z-index:3;"
+        style="width:64px;height:64px;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:18px;border:1.5px solid rgba(234,88,12,0.22);animation:hubRingPulse 3s ease-out infinite;z-index:2;"
+      ></div>
+      <div
+        class="absolute"
+        style="width:64px;height:64px;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:18px;border:1.5px solid rgba(234,88,12,0.22);animation:hubRingPulse 3s ease-out 1.5s infinite;z-index:2;"
+      ></div>
+
+      <!-- HUB card: its center sits at exactly (50%, 50%) — matches SVG hub coordinates -->
+      <div
+        class="absolute flex h-[64px] w-[64px] items-center justify-center overflow-hidden rounded-[18px] bg-white"
+        style="left:50%;top:50%;transform:translate(-50%,-50%);z-index:3;box-shadow:var(--shadow-hub-center);"
       >
-        <!-- pulse rings -->
-        <div
-          class="absolute"
-          style="width:64px;height:64px;top:50%;left:50%;transform:translate(-50%,-50%);border-radius:18px;border:1.5px solid rgba(234,88,12,0.22);animation:hubRingPulse 3s ease-out infinite;"
-        ></div>
-        <div
-          class="absolute"
-          style="width:64px;height:64px;top:50%;left:50%;transform:translate(-50%,-50%);border-radius:18px;border:1.5px solid rgba(234,88,12,0.22);animation:hubRingPulse 3s ease-out 1.5s infinite;"
-        ></div>
-        <!-- card -->
-        <div
-          class="flex h-[64px] w-[64px] items-center justify-center overflow-hidden rounded-[18px] bg-white"
-          style="box-shadow: var(--shadow-hub-center);"
+        <img src="/logos/src-hatch.png" alt="Hatch" class="h-full w-full object-cover" loading="lazy" />
+      </div>
+
+      <!-- HUB label: sits below the card (card bottom = 50%+32px) -->
+      <div
+        class="absolute text-center"
+        style="left:50%;top:calc(50% + 38px);transform:translateX(-50%);z-index:3;white-space:nowrap;"
+      >
+        <strong class="block text-[10px] font-bold tracking-[-0.01em] text-slate-900">Hatch</strong>
+        <span class="block font-mono text-[7px] uppercase tracking-[0.1em] text-hatch-accent-deep"
+          >{data.centerLabel}</span
         >
-          <img src="/logos/src-hatch.png" alt="Hatch" class="h-full w-full object-cover" loading="lazy" />
-        </div>
-        <div class="mt-[6px] text-center">
-          <strong class="block text-[10px] font-bold tracking-[-0.01em] text-slate-900">Hatch</strong>
-          <span class="block font-mono text-[7px] uppercase tracking-[0.1em] text-hatch-accent-deep"
-            >{data.centerLabel}</span
-          >
-        </div>
       </div>
 
       <!-- AGENT birds: centered at x=90%, y=22/50/78%
