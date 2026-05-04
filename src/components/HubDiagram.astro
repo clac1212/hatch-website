@@ -240,143 +240,130 @@ const agents = [
       </div>
     </div>
 
-    <!-- ── Mobile hub (visible only on small screens) ── -->
+    <!-- ── Mobile hub (visible only on small screens) ──
+         Strategy: fixed-height container, all elements absolutely positioned.
+         SVG viewBox="0 0 100 100" with preserveAspectRatio="none" so that
+         SVG coordinate X = CSS left X%, SVG coordinate Y = CSS top Y%.
+         This guarantees lines connect exactly to icon/bird centers.
+         ─── Coordinates ───────────────────────────────────────────
+         Source icon centers  : x=10,  y=13 / 37 / 62 / 87
+         Hub card center      : x=50,  y=50
+         Agent bird centers   : x=90,  y=22 / 50 / 78
+         ─────────────────────────────────────────────────────────── -->
     <div
       class="hub-mobile relative mx-auto block overflow-hidden rounded-2xl md:hidden"
-      style="background: var(--hub-gradient); max-width: 380px;"
+      style="background: var(--hub-gradient); max-width: 380px; height: 228px;"
     >
-      <!-- gradient overlay -->
+      <!-- radial gradient overlays -->
       <div
         class="pointer-events-none absolute inset-0"
-        style="background: radial-gradient(50% 60% at 20% 35%, rgba(254,215,170,0.5), transparent 65%), radial-gradient(45% 55% at 80% 70%, rgba(253,186,116,0.3), transparent 60%);"
+        style="background: radial-gradient(50% 60% at 18% 30%, rgba(254,215,170,0.55), transparent 60%), radial-gradient(40% 50% at 82% 72%, rgba(253,186,116,0.3), transparent 55%);"
+        aria-hidden="true"
+      ></div>
+
+      <!-- SVG: lines + animated dots — covers the FULL container -->
+      <svg
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
+        class="absolute inset-0 h-full w-full"
+        style="z-index:1;"
+        aria-hidden="true"
       >
-      </div>
+        <!-- connection lines: sources → hub, hub → agents -->
+        <g fill="none" stroke="#e2c9a8" stroke-width="0.55">
+          <path d="M 10 13 Q 30 13 50 50"></path>
+          <path d="M 10 37 Q 30 37 50 50"></path>
+          <path d="M 10 62 Q 30 62 50 50"></path>
+          <path d="M 10 87 Q 30 87 50 50"></path>
+          <path d="M 50 50 Q 70 22 90 22"></path>
+          <path d="M 50 50 Q 70 50 90 50"></path>
+          <path d="M 50 50 Q 70 78 90 78"></path>
+        </g>
+        <!-- orange dots: sources → hub -->
+        <circle r="1.6" fill="#ea580c" opacity="0.9">
+          <animateMotion dur="1.8s" begin="0s"   repeatCount="indefinite" path="M 10 13 Q 30 13 50 50"/>
+        </circle>
+        <circle r="1.6" fill="#ea580c" opacity="0.9">
+          <animateMotion dur="2.0s" begin="0.6s"  repeatCount="indefinite" path="M 10 37 Q 30 37 50 50"/>
+        </circle>
+        <circle r="1.6" fill="#ea580c" opacity="0.9">
+          <animateMotion dur="1.9s" begin="1.2s"  repeatCount="indefinite" path="M 10 62 Q 30 62 50 50"/>
+        </circle>
+        <!-- yellow dots: hub → agents -->
+        <circle r="1.6" fill="#fbbf24" opacity="0.95">
+          <animateMotion dur="1.6s" begin="0.3s"  repeatCount="indefinite" path="M 50 50 Q 70 22 90 22"/>
+        </circle>
+        <circle r="1.6" fill="#fbbf24" opacity="0.95">
+          <animateMotion dur="1.7s" begin="1.0s"  repeatCount="indefinite" path="M 50 50 Q 70 50 90 50"/>
+        </circle>
+        <circle r="1.6" fill="#fbbf24" opacity="0.95">
+          <animateMotion dur="1.8s" begin="1.6s"  repeatCount="indefinite" path="M 50 50 Q 70 78 90 78"/>
+        </circle>
+      </svg>
 
-      <div class="relative flex items-center gap-0 px-4 py-8">
-        <!-- SOURCES column -->
-        <div class="flex flex-col items-center gap-2.5">
-          {
-            sources.slice(0, 4).map(({ label, src, imgSize }) => (
-              <div
-                class="flex h-[38px] w-[38px] items-center justify-center overflow-hidden rounded-xl bg-white"
-                title={label}
-                style="box-shadow: var(--shadow-hub-src);"
-              >
-                <img
-                  src={src}
-                  alt={label}
-                  class="object-contain"
-                  style={imgSize ? `width:${imgSize};height:${imgSize};` : 'width:88%;height:88%;'}
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-            ))
-          }
-        </div>
-
-        <!-- CONNECTION lines + CENTER hub -->
-        <div class="relative flex flex-1 items-center justify-center">
-          <!-- SVG lines -->
-          <svg
-            viewBox="0 0 160 180"
-            preserveAspectRatio="none"
-            class="absolute inset-0 h-full w-full"
-            aria-hidden="true"
-          >
-            <!-- source → hub -->
-            <path d="M 0 22  Q 60 22,  80 90" stroke="#e2c9a8" stroke-width="1.2" fill="none"></path>
-            <path d="M 0 67  Q 60 67,  80 90" stroke="#e2c9a8" stroke-width="1.2" fill="none"></path>
-            <path d="M 0 112 Q 60 112, 80 90" stroke="#e2c9a8" stroke-width="1.2" fill="none"></path>
-            <path d="M 0 157 Q 60 157, 80 90" stroke="#e2c9a8" stroke-width="1.2" fill="none"></path>
-            <!-- hub → agents -->
-            <path d="M 80 90 Q 105 35,  160 20"  stroke="#e2c9a8" stroke-width="1.2" fill="none"></path>
-            <path d="M 80 90 Q 105 90,  160 90"  stroke="#e2c9a8" stroke-width="1.2" fill="none"></path>
-            <path d="M 80 90 Q 105 145, 160 158" stroke="#e2c9a8" stroke-width="1.2" fill="none"></path>
-            <!-- animated dots sources→hub -->
-            <circle r="3" fill="#ea580c" opacity="0.85">
-              <animateMotion dur="1.8s" begin="0s" repeatCount="indefinite">
-                <mpath href="#mob-ps0"></mpath>
-              </animateMotion>
-            </circle>
-            <circle r="3" fill="#ea580c" opacity="0.85">
-              <animateMotion dur="2.0s" begin="0.5s" repeatCount="indefinite">
-                <mpath href="#mob-ps1"></mpath>
-              </animateMotion>
-            </circle>
-            <circle r="3" fill="#ea580c" opacity="0.85">
-              <animateMotion dur="1.9s" begin="1.1s" repeatCount="indefinite">
-                <mpath href="#mob-ps2"></mpath>
-              </animateMotion>
-            </circle>
-            <!-- animated dots hub→agents -->
-            <circle r="3" fill="#fbbf24" opacity="0.9">
-              <animateMotion dur="1.6s" begin="0.3s" repeatCount="indefinite">
-                <mpath href="#mob-pa0"></mpath>
-              </animateMotion>
-            </circle>
-            <circle r="3" fill="#fbbf24" opacity="0.9">
-              <animateMotion dur="1.7s" begin="0.9s" repeatCount="indefinite">
-                <mpath href="#mob-pa1"></mpath>
-              </animateMotion>
-            </circle>
-            <circle r="3" fill="#fbbf24" opacity="0.9">
-              <animateMotion dur="1.8s" begin="1.5s" repeatCount="indefinite">
-                <mpath href="#mob-pa2"></mpath>
-              </animateMotion>
-            </circle>
-            <!-- hidden paths for animateMotion -->
-            <defs>
-              <path id="mob-ps0" d="M 0 22  Q 60 22,  80 90"></path>
-              <path id="mob-ps1" d="M 0 67  Q 60 67,  80 90"></path>
-              <path id="mob-ps2" d="M 0 112 Q 60 112, 80 90"></path>
-              <path id="mob-pa0" d="M 80 90 Q 105 35,  160 20"></path>
-              <path id="mob-pa1" d="M 80 90 Q 105 90,  160 90"></path>
-              <path id="mob-pa2" d="M 80 90 Q 105 145, 160 158"></path>
-            </defs>
-          </svg>
-
-          <!-- Hatch center card -->
-          <div class="relative z-10">
-            <!-- pulse rings -->
+      <!-- SOURCE icons: absolutely placed so their centers match SVG coordinates
+           Icon size 38×38 → offset = 19px from center point -->
+      {
+        sources.slice(0, 4).map(({ label, src, imgSize }, idx) => {
+          const yPct = [13, 37, 62, 87][idx];
+          return (
             <div
-              class="absolute"
-              style="width:62px;height:62px;top:50%;left:50%;transform:translate(-50%,-50%);border-radius:16px;border:1.5px solid rgba(234,88,12,0.22);animation:hubRingPulse 3s ease-out infinite;"
-            >
-            </div>
-            <div
-              class="absolute"
-              style="width:62px;height:62px;top:50%;left:50%;transform:translate(-50%,-50%);border-radius:16px;border:1.5px solid rgba(234,88,12,0.22);animation:hubRingPulse 3s ease-out 1.5s infinite;"
-            >
-            </div>
-            <div
-              class="flex h-[62px] w-[62px] items-center justify-center overflow-hidden rounded-[18px] bg-white"
-              style="box-shadow: var(--shadow-hub-center);"
+              class="absolute flex h-[38px] w-[38px] items-center justify-center overflow-hidden rounded-xl bg-white"
+              style={`left: calc(10% - 19px); top: calc(${yPct}% - 19px); z-index:2; box-shadow: var(--shadow-hub-src);`}
+              title={label}
             >
               <img
-                src="/logos/src-hatch.png"
-                alt="Hatch"
-                class="h-full w-full object-cover"
+                src={src}
+                alt={label}
+                class="object-contain"
+                style={imgSize ? `width:${imgSize};height:${imgSize};` : 'width:88%;height:88%;'}
                 loading="lazy"
+                decoding="async"
               />
             </div>
-            <div class="mt-2 text-center">
-              <strong class="block text-[11px] font-bold tracking-[-0.01em] text-slate-900"
-                >Hatch</strong
-              >
-              <span class="block font-mono text-[7px] uppercase tracking-[0.12em] text-hatch-accent-deep"
-                >{data.centerLabel}</span
-              >
-            </div>
-          </div>
-        </div>
+          );
+        })
+      }
 
-        <!-- AGENTS column -->
-        <div class="flex flex-col items-center gap-1">
-          <Peep size={42} showLabel={false} feet={false} />
-          <Jay size={42} showLabel={false} feet={false} />
-          <Sparrow size={42} showLabel={false} feet={false} />
+      <!-- HUB center card: centered at (50%, 50%) -->
+      <div
+        class="absolute"
+        style="left:50%; top:50%; transform:translate(-50%,-50%); z-index:3;"
+      >
+        <!-- pulse rings -->
+        <div
+          class="absolute"
+          style="width:64px;height:64px;top:50%;left:50%;transform:translate(-50%,-50%);border-radius:18px;border:1.5px solid rgba(234,88,12,0.22);animation:hubRingPulse 3s ease-out infinite;"
+        ></div>
+        <div
+          class="absolute"
+          style="width:64px;height:64px;top:50%;left:50%;transform:translate(-50%,-50%);border-radius:18px;border:1.5px solid rgba(234,88,12,0.22);animation:hubRingPulse 3s ease-out 1.5s infinite;"
+        ></div>
+        <!-- card -->
+        <div
+          class="flex h-[64px] w-[64px] items-center justify-center overflow-hidden rounded-[18px] bg-white"
+          style="box-shadow: var(--shadow-hub-center);"
+        >
+          <img src="/logos/src-hatch.png" alt="Hatch" class="h-full w-full object-cover" loading="lazy" />
         </div>
+        <div class="mt-[6px] text-center">
+          <strong class="block text-[10px] font-bold tracking-[-0.01em] text-slate-900">Hatch</strong>
+          <span class="block font-mono text-[7px] uppercase tracking-[0.1em] text-hatch-accent-deep"
+            >{data.centerLabel}</span
+          >
+        </div>
+      </div>
+
+      <!-- AGENT birds: centered at x=90%, y=22/50/78%
+           Bird component renders ~42×42px → offset = 21px -->
+      <div class="absolute" style="left:calc(90% - 21px); top:calc(22% - 21px); z-index:2;">
+        <Peep size={42} showLabel={false} feet={false} />
+      </div>
+      <div class="absolute" style="left:calc(90% - 21px); top:calc(50% - 21px); z-index:2;">
+        <Jay size={42} showLabel={false} feet={false} />
+      </div>
+      <div class="absolute" style="left:calc(90% - 21px); top:calc(78% - 21px); z-index:2;">
+        <Sparrow size={42} showLabel={false} feet={false} />
       </div>
     </div>
   </div>
