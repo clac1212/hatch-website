@@ -10,6 +10,7 @@ import Agents from '../../components/Agents.astro';
 import Pricing from '../../components/Pricing.astro';
 import FAQ from '../../components/FAQ.astro';
 import Footer from '../../components/Footer.astro';
+import PeepWidget from '../../components/PeepWidget.astro';
 
 const locale = 'en' as const;
 const landing = await getEntry('landing', locale);
@@ -29,4 +30,5 @@ const { data } = landing;
   <Pricing locale={locale} data={data.pricing} />
   <FAQ data={data.faq} />
   <Footer data={data.footer} locale={locale} />
+  <PeepWidget />
 </Base>
