@@ -7,7 +7,7 @@ import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://gethatch.io',
+  site: 'https://www.gethatch.io',
 
   // Native i18n routing — see https://docs.astro.build/en/guides/internationalization/
   // FR is the default locale → served at "/" (no prefix).
