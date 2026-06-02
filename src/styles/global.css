@@ -188,7 +188,7 @@
   align-items: center;
   gap: 44px;
   width: max-content;
-  animation: ticker 20s linear infinite;
+  animation: ticker 14s linear infinite;
 }
 .ticker-track:hover {
   animation-play-state: paused;
