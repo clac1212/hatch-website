@@ -82,17 +82,17 @@ const { locale, data } = Astro.props;
             // CSS ticker animation (translate -50%) loops without a visible seam.
             Array.from({ length: 2 }).flatMap((_, cycle) =>
               [
-                { src: '/logos/nobinobi.png', alt: 'Nobinobi' },
-                { src: '/logos/pny.png', alt: 'PNY' },
-                { src: '/logos/la-meulerie.png', alt: 'La Meulerie' },
-                { src: '/logos/crousty-one.png', alt: 'Crousty One' },
-                { src: '/logos/nemesis.webp', alt: 'Nemesis' },
-                { src: '/logos/afrik-n-fusion.png', alt: "Afrik'N'Fusion" },
-                { src: '/logos/burger-fries.png', alt: 'Burger & Fries' },
-              ].map(({ src, alt }) => (
+                { src: '/logos/nobinobi.png', alt: 'Nobinobi', h: 'h-8' },
+                { src: '/logos/pny.png', alt: 'PNY', h: 'h-8' },
+                { src: '/logos/la-meulerie.png', alt: 'La Meulerie', h: 'h-8' },
+                { src: '/logos/crousty-one.png', alt: 'Crousty One', h: 'h-8' },
+                { src: '/logos/nemesis.webp', alt: 'Nemesis', h: 'h-8' },
+                { src: '/logos/afrik-n-fusion.png', alt: "Afrik'N'Fusion", h: 'h-14' },
+                { src: '/logos/burger-fries.png', alt: 'Burger & Fries', h: 'h-14' },
+              ].map(({ src, alt, h }) => (
                 <>
                   <img
-                    class="hero-trust-logo h-8 w-auto flex-shrink-0 mix-blend-screen opacity-35 transition-opacity hover:opacity-60"
+                    class={`hero-trust-logo ${h} w-auto flex-shrink-0 mix-blend-screen opacity-35 transition-opacity hover:opacity-60`}
                     style="filter: grayscale(1) invert(1) brightness(1.3);"
                     src={src}
                     alt={alt}
