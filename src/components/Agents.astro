@@ -12,10 +12,13 @@ interface Props {
 const { locale, data, agents } = Astro.props;
 const sorted = [...agents].sort((a, b) => a.data.order - b.data.order);
 
-// PNG-based birds for agents without SVG components
+// All 5 live agents use PNG avatars for visual consistency
 const pngBirds: Record<string, string> = {
-  finch: '/logos/finch-avatar.png',
-  pecker: '/logos/pecker-avatar.png',
+  jay:     '/logos/jay-avatar.png',
+  peep:    '/logos/peep-avatar.png',
+  sparrow: '/logos/sparrow-avatar.png',
+  finch:   '/logos/finch-avatar.png',
+  pecker:  '/logos/pecker-avatar.png',
 };
 
 // Serialize agents data so the inline switching script can read it without a
@@ -100,14 +103,14 @@ const labels = {
                 </span>
               )}
               <span class="tab-bird-wrap flex h-11 w-11 items-center justify-center">
-                {a.key === 'peep' && <Peep size={44} showLabel={false} feet={false} />}
-                {a.key === 'jay' && <Jay size={44} showLabel={false} feet={false} />}
-                {a.key === 'sparrow' && <Sparrow size={44} showLabel={false} feet={false} />}
-                {a.key === 'legal' && <Rook size={44} showLabel={false} feet={false} />}
-                {a.key === 'marketing' && <Piper size={44} showLabel={false} feet={false} />}
-                {a.key === 'innovation' && <Kite size={44} showLabel={false} feet={false} />}
-                {pngBirds[a.key] && (
-                  <img src={pngBirds[a.key]} alt={a.name} width="44" height="44" style="border-radius:50%;object-fit:cover;" />
+                {pngBirds[a.key] ? (
+                  <img src={pngBirds[a.key]} alt={a.name} width="44" height="44" class="agent-avatar" />
+                ) : a.key === 'legal' ? (
+                  <Rook size={44} showLabel={false} feet={false} />
+                ) : a.key === 'marketing' ? (
+                  <Piper size={44} showLabel={false} feet={false} />
+                ) : (
+                  <Kite size={44} showLabel={false} feet={false} />
                 )}
               </span>
               <div class="text-left">
@@ -149,19 +152,19 @@ const labels = {
             id="panel-bird"
           >
             <div data-bird="jay">
-              <Jay size={200} showLabel={false} feet={false} />
+              <img src="/logos/jay-avatar.png" alt="Jay" width="200" height="200" class="agent-avatar-panel" />
             </div>
             <div data-bird="peep" hidden>
-              <Peep size={200} showLabel={false} feet={false} />
+              <img src="/logos/peep-avatar.png" alt="Peep" width="200" height="200" class="agent-avatar-panel" />
             </div>
             <div data-bird="sparrow" hidden>
-              <Sparrow size={200} showLabel={false} feet={false} />
+              <img src="/logos/sparrow-avatar.png" alt="Sparrow" width="200" height="200" class="agent-avatar-panel" />
             </div>
             <div data-bird="finch" hidden>
-              <img src="/logos/finch-avatar.png" alt="Finch" width="200" height="200" style="border-radius:50%;object-fit:cover;" />
+              <img src="/logos/finch-avatar.png" alt="Finch" width="200" height="200" class="agent-avatar-panel" />
             </div>
             <div data-bird="pecker" hidden>
-              <img src="/logos/pecker-avatar.png" alt="Pecker" width="200" height="200" style="border-radius:50%;object-fit:cover;" />
+              <img src="/logos/pecker-avatar.png" alt="Pecker" width="200" height="200" class="agent-avatar-panel" />
             </div>
             <div data-bird="legal" hidden>
               <Rook size={200} showLabel={false} feet={false} />
@@ -334,5 +337,17 @@ const labels = {
   .panel-coming-overlay.visible {
     display: flex;
     flex-direction: column;
+  }
+  .agent-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .agent-avatar-panel {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
   }
 </style>

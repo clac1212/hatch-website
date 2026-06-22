@@ -244,11 +244,9 @@ const agents = [
                   Bientôt
                 </span>
               )}
-              {key === 'peep' && <Peep size={46} showLabel={false} feet={false} />}
-              {key === 'jay' && <Jay size={46} showLabel={false} feet={false} />}
-              {key === 'sparrow' && <Sparrow size={46} showLabel={false} feet={false} />}
-              {key === 'finch' && <img src="/logos/finch-avatar.png" alt="Finch" width="46" height="46" style="border-radius:50%;object-fit:cover;" />}
-              {key === 'pecker' && <img src="/logos/pecker-avatar.png" alt="Pecker" width="46" height="46" style="border-radius:50%;object-fit:cover;" />}
+              {(key === 'jay' || key === 'peep' || key === 'sparrow' || key === 'finch' || key === 'pecker') && (
+                <img src={`/logos/${key}-avatar.png`} alt={name} width="46" height="46" style="border-radius:50%;object-fit:cover;" />
+              )}
               {key === 'legal' && <Rook size={46} showLabel={false} feet={false} />}
               {key === 'marketing' && <Piper size={46} showLabel={false} feet={false} />}
               {key === 'innovation' && <Kite size={46} showLabel={false} feet={false} />}
@@ -381,13 +379,13 @@ const agents = [
       <!-- AGENT birds: centered at x=90%, y=22/50/78%
            Bird component renders ~42×42px → offset = 21px -->
       <div class="absolute" style="left:calc(90% - 21px); top:calc(22% - 21px); z-index:2;">
-        <Jay size={42} showLabel={false} feet={false} />
+        <img src="/logos/jay-avatar.png" alt="Jay" width="42" height="42" style="border-radius:50%;object-fit:cover;" />
       </div>
       <div class="absolute" style="left:calc(90% - 21px); top:calc(50% - 21px); z-index:2;">
-        <Peep size={42} showLabel={false} feet={false} />
+        <img src="/logos/peep-avatar.png" alt="Peep" width="42" height="42" style="border-radius:50%;object-fit:cover;" />
       </div>
       <div class="absolute" style="left:calc(90% - 21px); top:calc(78% - 21px); z-index:2;">
-        <Sparrow size={42} showLabel={false} feet={false} />
+        <img src="/logos/sparrow-avatar.png" alt="Sparrow" width="42" height="42" style="border-radius:50%;object-fit:cover;" />
       </div>
     </div>
   </div>
