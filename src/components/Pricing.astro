@@ -10,11 +10,10 @@ interface Props {
 const { locale, data } = Astro.props;
 const demo = demoUrl(locale);
 
-// One accent color per plan size
 const palette = [
-  { border: '#386641', badge: 'rgba(56,102,65,0.10)', badgeText: '#386641', btn: 'rgba(56,102,65,0.08)', btnHover: 'rgba(56,102,65,0.14)', btnText: '#264d2e' },
-  { border: '#ea580c', badge: 'rgba(234,88,12,0.10)', badgeText: '#ea580c', btn: 'rgba(234,88,12,0.08)', btnHover: 'rgba(234,88,12,0.14)', btnText: '#9a3412' },
-  { border: '#1a2e1c', badge: 'rgba(26,46,28,0.10)',  badgeText: '#1a2e1c', btn: 'rgba(26,46,28,0.07)',  btnHover: 'rgba(26,46,28,0.13)', btnText: '#0f1f10' },
+  { border: '#386641', bg: 'rgba(56,102,65,0.08)',  letter: '#386641', btn: 'rgba(56,102,65,0.08)', btnHover: 'rgba(56,102,65,0.14)', btnText: '#264d2e', badgeText: '#386641' },
+  { border: '#ea580c', bg: 'rgba(234,88,12,0.07)',  letter: '#ea580c', btn: 'rgba(234,88,12,0.08)', btnHover: 'rgba(234,88,12,0.14)', btnText: '#9a3412', badgeText: '#ea580c' },
+  { border: '#1a2e1c', bg: 'rgba(26,46,28,0.07)',   letter: '#1a2e1c', btn: 'rgba(26,46,28,0.07)',  btnHover: 'rgba(26,46,28,0.13)', btnText: '#0f1f10', badgeText: '#1a2e1c' },
 ];
 ---
 
@@ -37,53 +36,44 @@ const palette = [
       <p class="mx-auto max-w-[520px] text-base text-slate-600">{data.sub}</p>
     </div>
 
-    <!-- 3 cards: S / M / L -->
-    <div class="price-grid mx-auto grid max-w-[960px] gap-5 md:grid-cols-3 items-stretch">
+    <!-- 3 flip cards: S / M / L -->
+    <div class="price-grid mx-auto grid max-w-[960px] gap-5 md:grid-cols-3">
       {
         data.plans.map((plan, i) => {
           const c = palette[i];
           return (
-            <div
-              class="price-card relative flex flex-col rounded-[22px] bg-white px-7 pb-8 pt-8 transition hover:-translate-y-[3px] hover:shadow-[0_20px_52px_rgba(0,0,0,0.09)]"
-              style={`border: 2px solid ${c.border};`}
-            >
-              <!-- Size badge -->
-              <div
-                class="plan-size mb-4 inline-flex h-10 w-10 items-center justify-center rounded-[11px] text-[17px] font-extrabold"
-                style={`background:${c.badge}; color:${c.badgeText};`}
-              >
-                {plan.size}
+            <div class="flip-card" style="perspective: 1000px; height: 320px;">
+              <div class="flip-inner" style={`border-color: ${c.border};`}>
+
+                <!-- FRONT: just the letter -->
+                <div class="flip-face flip-front" style={`background: ${c.bg}; border: 2px solid ${c.border};`}>
+                  <span class="flip-letter" style={`color: ${c.letter};`}>{plan.size}</span>
+                  <span class="flip-hint">Survolez →</span>
+                </div>
+
+                <!-- BACK: all details -->
+                <div class="flip-face flip-back" style={`border: 2px solid ${c.border};`}>
+                  <div class="flip-back-inner">
+                    <div class="plan-size-badge" style={`background: ${c.bg}; color: ${c.badgeText};`}>
+                      {plan.size}
+                    </div>
+                    <div class="plan-segment">{plan.segment}</div>
+                    <div class="plan-desc">{plan.desc}</div>
+                    <div class="plan-price">
+                      <span class="plan-currency">€</span>
+                      <span class="plan-amount">{plan.priceMonthly}</span>
+                      <span class="plan-unit">/loc/mo</span>
+                    </div>
+                    <a
+                      href={demo}
+                      class="plan-btn"
+                      style={`background: ${c.btn}; color: ${c.btnText}; border: 1.5px solid ${c.border}40;`}
+                      set:html={plan.btn}
+                    />
+                  </div>
+                </div>
+
               </div>
-
-              <!-- Segment label -->
-              <div class="plan-segment mb-1 text-[14px] font-semibold text-slate-900">
-                {plan.segment}
-              </div>
-
-              <!-- Employee desc -->
-              <div class="plan-desc mb-7 text-[12px] text-slate-400">
-                {plan.desc}
-              </div>
-
-              <!-- Price -->
-              <div class="plan-price mb-1 flex items-baseline gap-0.5">
-                <span class="text-[14px] font-medium text-slate-400">€</span>
-                <span class="text-[52px] font-extrabold leading-none tracking-[-0.04em] text-slate-900">
-                  {plan.priceMonthly}
-                </span>
-                <span class="ml-1 text-[13px] font-medium text-slate-400">/loc/mo</span>
-              </div>
-
-              <div class="flex-1"></div>
-
-              <a
-                href={demo}
-                class="plan-btn mt-8 block w-full rounded-[11px] py-3 text-center text-sm font-semibold transition"
-                style={`background:${c.btn}; color:${c.btnText}; border: 1.5px solid ${c.border}40;`}
-                onmouseover={`this.style.background='${c.btnHover}'`}
-                onmouseout={`this.style.background='${c.btn}'`}
-                set:html={plan.btn}
-              />
             </div>
           );
         })
@@ -96,3 +86,161 @@ const palette = [
     />
   </div>
 </section>
+
+<style>
+  .flip-card {
+    cursor: pointer;
+  }
+
+  .flip-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1);
+    border-radius: 22px;
+  }
+
+  .flip-card:hover .flip-inner {
+    transform: rotateY(180deg);
+  }
+
+  .flip-face {
+    position: absolute;
+    inset: 0;
+    border-radius: 22px;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  /* FRONT */
+  .flip-front {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+  }
+
+  .flip-letter {
+    font-family: var(--font-display);
+    font-size: 88px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+
+  .flip-hint {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(15, 31, 16, 0.3);
+  }
+
+  /* BACK */
+  .flip-back {
+    background: #fff;
+    transform: rotateY(180deg);
+    display: flex;
+    align-items: stretch;
+  }
+
+  .flip-back-inner {
+    display: flex;
+    flex-direction: column;
+    padding: 28px;
+    width: 100%;
+  }
+
+  .plan-size-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 800;
+    margin-bottom: 14px;
+  }
+
+  .plan-segment {
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 4px;
+  }
+
+  .plan-desc {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-bottom: 18px;
+  }
+
+  .plan-price {
+    display: flex;
+    align-items: baseline;
+    gap: 2px;
+    margin-bottom: auto;
+  }
+
+  .plan-currency {
+    font-size: 14px;
+    font-weight: 500;
+    color: #94a3b8;
+  }
+
+  .plan-amount {
+    font-size: 48px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    color: #0f172a;
+  }
+
+  .plan-unit {
+    font-size: 13px;
+    font-weight: 500;
+    color: #94a3b8;
+    margin-left: 4px;
+  }
+
+  .plan-btn {
+    display: block;
+    width: 100%;
+    margin-top: 20px;
+    padding: 11px 0;
+    border-radius: 11px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+
+  /* Mobile: no flip, show back directly */
+  @media (hover: none) {
+    .flip-inner {
+      transform: rotateY(180deg);
+    }
+    .flip-card {
+      height: auto !important;
+    }
+    .flip-face {
+      position: relative;
+      inset: auto;
+    }
+    .flip-front {
+      display: none;
+    }
+    .flip-back {
+      transform: none;
+    }
+    .flip-inner {
+      transform: none;
+      display: flex;
+      flex-direction: column;
+    }
+  }
+</style>
