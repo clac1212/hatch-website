@@ -152,8 +152,8 @@ const landing = defineCollection({
 const agents = defineCollection({
   loader: glob({ base: './src/content/agents', pattern: '**/*.md' }),
   schema: z.object({
-    key: z.enum(['peep', 'jay', 'sparrow', 'finch', 'pecker', 'legal', 'marketing', 'innovation']),
-    order: z.number(), // 1..8, drives tab order
+    key: z.enum(['peep', 'jay', 'sparrow', 'finch', 'pecker']),
+    order: z.number(), // 1..5, drives tab order
     num: z.string(), // "AGT·01"
     name: z.string(), // "Peep"
     species: z.string(), // "Phasianus poussin operatus"

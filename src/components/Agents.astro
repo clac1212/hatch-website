@@ -2,7 +2,6 @@
 import type { Locale } from '../i18n/ui';
 import type { CollectionEntry } from 'astro:content';
 import { JayAvatar, PeepAvatar, SparrowAvatar, FinchAvatar, PeckerAvatar } from './birds/AvatarBirds.tsx';
-import { Rook, Piper, Kite } from './birds/Birds.tsx';
 
 interface Props {
   locale: Locale;
@@ -99,10 +98,7 @@ const labels = {
                  : a.key === 'peep' ? <PeepAvatar size={44} />
                  : a.key === 'sparrow' ? <SparrowAvatar size={44} />
                  : a.key === 'finch' ? <FinchAvatar size={44} />
-                 : a.key === 'pecker' ? <PeckerAvatar size={44} />
-                 : a.key === 'legal' ? <Rook size={44} showLabel={false} feet={false} />
-                 : a.key === 'marketing' ? <Piper size={44} showLabel={false} feet={false} />
-                 : <Kite size={44} showLabel={false} feet={false} />}
+                 : <PeckerAvatar size={44} />}
               </span>
               <div class="text-left">
                 <div class="tab-name text-[13px] font-bold leading-none text-white">{a.name}</div>
@@ -147,9 +143,6 @@ const labels = {
             <div data-bird="sparrow" hidden><SparrowAvatar size={200} /></div>
             <div data-bird="finch" hidden><FinchAvatar size={200} /></div>
             <div data-bird="pecker" hidden><PeckerAvatar size={200} /></div>
-            <div data-bird="legal" hidden><Rook size={200} showLabel={false} feet={false} /></div>
-            <div data-bird="marketing" hidden><Piper size={200} showLabel={false} feet={false} /></div>
-            <div data-bird="innovation" hidden><Kite size={200} showLabel={false} feet={false} /></div>
           </div>
 
           <div

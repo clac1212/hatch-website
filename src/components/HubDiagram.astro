@@ -2,7 +2,6 @@
 import type { Locale } from '../i18n/ui';
 import type { CollectionEntry } from 'astro:content';
 import { JayAvatar, PeepAvatar, SparrowAvatar, FinchAvatar, PeckerAvatar } from './birds/AvatarBirds.tsx';
-import { Rook, Piper, Kite } from './birds/Birds.tsx';
 
 interface Props {
   locale: Locale;
@@ -24,16 +23,13 @@ const sources = [
   { i: 6, top: '93%', label: 'Airtable', src: '/logos/src-airtable.png' },
 ];
 
-// 8 agents in a quincunx pattern (alternating columns), 5 live + 3 soon.
+// 5 live agents evenly spaced in a quincunx pattern (alternating columns).
 const agents = [
-  { key: 'jay',        name: 'Jay',     top: '9%',  left: '88%', soon: false },
-  { key: 'peep',       name: 'Peep',    top: '21%', left: '95%', soon: false },
-  { key: 'sparrow',    name: 'Sparrow', top: '33%', left: '88%', soon: false },
-  { key: 'finch',      name: 'Finch',   top: '45%', left: '95%', soon: false },
-  { key: 'pecker',     name: 'Pecker',  top: '57%', left: '88%', soon: false },
-  { key: 'legal',      name: 'Rook',    top: '69%', left: '95%', soon: true  },
-  { key: 'marketing',  name: 'Piper',   top: '81%', left: '88%', soon: true  },
-  { key: 'innovation', name: 'Kite',    top: '93%', left: '95%', soon: true  },
+  { key: 'jay',     name: 'Jay',     top: '9%',  left: '88%' },
+  { key: 'peep',    name: 'Peep',    top: '30%', left: '95%' },
+  { key: 'sparrow', name: 'Sparrow', top: '51%', left: '88%' },
+  { key: 'finch',   name: 'Finch',   top: '72%', left: '95%' },
+  { key: 'pecker',  name: 'Pecker',  top: '93%', left: '88%' },
 ];
 ---
 
@@ -92,13 +88,10 @@ const agents = [
           <path id="p-s5" d="M 162 724   C 300 724,   370 460, 446 460"></path>
           <path id="p-s6" d="M 162 855.6 C 300 855.6, 370 460, 446 460"></path>
           <path id="p-a0" d="M 634 460 C 750 460, 830 82.8,  950 82.8"></path>
-          <path id="p-a1" d="M 634 460 C 750 460, 860 193.2, 1026 193.2"></path>
-          <path id="p-a2" d="M 634 460 C 750 460, 830 303.6, 950 303.6"></path>
-          <path id="p-a3" d="M 634 460 C 750 460, 860 414,   1026 414"></path>
-          <path id="p-a4" d="M 634 460 C 750 460, 830 524.4, 950 524.4"></path>
-          <path id="p-a5" d="M 634 460 C 750 460, 860 634.8, 1026 634.8"></path>
-          <path id="p-a6" d="M 634 460 C 750 460, 830 745.2, 950 745.2"></path>
-          <path id="p-a7" d="M 634 460 C 750 460, 860 856,   1026 856"></path>
+          <path id="p-a1" d="M 634 460 C 750 460, 860 276,   1026 276"></path>
+          <path id="p-a2" d="M 634 460 C 750 460, 830 469.2, 950 469.2"></path>
+          <path id="p-a3" d="M 634 460 C 750 460, 860 662.4, 1026 662.4"></path>
+          <path id="p-a4" d="M 634 460 C 750 460, 830 855.6, 950 855.6"></path>
         </g>
         <g filter="url(#hub-glow)">
           <circle r="3.5" fill="#ea580c"
@@ -161,21 +154,6 @@ const agents = [
               ><mpath href="#p-a4"></mpath></animateMotion
             ></circle
           >
-          <circle r="3.5" fill="#fbbf24"
-            ><animateMotion dur="1.8s" begin="3.6s" repeatCount="indefinite"
-              ><mpath href="#p-a5"></mpath></animateMotion
-            ></circle
-          >
-          <circle r="3.5" fill="#fbbf24" opacity="0.5"
-            ><animateMotion dur="2.0s" begin="4.0s" repeatCount="indefinite"
-              ><mpath href="#p-a6"></mpath></animateMotion
-            ></circle
-          >
-          <circle r="3.5" fill="#fbbf24" opacity="0.5"
-            ><animateMotion dur="1.9s" begin="4.4s" repeatCount="indefinite"
-              ><mpath href="#p-a7"></mpath></animateMotion
-            ></circle
-          >
         </g>
       </svg>
 
@@ -234,25 +212,17 @@ const agents = [
 
         <!-- AGENTS -->
         {
-          agents.map(({ key, name, top, left, soon }) => (
+          agents.map(({ key, name, top, left }) => (
             <div
               class="hub-agent-card absolute flex flex-col items-center"
               data-i={key}
-              style={`left:${left}; top:${top}; transform: translate(-50%,-50%); width:64px; pointer-events: auto; opacity: ${soon ? '0.6' : '1'};`}
+              style={`left:${left}; top:${top}; transform: translate(-50%,-50%); width:64px; pointer-events: auto;`}
             >
-              {soon && (
-                <span style="position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;background:rgba(148,163,184,0.15);border:1px solid rgba(148,163,184,0.25);color:#64748b;padding:1px 5px;border-radius:99px;white-space:nowrap;">
-                  Bientôt
-                </span>
-              )}
               {key === 'jay' && <JayAvatar size={46} />}
               {key === 'peep' && <PeepAvatar size={46} />}
               {key === 'sparrow' && <SparrowAvatar size={46} />}
               {key === 'finch' && <FinchAvatar size={46} />}
               {key === 'pecker' && <PeckerAvatar size={46} />}
-              {key === 'legal' && <Rook size={46} showLabel={false} feet={false} />}
-              {key === 'marketing' && <Piper size={46} showLabel={false} feet={false} />}
-              {key === 'innovation' && <Kite size={46} showLabel={false} feet={false} />}
               <span class="hub-agent-name mt-[4px] block whitespace-nowrap text-center font-display text-[10px] font-bold tracking-[-0.01em] text-slate-900">
                 {name}
               </span>
