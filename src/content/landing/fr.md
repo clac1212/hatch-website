@@ -88,46 +88,28 @@ pricing:
   label: 'Tarifs'
   h2: '<em style="color:#ea580c;font-style:italic;">Simple.</em> Par location.<br>Pas par utilisateur.'
   sub: 'Par utilisateur, vous payez des comptes inactifs, des départs oubliés, des fantômes. Chez Hatch : un établissement actif, un tarif fixe.'
-  annualPill: 'Engagement annuel : 15% de réduction automatique'
-  toggleFranchise: 'Franchise Classique'
-  toggleDark: 'Dark Kitchen'
+  toggleMonthly: 'Mensuel'
+  toggleAnnual: 'Annuel −15%'
   footnote: 'Tous les prix sont HT · Engagement annuel disponible avec <strong>15% de remise</strong>'
-  franchise:
-    core:
-      bracket: '1–50 établissements'
-      unit: '/loc/mois'
-      price: '<sup>€</sup>30'
-      desc: 'Toute la plateforme Hatch dès le premier établissement. Aucune fonctionnalité retirée.'
+  plans:
+    - size: 'S'
+      segment: 'Kiosques & comptoirs'
+      desc: '1–2 employés par établissement'
+      priceMonthly: 19
+      priceAnnual: 16
       btn: 'Demander une démo'
-    scale:
-      bracket: '51–100 établissements'
-      unit: '/loc/mois'
-      price: '<sup>€</sup>25'
-      desc: "La même plateforme, à un tarif dégressif. Plus votre réseau grandit, moins vous payez à l'unité."
+    - size: 'M'
+      segment: 'Dark kitchens & host kitchens'
+      desc: '3–5 employés par établissement'
+      priceMonthly: 29
+      priceAnnual: 25
       btn: 'Demander une démo'
-    enterprise:
-      bracket: '100+ établissements'
-      price: 'Sur mesure'
-      desc: 'La même plateforme, avec un contrat cadre et un account manager dédié pour les grands réseaux.'
-      btn: 'Nous contacter'
-  darkKitchen:
-    core:
-      bracket: '1–30 locs'
-      unit: '/loc/mois'
-      price: '<sup>€</sup>15'
-      desc: 'Toute la plateforme Hatch dès la première dark kitchen. Aucune fonctionnalité retirée.'
+    - size: 'L'
+      segment: 'Franchises & restaurants'
+      desc: '6+ employés par établissement'
+      priceMonthly: 39
+      priceAnnual: 33
       btn: 'Demander une démo'
-    scale:
-      bracket: '31–80 locs'
-      unit: '/loc/mois'
-      price: '<sup>€</sup>12'
-      desc: "La même plateforme, à un tarif dégressif. Plus vous ouvrez de cuisines, moins vous payez à l'unité."
-      btn: 'Demander une démo'
-    enterprise:
-      bracket: '80+ locs'
-      price: 'Sur mesure'
-      desc: 'La même plateforme, avec un contrat cadre et un account manager dédié pour les grands opérateurs.'
-      btn: 'Nous contacter'
 
 faq:
   h2: 'Les questions <em style="color:#ea580c;font-style:italic;">qu''on nous pose.</em>'

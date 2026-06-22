@@ -88,46 +88,28 @@ pricing:
   label: 'Pricing'
   h2: '<em style="color:#ea580c;font-style:italic;">Simple.</em> Per location.<br>Not per user.'
   sub: 'With per-user pricing, you pay for inactive accounts, forgotten departures, ghosts. At Hatch: one active location, one fixed price.'
-  annualPill: 'Annual commitment : 15% discount automatically applied'
-  toggleFranchise: 'Classic Franchise'
-  toggleDark: 'Dark Kitchen'
-  footnote: 'All prices are excluding tax · Annual commitment available with <strong>15% discount</strong>'
-  franchise:
-    core:
-      bracket: '1–50 locations'
-      unit: '/loc/mo'
-      price: '<sup>€</sup>30'
-      desc: 'Full Hatch platform from day one. No features removed.'
+  toggleMonthly: 'Monthly'
+  toggleAnnual: 'Annual −15%'
+  footnote: 'All prices excl. VAT · Annual commitment available with <strong>15% discount</strong>'
+  plans:
+    - size: 'S'
+      segment: 'Kiosks & counters'
+      desc: '1–2 employees per location'
+      priceMonthly: 19
+      priceAnnual: 16
       btn: 'Request a demo'
-    scale:
-      bracket: '51–100 locations'
-      unit: '/loc/mo'
-      price: '<sup>€</sup>25'
-      desc: 'Same platform, tiered pricing. The bigger your network grows, the less you pay per unit.'
+    - size: 'M'
+      segment: 'Dark kitchens & host kitchens'
+      desc: '3–5 employees per location'
+      priceMonthly: 29
+      priceAnnual: 25
       btn: 'Request a demo'
-    enterprise:
-      bracket: '100+ locations'
-      price: 'Custom'
-      desc: 'Same platform, with a master agreement and a dedicated account manager for large networks.'
-      btn: 'Contact us'
-  darkKitchen:
-    core:
-      bracket: '1–30 locs'
-      unit: '/loc/mo'
-      price: '<sup>€</sup>15'
-      desc: 'Full Hatch platform from your first dark kitchen. No features removed.'
+    - size: 'L'
+      segment: 'Franchises & restaurants'
+      desc: '6+ employees per location'
+      priceMonthly: 39
+      priceAnnual: 33
       btn: 'Request a demo'
-    scale:
-      bracket: '31–80 locs'
-      unit: '/loc/mo'
-      price: '<sup>€</sup>12'
-      desc: 'Same platform, tiered pricing. The more kitchens you open, the less you pay per unit.'
-      btn: 'Request a demo'
-    enterprise:
-      bracket: '80+ locs'
-      price: 'Custom'
-      desc: 'Same platform, with a master agreement and a dedicated account manager for large operators.'
-      btn: 'Contact us'
 
 faq:
   h2: 'Questions <em style="color:#ea580c;font-style:italic;">we get asked.</em>'

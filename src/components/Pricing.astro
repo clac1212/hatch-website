@@ -27,260 +27,120 @@ const demo = demoUrl(locale);
         style="font-size: clamp(26px, 3.6vw, 40px); line-height: 1.08; letter-spacing: -0.02em;"
         set:html={data.h2}
       />
-      <p class="mx-auto max-w-[420px] text-base text-slate-600">{data.sub}</p>
+      <p class="mx-auto max-w-[520px] text-base text-slate-600">{data.sub}</p>
     </div>
 
+    <!-- Monthly / Annual toggle -->
     <div class="toggle-wrap mb-11 flex justify-center">
-      <div class="toggle flex gap-1 rounded-[11px] bg-slate-100 p-1">
+      <div class="flex gap-1 rounded-[11px] bg-slate-100 p-1">
         <button
           type="button"
-          class="t-btn active rounded-lg border-none bg-white px-5 py-2.5 text-sm font-semibold text-slate-900 shadow-[0_2px_8px_rgba(0,0,0,0.07)] transition"
-          data-target="franchise"
+          id="toggle-monthly"
+          class="pricing-toggle active rounded-lg border-none bg-white px-5 py-2.5 text-sm font-semibold text-slate-900 shadow-[0_2px_8px_rgba(0,0,0,0.07)] transition"
         >
-          {data.toggleFranchise}
+          {data.toggleMonthly}
         </button>
         <button
           type="button"
-          class="t-btn rounded-lg border-none bg-transparent px-5 py-2.5 text-sm font-semibold text-slate-500 transition hover:text-slate-900"
-          data-target="dark"
+          id="toggle-annual"
+          class="pricing-toggle rounded-lg border-none bg-transparent px-5 py-2.5 text-sm font-semibold text-slate-500 transition hover:text-slate-900"
         >
-          {data.toggleDark}
+          {data.toggleAnnual}
         </button>
       </div>
     </div>
 
-    <div class="price-grids show" id="price-franchise">
-      <div class="price-grid mx-auto grid max-w-[960px] gap-4 md:grid-cols-3 items-stretch">
-        <!-- Core -->
-        <div
-          class="price-card relative flex flex-col rounded-[20px] border-[1.5px] border-slate-200 bg-white px-7 pb-7 pt-9 transition hover:-translate-y-[3px] hover:shadow-[0_16px_48px_rgba(0,0,0,0.08)]"
-        >
-          <div
-            class="plan-name mb-5 text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500"
-          >
-            Core
-          </div>
-          <div
-            class="plan-price flex min-h-[52px] items-baseline text-[48px] font-extrabold leading-none tracking-[-0.04em] text-slate-900"
-          >
-            <span set:html={data.franchise.core.price} /><span
-              class="ml-0.5 text-[15px] font-medium text-slate-400">{data.franchise.core.unit}</span
+    <!-- 3 cards: S / M / L -->
+    <div class="price-grid mx-auto grid max-w-[960px] gap-4 md:grid-cols-3 items-stretch">
+      {
+        data.plans.map((plan) => (
+          <div class="price-card relative flex flex-col rounded-[20px] border-[1.5px] border-slate-200 bg-white px-7 pb-7 pt-9 transition hover:-translate-y-[3px] hover:shadow-[0_16px_48px_rgba(0,0,0,0.08)]">
+            <!-- Size badge -->
+            <div class="plan-size mb-3 inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-slate-100 text-base font-extrabold text-slate-800">
+              {plan.size}
+            </div>
+
+            <!-- Segment label -->
+            <div class="plan-segment mb-1 text-[13px] font-semibold text-slate-900">
+              {plan.segment}
+            </div>
+
+            <!-- Employee desc -->
+            <div class="plan-desc mb-6 text-[12px] text-slate-400">
+              {plan.desc}
+            </div>
+
+            <!-- Price -->
+            <div class="plan-price mb-1 flex items-baseline gap-0.5">
+              <span class="text-[13px] font-medium text-slate-400">€</span>
+              <span
+                class="price-value text-[48px] font-extrabold leading-none tracking-[-0.04em] text-slate-900"
+                data-monthly={plan.priceMonthly}
+                data-annual={plan.priceAnnual}
+              >
+                {plan.priceMonthly}
+              </span>
+              <span class="ml-1 text-[13px] font-medium text-slate-400">/loc/mo</span>
+            </div>
+
+            <!-- Annual savings line (hidden in monthly mode) -->
+            <div
+              class="annual-savings mb-5 hidden text-[12px] font-medium text-hatch-accent"
+              data-monthly-price={plan.priceMonthly}
+              data-annual-price={plan.priceAnnual}
             >
-          </div>
-          <div
-            class="plan-bracket orange mb-4 mt-1.5 inline-flex items-center self-start rounded-full border border-hatch-accent/20 bg-hatch-accent-bg px-2.5 py-[3px] text-[11px] font-semibold text-hatch-accent"
-          >
-            {data.franchise.core.bracket}
-          </div>
-          <div class="plan-desc flex-1 text-sm leading-[1.65] text-slate-500">
-            {data.franchise.core.desc}
-          </div>
-          <hr class="plan-divider my-6 border-t border-slate-100" />
-          <a
-            href={demo}
-            class="plan-btn outline-btn w-full rounded-[10px] border-[1.5px] border-slate-200 bg-transparent py-3 text-sm font-semibold text-slate-900 transition hover:border-slate-300 hover:bg-slate-50 text-center block"
-            >{data.franchise.core.btn}</a
-          >
-        </div>
+              −{Math.round((1 - plan.priceAnnual / plan.priceMonthly) * 100)}% vs mensuel
+            </div>
+            <div class="monthly-spacer mb-5 h-[20px]"></div>
 
-        <!-- Scale (featured-orange) -->
-        <div
-          class="price-card featured-orange relative flex flex-col rounded-[20px] border-[1.5px] border-hatch-accent px-7 pb-7 pt-9 transition hover:-translate-y-[3px] hover:shadow-[0_16px_48px_rgba(0,0,0,0.08)]"
-          style="background:#fff8f5;"
-        >
-          <div
-            class="plan-name orange mb-5 text-[11px] font-bold uppercase tracking-[0.14em] text-hatch-accent"
-          >
-            Scale
-          </div>
-          <div
-            class="plan-price flex min-h-[52px] items-baseline text-[48px] font-extrabold leading-none tracking-[-0.04em] text-slate-900"
-          >
-            <span set:html={data.franchise.scale.price} /><span
-              class="ml-0.5 text-[15px] font-medium text-hatch-accent"
-              >{data.franchise.scale.unit}</span
-            >
-          </div>
-          <div
-            class="plan-bracket orange mb-4 mt-1.5 inline-flex items-center self-start rounded-full border border-hatch-accent/20 bg-hatch-accent-bg px-2.5 py-[3px] text-[11px] font-semibold text-hatch-accent"
-          >
-            {data.franchise.scale.bracket}
-          </div>
-          <div class="plan-desc flex-1 text-sm leading-[1.65] text-slate-500">
-            {data.franchise.scale.desc}
-          </div>
-          <hr class="plan-divider my-6 border-t border-slate-100" />
-          <a
-            href={demo}
-            class="plan-btn orange-btn w-full rounded-[10px] border-none bg-hatch-accent py-3 text-sm font-semibold text-white transition hover:bg-hatch-accent-deep text-center block"
-            >{data.franchise.scale.btn}</a
-          >
-        </div>
+            <div class="flex-1"></div>
 
-        <!-- Enterprise -->
-        <div
-          class="price-card relative flex flex-col rounded-[20px] border-[1.5px] border-slate-200 bg-white px-7 pb-7 pt-9 transition hover:-translate-y-[3px] hover:shadow-[0_16px_48px_rgba(0,0,0,0.08)]"
-        >
-          <div
-            class="plan-name mb-5 text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500"
-          >
-            Enterprise
+            <a
+              href={demo}
+              class="plan-btn mt-4 block w-full rounded-[10px] border-[1.5px] border-slate-200 bg-transparent py-3 text-center text-sm font-semibold text-slate-900 transition hover:border-slate-300 hover:bg-slate-50"
+              set:html={plan.btn}
+            />
           </div>
-          <div
-            class="plan-price text-price flex min-h-[52px] items-center text-[34px] font-extrabold leading-none tracking-[-0.04em] text-slate-900"
-          >
-            {data.franchise.enterprise.price}
-          </div>
-          <div
-            class="plan-bracket orange mb-4 mt-1.5 inline-flex items-center self-start rounded-full border border-hatch-accent/20 bg-hatch-accent-bg px-2.5 py-[3px] text-[11px] font-semibold text-hatch-accent"
-          >
-            {data.franchise.enterprise.bracket}
-          </div>
-          <div class="plan-desc flex-1 text-sm leading-[1.65] text-slate-500">
-            {data.franchise.enterprise.desc}
-          </div>
-          <hr class="plan-divider my-6 border-t border-slate-100" />
-          <a
-            href={demo}
-            class="plan-btn outline-btn w-full rounded-[10px] border-[1.5px] border-slate-200 bg-transparent py-3 text-sm font-semibold text-slate-900 transition hover:border-slate-300 hover:bg-slate-50 text-center block"
-            >{data.franchise.enterprise.btn}</a
-          >
-        </div>
-      </div>
-    </div>
-
-    <div class="price-grids" id="price-dark">
-      <div class="price-grid mx-auto grid max-w-[960px] gap-4 md:grid-cols-3 items-stretch">
-        <!-- Core -->
-        <div
-          class="price-card relative flex flex-col rounded-[20px] border-[1.5px] border-slate-200 bg-white px-7 pb-7 pt-9 transition hover:-translate-y-[3px] hover:shadow-[0_16px_48px_rgba(0,0,0,0.08)]"
-        >
-          <div
-            class="plan-name mb-5 text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500"
-          >
-            Core
-          </div>
-          <div
-            class="plan-price flex min-h-[52px] items-baseline text-[48px] font-extrabold leading-none tracking-[-0.04em] text-slate-900"
-          >
-            <span set:html={data.darkKitchen.core.price} /><span
-              class="ml-0.5 text-[15px] font-medium text-slate-400"
-              >{data.darkKitchen.core.unit}</span
-            >
-          </div>
-          <div
-            class="plan-bracket mb-4 mt-1.5 inline-flex items-center self-start rounded-full border border-hatch-pill-bg-strong bg-hatch-pill-bg px-2.5 py-[3px] text-[11px] font-semibold text-hatch-primary"
-          >
-            {data.darkKitchen.core.bracket}
-          </div>
-          <div class="plan-desc flex-1 text-sm leading-[1.65] text-slate-500">
-            {data.darkKitchen.core.desc}
-          </div>
-          <hr class="plan-divider my-6 border-t border-slate-100" />
-          <a
-            href={demo}
-            class="plan-btn outline-btn w-full rounded-[10px] border-[1.5px] border-slate-200 bg-transparent py-3 text-sm font-semibold text-slate-900 transition hover:border-slate-300 hover:bg-slate-50 text-center block"
-            >{data.darkKitchen.core.btn}</a
-          >
-        </div>
-
-        <!-- Scale (featured) -->
-        <div
-          class="price-card featured relative flex flex-col rounded-[20px] border-[1.5px] border-hatch-primary px-7 pb-7 pt-9 transition hover:-translate-y-[3px] hover:shadow-[0_16px_48px_rgba(0,0,0,0.08)]"
-          style="background:#f7fdf8;"
-        >
-          <div
-            class="plan-name green mb-5 text-[11px] font-bold uppercase tracking-[0.14em] text-hatch-primary"
-          >
-            Scale
-          </div>
-          <div
-            class="plan-price flex min-h-[52px] items-baseline text-[48px] font-extrabold leading-none tracking-[-0.04em] text-slate-900"
-          >
-            <span set:html={data.darkKitchen.scale.price} /><span
-              class="ml-0.5 text-[15px] font-medium text-hatch-primary"
-              >{data.darkKitchen.scale.unit}</span
-            >
-          </div>
-          <div
-            class="plan-bracket mb-4 mt-1.5 inline-flex items-center self-start rounded-full border border-hatch-pill-bg-strong bg-hatch-pill-bg px-2.5 py-[3px] text-[11px] font-semibold text-hatch-primary"
-          >
-            {data.darkKitchen.scale.bracket}
-          </div>
-          <div class="plan-desc flex-1 text-sm leading-[1.65] text-slate-500">
-            {data.darkKitchen.scale.desc}
-          </div>
-          <hr class="plan-divider my-6 border-t border-slate-100" />
-          <a
-            href={demo}
-            class="plan-btn green-btn w-full rounded-[10px] border-none bg-hatch-primary py-3 text-sm font-semibold text-white transition hover:bg-hatch-primary-soft text-center block"
-            >{data.darkKitchen.scale.btn}</a
-          >
-        </div>
-
-        <!-- Enterprise -->
-        <div
-          class="price-card relative flex flex-col rounded-[20px] border-[1.5px] border-slate-200 bg-white px-7 pb-7 pt-9 transition hover:-translate-y-[3px] hover:shadow-[0_16px_48px_rgba(0,0,0,0.08)]"
-        >
-          <div
-            class="plan-name mb-5 text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500"
-          >
-            Enterprise
-          </div>
-          <div
-            class="plan-price text-price flex min-h-[52px] items-center text-[34px] font-extrabold leading-none tracking-[-0.04em] text-slate-900"
-          >
-            {data.darkKitchen.enterprise.price}
-          </div>
-          <div
-            class="plan-bracket mb-4 mt-1.5 inline-flex items-center self-start rounded-full border border-hatch-pill-bg-strong bg-hatch-pill-bg px-2.5 py-[3px] text-[11px] font-semibold text-hatch-primary"
-          >
-            {data.darkKitchen.enterprise.bracket}
-          </div>
-          <div class="plan-desc flex-1 text-sm leading-[1.65] text-slate-500">
-            {data.darkKitchen.enterprise.desc}
-          </div>
-          <hr class="plan-divider my-6 border-t border-slate-100" />
-          <a
-            href={demo}
-            class="plan-btn outline-btn w-full rounded-[10px] border-[1.5px] border-slate-200 bg-transparent py-3 text-sm font-semibold text-slate-900 transition hover:border-slate-300 hover:bg-slate-50 text-center block"
-            >{data.darkKitchen.enterprise.btn}</a
-          >
-        </div>
-      </div>
+        ))
+      }
     </div>
 
     <p
-      class="price-footnote mt-5 text-center text-[13px] text-slate-500"
+      class="price-footnote mt-6 text-center text-[13px] text-slate-500"
       set:html={data.footnote}
     />
   </div>
 </section>
 
 <script>
-  // Pricing toggle: switch between "franchise" and "dark kitchen" grids by
-  // toggling the .show class. CSS does the display: block/none.
-  const toggles = document.querySelectorAll('.t-btn[data-target]');
-  toggles.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const target = (btn as HTMLElement).dataset.target;
-      if (!target) return;
-      toggles.forEach((b) => {
-        const active = (b as HTMLElement).dataset.target === target;
-        b.classList.toggle('active', active);
-        if (active) {
-          (b as HTMLElement).style.background = '#fff';
-          (b as HTMLElement).style.color = '#0f172a';
-          (b as HTMLElement).style.boxShadow = '0 2px 8px rgba(0,0,0,0.07)';
-        } else {
-          (b as HTMLElement).style.background = 'transparent';
-          (b as HTMLElement).style.color = '#64748b';
-          (b as HTMLElement).style.boxShadow = 'none';
-        }
-      });
-      document.querySelectorAll('.price-grids').forEach((g) => {
-        g.classList.toggle('show', g.id === `price-${target}`);
-      });
+  const btnMonthly = document.getElementById('toggle-monthly') as HTMLButtonElement;
+  const btnAnnual = document.getElementById('toggle-annual') as HTMLButtonElement;
+  const priceValues = document.querySelectorAll<HTMLElement>('.price-value');
+  const annualRows = document.querySelectorAll<HTMLElement>('.annual-savings');
+  const monthlySpacers = document.querySelectorAll<HTMLElement>('.monthly-spacer');
+
+  function setMode(mode: 'monthly' | 'annual') {
+    const isAnnual = mode === 'annual';
+
+    // Toggle button styles
+    [btnMonthly, btnAnnual].forEach((btn) => {
+      const active = isAnnual ? btn === btnAnnual : btn === btnMonthly;
+      btn.classList.toggle('active', active);
+      btn.style.background = active ? '#fff' : 'transparent';
+      btn.style.color = active ? '#0f172a' : '#64748b';
+      btn.style.boxShadow = active ? '0 2px 8px rgba(0,0,0,0.07)' : 'none';
     });
-  });
+
+    // Swap prices
+    priceValues.forEach((el) => {
+      el.textContent = isAnnual ? (el.dataset.annual ?? '') : (el.dataset.monthly ?? '');
+    });
+
+    // Show/hide savings line
+    annualRows.forEach((el) => el.classList.toggle('hidden', !isAnnual));
+    monthlySpacers.forEach((el) => el.classList.toggle('hidden', isAnnual));
+  }
+
+  btnMonthly.addEventListener('click', () => setMode('monthly'));
+  btnAnnual.addEventListener('click', () => setMode('annual'));
 </script>

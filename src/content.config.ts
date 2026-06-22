@@ -116,20 +116,17 @@ const landing = defineCollection({
       label: richString,
       h2: richString,
       sub: richString,
-      annualPill: richString,
-      toggleFranchise: richString,
-      toggleDark: richString,
+      toggleMonthly: richString,
+      toggleAnnual: richString,
       footnote: richString,
-      franchise: z.object({
-        core: tier,
-        scale: tier,
-        enterprise: tier,
-      }),
-      darkKitchen: z.object({
-        core: tier,
-        scale: tier,
-        enterprise: tier,
-      }),
+      plans: z.array(z.object({
+        size: z.string(),
+        segment: richString,
+        desc: richString,
+        priceMonthly: z.number(),
+        priceAnnual: z.number(),
+        btn: richString,
+      })),
     }),
 
     faq: z.object({
