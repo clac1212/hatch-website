@@ -1,7 +1,8 @@
 ---
 import type { Locale } from '../i18n/ui';
 import type { CollectionEntry } from 'astro:content';
-import { Peep, Jay, Sparrow, Rook, Piper, Kite } from './birds/Birds.tsx';
+import { JayAvatar, PeepAvatar, SparrowAvatar, FinchAvatar, PeckerAvatar } from './birds/AvatarBirds.tsx';
+import { Rook, Piper, Kite } from './birds/Birds.tsx';
 
 interface Props {
   locale: Locale;
@@ -244,9 +245,11 @@ const agents = [
                   Bientôt
                 </span>
               )}
-              {(key === 'jay' || key === 'peep' || key === 'sparrow' || key === 'finch' || key === 'pecker') && (
-                <img src={`/logos/${key}-avatar.png`} alt={name} width="46" height="46" style="border-radius:50%;object-fit:cover;" />
-              )}
+              {key === 'jay' && <JayAvatar size={46} />}
+              {key === 'peep' && <PeepAvatar size={46} />}
+              {key === 'sparrow' && <SparrowAvatar size={46} />}
+              {key === 'finch' && <FinchAvatar size={46} />}
+              {key === 'pecker' && <PeckerAvatar size={46} />}
               {key === 'legal' && <Rook size={46} showLabel={false} feet={false} />}
               {key === 'marketing' && <Piper size={46} showLabel={false} feet={false} />}
               {key === 'innovation' && <Kite size={46} showLabel={false} feet={false} />}
@@ -379,13 +382,13 @@ const agents = [
       <!-- AGENT birds: centered at x=90%, y=22/50/78%
            Bird component renders ~42×42px → offset = 21px -->
       <div class="absolute" style="left:calc(90% - 21px); top:calc(22% - 21px); z-index:2;">
-        <img src="/logos/jay-avatar.png" alt="Jay" width="42" height="42" style="border-radius:50%;object-fit:cover;" />
+        <JayAvatar size={42} />
       </div>
       <div class="absolute" style="left:calc(90% - 21px); top:calc(50% - 21px); z-index:2;">
-        <img src="/logos/peep-avatar.png" alt="Peep" width="42" height="42" style="border-radius:50%;object-fit:cover;" />
+        <PeepAvatar size={42} />
       </div>
       <div class="absolute" style="left:calc(90% - 21px); top:calc(78% - 21px); z-index:2;">
-        <img src="/logos/sparrow-avatar.png" alt="Sparrow" width="42" height="42" style="border-radius:50%;object-fit:cover;" />
+        <SparrowAvatar size={42} />
       </div>
     </div>
   </div>

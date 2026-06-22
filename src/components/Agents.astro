@@ -1,7 +1,8 @@
 ---
 import type { Locale } from '../i18n/ui';
 import type { CollectionEntry } from 'astro:content';
-import { Peep, Jay, Sparrow, Rook, Piper, Kite } from './birds/Birds.tsx';
+import { JayAvatar, PeepAvatar, SparrowAvatar, FinchAvatar, PeckerAvatar } from './birds/AvatarBirds.tsx';
+import { Rook, Piper, Kite } from './birds/Birds.tsx';
 
 interface Props {
   locale: Locale;
@@ -11,15 +12,6 @@ interface Props {
 
 const { locale, data, agents } = Astro.props;
 const sorted = [...agents].sort((a, b) => a.data.order - b.data.order);
-
-// All 5 live agents use PNG avatars for visual consistency
-const pngBirds: Record<string, string> = {
-  jay:     '/logos/jay-avatar.png',
-  peep:    '/logos/peep-avatar.png',
-  sparrow: '/logos/sparrow-avatar.png',
-  finch:   '/logos/finch-avatar.png',
-  pecker:  '/logos/pecker-avatar.png',
-};
 
 // Serialize agents data so the inline switching script can read it without a
 // second network request. Strip out fields the client doesn't need.
@@ -102,16 +94,15 @@ const labels = {
                   {labels.tabSoon}
                 </span>
               )}
-              <span class="tab-bird-wrap flex h-11 w-11 items-center justify-center">
-                {pngBirds[a.key] ? (
-                  <img src={pngBirds[a.key]} alt={a.name} width="44" height="44" class="agent-avatar" />
-                ) : a.key === 'legal' ? (
-                  <Rook size={44} showLabel={false} feet={false} />
-                ) : a.key === 'marketing' ? (
-                  <Piper size={44} showLabel={false} feet={false} />
-                ) : (
-                  <Kite size={44} showLabel={false} feet={false} />
-                )}
+              <span class="tab-bird-wrap flex h-11 w-11 items-center justify-center overflow-hidden">
+                {a.key === 'jay' ? <JayAvatar size={44} />
+                 : a.key === 'peep' ? <PeepAvatar size={44} />
+                 : a.key === 'sparrow' ? <SparrowAvatar size={44} />
+                 : a.key === 'finch' ? <FinchAvatar size={44} />
+                 : a.key === 'pecker' ? <PeckerAvatar size={44} />
+                 : a.key === 'legal' ? <Rook size={44} showLabel={false} feet={false} />
+                 : a.key === 'marketing' ? <Piper size={44} showLabel={false} feet={false} />
+                 : <Kite size={44} showLabel={false} feet={false} />}
               </span>
               <div class="text-left">
                 <div class="tab-name text-[13px] font-bold leading-none text-white">{a.name}</div>
@@ -151,30 +142,14 @@ const labels = {
             class="panel-bird-wrap relative z-10 mb-5 flex items-center justify-center"
             id="panel-bird"
           >
-            <div data-bird="jay">
-              <img src="/logos/jay-avatar.png" alt="Jay" width="200" height="200" class="agent-avatar-panel" />
-            </div>
-            <div data-bird="peep" hidden>
-              <img src="/logos/peep-avatar.png" alt="Peep" width="200" height="200" class="agent-avatar-panel" />
-            </div>
-            <div data-bird="sparrow" hidden>
-              <img src="/logos/sparrow-avatar.png" alt="Sparrow" width="200" height="200" class="agent-avatar-panel" />
-            </div>
-            <div data-bird="finch" hidden>
-              <img src="/logos/finch-avatar.png" alt="Finch" width="200" height="200" class="agent-avatar-panel" />
-            </div>
-            <div data-bird="pecker" hidden>
-              <img src="/logos/pecker-avatar.png" alt="Pecker" width="200" height="200" class="agent-avatar-panel" />
-            </div>
-            <div data-bird="legal" hidden>
-              <Rook size={200} showLabel={false} feet={false} />
-            </div>
-            <div data-bird="marketing" hidden>
-              <Piper size={200} showLabel={false} feet={false} />
-            </div>
-            <div data-bird="innovation" hidden>
-              <Kite size={200} showLabel={false} feet={false} />
-            </div>
+            <div data-bird="jay"><JayAvatar size={200} /></div>
+            <div data-bird="peep" hidden><PeepAvatar size={200} /></div>
+            <div data-bird="sparrow" hidden><SparrowAvatar size={200} /></div>
+            <div data-bird="finch" hidden><FinchAvatar size={200} /></div>
+            <div data-bird="pecker" hidden><PeckerAvatar size={200} /></div>
+            <div data-bird="legal" hidden><Rook size={200} showLabel={false} feet={false} /></div>
+            <div data-bird="marketing" hidden><Piper size={200} showLabel={false} feet={false} /></div>
+            <div data-bird="innovation" hidden><Kite size={200} showLabel={false} feet={false} /></div>
           </div>
 
           <div
@@ -338,16 +313,8 @@ const labels = {
     display: flex;
     flex-direction: column;
   }
-  .agent-avatar {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    object-fit: cover;
-  }
-  .agent-avatar-panel {
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    object-fit: cover;
+  .agent-tab.active {
+    border-color: rgba(255, 255, 255, 0.22);
+    background-color: rgba(255, 255, 255, 0.09);
   }
 </style>
