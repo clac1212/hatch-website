@@ -1,7 +1,7 @@
 ---
 key: 'peep'
-order: 1
-num: 'AGT·01'
+order: 2
+num: 'AGT·02'
 name: 'Peep'
 species: 'Phasianus poussin operatus'
 status: 'live'

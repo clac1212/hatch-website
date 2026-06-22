@@ -3,8 +3,8 @@ key: 'sparrow'
 order: 3
 num: 'AGT·03'
 name: 'Sparrow'
-species: 'Passer developmentalis'
-status: 'dev'
+species: 'Passer venalis'
+status: 'live'
 bg: 'rgba(52,211,153,0.05)'
 fr:
   role: 'Développement'

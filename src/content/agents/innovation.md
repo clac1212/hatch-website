@@ -1,9 +1,9 @@
 ---
 key: 'innovation'
-order: 6
-num: 'AGT·06'
+order: 8
+num: 'AGT·08'
 name: 'Kite'
-species: 'Milvus innovator altus'
+species: 'Milvus inventor'
 status: 'soon'
 bg: 'rgba(217,119,6,0.05)'
 fr:

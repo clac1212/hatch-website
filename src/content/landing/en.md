@@ -1,5 +1,5 @@
 ---
-title: 'Hatch — The AI-native OS for franchise networks'
+title: 'Hatch — The OS for restaurant networks'
 description: 'Hatch is the AI-native operating system that helps franchises and branches grow, automate operations, and take back control of their day-to-day.'
 
 nav:
@@ -128,6 +128,6 @@ faq:
       a: 'Not at all. Our AI is multilingual by nature. From Bengali to Chinese to English, anything is possible.'
 
 footer:
-  tagline: 'The AI-native OS for franchise networks'
+  tagline: 'The OS for restaurant networks'
   copyright: '© 2026 Hatch · gethatch.io'
 ---

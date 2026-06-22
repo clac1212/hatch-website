@@ -1,9 +1,9 @@
 ---
 key: 'jay'
-order: 2
-num: 'AGT·02'
+order: 1
+num: 'AGT·01'
 name: 'Jay'
-species: 'Garrulus documentarius'
+species: 'Corvus jay scribens'
 status: 'live'
 bg: 'rgba(99,102,241,0.06)'
 fr:

@@ -1,7 +1,7 @@
 ---
 key: 'legal'
-order: 4
-num: 'AGT·04'
+order: 6
+num: 'AGT·06'
 name: 'Rook'
 species: 'Corvus juridicus contractus'
 status: 'soon'

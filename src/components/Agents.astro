@@ -12,14 +12,11 @@ interface Props {
 const { locale, data, agents } = Astro.props;
 const sorted = [...agents].sort((a, b) => a.data.order - b.data.order);
 
-const birdComponents = {
-  peep: Peep,
-  jay: Jay,
-  sparrow: Sparrow,
-  legal: Rook,
-  marketing: Piper,
-  innovation: Kite,
-} as const;
+// PNG-based birds for agents without SVG components
+const pngBirds: Record<string, string> = {
+  finch: '/logos/finch-avatar.png',
+  pecker: '/logos/pecker-avatar.png',
+};
 
 // Serialize agents data so the inline switching script can read it without a
 // second network request. Strip out fields the client doesn't need.
@@ -109,6 +106,9 @@ const labels = {
                 {a.key === 'legal' && <Rook size={44} showLabel={false} feet={false} />}
                 {a.key === 'marketing' && <Piper size={44} showLabel={false} feet={false} />}
                 {a.key === 'innovation' && <Kite size={44} showLabel={false} feet={false} />}
+                {pngBirds[a.key] && (
+                  <img src={pngBirds[a.key]} alt={a.name} width="44" height="44" style="border-radius:50%;object-fit:cover;" />
+                )}
               </span>
               <div class="text-left">
                 <div class="tab-name text-[13px] font-bold leading-none text-white">{a.name}</div>
@@ -134,7 +134,7 @@ const labels = {
           <div
             class="absolute inset-0 pointer-events-none transition"
             id="panel-bg"
-            style="background: rgba(251,191,36,0.04);"
+            style="background: rgba(99,102,241,0.06);"
           >
           </div>
           <div
@@ -148,14 +148,20 @@ const labels = {
             class="panel-bird-wrap relative z-10 mb-5 flex items-center justify-center"
             id="panel-bird"
           >
-            <div data-bird="peep">
-              <Peep size={200} showLabel={false} feet={false} />
-            </div>
-            <div data-bird="jay" hidden>
+            <div data-bird="jay">
               <Jay size={200} showLabel={false} feet={false} />
+            </div>
+            <div data-bird="peep" hidden>
+              <Peep size={200} showLabel={false} feet={false} />
             </div>
             <div data-bird="sparrow" hidden>
               <Sparrow size={200} showLabel={false} feet={false} />
+            </div>
+            <div data-bird="finch" hidden>
+              <img src="/logos/finch-avatar.png" alt="Finch" width="200" height="200" style="border-radius:50%;object-fit:cover;" />
+            </div>
+            <div data-bird="pecker" hidden>
+              <img src="/logos/pecker-avatar.png" alt="Pecker" width="200" height="200" style="border-radius:50%;object-fit:cover;" />
             </div>
             <div data-bird="legal" hidden>
               <Rook size={200} showLabel={false} feet={false} />
@@ -172,13 +178,13 @@ const labels = {
             class="panel-agent-name relative z-10 mb-1 text-[38px] font-extrabold tracking-[-0.03em] text-white"
             id="panel-name"
           >
-            Peep
+            Jay
           </div>
           <div
             class="panel-agent-species mb-4 font-mono text-[11px] italic text-white/[0.18]"
             id="panel-species"
           >
-            Phasianus poussin operatus
+            Corvus jay scribens
           </div>
           <div
             class="panel-agent-desc relative z-10 text-sm leading-[1.65] text-white/[0.46]"
@@ -209,7 +215,7 @@ const labels = {
       </div>
 
       <div
-        class="panel-coming-overlay absolute inset-0 z-20 flex-col items-center justify-center gap-3"
+        class="panel-coming-overlay absolute inset-0 z-20 items-center justify-center gap-3"
         id="coming-overlay"
         style="background: rgba(5,19,9,0.88); backdrop-filter: blur(3px);"
       >
@@ -317,6 +323,16 @@ const labels = {
     });
 
     // Initial render of feature list for default-active tab.
-    select(agentsData[0]?.key || 'peep');
+    select(agentsData[0]?.key || 'jay');
   })();
 </script>
+
+<style>
+  .panel-coming-overlay {
+    display: none;
+  }
+  .panel-coming-overlay.visible {
+    display: flex;
+    flex-direction: column;
+  }
+</style>

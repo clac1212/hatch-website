@@ -6,7 +6,7 @@
  *
  * Two collections:
  *   - landing  → one entry per locale (fr, en) with all section copy
- *   - agents   → one entry per agent (peep, jay, sparrow, rook, piper, kite)
+ *   - agents   → one entry per agent (jay, peep, sparrow, finch, pecker, rook, piper, kite)
  *                with both fr and en blocks embedded
  */
 
@@ -152,8 +152,8 @@ const landing = defineCollection({
 const agents = defineCollection({
   loader: glob({ base: './src/content/agents', pattern: '**/*.md' }),
   schema: z.object({
-    key: z.enum(['peep', 'jay', 'sparrow', 'legal', 'marketing', 'innovation']),
-    order: z.number(), // 1..6, drives tab order
+    key: z.enum(['peep', 'jay', 'sparrow', 'finch', 'pecker', 'legal', 'marketing', 'innovation']),
+    order: z.number(), // 1..8, drives tab order
     num: z.string(), // "AGT·01"
     name: z.string(), // "Peep"
     species: z.string(), // "Phasianus poussin operatus"
