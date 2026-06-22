@@ -7,43 +7,47 @@ species: 'Phasianus poussin operatus'
 status: 'live'
 bg: 'rgba(251,191,36,0.05)'
 fr:
-  role: 'Opérations'
-  desc: "L'assistant terrain de votre réseau. Il connaît chaque procédure, répond à chaque question, 24/7 sur WhatsApp, dans la langue du demandeur."
+  role: 'Vie de Réseau'
+  desc: "La voix de votre réseau. Il centralise et envoie toutes vos communications siège-terrain via WhatsApp, dans la langue de chaque équipier."
   features:
     - icon: '💬'
-      name: 'Assistant WhatsApp IA'
-      desc: 'Réponses instantanées et sourcées depuis votre base documentaire. Détection automatique de la langue, disponible 24/7.'
-    - icon: '📥'
-      name: 'Inbox & escalade Slack'
-      desc: "Quand l'IA ne sait pas répondre, la question remonte en ticket. L'équipe répond depuis Hatch ou Slack, le terrain reçoit la réponse sur WhatsApp."
-    - icon: '📡'
-      name: 'Communication ciblée'
-      desc: "Rédigez avec l'IA, segmentez par tags, programmez l'envoi et suivez les confirmations de lecture en temps réel."
-    - icon: '🎓'
-      name: 'Formation & parcours IA'
-      desc: 'Modules e-learning générés depuis vos documents. Onboarding structuré avec badges et quiz WhatsApp ciblés.'
-    - icon: '📋'
-      name: 'Audit IA'
-      desc: "Grilles HACCP pré-remplies par l'IA, scoring automatique, plans d'action priorisés. Fini les retranscriptions manuelles."
-      isNew: true
+      name: 'WhatsApp natif multilingue'
+      desc: "Détection automatique de la langue de l'équipier, remontée siège en français, disponible 24/7."
+    - icon: '✉️'
+      name: 'Compositeur modulaire'
+      desc: 'Communications en blocs texte, images, questions, sondages avec agent IA multimodal.'
+    - icon: '🎯'
+      name: 'Ciblage par tags'
+      desc: 'Managers, franchisés, sites — avec programmation différée et rappels automatiques.'
+    - icon: '📊'
+      name: 'Suivi lecture temps réel'
+      desc: 'Livraison et lecture avec alerte en cas de non-distribution.'
+    - icon: '🎙️'
+      name: 'Voix de marque'
+      desc: 'Instructions personnalisées pour que Peep parle comme votre siège.'
+    - icon: '📎'
+      name: 'Documents via WhatsApp'
+      desc: 'Partagez vos fichiers directement dans la conversation.'
 en:
-  role: 'Operations'
-  desc: "Your network's field assistant. It knows every procedure, answers every question, 24/7 on WhatsApp, in the user's language."
+  role: 'Network Life'
+  desc: "Your network's voice. It centralises and delivers all your HQ-to-field communications via WhatsApp, in each team member's language."
   features:
     - icon: '💬'
-      name: 'AI WhatsApp assistant'
-      desc: 'Instant, sourced answers from your knowledge base. Automatic language detection, available 24/7.'
-    - icon: '📥'
-      name: 'Inbox & Slack escalation'
-      desc: "When the AI can't answer, the question becomes a ticket. The team replies from Hatch or Slack, and the answer lands on the user's WhatsApp."
-    - icon: '📡'
-      name: 'Targeted communications'
-      desc: 'Draft with AI, segment by tags, schedule delivery and track read confirmations in real time.'
-    - icon: '🎓'
-      name: 'AI training & learning paths'
-      desc: 'E-learning modules generated from your documents. Structured onboarding with badges and targeted WhatsApp quizzes.'
-    - icon: '📋'
-      name: 'AI audits'
-      desc: 'HACCP grids pre-filled by AI, automatic scoring, prioritized action plans. No more manual transcriptions.'
-      isNew: true
+      name: 'Native multilingual WhatsApp'
+      desc: 'Automatic language detection, HQ replies in French, available 24/7.'
+    - icon: '✉️'
+      name: 'Modular message builder'
+      desc: 'Text, images, questions, polls — with a multimodal AI agent.'
+    - icon: '🎯'
+      name: 'Tag-based targeting'
+      desc: 'Managers, franchisees, sites — with scheduled delivery and auto-reminders.'
+    - icon: '📊'
+      name: 'Real-time read tracking'
+      desc: 'Delivery and read receipts with alerts for non-delivery.'
+    - icon: '🎙️'
+      name: 'Brand voice'
+      desc: 'Custom instructions so Peep speaks like your HQ.'
+    - icon: '📎'
+      name: 'Documents via WhatsApp'
+      desc: 'Share files directly in the conversation.'
 ---
