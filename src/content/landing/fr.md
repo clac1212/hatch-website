@@ -90,7 +90,7 @@ pricing:
   sub: 'Par utilisateur, vous payez des comptes inactifs, des départs oubliés, des fantômes. Chez Hatch : un établissement actif, un tarif fixe.'
   toggleMonthly: 'Mensuel'
   toggleAnnual: 'Annuel −15%'
-  footnote: 'Tous les prix sont HT · Engagement annuel disponible avec <strong>15% de remise</strong>'
+  footnote: 'Tous les prix sont HT'
   plans:
     - size: 'S'
       segment: 'Kiosques & comptoirs'

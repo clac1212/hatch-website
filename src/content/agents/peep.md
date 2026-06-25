@@ -8,7 +8,7 @@ status: 'live'
 bg: 'rgba(251,191,36,0.05)'
 fr:
   role: 'Vie de Réseau'
-  desc: "La voix de votre réseau. Il centralise et envoie toutes vos communications siège-terrain via WhatsApp, dans la langue de chaque équipier."
+  desc: 'La voix de votre réseau. Il centralise et envoie toutes vos communications siège-terrain via WhatsApp, dans la langue de chaque équipier.'
   features:
     - icon: '💬'
       name: 'WhatsApp natif multilingue'

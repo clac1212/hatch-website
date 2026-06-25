@@ -18,7 +18,7 @@ fr:
       desc: 'Cartes, flashcards, QCM, vidéos — jouables entre deux services.'
     - icon: '⚡'
       name: 'Envoi automatique'
-      desc: "À chaque nouvel équipier tagué, le parcours part tout seul."
+      desc: 'À chaque nouvel équipier tagué, le parcours part tout seul.'
     - icon: '🌍'
       name: 'Multilingue automatique'
       desc: "Détection de la langue de l'apprenant en temps réel."

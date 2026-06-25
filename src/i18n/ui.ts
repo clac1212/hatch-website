@@ -8,7 +8,6 @@ export type Locale = (typeof locales)[number];
 
 export const defaultLocale: Locale = 'fr';
 
-
 export function demoUrl(locale: Locale): string {
   return locale === 'en' ? '/en/demo' : '/demo';
 }

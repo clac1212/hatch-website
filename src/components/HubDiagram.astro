@@ -1,7 +1,13 @@
 ---
 import type { Locale } from '../i18n/ui';
 import type { CollectionEntry } from 'astro:content';
-import { JayAvatar, PeepAvatar, SparrowAvatar, FinchAvatar, PeckerAvatar } from './birds/AvatarBirds.tsx';
+import {
+  JayAvatar,
+  PeepAvatar,
+  SparrowAvatar,
+  FinchAvatar,
+  PeckerAvatar,
+} from './birds/AvatarBirds.tsx';
 
 interface Props {
   locale: Locale;
@@ -25,11 +31,11 @@ const sources = [
 
 // 5 live agents evenly spaced in a quincunx pattern (alternating columns).
 const agents = [
-  { key: 'jay',     name: 'Jay',     top: '9%',  left: '88%' },
-  { key: 'peep',    name: 'Peep',    top: '30%', left: '95%' },
+  { key: 'jay', name: 'Jay', top: '9%', left: '88%' },
+  { key: 'peep', name: 'Peep', top: '30%', left: '95%' },
   { key: 'sparrow', name: 'Sparrow', top: '51%', left: '88%' },
-  { key: 'finch',   name: 'Finch',   top: '72%', left: '95%' },
-  { key: 'pecker',  name: 'Pecker',  top: '93%', left: '88%' },
+  { key: 'finch', name: 'Finch', top: '72%', left: '95%' },
+  { key: 'pecker', name: 'Pecker', top: '93%', left: '88%' },
 ];
 ---
 
@@ -251,7 +257,8 @@ const agents = [
         class="pointer-events-none absolute inset-0"
         style="background: radial-gradient(50% 60% at 18% 30%, rgba(254,215,170,0.55), transparent 60%), radial-gradient(40% 50% at 82% 72%, rgba(253,186,116,0.3), transparent 55%);"
         aria-hidden="true"
-      ></div>
+      >
+      </div>
 
       <!-- SVG: lines + animated dots — covers the FULL container -->
       <svg
@@ -273,26 +280,51 @@ const agents = [
         </g>
         <!-- orange dots: sources → hub -->
         <circle r="1.6" fill="#ea580c" opacity="0.9">
-          <animateMotion dur="1.8s" begin="0s"   repeatCount="indefinite" path="M 10 13 Q 30 13 50 50"/>
+          <animateMotion dur="1.8s" begin="0s" repeatCount="indefinite" path="M 10 13 Q 30 13 50 50"
+          ></animateMotion>
         </circle>
         <circle r="1.6" fill="#ea580c" opacity="0.9">
-          <animateMotion dur="2.0s" begin="0.6s"  repeatCount="indefinite" path="M 10 37 Q 30 37 50 50"/>
+          <animateMotion
+            dur="2.0s"
+            begin="0.6s"
+            repeatCount="indefinite"
+            path="M 10 37 Q 30 37 50 50"></animateMotion>
         </circle>
         <circle r="1.6" fill="#ea580c" opacity="0.9">
-          <animateMotion dur="1.9s" begin="1.2s"  repeatCount="indefinite" path="M 10 62 Q 30 62 50 50"/>
+          <animateMotion
+            dur="1.9s"
+            begin="1.2s"
+            repeatCount="indefinite"
+            path="M 10 62 Q 30 62 50 50"></animateMotion>
         </circle>
         <circle r="1.6" fill="#ea580c" opacity="0.9">
-          <animateMotion dur="2.1s" begin="1.8s"  repeatCount="indefinite" path="M 10 87 Q 30 87 50 50"/>
+          <animateMotion
+            dur="2.1s"
+            begin="1.8s"
+            repeatCount="indefinite"
+            path="M 10 87 Q 30 87 50 50"></animateMotion>
         </circle>
         <!-- yellow dots: hub → agents -->
         <circle r="1.6" fill="#fbbf24" opacity="0.95">
-          <animateMotion dur="1.6s" begin="0.3s"  repeatCount="indefinite" path="M 50 50 Q 70 22 90 22"/>
+          <animateMotion
+            dur="1.6s"
+            begin="0.3s"
+            repeatCount="indefinite"
+            path="M 50 50 Q 70 22 90 22"></animateMotion>
         </circle>
         <circle r="1.6" fill="#fbbf24" opacity="0.95">
-          <animateMotion dur="1.7s" begin="1.0s"  repeatCount="indefinite" path="M 50 50 Q 70 50 90 50"/>
+          <animateMotion
+            dur="1.7s"
+            begin="1.0s"
+            repeatCount="indefinite"
+            path="M 50 50 Q 70 50 90 50"></animateMotion>
         </circle>
         <circle r="1.6" fill="#fbbf24" opacity="0.95">
-          <animateMotion dur="1.8s" begin="1.6s"  repeatCount="indefinite" path="M 50 50 Q 70 78 90 78"/>
+          <animateMotion
+            dur="1.8s"
+            begin="1.6s"
+            repeatCount="indefinite"
+            path="M 50 50 Q 70 78 90 78"></animateMotion>
         </circle>
       </svg>
 
@@ -324,18 +356,25 @@ const agents = [
       <div
         class="absolute"
         style="width:64px;height:64px;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:18px;border:1.5px solid rgba(234,88,12,0.22);animation:hubRingPulse 3s ease-out infinite;z-index:2;"
-      ></div>
+      >
+      </div>
       <div
         class="absolute"
         style="width:64px;height:64px;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:18px;border:1.5px solid rgba(234,88,12,0.22);animation:hubRingPulse 3s ease-out 1.5s infinite;z-index:2;"
-      ></div>
+      >
+      </div>
 
       <!-- HUB card: its center sits at exactly (50%, 50%) — matches SVG hub coordinates -->
       <div
         class="absolute flex h-[64px] w-[64px] items-center justify-center overflow-hidden rounded-[18px] bg-white"
         style="left:50%;top:50%;transform:translate(-50%,-50%);z-index:3;box-shadow:var(--shadow-hub-center);"
       >
-        <img src="/logos/src-hatch.png" alt="Hatch" class="h-full w-full object-cover" loading="lazy" />
+        <img
+          src="/logos/src-hatch.png"
+          alt="Hatch"
+          class="h-full w-full object-cover"
+          loading="lazy"
+        />
       </div>
 
       <!-- HUB label: sits below the card (card bottom = 50%+32px) -->

@@ -1,7 +1,13 @@
 ---
 import type { Locale } from '../i18n/ui';
 import type { CollectionEntry } from 'astro:content';
-import { JayAvatar, PeepAvatar, SparrowAvatar, FinchAvatar, PeckerAvatar } from './birds/AvatarBirds.tsx';
+import {
+  JayAvatar,
+  PeepAvatar,
+  SparrowAvatar,
+  FinchAvatar,
+  PeckerAvatar,
+} from './birds/AvatarBirds.tsx';
 
 interface Props {
   locale: Locale;
@@ -94,11 +100,17 @@ const labels = {
                 </span>
               )}
               <span class="tab-bird-wrap flex h-11 w-11 items-center justify-center overflow-hidden">
-                {a.key === 'jay' ? <JayAvatar size={44} />
-                 : a.key === 'peep' ? <PeepAvatar size={44} />
-                 : a.key === 'sparrow' ? <SparrowAvatar size={44} />
-                 : a.key === 'finch' ? <FinchAvatar size={44} />
-                 : <PeckerAvatar size={44} />}
+                {a.key === 'jay' ? (
+                  <JayAvatar size={44} />
+                ) : a.key === 'peep' ? (
+                  <PeepAvatar size={44} />
+                ) : a.key === 'sparrow' ? (
+                  <SparrowAvatar size={44} />
+                ) : a.key === 'finch' ? (
+                  <FinchAvatar size={44} />
+                ) : (
+                  <PeckerAvatar size={44} />
+                )}
               </span>
               <div class="text-left">
                 <div class="tab-name text-[13px] font-bold leading-none text-white">{a.name}</div>

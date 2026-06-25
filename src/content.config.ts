@@ -119,14 +119,16 @@ const landing = defineCollection({
       toggleMonthly: richString,
       toggleAnnual: richString,
       footnote: richString,
-      plans: z.array(z.object({
-        size: z.string(),
-        segment: richString,
-        desc: richString,
-        priceMonthly: z.number(),
-        priceAnnual: z.number(),
-        btn: richString,
-      })),
+      plans: z.array(
+        z.object({
+          size: z.string(),
+          segment: richString,
+          desc: richString,
+          priceMonthly: z.number(),
+          priceAnnual: z.number(),
+          btn: richString,
+        }),
+      ),
     }),
 
     faq: z.object({

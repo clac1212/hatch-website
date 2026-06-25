@@ -90,7 +90,7 @@ pricing:
   sub: 'With per-user pricing, you pay for inactive accounts, forgotten departures, ghosts. At Hatch: one active location, one fixed price.'
   toggleMonthly: 'Monthly'
   toggleAnnual: 'Annual −15%'
-  footnote: 'All prices excl. VAT · Annual commitment available with <strong>15% discount</strong>'
+  footnote: 'All prices excl. VAT'
   plans:
     - size: 'S'
       segment: 'Kiosks & counters'
