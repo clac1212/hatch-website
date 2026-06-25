@@ -101,15 +101,16 @@ const plansJson = JSON.stringify(
           const c = palette[i];
           return (
             <div
-              class="price-card flex flex-col rounded-[22px] border-2 p-7"
+              class="price-card relative flex flex-col overflow-hidden rounded-[22px] border-2 p-7"
               style={`border-color: ${c.border}; background: ${c.bg};`}
             >
-              <div
-                class="plan-size-badge mb-4 inline-flex h-9 w-9 items-center justify-center rounded-[10px] text-sm font-extrabold"
-                style={`background: ${c.badgeBg}; color: ${c.accent};`}
+              <span
+                class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 font-display font-bold leading-none select-none"
+                style={`font-size: 140px; color: ${c.accent}; opacity: 0.11; letter-spacing: -0.04em;`}
+                aria-hidden="true"
               >
                 {plan.size}
-              </div>
+              </span>
               <div class="plan-segment mb-1 text-sm font-semibold text-slate-900">
                 {plan.segment}
               </div>
