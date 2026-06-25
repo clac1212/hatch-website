@@ -140,6 +140,7 @@ const landing = defineCollection({
       why: richString,
       product: richString,
       pricing: richString,
+      trust: richString,
       faq: richString,
       eyebrow: richString,
     }),

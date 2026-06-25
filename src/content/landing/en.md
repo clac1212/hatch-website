@@ -6,6 +6,7 @@ nav:
   why: 'Why Hatch'
   product: 'Product'
   pricing: 'Pricing'
+  trust: 'Trust'
   faq: 'FAQ'
   eyebrow: 'Franchises & Networks'
 

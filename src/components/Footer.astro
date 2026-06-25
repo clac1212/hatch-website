@@ -11,8 +11,10 @@ interface Props {
 const { data, locale } = Astro.props;
 const privacyUrl = locale === 'en' ? '/en/privacy' : '/privacy';
 const termsUrl = locale === 'en' ? '/en/terms' : '/terms';
+const trustUrl = locale === 'en' ? '/en/trust' : '/confiance';
 const privacyLabel = locale === 'en' ? 'Privacy' : 'Confidentialité';
 const termsLabel = locale === 'en' ? 'Terms' : 'CGU';
+const trustLabel = locale === 'en' ? 'Trust & Security' : 'Confiance & sécurité';
 ---
 
 <footer class="px-0 py-8 pb-12" style="background: var(--footer-gradient);">
@@ -46,6 +48,9 @@ const termsLabel = locale === 'en' ? 'Terms' : 'CGU';
     </div>
     <div class="flex flex-col items-end gap-2">
       <div class="flex items-center gap-5">
+        <a href={trustUrl} class="text-xs text-white/35 transition-colors hover:text-white/65"
+          >{trustLabel}</a
+        >
         <a href={privacyUrl} class="text-xs text-white/35 transition-colors hover:text-white/65"
           >{privacyLabel}</a
         >

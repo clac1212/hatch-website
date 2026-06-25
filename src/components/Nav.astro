@@ -40,6 +40,9 @@ const otherLocaleUrl = otherLocale === 'fr' ? '/' : '/en/';
         <a class="nav-link text-sm font-medium transition" href="#pricing">{data.pricing}</a>
       </li>
       <li>
+        <a class="nav-link text-sm font-medium transition" href={locale === 'fr' ? '/confiance' : '/en/trust'}>{data.trust}</a>
+      </li>
+      <li>
         <a class="nav-link text-sm font-medium transition" href="#faq">{data.faq}</a>
       </li>
     </ul>
