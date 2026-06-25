@@ -1,0 +1,172 @@
+---
+import type { Locale } from '../i18n/ui';
+import '../styles/global.css';
+
+interface Props {
+  locale: Locale;
+  title: string;
+  description?: string;
+}
+
+const { locale, title, description = title } = Astro.props;
+const homeUrl = locale === 'en' ? '/en/' : '/';
+const demoUrl = locale === 'en' ? '/en/demo' : '/demo';
+const backLabel = locale === 'en' ? '← Back to site' : '← Retour au site';
+const demoLabel = locale === 'en' ? 'Request a demo' : 'Demander une démo';
+const copyrightText = '© 2026 Hatch · gethatch.io';
+const privacyUrl = locale === 'en' ? '/en/privacy' : '/privacy';
+const termsUrl = locale === 'en' ? '/en/terms' : '/terms';
+const trustUrl = locale === 'en' ? '/en/trust' : '/confiance';
+const privacyLabel = locale === 'en' ? 'Privacy' : 'Confidentialité';
+const termsLabel = locale === 'en' ? 'Terms' : 'CGU';
+const trustLabel = locale === 'en' ? 'Trust & Security' : 'Confiance & sécurité';
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>{title}</title>
+
+    <style is:global>
+      .trust-nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        background: rgba(5, 19, 9, 0.92);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      }
+      .trust-nav-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 64px;
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 0 32px;
+      }
+      .trust-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.5);
+        text-decoration: none;
+        transition: color 0.15s;
+        font-family: 'Inter', sans-serif;
+      }
+      .trust-back:hover {
+        color: #fff;
+      }
+      .trust-demo-btn {
+        display: inline-flex;
+        align-items: center;
+        background: #fff4a4;
+        color: #1a2e1c;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 9px 20px;
+        border-radius: 9px;
+        text-decoration: none;
+        transition:
+          background 0.15s,
+          box-shadow 0.15s,
+          transform 0.15s;
+        font-family: 'Inter', sans-serif;
+        white-space: nowrap;
+      }
+      .trust-demo-btn:hover {
+        background: #f5e98a;
+        box-shadow: 0 6px 22px rgba(255, 244, 164, 0.28);
+        transform: translateY(-1px);
+      }
+      .trust-footer-link {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.35);
+        text-decoration: none;
+        transition: color 0.15s;
+        font-family: 'Inter', sans-serif;
+      }
+      .trust-footer-link:hover {
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      /* ── Trust page typography reset ── */
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        margin: 0;
+      }
+      * {
+        box-sizing: border-box;
+      }
+    </style>
+  </head>
+  <body style="background:#fff;margin:0;">
+    <!-- NAV -->
+    <nav class="trust-nav">
+      <div class="trust-nav-inner">
+        <a href={homeUrl} aria-label="Hatch">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="280 270 520 560"
+            width="30"
+            height="30"
+            style="display:block;border-radius:7px;"
+            aria-hidden="true"
+          >
+            <rect fill="#ea580c" x="0" y="0" width="1080" height="1080" rx="80"></rect>
+            <path
+              fill="#fff4a4"
+              d="M518.89,659.49V607.25l-38.18,11.3-39.32-27.47v68.41c0,16.44-19.17,17.25-19.17,31.21,0,12.72,11.75,14.36,26.12,14.36h63.15c14.82,0,26.57-1.64,26.57-14.36C538.06,676.74,518.89,675.93,518.89,659.49Z"
+            ></path>
+            <path
+              fill="#fff4a4"
+              d="M656.06,659.49V587.67c0-7.23-.27-14.14-.9-20.69L578,589.79c.1,2.23.14,4.52.14,6.93v62.77c0,16.44-19.17,17.25-19.17,31.62,0,12.31,12.19,13.95,26.57,13.95h63.15c14.37,0,26.57-1.64,26.57-13.95C675.24,676.74,656.06,675.93,656.06,659.49Z"
+            ></path>
+            <path
+              fill="#fff4a4"
+              d="M575.43,469.79c-33,2.2-54.49,20.63-66.44,44.57l-2.18.14L499,396.32c-1-15.64-6.26-22.29-21.49-21.28-22.57,1.5-73.67,20.6-72.69,35.39.66,10,7.78,12.14,16.44,17.68,5.9,3.53,11.09,9.3,12.07,24.06l8.93,115.63,39.16,28,36.47-13.4-.19-3c-1.79-26.93,7.76-47.79,29-49.21,16.38-1.09,25.46,9.35,29.66,29.86l75-29.09C642.27,490.47,620.26,466.82,575.43,469.79Z"
+            ></path>
+          </svg>
+        </a>
+        <a href={homeUrl} class="trust-back">{backLabel}</a>
+        <a href={demoUrl} class="trust-demo-btn">{demoLabel}</a>
+      </div>
+    </nav>
+
+    <!-- CONTENT: full-width, sections handle their own layout -->
+    <main style="padding-top:64px;">
+      <slot />
+    </main>
+
+    <!-- FOOTER -->
+    <footer style="background:linear-gradient(180deg,#0a1f0b 0%,#051309 100%);border-top:1px solid rgba(255,255,255,0.06);">
+      <div
+        style="max-width:1120px;margin:0 auto;padding:22px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;"
+      >
+        <span style="font-size:13px;color:rgba(255,255,255,0.3);font-family:'Inter',sans-serif;"
+          >{copyrightText}</span
+        >
+        <div style="display:flex;align-items:center;gap:20px;">
+          <a href={trustUrl} class="trust-footer-link">{trustLabel}</a>
+          <a href={privacyUrl} class="trust-footer-link">{privacyLabel}</a>
+          <a href={termsUrl} class="trust-footer-link">{termsLabel}</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
