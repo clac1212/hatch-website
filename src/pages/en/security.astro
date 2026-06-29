@@ -1,0 +1,20 @@
+---
+import { getEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Nav from '../../components/Nav.astro';
+import Security from '../../components/Security.astro';
+import Footer from '../../components/Footer.astro';
+import { securityContent } from '../../data/security';
+
+const locale = 'en' as const;
+const landing = await getEntry('landing', locale);
+if (!landing) throw new Error('Missing landing/en content collection entry.');
+const { data } = landing;
+const meta = securityContent[locale].meta;
+---
+
+<Base title={meta.title} description={meta.description} locale={locale}>
+  <Nav locale={locale} data={data.nav} />
+  <Security locale={locale} />
+  <Footer data={data.footer} locale={locale} />
+</Base>

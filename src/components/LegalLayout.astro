@@ -10,10 +10,12 @@ interface Props {
 
 const { locale, title, description = title } = Astro.props;
 const homeUrl = locale === 'en' ? '/en/' : '/';
+const securityUrl = locale === 'en' ? '/en/security' : '/security';
 const privacyUrl = locale === 'en' ? '/en/privacy' : '/privacy';
 const termsUrl = locale === 'en' ? '/en/terms' : '/terms';
 const backLabel = locale === 'en' ? 'Back to site' : 'Retour au site';
 const copyrightText = '© 2026 Hatch · gethatch.io';
+const securityLabel = locale === 'en' ? 'Security' : 'Sécurité';
 const privacyLabel = locale === 'en' ? 'Privacy' : 'Confidentialité';
 const termsLabel = locale === 'en' ? 'Terms' : 'CGU';
 ---
@@ -297,6 +299,7 @@ const termsLabel = locale === 'en' ? 'Terms' : 'CGU';
       >
         <span style="font-size:13px;color:rgba(255,255,255,0.3);">{copyrightText}</span>
         <div style="display:flex;align-items:center;gap:20px;">
+          <a href={securityUrl} class="legal-footer-link">{securityLabel}</a>
           <a href={privacyUrl} class="legal-footer-link">{privacyLabel}</a>
           <a href={termsUrl} class="legal-footer-link">{termsLabel}</a>
         </div>

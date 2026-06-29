@@ -11,6 +11,12 @@ const { locale, data } = Astro.props;
 const t = ui[locale];
 const otherLocale: Locale = locale === 'fr' ? 'en' : 'fr';
 const otherLocaleUrl = otherLocale === 'fr' ? '/' : '/en/';
+const securityUrl = locale === 'en' ? '/en/security' : '/security';
+// Anchor links (#pourquoi, #agents, …) only resolve on the homepage.
+// From any other page (e.g. /security), prefix with the home URL so they
+// navigate home first, then jump to the section.
+const homeUrl = locale === 'en' ? '/en/' : '/';
+const anchor = (id: string) => `${homeUrl}#${id}`;
 ---
 
 <nav>
@@ -31,16 +37,19 @@ const otherLocaleUrl = otherLocale === 'fr' ? '/' : '/en/';
 
     <ul class="nav-links hidden gap-8 md:flex" aria-label={t.ariaLabels.primaryNav}>
       <li>
-        <a class="nav-link text-sm font-medium transition" href="#pourquoi">{data.why}</a>
+        <a class="nav-link text-sm font-medium transition" href={anchor('pourquoi')}>{data.why}</a>
       </li>
       <li>
-        <a class="nav-link text-sm font-medium transition" href="#agents">{data.product}</a>
+        <a class="nav-link text-sm font-medium transition" href={anchor('agents')}>{data.product}</a>
       </li>
       <li>
-        <a class="nav-link text-sm font-medium transition" href="#pricing">{data.pricing}</a>
+        <a class="nav-link text-sm font-medium transition" href={anchor('pricing')}>{data.pricing}</a>
       </li>
       <li>
-        <a class="nav-link text-sm font-medium transition" href="#faq">{data.faq}</a>
+        <a class="nav-link text-sm font-medium transition" href={anchor('faq')}>{data.faq}</a>
+      </li>
+      <li>
+        <a class="nav-link text-sm font-medium transition" href={securityUrl}>{data.security}</a>
       </li>
     </ul>
 

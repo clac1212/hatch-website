@@ -7,6 +7,7 @@ nav:
   product: 'Le Produit'
   pricing: 'Tarifs'
   faq: 'FAQ'
+  security: 'Sécurité'
   eyebrow: 'Franchises & Succursales'
 
 hero:

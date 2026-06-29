@@ -141,6 +141,7 @@ const landing = defineCollection({
       product: richString,
       pricing: richString,
       faq: richString,
+      security: richString,
       eyebrow: richString,
     }),
 
