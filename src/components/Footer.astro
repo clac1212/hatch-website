@@ -9,8 +9,10 @@ interface Props {
 }
 
 const { data, locale } = Astro.props;
+const securityUrl = locale === 'en' ? '/en/security' : '/security';
 const privacyUrl = locale === 'en' ? '/en/privacy' : '/privacy';
 const termsUrl = locale === 'en' ? '/en/terms' : '/terms';
+const securityLabel = locale === 'en' ? 'Security' : 'Sécurité';
 const privacyLabel = locale === 'en' ? 'Privacy' : 'Confidentialité';
 const termsLabel = locale === 'en' ? 'Terms' : 'CGU';
 ---
@@ -46,6 +48,9 @@ const termsLabel = locale === 'en' ? 'Terms' : 'CGU';
     </div>
     <div class="flex flex-col items-end gap-2">
       <div class="flex items-center gap-5">
+        <a href={securityUrl} class="text-xs text-white/35 transition-colors hover:text-white/65"
+          >{securityLabel}</a
+        >
         <a href={privacyUrl} class="text-xs text-white/35 transition-colors hover:text-white/65"
           >{privacyLabel}</a
         >

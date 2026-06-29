@@ -1,0 +1,207 @@
+---
+import { demoUrl, type Locale } from '../i18n/ui';
+import { securityContent, type SecurityIcon } from '../data/security';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const c = securityContent[locale];
+
+// Inline stroke icons, keyed to SecurityCard.icon. Kept here so the content
+// module stays text-only. Single-color (currentColor) so the tile sets the hue.
+const ICONS: Record<SecurityIcon, string> = {
+  select: '<polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>',
+  location:
+    '<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>',
+  encryption:
+    '<rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  noTrain: '<circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/>',
+  noRetention:
+    '<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/>',
+  isolation: '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M12 3v18"/>',
+  sso: '<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="m10 17 5-5-5-5"/><path d="M15 12H3"/>',
+  roles:
+    '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  permissions:
+    '<line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" y1="10" y2="3"/><line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/><line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/><line x1="2" x2="6" y1="14" y2="14"/><line x1="10" x2="14" y1="8" y2="8"/><line x1="18" x2="22" y1="16" y2="16"/>',
+  gdpr: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/>',
+  aiAct:
+    '<path d="M12 3v18"/><path d="M5 7h14"/><path d="M7 7l-3 6a3 3 0 0 0 6 0Z"/><path d="M17 7l-3 6a3 3 0 0 0 6 0Z"/><path d="M8 21h8"/>',
+  doc: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/>',
+};
+
+// Per-section background, alternating; section index 1 ("no AI training") gets
+// the dark spotlight. Lengths match c.sections (4).
+const SECTION_BG = ['bg-white', 'bg-hatch-bg', 'bg-white', 'bg-hatch-surface'];
+const SECTION_DARK = [false, true, false, false];
+---
+
+<!-- ── Hero (dark) ── -->
+<section
+  class="sec-hero relative overflow-hidden bg-hatch-bg px-0 pb-24 pt-[150px] text-center text-white"
+  id="hero"
+>
+  <div class="sec-hero-glow pointer-events-none absolute inset-0" aria-hidden="true"></div>
+  <div class="container-site relative z-[1] flex flex-col items-center">
+    <div
+      class="mb-8 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 pl-2.5 text-xs font-semibold tracking-[0.04em] text-white/60"
+    >
+      <span
+        class="pulse-dot block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-hatch-primary-bright shadow-[0_0_8px_rgba(90,173,110,0.7)]"
+      ></span>
+      <span>{c.hero.eyebrow}</span>
+    </div>
+
+    <h1
+      class="mx-auto mb-6 max-w-[780px] font-display font-bold text-white"
+      style="font-size: clamp(38px, 5.5vw, 64px); line-height: 1.04; letter-spacing: -0.025em;"
+    >
+      {c.hero.h1}
+    </h1>
+
+    <p class="mx-auto mb-8 max-w-[560px] text-lg leading-[1.7] text-white/70">{c.hero.sub}</p>
+
+    <div class="mb-10 flex flex-wrap justify-center gap-2.5">
+      {
+        c.hero.trust.map((t) => (
+          <span class="inline-flex items-center gap-1.5 rounded-full border border-white/12 bg-white/5 px-3 py-1.5 text-xs font-medium text-white/75">
+            <svg
+              class="h-3.5 w-3.5 flex-shrink-0 text-hatch-primary-bright"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="m5 12 5 5L20 7" />
+            </svg>
+            {t}
+          </span>
+        ))
+      }
+    </div>
+
+    <a
+      href={demoUrl(locale)}
+      class="inline-flex items-center gap-[7px] whitespace-nowrap rounded-[9px] bg-hatch-cta px-5 py-2.5 text-sm font-semibold text-hatch-text transition hover:-translate-y-px hover:bg-hatch-cta-hover hover:shadow-[0_6px_22px_rgba(255,244,164,0.28)]"
+    >
+      {c.hero.cta}
+      <svg
+        width="15"
+        height="15"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+      >
+        <path d="M5 12h14M12 5l7 7-7 7"></path>
+      </svg>
+    </a>
+  </div>
+</section>
+
+<!-- ── Themed sections ── -->
+{
+  c.sections.map((section, i) => {
+    const dark = SECTION_DARK[i];
+    return (
+      <section class:list={['px-0 py-20', SECTION_BG[i]]}>
+        <div class="container-site">
+          <div class="mx-auto mb-12 max-w-[680px] text-center">
+            <h2
+              class:list={['font-display font-bold', dark ? 'text-white' : 'text-hatch-text']}
+              style="font-size: clamp(28px, 3.8vw, 42px); line-height: 1.08; letter-spacing: -0.02em;"
+            >
+              {section.title}
+            </h2>
+            <p
+              class:list={['mt-4 text-lg leading-[1.6]', dark ? 'text-white/65' : 'text-slate-500']}
+            >
+              {section.subtitle}
+            </p>
+          </div>
+
+          <div class="grid gap-5 md:grid-cols-3">
+            {section.cards.map((card) => (
+              <div
+                class:list={[
+                  'rounded-2xl border p-6',
+                  dark
+                    ? 'border-white/10 bg-white/[0.04]'
+                    : 'border-slate-200 bg-white transition hover:shadow-[var(--shadow-card-hover)]',
+                ]}
+              >
+                <div
+                  class:list={[
+                    'mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl',
+                    dark
+                      ? 'bg-white/10 text-hatch-primary-bright'
+                      : 'bg-hatch-pill-bg text-hatch-primary',
+                  ]}
+                >
+                  <svg
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                    set:html={ICONS[card.icon]}
+                  />
+                </div>
+                <h3
+                  class:list={[
+                    'mb-2 font-display text-lg font-bold',
+                    dark ? 'text-white' : 'text-hatch-text',
+                  ]}
+                >
+                  {card.title}
+                </h3>
+                <p
+                  class:list={[
+                    'text-[14.5px] leading-[1.6]',
+                    dark ? 'text-white/70' : 'text-slate-600',
+                  ]}
+                >
+                  {card.body}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  })
+}
+
+<!-- ── Contact (dark band) ── -->
+<section class="bg-hatch-bg px-0 py-20 text-center text-white">
+  <div class="container-site flex flex-col items-center">
+    <h2
+      class="mb-4 font-display font-bold text-white"
+      style="font-size: clamp(26px, 3.4vw, 38px); line-height: 1.1;"
+    >
+      {c.contact.heading}
+    </h2>
+    <p class="mb-8 max-w-[560px] text-lg leading-[1.7] text-white/70">{c.contact.body}</p>
+    <a
+      href={demoUrl(locale)}
+      class="inline-flex items-center gap-[7px] whitespace-nowrap rounded-[9px] bg-hatch-cta px-5 py-2.5 text-sm font-semibold text-hatch-text transition hover:-translate-y-px hover:bg-hatch-cta-hover hover:shadow-[0_6px_22px_rgba(255,244,164,0.28)]"
+    >
+      {c.contact.cta}
+    </a>
+  </div>
+</section>
+
+<style>
+  .sec-hero-glow {
+    background: var(--hero-glow);
+  }
+</style>

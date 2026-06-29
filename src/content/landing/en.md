@@ -7,6 +7,7 @@ nav:
   product: 'Product'
   pricing: 'Pricing'
   faq: 'FAQ'
+  security: 'Security'
   eyebrow: 'Franchises & Networks'
 
 hero:
