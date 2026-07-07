@@ -1,0 +1,1112 @@
+---
+import type { Locale } from '../i18n/ui';
+import '../styles/global.css';
+
+interface Props {
+  locale: Locale;
+  title: string;
+  description?: string;
+  navLabel: string; // "Hatch Sans Filtre" / localized — used in footer
+}
+
+const { locale, title, description = title, navLabel } = Astro.props;
+
+const isEn = locale === 'en';
+const homeUrl = isEn ? '/en/' : '/';
+const backLabel = isEn ? 'Back to site' : 'Retour au site';
+const copyright =
+  '© 2026 Hatch OS · ' +
+  (isEn ? 'The OS for restaurant networks' : "L'OS des réseaux de restauration") +
+  ' · gethatch.io';
+
+// Footer columns
+const cols = isEn
+  ? [
+      {
+        h: 'Product',
+        items: [
+          { t: 'Product', href: '/en/#agents' },
+          { t: 'Pricing', href: '/en/#pricing' },
+          { t: 'Trust', href: '/en/trust' },
+        ],
+      },
+      {
+        h: 'Resources',
+        items: [
+          { t: navLabel, href: '/en/unfiltered', hi: true },
+          { t: 'Privacy', href: '/en/privacy' },
+          { t: 'Terms', href: '/en/terms' },
+        ],
+      },
+      {
+        h: 'Company',
+        items: [
+          { t: 'Demo', href: '/en/demo' },
+          { t: 'Contact', href: 'mailto:cesar@gethatch.io' },
+        ],
+      },
+      {
+        h: 'Follow',
+        items: [
+          { t: 'LinkedIn', href: 'https://www.linkedin.com/company/gethatch' },
+          { t: 'Instagram', href: 'https://www.instagram.com/gethatch' },
+        ],
+      },
+    ]
+  : [
+      {
+        h: 'Produit',
+        items: [
+          { t: 'Le produit', href: '/#agents' },
+          { t: 'Tarifs', href: '/#pricing' },
+          { t: 'Confiance', href: '/confiance' },
+        ],
+      },
+      {
+        h: 'Ressources',
+        items: [
+          { t: navLabel, href: '/sans-filtre', hi: true },
+          { t: 'Confidentialité', href: '/privacy' },
+          { t: 'CGU', href: '/terms' },
+        ],
+      },
+      {
+        h: 'Entreprise',
+        items: [
+          { t: 'Démo', href: '/demo' },
+          { t: 'Contact', href: 'mailto:cesar@gethatch.io' },
+        ],
+      },
+      {
+        h: 'Suivre',
+        items: [
+          { t: 'LinkedIn', href: 'https://www.linkedin.com/company/gethatch' },
+          { t: 'Instagram', href: 'https://www.instagram.com/gethatch' },
+        ],
+      },
+    ];
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600;1,9..144,700&family=Fredoka:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Courier+Prime:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>{title}</title>
+  </head>
+  <body class="sf-body">
+    <div class="sf-doc">
+      <!-- UTILITY BAR: back to site + language toggle -->
+      <div class="sf-wrap">
+        <div class="sf-utility">
+          <a href={homeUrl} class="sf-back">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg
+            >
+            {backLabel}
+          </a>
+          <div class="sf-lang" role="group" aria-label={isEn ? 'Language' : 'Langue'}>
+            <a
+              href="/sans-filtre"
+              class:list={['sf-lang-btn', !isEn && 'on']}
+              aria-current={!isEn ? 'true' : undefined}>FR</a
+            >
+            <a
+              href="/en/unfiltered"
+              class:list={['sf-lang-btn', isEn && 'on']}
+              aria-current={isEn ? 'true' : undefined}>EN</a
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE CONTENT (masthead bar, editions…) -->
+      <slot />
+
+      <!-- FOOTER -->
+      <div class="sf-wrap">
+        <footer class="sf-footer">
+          <a href={homeUrl} class="sf-foot-brand" aria-label="Hatch OS">
+            <img src="/logos/hatch-bird-green.svg" alt="Hatch OS" width="32" height="32" />
+          </a>
+          <div class="sf-foot-cols">
+            {
+              cols.map((c) => (
+                <div>
+                  <h4>{c.h}</h4>
+                  <div>
+                    {c.items.map((it) => (
+                      <a href={it.href} class:list={['sf-foot-link', it.hi && 'hi']}>
+                        {it.t}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+          <div class="sf-foot-base">{copyright}</div>
+        </footer>
+      </div>
+    </div>
+
+    <style is:global>
+      /* ─────────────────────────────────────────────────────────────
+       * Hatch Sans Filtre — editorial "journal" page styling.
+       * Scoped to .sf-* classes so it never leaks into other pages.
+       * Palette is page-local (warm paper) but the accent reuses the
+       * brand green (#386641 = --color-hatch-primary).
+       * ───────────────────────────────────────────────────────────── */
+      .sf-body {
+        --paper: #f7f3e8;
+        --paper2: #f9efc9;
+        --ink: #181712;
+        --ink-soft: #43413a;
+        --ink-mute: #8f8b7d;
+        --line: #d9d3c0;
+        --green: #386641;
+        color: var(--ink);
+        font-family: 'Newsreader', Georgia, serif;
+        font-size: 17px;
+        line-height: 1.6;
+        margin: 0;
+        background: var(--paper);
+      }
+      /* Warm gradient anchored to the bottom of the page — it builds up toward
+       * the footer and scrolls with the content (à la Dia). It's the doc's own
+       * background, so text always sits crisply on top. */
+      .sf-doc {
+        position: relative;
+        background-color: transparent;
+        background-image: linear-gradient(
+          to top,
+          rgba(243, 199, 112, 0.6) 0%,
+          rgba(249, 225, 150, 0.26) 28%,
+          rgba(247, 243, 232, 0) 62%
+        );
+        background-repeat: no-repeat;
+        background-position: center bottom;
+        background-size: 100% 78vh;
+      }
+      .sf-wrap {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 0 34px;
+      }
+
+      /* ── Utility bar: back to site + language toggle ── */
+      .sf-utility {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 16px;
+      }
+      .sf-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-family: 'Courier Prime', monospace;
+        font-size: 12px;
+        letter-spacing: 0.4px;
+        color: var(--ink-soft);
+        transition: color 0.15s;
+      }
+      .sf-back:hover {
+        color: var(--ink);
+      }
+      .sf-back svg {
+        transition: transform 0.15s;
+      }
+      .sf-back:hover svg {
+        transform: translateX(-3px);
+      }
+      .sf-lang {
+        display: inline-flex;
+        gap: 2px;
+        border: 1px solid var(--line);
+        border-radius: 100px;
+        padding: 2px;
+      }
+      .sf-lang-btn {
+        font-family: 'Courier Prime', monospace;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        padding: 3px 11px;
+        border-radius: 100px;
+        color: var(--ink-mute);
+        transition:
+          background 0.15s,
+          color 0.15s;
+      }
+      .sf-lang-btn:hover {
+        color: var(--ink);
+      }
+      .sf-lang-btn.on {
+        background: var(--ink);
+        color: var(--paper);
+      }
+      .sf-display {
+        font-family: 'Fraunces', serif;
+      }
+      .sf-mono {
+        font-family: 'Courier Prime', 'Courier New', monospace;
+      }
+
+      /* ── Nav ── */
+      .sf-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .sf-brand {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        color: var(--ink);
+      }
+      .sf-brand img {
+        width: 30px;
+        height: 30px;
+        border-radius: 7px;
+        display: block;
+      }
+      .sf-brand-name {
+        font-family: 'Fraunces', serif;
+        font-weight: 700;
+        font-size: 19px;
+      }
+      .sf-nav-links {
+        display: flex;
+        gap: 22px;
+        font-size: 14px;
+        color: var(--ink-soft);
+      }
+      .sf-nav-link {
+        color: var(--ink-soft);
+        transition: color 0.15s;
+      }
+      .sf-nav-link:hover {
+        color: var(--ink);
+      }
+      .sf-nav-link.on {
+        color: var(--green);
+        font-weight: 500;
+        border-bottom: 2px solid var(--green);
+        padding-bottom: 2px;
+      }
+      .sf-demo {
+        font-size: 13px;
+        border: 1px solid var(--ink);
+        padding: 6px 14px;
+        border-radius: 2px;
+        color: var(--ink);
+        white-space: nowrap;
+        transition:
+          background 0.15s,
+          color 0.15s;
+      }
+      .sf-demo:hover {
+        background: var(--ink);
+        color: var(--paper);
+      }
+
+      /* ── Meta strip ── */
+      .sf-strip {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 13px 0;
+        font-family: 'Courier Prime', monospace;
+        font-size: 11.5px;
+        letter-spacing: 0.4px;
+        color: var(--ink-soft);
+        border-bottom: 1px solid var(--line);
+      }
+      .sf-strip .seg {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+      }
+      .sf-digits {
+        display: inline-flex;
+        gap: 3px;
+        margin-left: 5px;
+      }
+      .sf-digits b {
+        display: inline-block;
+        width: 15px;
+        text-align: center;
+        border: 1px solid var(--line);
+        background: #fff;
+        border-radius: 2px;
+        font-weight: 400;
+        padding: 1px 0;
+      }
+
+      /* ── Masthead bar (Dia-style): meta flanks the centered logo ── */
+      .sf-mast {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        gap: 48px;
+        padding: 22px 0 24px;
+        border-bottom: 3px double var(--ink);
+      }
+      .sf-mast-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        font-family: 'Courier Prime', monospace;
+        font-size: 11.5px;
+        letter-spacing: 0.4px;
+        color: var(--ink-soft);
+      }
+      .sf-mast-meta.right {
+        align-items: flex-end;
+        text-align: right;
+      }
+      .sf-mast-meta .seg {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        white-space: nowrap;
+      }
+      .sf-mast-center {
+        text-align: center;
+        color: var(--ink);
+        display: block;
+      }
+      .sf-mast-title {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      .sf-mast-logo {
+        width: 78px;
+        height: 78px;
+        border-radius: 16px;
+        display: block;
+        box-shadow: 0 2px 0 #e0d9c4;
+      }
+      .sf-mast-title {
+        flex-wrap: nowrap;
+      }
+      /* "hatch" wordmark logo replacing the plain-text word in the masthead. */
+      .sf-mast-hatchwrap {
+        display: inline-flex;
+        align-items: flex-start;
+        gap: 4px;
+      }
+      .sf-mast-logo-word {
+        height: clamp(30px, 4.2vw, 54px);
+        width: auto;
+        display: block;
+        flex-shrink: 0;
+      }
+      .sf-mast-os {
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 600;
+        font-size: clamp(11px, 1.5vw, 18px);
+        line-height: 1;
+        color: var(--ink);
+        margin-top: 0.12em;
+      }
+      /* "Mensuel" / "Monthly" — rounded outline with bouncy, staggered
+       * letters, à la Dia "Weekly". Each letter is its own inline-block so it
+       * can be nudged up/down and rotated for the playful, hand-placed feel. */
+      .sf-mast-title .sf {
+        font-family: 'Fredoka', 'Fraunces', sans-serif;
+        font-weight: 500;
+        font-size: clamp(24px, 3.6vw, 44px);
+        line-height: 0.9;
+        color: transparent;
+        -webkit-text-stroke: 1.3px var(--ink);
+        text-stroke: 1.3px var(--ink);
+        display: inline-block;
+        white-space: nowrap;
+        padding: 0.12em 0.06em 0.12em 0;
+        /* Jaunty tilt, à la Dia "Weekly" (other diagonal). */
+        transform: rotate(9deg);
+        transform-origin: center;
+        margin: 0 0.15em;
+      }
+      .sf-mast-title .sf .l {
+        display: inline-block;
+      }
+      .sf-mast-title .sf .l:nth-child(1) {
+        transform: translateY(3px) rotate(-5deg);
+      }
+      .sf-mast-title .sf .l:nth-child(2) {
+        transform: translateY(-5px) rotate(3deg);
+      }
+      .sf-mast-title .sf .l:nth-child(3) {
+        transform: translateY(4px) rotate(-3deg);
+      }
+      .sf-mast-title .sf .l:nth-child(4) {
+        transform: translateY(-6px) rotate(4deg);
+      }
+      .sf-mast-title .sf .l:nth-child(5) {
+        transform: translateY(2px) rotate(-4deg);
+      }
+      .sf-mast-title .sf .l:nth-child(6) {
+        transform: translateY(-4px) rotate(3deg);
+      }
+      .sf-mast-title .sf .l:nth-child(7) {
+        transform: translateY(5px) rotate(-3deg);
+      }
+      .sf-mast-title .sf .l:nth-child(8) {
+        transform: translateY(-3px) rotate(4deg);
+      }
+      .sf-mast-tag {
+        display: inline-block;
+        margin-top: 2px;
+        transform: translateX(46px) rotate(-7deg);
+        background: var(--ink);
+        color: var(--paper);
+        font-family: 'Courier Prime', monospace;
+        font-size: clamp(8.5px, 1vw, 10.5px);
+        letter-spacing: 2.5px;
+        padding: 2.5px 9px;
+        white-space: nowrap;
+      }
+      .sf-mast-sub {
+        margin-top: 34px;
+        font-family: 'Courier Prime', monospace;
+        font-size: 11.5px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+      }
+      .sf-dot {
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        border: 1px solid var(--ink-soft);
+        border-radius: 50%;
+      }
+
+      /* ── Issue headline ── */
+      .sf-issue {
+        text-align: center;
+        padding: 50px 0 8px;
+      }
+      .sf-issue h1 {
+        font-family: 'Fraunces', serif;
+        font-weight: 600;
+        font-size: clamp(34px, 5.5vw, 56px);
+        line-height: 1.02;
+        letter-spacing: -1.5px;
+        max-width: 780px;
+        margin: 0 auto;
+      }
+      .sf-lede {
+        max-width: 620px;
+        margin: 30px auto 0;
+        font-size: 20px;
+        line-height: 1.65;
+        color: var(--ink-soft);
+      }
+      .sf-lede .sf-sig {
+        display: block;
+        margin-top: 16px;
+        font-family: 'Courier Prime', monospace;
+        font-size: 12.5px;
+        color: var(--ink-mute);
+        letter-spacing: 0.3px;
+      }
+
+      /* ── Featured band ── */
+      .sf-band {
+        background: linear-gradient(180deg, var(--paper) 0%, var(--paper2) 100%);
+        margin-top: 38px;
+      }
+      .sf-feat {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 50px;
+        align-items: center;
+        padding: 56px 0;
+      }
+      .sf-feat h2 {
+        font-family: 'Fraunces', serif;
+        font-weight: 600;
+        font-size: 32px;
+        line-height: 1.1;
+        letter-spacing: -0.5px;
+        margin: 0 0 15px;
+      }
+      .sf-feat p {
+        font-size: 17px;
+        color: var(--ink-soft);
+        margin: 0 0 13px;
+      }
+      .sf-eyebrow {
+        font-family: 'Courier Prime', monospace;
+        font-size: 11.5px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--green);
+        margin: 0 0 14px;
+      }
+      .sf-shot {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 1px 0 #e7e1cf;
+      }
+      .sf-shot-bar {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 9px 12px;
+        border-bottom: 1px solid var(--line);
+        background: #faf8f1;
+      }
+      .sf-shot-bar i {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #d9d3c0;
+        display: inline-block;
+      }
+      .sf-shot-bar span {
+        margin-left: 8px;
+        font-family: 'Courier Prime', monospace;
+        font-size: 11px;
+        color: var(--ink-mute);
+      }
+      /* Real product screenshot inside the browser frame. */
+      .sf-shot-screen {
+        aspect-ratio: 16 / 10;
+        background-color: #f1efe9;
+        background-size: cover;
+        background-position: top center;
+        background-repeat: no-repeat;
+      }
+      .sf-shot-body {
+        padding: 26px 22px;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+      }
+      .sf-shot-avatar {
+        width: 96px;
+        height: 96px;
+        flex-shrink: 0;
+        border-radius: 18px;
+        background: #f1f5ec;
+        border: 1px solid #e7efe2;
+        object-fit: contain;
+        padding: 6px;
+      }
+      .sf-shot-meta .nm {
+        font-family: 'Fraunces', serif;
+        font-weight: 600;
+        font-size: 20px;
+        color: var(--ink);
+      }
+      .sf-shot-meta .st {
+        font-family: 'Courier Prime', monospace;
+        font-size: 12px;
+        color: var(--green);
+        margin-top: 2px;
+      }
+      .sf-shot-meta .role {
+        font-size: 14px;
+        color: var(--ink-soft);
+        margin-top: 8px;
+        line-height: 1.4;
+      }
+
+      /* ── Attribution ── */
+      .sf-attrib {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 20px;
+      }
+      .sf-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        background: var(--green);
+        color: #eafbe9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Fraunces', serif;
+        font-weight: 600;
+        font-size: 17px;
+        overflow: hidden;
+      }
+      /* When an author photo is set, it covers the circle; the initial stays
+       * as a graceful fallback if the image is missing. */
+      .sf-avatar-photo {
+        background-size: cover;
+        background-position: center 26%;
+        background-repeat: no-repeat;
+        color: transparent;
+        filter: grayscale(1);
+      }
+      .sf-by {
+        font-family: 'Courier Prime', monospace;
+        font-size: 12.5px;
+        color: var(--ink-mute);
+      }
+      .sf-by b {
+        display: block;
+        color: var(--ink);
+        font-weight: 700;
+        font-size: 13.5px;
+      }
+
+      /* ── More updates ── */
+      .sf-more {
+        padding: 58px 0 18px;
+        text-align: center;
+      }
+      /* Mixed section titles: the last word keeps the hollow italic-serif
+       * outline while the rest is solid Fraunces (à la "Dia Weekly"). */
+      .sf-om {
+        font-style: italic;
+        color: transparent;
+        -webkit-text-stroke: 1.3px var(--ink);
+        text-stroke: 1.3px var(--ink);
+      }
+      .sf-more h2 {
+        font-family: 'Fraunces', serif;
+        font-weight: 600;
+        color: var(--ink);
+        font-size: clamp(38px, 6vw, 52px);
+        margin: 0 0 30px;
+      }
+      .sf-more-list {
+        max-width: 740px;
+        margin: 0 auto;
+        text-align: left;
+      }
+      .sf-mu {
+        padding: 30px 0;
+        border-top: 1px solid var(--line);
+      }
+      .sf-mu p {
+        font-size: 18px;
+        line-height: 1.72;
+        color: var(--ink-soft);
+        margin: 0;
+      }
+      .sf-mu p b {
+        color: var(--ink);
+        font-weight: 700;
+        font-family: 'Fraunces', serif;
+      }
+      .sf-mu .ship {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin-top: 14px;
+        font-family: 'Courier Prime', monospace;
+        font-size: 12px;
+        color: var(--ink-mute);
+      }
+      .sf-mu .ship .av {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        background: var(--green);
+        color: #eafbe9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Fraunces', serif;
+        font-weight: 600;
+        font-size: 12px;
+        overflow: hidden;
+      }
+
+      /* ── Update blocks: alternating image + text, à la Dia ── */
+      .sf-ublock {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 52px;
+        align-items: center;
+        padding: 50px 0;
+        border-top: 1px solid var(--line);
+      }
+      .sf-ublock.rev > :first-child {
+        order: 2;
+      }
+      .sf-ucard {
+        position: relative;
+        border-radius: 16px;
+        aspect-ratio: 16 / 11;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background: #eef1ec;
+      }
+      /* Bare media: the screenshot/video IS the visual — natural aspect ratio,
+       * rounded corners, soft shadow, no surrounding panel. */
+      .sf-umedia {
+        display: block;
+        width: 100%;
+        height: auto;
+        border-radius: 16px;
+        box-shadow: 0 14px 34px rgba(0, 0, 0, 0.12);
+      }
+      .sf-umedia-vwrap {
+        overflow: hidden;
+        line-height: 0;
+        aspect-ratio: 16 / 8;
+      }
+      .sf-umedia-vwrap video {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        /* Right edge anchored so the full language menu stays in view; the
+         * zoom crops the left (recording widget) and the empty bottom. */
+        object-position: right top;
+        transform: scale(1.1);
+        transform-origin: right top;
+      }
+      .sf-ucard img {
+        width: 42%;
+        height: auto;
+        filter: drop-shadow(0 12px 26px rgba(0, 0, 0, 0.16));
+      }
+      .sf-ucard img.sf-ucard-logo {
+        width: 34%;
+        filter: drop-shadow(0 10px 22px rgba(37, 211, 102, 0.28));
+      }
+      /* Emojis floating around the mascot. */
+      .sf-emoji {
+        position: absolute;
+        font-size: clamp(20px, 2.7vw, 34px);
+        line-height: 1;
+        filter: drop-shadow(0 4px 7px rgba(0, 0, 0, 0.14));
+        animation: sf-float 3.4s ease-in-out infinite;
+      }
+      @keyframes sf-float {
+        0%,
+        100% {
+          transform: translateY(3px) rotate(-6deg);
+        }
+        50% {
+          transform: translateY(-9px) rotate(6deg);
+        }
+      }
+      .sf-emoji-1 {
+        top: 15%;
+        left: 19%;
+        animation-delay: 0s;
+      }
+      .sf-emoji-2 {
+        top: 13%;
+        right: 21%;
+        animation-delay: 0.5s;
+      }
+      .sf-emoji-3 {
+        bottom: 19%;
+        left: 23%;
+        animation-delay: 1s;
+      }
+      .sf-emoji-4 {
+        bottom: 16%;
+        right: 20%;
+        animation-delay: 1.5s;
+      }
+      .sf-emoji-5 {
+        top: 46%;
+        left: 9%;
+        animation-delay: 2s;
+      }
+      .sf-emoji-6 {
+        top: 49%;
+        right: 9%;
+        animation-delay: 2.5s;
+      }
+      .sf-ublock-txt h3 {
+        font-family: 'Fraunces', serif;
+        font-weight: 700;
+        font-size: 27px;
+        line-height: 1.14;
+        letter-spacing: -0.02em;
+        color: var(--ink);
+        margin: 0 0 13px;
+      }
+      .sf-ublock-txt p {
+        font-size: 17px;
+        line-height: 1.72;
+        color: var(--ink-soft);
+        margin: 0;
+      }
+
+      /* ── Off the clock ── */
+      .sf-clock {
+        padding: 52px 0;
+        text-align: center;
+      }
+      .sf-clock h2 {
+        font-family: 'Fraunces', serif;
+        font-weight: 600;
+        color: var(--ink);
+        font-size: clamp(38px, 6vw, 50px);
+        margin: 0 0 8px;
+      }
+      .sf-clock-body {
+        max-width: 620px;
+        margin: 22px auto 0;
+        text-align: left;
+      }
+      .sf-clock-body h3 {
+        font-family: 'Fraunces', serif;
+        font-weight: 600;
+        font-size: clamp(20px, 2.7vw, 27px);
+        line-height: 1.2;
+        color: var(--ink);
+        text-align: center;
+        margin: 0 0 20px;
+      }
+      .sf-clock-body p {
+        font-size: 17px;
+        line-height: 1.75;
+        color: var(--ink-soft);
+        margin: 0 0 14px;
+      }
+      .sf-clock-body .sf-clock-motto {
+        font-family: 'Fraunces', serif;
+        font-style: italic;
+        font-weight: 600;
+        font-size: clamp(21px, 3vw, 28px);
+        line-height: 1.3;
+        color: var(--ink);
+        text-align: center;
+        margin: 28px 0 0;
+      }
+
+      /* ── CTA ── */
+      .sf-cta {
+        text-align: center;
+        padding: 22px 0 8px;
+      }
+      .sf-cta h2 {
+        font-family: 'Fraunces', serif;
+        font-weight: 600;
+        color: var(--ink);
+        font-size: clamp(40px, 6.5vw, 56px);
+        margin: 0 0 12px;
+      }
+      .sf-cta p {
+        font-size: 17px;
+        color: var(--ink-soft);
+        margin: 0 0 24px;
+      }
+      .sf-cta a {
+        display: inline-block;
+        background: var(--green);
+        color: #fff;
+        font-size: 17px;
+        padding: 14px 32px;
+        border-radius: 3px;
+        transition: background 0.15s;
+      }
+      .sf-cta a:hover {
+        background: #2c5133;
+      }
+
+      /* ── Past editions ── */
+      .sf-past {
+        padding: 60px 0 20px;
+      }
+      .sf-past h2 {
+        font-family: 'Fraunces', serif;
+        font-weight: 600;
+        color: var(--ink);
+        font-size: 40px;
+        text-align: center;
+        margin: 0 0 4px;
+      }
+      .sf-past .hint {
+        text-align: center;
+        font-family: 'Courier Prime', monospace;
+        font-size: 11.5px;
+        color: var(--ink-mute);
+        margin-bottom: 28px;
+      }
+      .sf-past-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+      }
+      .sf-pc {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffdf6;
+        overflow: hidden;
+        transition: box-shadow 0.15s;
+      }
+      .sf-pc:hover {
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      }
+      .sf-pc .meta {
+        font-family: 'Courier Prime', monospace;
+        font-size: 11px;
+        color: var(--ink-mute);
+        padding: 15px 15px 5px;
+      }
+      .sf-pc h3 {
+        font-family: 'Fraunces', serif;
+        font-weight: 600;
+        font-size: 19px;
+        line-height: 1.1;
+        padding: 0 15px 15px;
+        margin: 0;
+      }
+
+      /* ── Footer ── */
+      .sf-footer {
+        margin-top: 66px;
+        border-top: 3px double var(--ink);
+        padding: 38px 0 56px;
+      }
+      .sf-foot-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 26px;
+        color: var(--ink);
+      }
+      .sf-foot-brand img {
+        width: 30px;
+        height: 30px;
+        border-radius: 7px;
+      }
+      .sf-foot-brand span {
+        font-family: 'Fraunces', serif;
+        font-weight: 700;
+        font-size: 18px;
+      }
+      .sf-foot-cols {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+        font-family: 'Courier Prime', monospace;
+        font-size: 11.5px;
+        letter-spacing: 1px;
+        color: var(--ink-soft);
+      }
+      .sf-foot-cols h4 {
+        color: var(--ink);
+        font-size: 11.5px;
+        letter-spacing: 2px;
+        margin: 0 0 11px;
+        font-weight: 700;
+      }
+      .sf-foot-link {
+        display: block;
+        padding: 4px 0;
+        color: var(--ink-soft);
+        transition: color 0.15s;
+      }
+      .sf-foot-link:hover {
+        color: var(--ink);
+      }
+      .sf-foot-link.hi {
+        color: var(--green);
+        font-weight: 700;
+      }
+      .sf-foot-base {
+        margin-top: 30px;
+        text-align: center;
+        font-family: 'Courier Prime', monospace;
+        font-size: 11.5px;
+        color: var(--ink-mute);
+      }
+
+      /* ── Responsive ── */
+      @media (max-width: 820px) {
+        .sf-nav-links {
+          display: none;
+        }
+        .sf-mast-title {
+          gap: 10px;
+          flex-wrap: wrap;
+        }
+        .sf-mast-tag {
+          transform: rotate(-7deg);
+        }
+        .sf-mast {
+          grid-template-columns: 1fr;
+          justify-items: center;
+          gap: 16px;
+          padding: 16px 0 20px;
+        }
+        .sf-mast-center {
+          order: -1;
+        }
+        .sf-mast-meta,
+        .sf-mast-meta.right {
+          align-items: center;
+          text-align: center;
+        }
+        .sf-mast-meta .seg {
+          justify-content: center;
+        }
+        .sf-feat {
+          grid-template-columns: 1fr;
+          gap: 28px;
+        }
+        .sf-feat .sf-shot {
+          order: 2;
+        }
+        .sf-ublock {
+          grid-template-columns: 1fr;
+          gap: 24px;
+          padding: 38px 0;
+        }
+        .sf-ublock > :first-child,
+        .sf-ublock.rev > :first-child {
+          order: -1;
+        }
+        .sf-past-grid {
+          grid-template-columns: 1fr;
+        }
+        .sf-foot-cols {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+    </style>
+  </body>
+</html>

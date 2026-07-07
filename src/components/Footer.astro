@@ -12,9 +12,11 @@ const { data, locale } = Astro.props;
 const securityUrl = locale === 'en' ? '/en/security' : '/security';
 const privacyUrl = locale === 'en' ? '/en/privacy' : '/privacy';
 const termsUrl = locale === 'en' ? '/en/terms' : '/terms';
+const sansFiltreUrl = locale === 'en' ? '/en/unfiltered' : '/sans-filtre';
 const securityLabel = locale === 'en' ? 'Security' : 'Sécurité';
 const privacyLabel = locale === 'en' ? 'Privacy' : 'Confidentialité';
 const termsLabel = locale === 'en' ? 'Terms' : 'CGU';
+const sansFiltreLabel = locale === 'en' ? 'Unfiltered' : 'Sans Filtre';
 ---
 
 <footer class="px-0 py-8 pb-12" style="background: var(--footer-gradient);">
@@ -48,6 +50,11 @@ const termsLabel = locale === 'en' ? 'Terms' : 'CGU';
     </div>
     <div class="flex flex-col items-end gap-2">
       <div class="flex items-center gap-5">
+        <a
+          href={sansFiltreUrl}
+          class="text-xs text-hatch-accent-soft transition-colors hover:text-hatch-accent"
+          >{sansFiltreLabel}</a
+        >
         <a href={securityUrl} class="text-xs text-white/35 transition-colors hover:text-white/65"
           >{securityLabel}</a
         >

@@ -142,6 +142,7 @@ const landing = defineCollection({
       pricing: richString,
       faq: richString,
       security: richString,
+      sansFiltre: richString,
       eyebrow: richString,
     }),
 
@@ -189,4 +190,57 @@ const agents = defineCollection({
   }),
 });
 
-export const collections = { landing, agents };
+// Hatch OS Sans Filtre — one Markdown file per monthly edition. Adding an
+// edition = drop a file in src/content/sans-filtre, nothing in code changes.
+const sfAgent = z.enum(['peep', 'jay', 'sparrow', 'finch', 'pecker']);
+
+const sfUpdate = z.object({
+  title: richString,
+  desc: richString,
+  shippedBy: richString,
+  date: richString,
+  agent: sfAgent.optional(),
+  image: z.string().optional(), // screenshot path
+  video: z.string().optional(), // mp4 path
+  logo: z.string().optional(), // e.g. animated WhatsApp SVG
+  emojis: z.array(z.string()).optional(), // floating emoji illustration
+});
+
+const sfEdition = z.object({
+  month: richString,
+  dateline: richString,
+  issueTitle: richString,
+  intro: richString,
+  signature: richString,
+  featured: z.object({
+    eyebrow: richString,
+    title: richString,
+    body: z.array(richString),
+    shippedBy: richString,
+    date: richString,
+    agent: sfAgent.optional(),
+    image: z.string().optional(),
+  }),
+  updates: z.array(sfUpdate),
+  horsDesClousTitle: richString,
+  horsDesClousHeading: richString,
+  horsDesClous: z.array(richString),
+  horsDesClousMotto: richString,
+  ctaTitle: richString,
+  ctaText: richString,
+  ctaBtn: richString,
+});
+
+const sansFiltre = defineCollection({
+  loader: glob({ base: './src/content/sans-filtre', pattern: '**/*.md' }),
+  schema: z.object({
+    edition: richString, // "001"
+    updatesCount: richString, // "007"
+    date: z.string(), // "2026-07-06" — drives sort, newest first
+    location: richString,
+    fr: sfEdition,
+    en: sfEdition,
+  }),
+});
+
+export const collections = { landing, agents, sansFiltre };

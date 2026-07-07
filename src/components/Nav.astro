@@ -12,6 +12,8 @@ const t = ui[locale];
 const otherLocale: Locale = locale === 'fr' ? 'en' : 'fr';
 const otherLocaleUrl = otherLocale === 'fr' ? '/' : '/en/';
 const securityUrl = locale === 'en' ? '/en/security' : '/security';
+const sansFiltreUrl = locale === 'en' ? '/en/unfiltered' : '/sans-filtre';
+const sfEyebrow = locale === 'en' ? 'Monthly' : 'Mensuel';
 // Anchor links (#pourquoi, #agents, …) only resolve on the homepage.
 // From any other page (e.g. /security), prefix with the home URL so they
 // navigate home first, then jump to the section.
@@ -21,18 +23,8 @@ const anchor = (id: string) => `${homeUrl}#${id}`;
 
 <nav>
   <div class="nav-inner mx-auto flex h-16 max-w-[1120px] items-center justify-between px-8 md:px-8">
-    <a href={locale === 'fr' ? '/' : '/en/'} class="logo flex items-center" aria-label="Hatch">
-      <img
-        class="logo-img logo-img-light block h-7 w-auto"
-        src="/logos/hatch-light.png"
-        alt="Hatch"
-        style="filter: brightness(0) saturate(100%) invert(50%) sepia(100%) saturate(380%) hue-rotate(348deg) brightness(91%);"
-      />
-      <img
-        class="logo-img logo-img-dark hidden h-7 w-auto"
-        src="/logos/hatch-dark.png"
-        alt="Hatch"
-      />
+    <a href={locale === 'fr' ? '/' : '/en/'} class="logo flex items-center" aria-label="Hatch OS">
+      <img class="logo-img block h-7 w-auto" src="/logos/hatch-os.png" alt="Hatch OS" />
     </a>
 
     <ul class="nav-links hidden gap-8 md:flex" aria-label={t.ariaLabels.primaryNav}>
@@ -40,16 +32,32 @@ const anchor = (id: string) => `${homeUrl}#${id}`;
         <a class="nav-link text-sm font-medium transition" href={anchor('pourquoi')}>{data.why}</a>
       </li>
       <li>
-        <a class="nav-link text-sm font-medium transition" href={anchor('agents')}>{data.product}</a>
+        <a class="nav-link text-sm font-medium transition" href={anchor('agents')}>{data.product}</a
+        >
       </li>
       <li>
-        <a class="nav-link text-sm font-medium transition" href={anchor('pricing')}>{data.pricing}</a>
+        <a class="nav-link text-sm font-medium transition" href={anchor('pricing')}
+          >{data.pricing}</a
+        >
       </li>
       <li>
         <a class="nav-link text-sm font-medium transition" href={anchor('faq')}>{data.faq}</a>
       </li>
       <li>
         <a class="nav-link text-sm font-medium transition" href={securityUrl}>{data.security}</a>
+      </li>
+      <li class="flex items-center">
+        <a
+          class="sf-navlink inline-flex -translate-y-[3px] -rotate-3 flex-col items-start leading-none transition hover:scale-[1.06]"
+          href={sansFiltreUrl}
+        >
+          <span class="-rotate-2 text-[8px] font-bold uppercase tracking-[0.18em] text-hatch-accent"
+            >{sfEyebrow}</span
+          >
+          <span class="whitespace-nowrap text-[13px] font-semibold text-hatch-accent"
+            >{data.sansFiltre}</span
+          >
+        </a>
       </li>
     </ul>
 

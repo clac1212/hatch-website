@@ -26,7 +26,7 @@ fr:
       name: 'Multi-admins siège'
       desc: 'Accessible à tous les admins avec terminologie franchise native, phases en catégories.'
     - icon: '🏠'
-      name: '100% natif Hatch'
+      name: '100% natif Hatch OS'
       desc: 'Aucun CRM tiers à intégrer.'
 en:
   role: 'Development'
@@ -48,6 +48,6 @@ en:
       name: 'Multi-admin HQ access'
       desc: 'All HQ admins included, with native franchise terminology and stages by category.'
     - icon: '🏠'
-      name: '100% native Hatch'
+      name: '100% native Hatch OS'
       desc: 'No third-party CRM to integrate.'
 ---
