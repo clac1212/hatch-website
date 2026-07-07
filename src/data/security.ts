@@ -8,7 +8,7 @@
  * subtitle) backed by exactly three short cards. Modelled on dust.tt/home/security.
  * Deliberately high-level — no legal definitions, no AI-Act article numbers, no
  * internal detail. Anything granular (DPA, classification note) lives "on request",
- * not on the public page. Every claim must be true of Hatch.
+ * not on the public page. Every claim must be true of Hatch OS.
  */
 import type { Locale } from '../i18n/ui';
 
@@ -49,7 +49,7 @@ export interface SecurityContent {
 export const securityContent: Record<Locale, SecurityContent> = {
   fr: {
     meta: {
-      title: 'Sécurité & confidentialité — Hatch',
+      title: 'Sécurité & confidentialité — Hatch OS',
       description:
         'Vous gardez le contrôle de vos données : hébergées en France, jamais utilisées pour entraîner une IA, et accessibles uniquement à qui vous décidez.',
     },
@@ -63,12 +63,12 @@ export const securityContent: Record<Locale, SecurityContent> = {
     sections: [
       {
         title: 'Vous décidez de ce que vous partagez',
-        subtitle: 'Vous choisissez précisément les données que Hatch utilise.',
+        subtitle: 'Vous choisissez précisément les données que Hatch OS utilise.',
         cards: [
           {
             icon: 'select',
             title: 'Sélection à la source',
-            body: 'Choisissez exactement ce que Hatch utilise, source par source.',
+            body: 'Choisissez exactement ce que Hatch OS utilise, source par source.',
           },
           {
             icon: 'location',
@@ -154,7 +154,7 @@ export const securityContent: Record<Locale, SecurityContent> = {
   },
   en: {
     meta: {
-      title: 'Security & privacy — Hatch',
+      title: 'Security & privacy — Hatch OS',
       description:
         'You stay in control of your data: hosted in France, never used to train AI, and accessible only to whom you decide.',
     },
@@ -168,12 +168,12 @@ export const securityContent: Record<Locale, SecurityContent> = {
     sections: [
       {
         title: 'You decide what you share',
-        subtitle: 'You choose exactly which data Hatch uses.',
+        subtitle: 'You choose exactly which data Hatch OS uses.',
         cards: [
           {
             icon: 'select',
             title: 'Source-level selection',
-            body: 'Choose exactly what Hatch uses, source by source.',
+            body: 'Choose exactly what Hatch OS uses, source by source.',
           },
           {
             icon: 'location',
