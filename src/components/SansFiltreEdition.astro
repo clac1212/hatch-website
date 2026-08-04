@@ -273,14 +273,12 @@ const thumbOf = (b: (typeof entry)['data']['fr']) =>
             const th = thumbOf(b);
             return (
               <a class="sf-pc" href={`${base}/${p.data.edition}`}>
-                <div class="sf-pc-thumb" style={th ? `background-image:url(${th})` : undefined} />
-                <div class="sf-pc-body">
-                  <div class="meta">
-                    {b.month} · {t.editionLabel}
-                    {p.data.edition}
-                  </div>
-                  <h3>{b.issueTitle}</h3>
+                <div class="meta">
+                  {b.month} · {t.editionLabel}
+                  {p.data.edition}
                 </div>
+                <h3>{b.issueTitle}</h3>
+                <div class="sf-pc-thumb" style={th ? `background-image:url(${th})` : undefined} />
               </a>
             );
           })}
