@@ -194,53 +194,48 @@ const thumbOf = (b: (typeof entry)['data']['fr']) =>
   </div>
   {
     d.updates.map((u, i) => {
-      const a = AUTHORS[u.shippedBy] ?? {};
       const ag = AGENT_INFO[u.agent ?? ''] ?? { name: '', tint: '#eef1ec' };
-      return (
-        <div class:list={['sf-ublock', i % 2 === 1 && 'rev']}>
-          {u.video ? (
-            <div class="sf-umedia sf-umedia-vwrap">
-              <video src={u.video} autoplay loop muted playsinline />
-            </div>
-          ) : u.image ? (
-            <img class="sf-umedia" src={u.image} alt={u.title} />
+      const media = u.video ? (
+        <div class="sf-umedia sf-umedia-vwrap">
+          <video src={u.video} autoplay loop muted playsinline />
+        </div>
+      ) : u.image ? (
+        <img class="sf-umedia" src={u.image} alt={u.title} />
+      ) : (
+        <div
+          class="sf-ucard"
+          style={
+            u.logo ? 'background:linear-gradient(135deg,#e8f7ef,#ccecd9)' : `background:${ag.tint}`
+          }
+        >
+          {u.logo ? (
+            <img class="sf-ucard-logo" src={u.logo} alt="WhatsApp" />
           ) : (
-            <div
-              class="sf-ucard"
-              style={
-                u.logo
-                  ? 'background:linear-gradient(135deg,#e8f7ef,#ccecd9)'
-                  : `background:${ag.tint}`
-              }
-            >
-              {u.logo ? (
-                <img class="sf-ucard-logo" src={u.logo} alt="WhatsApp" />
-              ) : (
-                u.agent && <img src={`/logos/${u.agent}-avatar.png`} alt={ag.name} />
-              )}
-              {u.emojis?.map((em, j) => (
-                <span class={`sf-emoji sf-emoji-${j + 1}`} aria-hidden="true">
-                  {em}
-                </span>
-              ))}
-            </div>
+            u.agent && <img src={`/logos/${u.agent}-avatar.png`} alt={ag.name} />
           )}
+          {u.emojis?.map((em, j) => (
+            <span class={`sf-emoji sf-emoji-${j + 1}`} aria-hidden="true">
+              {em}
+            </span>
+          ))}
+        </div>
+      );
+      return u.highlight ? (
+        <div class="sf-ushow">
+          {media}
+          <div class="sf-ushow-txt">
+            <h3>{u.title}</h3>
+            <p>{u.desc}</p>
+            {u.date && <div class="sf-udate">{u.date}</div>}
+          </div>
+        </div>
+      ) : (
+        <div class:list={['sf-ublock', i % 2 === 1 && 'rev']}>
+          {media}
           <div class="sf-ublock-txt">
             <h3>{u.title}</h3>
             <p>{u.desc}</p>
-            <div class="sf-attrib">
-              <div
-                class:list={['sf-avatar', a.photo && 'sf-avatar-photo']}
-                style={a.photo ? `background-image:url(${a.photo})` : undefined}
-              >
-                {initial(u.shippedBy)}
-              </div>
-              <div class="sf-by">
-                {t.by}
-                <b>{u.shippedBy}</b>
-                {u.date}
-              </div>
-            </div>
+            {u.date && <div class="sf-udate">{u.date}</div>}
           </div>
         </div>
       );

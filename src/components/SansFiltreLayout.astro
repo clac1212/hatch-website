@@ -872,6 +872,44 @@ const cols = isEn
         color: var(--ink-soft);
         margin: 0;
       }
+      /* Small shipped-on date under an update (author line intentionally dropped). */
+      .sf-udate {
+        font-family: 'Courier Prime', monospace;
+        font-size: 11px;
+        letter-spacing: 0.02em;
+        color: var(--ink-mute);
+        margin-top: 14px;
+      }
+
+      /* Highlighted update: big media on top, text centered below. */
+      .sf-ushow {
+        padding: 56px 0;
+        border-top: 1px solid var(--line);
+      }
+      .sf-ushow .sf-umedia,
+      .sf-ushow .sf-umedia-vwrap {
+        width: 100%;
+      }
+      .sf-ushow-txt {
+        max-width: 640px;
+        margin: 30px auto 0;
+        text-align: center;
+      }
+      .sf-ushow-txt h3 {
+        font-family: 'Fraunces', serif;
+        font-weight: 700;
+        font-size: 32px;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        color: var(--ink);
+        margin: 0 0 14px;
+      }
+      .sf-ushow-txt p {
+        font-size: 17.5px;
+        line-height: 1.72;
+        color: var(--ink-soft);
+        margin: 0;
+      }
 
       /* ── Off the clock ── */
       .sf-clock {
@@ -1123,6 +1161,12 @@ const cols = isEn
         .sf-ublock > :first-child,
         .sf-ublock.rev > :first-child {
           order: -1;
+        }
+        .sf-ushow {
+          padding: 40px 0;
+        }
+        .sf-ushow-txt h3 {
+          font-size: 25px;
         }
         .sf-pc-thumb {
           width: 84px;
