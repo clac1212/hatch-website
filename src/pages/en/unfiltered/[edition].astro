@@ -1,0 +1,29 @@
+---
+import { getCollection } from 'astro:content';
+import SansFiltreLayout from '../../../components/SansFiltreLayout.astro';
+import SansFiltreEdition from '../../../components/SansFiltreEdition.astro';
+
+// One page per edition (/en/unfiltered/001, /002, …) so the archive cards open
+// the real edition, like Dia's per-issue pages.
+export async function getStaticPaths() {
+  const editions = (await getCollection('sansFiltre')).sort((a, b) =>
+    b.data.date.localeCompare(a.data.date),
+  );
+  return editions.map((entry) => ({
+    params: { edition: entry.data.edition },
+    props: { entry, editions },
+  }));
+}
+
+const { entry, editions } = Astro.props;
+const d = entry.data.en;
+---
+
+<SansFiltreLayout
+  locale="en"
+  navLabel="Hatch OS Unfiltered"
+  title={`${d.month} · Hatch OS Unfiltered`}
+  description={d.intro.slice(0, 155)}
+>
+  <SansFiltreEdition entry={entry} locale="en" editions={editions} />
+</SansFiltreLayout>

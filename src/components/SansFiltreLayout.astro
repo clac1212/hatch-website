@@ -872,6 +872,44 @@ const cols = isEn
         color: var(--ink-soft);
         margin: 0;
       }
+      /* Small shipped-on date under an update (author line intentionally dropped). */
+      .sf-udate {
+        font-family: 'Courier Prime', monospace;
+        font-size: 11px;
+        letter-spacing: 0.02em;
+        color: var(--ink-mute);
+        margin-top: 14px;
+      }
+
+      /* Highlighted update: big media on top, text centered below. */
+      .sf-ushow {
+        padding: 56px 0;
+        border-top: 1px solid var(--line);
+      }
+      .sf-ushow .sf-umedia,
+      .sf-ushow .sf-umedia-vwrap {
+        width: 100%;
+      }
+      .sf-ushow-txt {
+        max-width: 640px;
+        margin: 30px auto 0;
+        text-align: center;
+      }
+      .sf-ushow-txt h3 {
+        font-family: 'Fraunces', serif;
+        font-weight: 700;
+        font-size: 32px;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        color: var(--ink);
+        margin: 0 0 14px;
+      }
+      .sf-ushow-txt p {
+        font-size: 17.5px;
+        line-height: 1.72;
+        color: var(--ink-soft);
+        margin: 0;
+      }
 
       /* ── Off the clock ── */
       .sf-clock {
@@ -966,33 +1004,57 @@ const cols = isEn
         margin-bottom: 28px;
       }
       .sf-past-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 24px;
       }
+      /* Dia "Past Issues" card: meta + title on top, thumbnail peeking out
+       * the bottom (clipped by the card's rounded corners). */
       .sf-pc {
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        background: #fffdf6;
+        position: relative;
+        width: 280px;
+        height: 320px;
         overflow: hidden;
-        transition: box-shadow 0.15s;
+        padding: 30px 26px 0;
+        text-align: center;
+        background: #fffdf6;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        transition:
+          box-shadow 0.15s,
+          transform 0.15s;
       }
       .sf-pc:hover {
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 14px 32px rgba(0, 0, 0, 0.09);
+        transform: translateY(-3px);
       }
       .sf-pc .meta {
         font-family: 'Courier Prime', monospace;
         font-size: 11px;
+        letter-spacing: 0.02em;
         color: var(--ink-mute);
-        padding: 15px 15px 5px;
       }
       .sf-pc h3 {
         font-family: 'Fraunces', serif;
-        font-weight: 600;
-        font-size: 19px;
-        line-height: 1.1;
-        padding: 0 15px 15px;
-        margin: 0;
+        font-weight: 700;
+        font-size: 24px;
+        line-height: 1.12;
+        margin: 12px 0 0;
+        color: var(--ink);
+      }
+      .sf-pc-thumb {
+        position: absolute;
+        left: 26px;
+        right: 26px;
+        top: 150px;
+        bottom: 0;
+        background-color: #eef1ec;
+        background-size: cover;
+        background-position: top center;
+        border: 1px solid var(--line);
+        border-bottom: none;
+        border-radius: 12px 12px 0 0;
       }
 
       /* ── Footer ── */
@@ -1100,8 +1162,15 @@ const cols = isEn
         .sf-ublock.rev > :first-child {
           order: -1;
         }
-        .sf-past-grid {
-          grid-template-columns: 1fr;
+        .sf-ushow {
+          padding: 40px 0;
+        }
+        .sf-ushow-txt h3 {
+          font-size: 25px;
+        }
+        .sf-pc {
+          width: 100%;
+          max-width: 340px;
         }
         .sf-foot-cols {
           grid-template-columns: 1fr 1fr;

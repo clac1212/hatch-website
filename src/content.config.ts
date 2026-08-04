@@ -204,6 +204,7 @@ const sfUpdate = z.object({
   video: z.string().optional(), // mp4 path
   logo: z.string().optional(), // e.g. animated WhatsApp SVG
   emojis: z.array(z.string()).optional(), // floating emoji illustration
+  highlight: z.boolean().optional(), // showcase: big media on top, text below
 });
 
 const sfEdition = z.object({
