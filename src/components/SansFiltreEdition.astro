@@ -1,0 +1,296 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  entry: CollectionEntry<'sansFiltre'>;
+  locale: 'fr' | 'en';
+  editions: CollectionEntry<'sansFiltre'>[]; // all editions, newest first
+}
+
+const { entry, locale, editions } = Astro.props;
+const e = entry.data;
+const d = e[locale];
+const isFr = locale === 'fr';
+
+const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+const initial = (s: string) => s.charAt(0).toUpperCase();
+
+// Author identities (photo + role). Drop the photo file at the given path and
+// it renders automatically; until then the green initial circle is the fallback.
+const AUTHORS: Record<string, { photo?: string; role?: string }> = {
+  César: { photo: '/logos/cesar.jpg', role: 'CPTO' },
+  Patrick: { role: isFr ? 'Co-fondateur' : 'Co-founder' },
+};
+const fa = AUTHORS[d.featured.shippedBy] ?? {};
+
+// Split a section title into leading words (solid Fraunces) + last word with
+// trailing punctuation (hollow outline accent), for a "Dia Weekly" style mix.
+function mixTitle(title: string) {
+  const tokens = title.trim().split(/\s+/);
+  let i = tokens.length - 1;
+  while (i > 0 && !/\p{L}/u.test(tokens[i])) i--;
+  return { rest: tokens.slice(0, i).join(' '), outline: tokens.slice(i).join(' ') };
+}
+
+// Localized UI strings (everything not coming from the Markdown content).
+const t = isFr
+  ? {
+      home: '/',
+      homeAria: 'Hatch OS — accueil',
+      mensuel: 'Mensuel',
+      tag: 'SANS FILTRE',
+      sub: 'Nouvelles fonctionnalités',
+      subEnd: 'Chaque mois',
+      editionLabel: 'Édition N°',
+      updatesLabel: 'Nouveautés',
+      featured: 'À la une',
+      online: '● en ligne',
+      shotRole: 'Agent WhatsApp · Développement réseau',
+      by: 'shippé par',
+      more: 'Encore quelques nouveautés',
+      pastTitle: 'Éditions précédentes',
+      pastHint: "Les éditions passées s'afficheront ici.",
+      cta: '/demo',
+    }
+  : {
+      home: '/en/',
+      homeAria: 'Hatch OS — home',
+      mensuel: 'Monthly',
+      tag: 'UNFILTERED',
+      sub: 'New features',
+      subEnd: 'Every month',
+      editionLabel: 'Issue No.',
+      updatesLabel: 'Updates',
+      featured: 'Featured',
+      online: '● online',
+      shotRole: 'WhatsApp agent · Network development',
+      by: 'shipped by',
+      more: 'A few more updates',
+      pastTitle: 'Past editions',
+      pastHint: 'Past editions will show up here.',
+      cta: '/en/demo',
+    };
+const base = isFr ? '/sans-filtre' : '/en/unfiltered';
+
+const tMore = mixTitle(t.more);
+const tClock = mixTitle(d.horsDesClousTitle);
+const tCta = mixTitle(d.ctaTitle);
+const tPast = mixTitle(t.pastTitle);
+
+// Per-agent soft tint + label for the update block illustration panels.
+const AGENT_INFO: Record<string, { name: string; tint: string }> = {
+  sparrow: { name: 'Sparrow', tint: 'linear-gradient(135deg,#eafaf0,#d3efe0)' },
+  jay: { name: 'Jay', tint: 'linear-gradient(135deg,#eef0ff,#dde1ff)' },
+  peep: { name: 'Peep', tint: 'linear-gradient(135deg,#fff8e6,#fdebc2)' },
+  finch: { name: 'Finch', tint: 'linear-gradient(135deg,#e9f7ef,#cfeedd)' },
+  pecker: { name: 'Pecker', tint: 'linear-gradient(135deg,#fff1e6,#fdd7b8)' },
+};
+
+// Every OTHER edition fills the archive (editions is pre-sorted newest first).
+const past = editions.filter((x) => x.data.edition !== e.edition);
+const thumbOf = (b: (typeof entry)['data']['fr']) =>
+  b.featured.image ||
+  b.updates.find((u) => u.image)?.image ||
+  (b.featured.agent ? `/logos/${b.featured.agent}-avatar.png` : null);
+---
+
+<div class="sf-wrap">
+  <!-- MASTHEAD BAR (Dia-style): meta left · logo center · edition right -->
+  <header class="sf-mast">
+    <div class="sf-mast-meta left">
+      <span class="seg">&#9432;&nbsp; {d.dateline}</span>
+      <span class="seg">&#9677;&nbsp; {e.location}</span>
+    </div>
+    <a href={t.home} class="sf-mast-center" aria-label={t.homeAria}>
+      <div class="sf-mast-title">
+        <img class="sf-mast-logo-word" src="/logos/hatch-os.png" alt="hatch OS" />
+        <span class="sf" aria-label={t.mensuel}
+          >{t.mensuel.split('').map((c) => <span class="l">{c}</span>)}</span
+        >
+      </div>
+      <span class="sf-mast-tag">{t.tag}</span>
+      <div class="sf-mast-sub">
+        {t.sub}
+        <span class="sf-dot"></span>
+        {t.subEnd}
+      </div>
+    </a>
+    <div class="sf-mast-meta right">
+      <span class="seg"
+        >{t.editionLabel}<span class="sf-digits">{e.edition.split('').map((c) => <b>{c}</b>)}</span
+        ></span
+      >
+      <span class="seg"
+        >{t.updatesLabel}<span class="sf-digits"
+          >{e.updatesCount.split('').map((c) => <b>{c}</b>)}</span
+        ></span
+      >
+    </div>
+  </header>
+
+  <!-- ISSUE HEADLINE -->
+  <div class="sf-issue">
+    <h1>{d.issueTitle}</h1>
+    <p class="sf-lede">
+      {d.intro}
+      <span class="sf-sig">{d.signature}</span>
+    </p>
+  </div>
+</div>
+
+<!-- FEATURED -->
+<div class="sf-band">
+  <div class="sf-wrap">
+    <div class="sf-feat">
+      <div class="sf-shot">
+        <div class="sf-shot-bar">
+          <i></i><i></i><i></i><span>{d.featured.eyebrow}</span>
+        </div>
+        {
+          d.featured.image ? (
+            <div class="sf-shot-screen" style={`background-image:url(${d.featured.image})`} />
+          ) : (
+            <div class="sf-shot-body">
+              <img
+                class="sf-shot-avatar"
+                src={`/logos/${d.featured.agent}-avatar.png`}
+                alt={capitalize(d.featured.agent ?? '')}
+              />
+              <div class="sf-shot-meta">
+                <div class="nm">{capitalize(d.featured.agent ?? '')}</div>
+                <div class="st">{t.online}</div>
+                <div class="role">{t.shotRole}</div>
+              </div>
+            </div>
+          )
+        }
+      </div>
+      <div>
+        <p class="sf-eyebrow">{t.featured}</p>
+        <h2>{d.featured.title}</h2>
+        {d.featured.body.map((para) => <p>{para}</p>)}
+        <div class="sf-attrib">
+          <div
+            class:list={['sf-avatar', fa.photo && 'sf-avatar-photo']}
+            style={fa.photo ? `background-image:url(${fa.photo})` : undefined}
+          >
+            {initial(d.featured.shippedBy)}
+          </div>
+          <div class="sf-by">
+            {t.by}<b>{d.featured.shippedBy}</b>{
+              [fa.role, d.featured.date].filter(Boolean).join(' · ')
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sf-wrap">
+  <!-- MORE UPDATES -->
+  <div class="sf-more">
+    <h2>{tMore.rest} <span class="sf-om">{tMore.outline}</span></h2>
+  </div>
+  {
+    d.updates.map((u, i) => {
+      const a = AUTHORS[u.shippedBy] ?? {};
+      const ag = AGENT_INFO[u.agent ?? ''] ?? { name: '', tint: '#eef1ec' };
+      return (
+        <div class:list={['sf-ublock', i % 2 === 1 && 'rev']}>
+          {u.video ? (
+            <div class="sf-umedia sf-umedia-vwrap">
+              <video src={u.video} autoplay loop muted playsinline />
+            </div>
+          ) : u.image ? (
+            <img class="sf-umedia" src={u.image} alt={u.title} />
+          ) : (
+            <div
+              class="sf-ucard"
+              style={
+                u.logo
+                  ? 'background:linear-gradient(135deg,#e8f7ef,#ccecd9)'
+                  : `background:${ag.tint}`
+              }
+            >
+              {u.logo ? (
+                <img class="sf-ucard-logo" src={u.logo} alt="WhatsApp" />
+              ) : (
+                u.agent && <img src={`/logos/${u.agent}-avatar.png`} alt={ag.name} />
+              )}
+              {u.emojis?.map((em, j) => (
+                <span class={`sf-emoji sf-emoji-${j + 1}`} aria-hidden="true">
+                  {em}
+                </span>
+              ))}
+            </div>
+          )}
+          <div class="sf-ublock-txt">
+            <h3>{u.title}</h3>
+            <p>{u.desc}</p>
+            <div class="sf-attrib">
+              <div
+                class:list={['sf-avatar', a.photo && 'sf-avatar-photo']}
+                style={a.photo ? `background-image:url(${a.photo})` : undefined}
+              >
+                {initial(u.shippedBy)}
+              </div>
+              <div class="sf-by">
+                {t.by}
+                <b>{u.shippedBy}</b>
+                {u.date}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    })
+  }
+
+  <!-- OFF THE CLOCK -->
+  <div class="sf-clock">
+    <h2>{tClock.rest} <span class="sf-om">{tClock.outline}</span></h2>
+    <div class="sf-clock-body">
+      <h3>{d.horsDesClousHeading}</h3>
+      {d.horsDesClous.map((p) => <p>{p}</p>)}
+      <p class="sf-clock-motto">
+        {isFr ? `« ${d.horsDesClousMotto} »` : `“${d.horsDesClousMotto}”`}
+      </p>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="sf-cta">
+    <h2>{tCta.rest} <span class="sf-om">{tCta.outline}</span></h2>
+    <p>{d.ctaText}</p>
+    <a href={t.cta}>{d.ctaBtn}</a>
+  </div>
+
+  <!-- PAST EDITIONS -->
+  <div class="sf-past">
+    <h2>{tPast.rest} <span class="sf-om">{tPast.outline}</span></h2>
+    {past.length === 0 ? <div class="hint">{t.pastHint}</div> : <div class="hint">&nbsp;</div>}
+    {
+      past.length > 0 && (
+        <div class="sf-past-grid">
+          {past.map((p) => {
+            const b = p.data[locale];
+            const th = thumbOf(b);
+            return (
+              <a class="sf-pc" href={`${base}/${p.data.edition}`}>
+                <div class="sf-pc-thumb" style={th ? `background-image:url(${th})` : undefined} />
+                <div class="sf-pc-body">
+                  <div class="meta">
+                    {b.month} · {t.editionLabel}
+                    {p.data.edition}
+                  </div>
+                  <h3>{b.issueTitle}</h3>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      )
+    }
+  </div>
+</div>
