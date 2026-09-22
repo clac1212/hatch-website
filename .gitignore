@@ -23,3 +23,6 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 .vercel
+
+# fal.ai harvested assets (heavy, re-downloadable via scripts/fal_harvest.py)
+_reference/hatch-hero/
