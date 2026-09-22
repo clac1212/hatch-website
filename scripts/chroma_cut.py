@@ -12,6 +12,8 @@ from PIL import Image, ImageFilter
 from scipy import ndimage
 
 src, dst = sys.argv[1], sys.argv[2]
+GLOBAL = "--global" in sys.argv   # key every green pixel, not only the region connected to the border
+                                  # (use when nothing in the scene is legitimately green, e.g. isolated objects)
 im = Image.open(src).convert("RGB")
 a = np.asarray(im).astype(np.int16)
 H, W, _ = a.shape
@@ -33,7 +35,7 @@ while q:
     for ny, nx in ((y - 1, x), (y + 1, x), (y, x - 1), (y, x + 1)):
         if 0 <= ny < H and 0 <= nx < W and greenish[ny, nx] and not seen[ny, nx]:
             seen[ny, nx] = True; q.append((ny, nx))
-outer = seen
+outer = greenish if GLOBAL else seen
 
 gl = g.astype(np.float32)
 bgl = np.median(gl[outer])
