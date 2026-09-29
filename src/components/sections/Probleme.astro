@@ -1,13 +1,819 @@
 ---
+import { getEntry } from 'astro:content';
+import { Image, getImage } from 'astro:assets';
 import { section } from '../../content/section';
 import type { Locale } from '../../i18n/ui';
+import cadre from '../../assets/probleme/iphone-cadre.png';
+import fondEcran from '../../assets/probleme/fond-ecran-bunbun.jpg';
+import grain from '../../assets/probleme/fond-grain-nuit.jpg';
+import peep from '../../assets/probleme/peep.png';
+import owl from '../../assets/probleme/owl.png';
+import pecker from '../../assets/probleme/pecker.png';
+import lark from '../../assets/probleme/lark.png';
+import jay from '../../assets/probleme/jay.png';
+import finch from '../../assets/probleme/finch.png';
+import sparrow from '../../assets/probleme/sparrow.png';
 
+/**
+ * 03 — Problème (v4 node hnwZk): pinned track. Saturday night, the head office's phone fills up
+ * with seven notifications, then each one is taken over by a Hatch agent. Steps are driven by the
+ * shared engine (src/scripts/pistes.ts) and rendered by src/scripts/probleme.ts.
+ * Without JS or with reduced motion, the final state is shown as a plain list instead of the track.
+ */
 interface Props {
   locale: Locale;
 }
 
 const { locale } = Astro.props;
 const data = await section('probleme', locale);
+const { telephone: tel } = data;
+
+const avatars = { peep, owl, pecker, lark, jay, finch, sparrow };
+const agents = Object.fromEntries(
+  await Promise.all(
+    Object.keys(avatars).map(async (id) => {
+      const entry = await getEntry('agents', `${locale}/${id}`);
+      if (!entry) throw new Error(`Missing src/content/agents/${locale}/${id}.md`);
+      return [id, entry.data.name] as const;
+    }),
+  ),
+) as Record<keyof typeof avatars, string>;
+
+// Phone list, most recent first (the proto's ORDRE = [6 … 0]).
+const recentes = [...data.notifications].reverse();
+
+// App glyphs (Phosphor, 256×256 viewBox) and their rendered size in px.
+const glyphes = {
+  whatsapp: [
+    'M187.3,159.06A36.09,36.09,0,0,1,152,188a84.09,84.09,0,0,1-84-84A36.09,36.09,0,0,1,96.94,68.7,12,12,0,0,1,110,75.1l11.48,23a12,12,0,0,1-.75,12l-8.52,12.78a44.56,44.56,0,0,0,20.91,20.91l12.78-8.52a12,12,0,0,1,12-.75l23,11.48A12,12,0,0,1,187.3,159.06ZM236,128A108,108,0,0,1,78.77,224.15L46.34,235A20,20,0,0,1,21,209.66l10.81-32.43A108,108,0,1,1,236,128Zm-24,0A84,84,0,1,0,55.27,170.06a12,12,0,0,1,1,9.81l-9.93,29.79,29.79-9.93a12.1,12.1,0,0,1,3.8-.62,12,12,0,0,1,6,1.62A84,84,0,0,0,212,128Z',
+    25,
+  ],
+  appel: [
+    'M231.88,175.08A56.26,56.26,0,0,1,176,224C96.6,224,32,159.4,32,80A56.26,56.26,0,0,1,80.92,24.12a16,16,0,0,1,16.62,9.52l21.12,47.15,0,.12A16,16,0,0,1,117.39,96c-.18.27-.37.52-.57.77L96,121.45c7.49,15.22,23.41,31,38.83,38.51l24.34-20.71a8.12,8.12,0,0,1,.75-.56,16,16,0,0,1,15.17-1.4l.13.06,47.11,21.11A16,16,0,0,1,231.88,175.08Z',
+    21,
+  ],
+  mail: [
+    'M224,48H32a8,8,0,0,0-8,8V192a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A8,8,0,0,0,224,48Zm-8,144H40V74.19l82.59,75.71a8,8,0,0,0,10.82,0L216,74.19V192Z',
+    24,
+  ],
+  sms: [
+    'M232,128A104,104,0,0,1,79.12,219.82L45.07,231.17a16,16,0,0,1-20.24-20.24l11.35-34.05A104,104,0,1,1,232,128Z',
+    25,
+  ],
+} as const;
+
+const grainNuit = await getImage({ src: grain, format: 'webp', width: 1440, quality: 60 });
+const ecran = await getImage({ src: fondEcran, format: 'webp', width: 851, quality: 70 });
+const textes = JSON.stringify({ quand: tel.quand, horloge: tel.horloge });
 ---
 
-<section data-todo={String(data.todo)}></section>
+<section
+  class="piste pb"
+  data-piste="probleme"
+  data-longueurs="50,65,65,65,65,65,65,110,75,75,75,75,75,75,75,100"
+  data-cadence="420"
+  data-textes={textes}
+  aria-labelledby="probleme-titre"
+>
+  <div class="collant bg-night bg-cover bg-center" style={`background-image:url(${grainNuit.src})`}>
+    <!-- Animated scene (decorative: the same content is in .statique for assistive tech). -->
+    <div class="cadre-piste scene" data-largeur="1240" data-hauteur="980" aria-hidden="true">
+      <div class="texte">
+        <div class="etat avant">
+          <p class="titre-scene">
+            {
+              data.titreAvant.map((l) => (
+                <>
+                  <span class="l">{l}</span>{' '}
+                </>
+              ))
+            }
+          </p>
+          <div class="croissance">
+            <div class="paliers">{data.paliers.map((p) => <span>{p}</span>)}</div>
+            <div class="piste-barre"><div class="remplissage"></div></div>
+          </div>
+        </div>
+        <div class="etat apres cache">
+          <p class="titre-scene">
+            {
+              data.titreApres.map((l) => (
+                <>
+                  <span class="l">{l}</span>{' '}
+                </>
+              ))
+            }
+          </p>
+        </div>
+        <div class="agents">
+          {recentes.map((n) => <Image src={avatars[n.agent]} alt="" width={54} densities={[2]} />)}
+        </div>
+      </div>
+
+      <div class="iphone">
+        <div class="vibreur">
+          <div class="ecran" style={`background-image:url(${ecran.src})`}>
+            <div class="statut">
+              <span>{tel.operateur}</span>
+              <span class="droite">
+                <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"
+                  ><rect x="0" y="8" width="3" height="4" rx="1"></rect><rect
+                    x="5"
+                    y="5.5"
+                    width="3"
+                    height="6.5"
+                    rx="1"></rect><rect x="10" y="3" width="3" height="9" rx="1"></rect><rect
+                    x="15"
+                    y="0"
+                    width="3"
+                    height="12"
+                    rx="1"></rect></svg
+                >
+                <svg width="16" height="12" viewBox="0 0 256 200" fill="currentColor"
+                  ><path
+                    d="M244.35,60.8l-104,125.43A15.93,15.93,0,0,1,128,192h0a15.93,15.93,0,0,1-12.31-5.77L11.65,60.8A15.65,15.65,0,0,1,8.11,48.91,15.93,15.93,0,0,1,14.28,38.1,186.67,186.67,0,0,1,128,0,186.67,186.67,0,0,1,241.72,38.1a15.93,15.93,0,0,1,6.17,10.81A15.65,15.65,0,0,1,244.35,60.8Z"
+                  ></path></svg
+                >
+                <svg width="27" height="13" viewBox="0 0 27 13"
+                  ><rect
+                    x=".5"
+                    y=".5"
+                    width="23"
+                    height="12"
+                    rx="3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-opacity=".53"></rect><rect
+                    x="2"
+                    y="2"
+                    width="16"
+                    height="9"
+                    rx="2"
+                    fill="currentColor"></rect><rect
+                    x="25"
+                    y="4.5"
+                    width="1.5"
+                    height="4"
+                    rx=".75"
+                    fill="currentColor"
+                    fill-opacity=".53"></rect></svg
+                >
+              </span>
+            </div>
+            <svg class="cadenas" viewBox="0 0 256 256"
+              ><path
+                d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96Z"
+              ></path></svg
+            >
+            <div class="date">{tel.date}</div>
+            <div class="heure">{tel.horloge[0]}</div>
+
+            <div class="notifs">
+              <div class="liste">
+                {
+                  recentes.map((n) => (
+                    <div class="notif">
+                      <div class="clip">
+                        <div class="double">
+                          <div class="f-notif">
+                            <div class="carte">
+                              <div class={`app app-${n.app}`}>
+                                <svg
+                                  width={glyphes[n.app][1]}
+                                  height={glyphes[n.app][1]}
+                                  viewBox="0 0 256 256"
+                                >
+                                  <path d={glyphes[n.app][0]} />
+                                </svg>
+                              </div>
+                              <div class="corps">
+                                <div class="ligne">
+                                  <span class="titre">{n.de}</span>
+                                  <span class="quand">{tel.quand[0]}</span>
+                                </div>
+                                <div class="message">{n.message}</div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="f-agent">
+                            <div class="carte">
+                              <div class="app agent">
+                                <Image src={avatars[n.agent]} alt="" width={34} densities={[2]} />
+                              </div>
+                              <div class="corps">
+                                <div class="ligne">
+                                  <span class="titre">
+                                    {agents[n.agent]} → {n.a}
+                                  </span>
+                                  <span class="quand">{tel.quand[0]}</span>
+                                </div>
+                                <div class="message">{n.reponse}</div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                }
+              </div>
+              <div class="pile cache"><i></i><i></i></div>
+            </div>
+
+            <div class="resume">
+              <div class="carte">
+                <div class="app hatch-app">
+                  <Image src={peep} alt="" width={32} densities={[2]} />
+                </div>
+                <div class="corps">
+                  <div class="ligne">
+                    <span class="titre">{data.resume.titre}</span>
+                    <span class="quand">{tel.quand[0]}</span>
+                  </div>
+                  <div class="message">{data.resume.message}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bouton torche">
+              <svg viewBox="0 0 256 256"
+                ><path
+                  d="M184,16H72A16,16,0,0,0,56,32V77.33a16.12,16.12,0,0,0,3.2,9.6L80,114.67V224a16,16,0,0,0,16,16h64a16,16,0,0,0,16-16V114.67l20.8-27.74a16.12,16.12,0,0,0,3.2-9.6V32A16,16,0,0,0,184,16ZM136,152a8,8,0,0,1-16,0V120a8,8,0,0,1,16,0ZM72,56V32H184V56Z"
+                ></path></svg
+              >
+            </div>
+            <div class="bouton photo">
+              <svg viewBox="0 0 256 256"
+                ><path
+                  d="M208,56H180.28L166.65,35.56A8,8,0,0,0,160,32H96a8,8,0,0,0-6.65,3.56L75.71,56H48A24,24,0,0,0,24,80V192a24,24,0,0,0,24,24H208a24,24,0,0,0,24-24V80A24,24,0,0,0,208,56Zm-44,76a36,36,0,1,1-36-36A36,36,0,0,1,164,132Z"
+                ></path></svg
+              >
+            </div>
+            <div class="barre"></div>
+          </div>
+          <Image src={cadre} alt="" class="cadre" widths={[403, 805]} sizes="403px" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Final state as plain content: shown without JS / with reduced motion, read by assistive tech otherwise. -->
+    <div class="statique mx-auto max-w-[1200px] px-5 py-24 text-paper md:px-10 lg:py-32">
+      <h2
+        id="probleme-titre"
+        class="font-display text-[clamp(2.5rem,1.6rem+3.6vw,4.5rem)] leading-none font-bold tracking-[-0.03em]"
+      >
+        {
+          data.titreApres.map((l) => (
+            <>
+              <span class="lg:block">{l}</span>{' '}
+            </>
+          ))
+        }
+      </h2>
+      <ol aria-label={data.listeLabel} class="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {
+          data.notifications.map((n) => (
+            <li class="ios flex flex-col gap-3 rounded-[22px] bg-gray-50/90 p-3.5 text-black">
+              <div class="flex gap-[11px]">
+                <div class={`app app-${n.app}`}>
+                  <svg
+                    width={glyphes[n.app][1]}
+                    height={glyphes[n.app][1]}
+                    viewBox="0 0 256 256"
+                    aria-hidden="true"
+                  >
+                    <path d={glyphes[n.app][0]} />
+                  </svg>
+                </div>
+                <p class="min-w-0 text-[15px] leading-[1.25]">
+                  <span class="sr-only">{tel.apps[n.app]} · </span>
+                  <strong class="block font-semibold">{n.de}</strong>
+                  {n.message}
+                </p>
+              </div>
+              <div class="flex gap-[11px] rounded-2xl bg-white p-2.5">
+                <div class="app agent">
+                  <Image src={avatars[n.agent]} alt="" width={34} densities={[2]} />
+                </div>
+                <p class="min-w-0 text-[15px] leading-[1.25]">
+                  <span class="flex items-center justify-between gap-2">
+                    <strong class="font-semibold">
+                      {agents[n.agent]} → {n.a}
+                    </strong>
+                    <span class="rounded-full bg-whatsapp px-2 py-0.5 text-[12px] font-semibold text-success">
+                      {data.regle} ✓
+                    </span>
+                  </span>
+                  {n.reponse}
+                </p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="mt-8 font-mono text-[13px] tracking-[0.06em] text-paper/75 uppercase">
+        {data.resume.message}
+      </p>
+    </div>
+  </div>
+</section>
+
+<script>
+  import '../../scripts/probleme';
+</script>
+
+<style>
+  /* ---------- Static final state (no JS, reduced motion) — the track is not pinned ---------- */
+  :global(.no-js) .pb .scene {
+    display: none;
+  }
+  :global(.no-js) .pb .collant {
+    position: relative;
+    height: auto;
+    overflow: visible;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pb .scene {
+      display: none;
+    }
+    .pb .collant {
+      position: relative;
+      height: auto;
+      overflow: visible;
+    }
+  }
+  .pb .ios {
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html:not(.no-js)) .pb .statique {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+  }
+
+  /* ---------- Scene, desktop (1240 × 980 design px, scaled by the engine) ---------- */
+  .scene {
+    color: var(--color-paper);
+    font-family: var(--font-sans);
+    line-height: normal;
+  }
+  .texte {
+    position: absolute;
+    left: 20px;
+    top: 280px;
+    /* v4: 520px; widened so the longer EN first line (« Saturday, 9:04 pm. ») stays on one line. */
+    width: 660px;
+    height: 460px;
+  }
+  .titre-scene {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 72px;
+    line-height: 1;
+    letter-spacing: -2px;
+    color: var(--color-paper);
+  }
+  .titre-scene .l {
+    display: block;
+  }
+  .etat {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    transition:
+      opacity 0.5s,
+      transform 0.7s var(--ease-hatch);
+  }
+  .etat.cache {
+    opacity: 0;
+    transform: translateY(16px);
+    pointer-events: none;
+  }
+  .croissance {
+    margin-top: 40px;
+    width: 420px;
+  }
+  .paliers {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: 0.06em;
+  }
+  /* v4 used /30 and /60: raised to the project's contrast floor for uppercase labels on night. */
+  .paliers span {
+    color: color-mix(in srgb, var(--color-paper) 55%, transparent);
+    transition: color 0.4s;
+  }
+  .paliers span.passe {
+    color: color-mix(in srgb, var(--color-paper) 80%, transparent);
+  }
+  .paliers span.actif {
+    color: var(--color-orange);
+  }
+  .piste-barre {
+    margin-top: 12px;
+    height: 4px;
+    border-radius: 2px;
+    background: color-mix(in srgb, var(--color-paper) 15%, transparent);
+    overflow: hidden;
+  }
+  .remplissage {
+    height: 100%;
+    width: 0;
+    background: var(--color-orange);
+    border-radius: 2px;
+    transition: width 1.2s var(--ease-hatch);
+  }
+  .agents {
+    position: absolute;
+    top: 270px;
+    display: flex;
+    gap: 10px;
+  }
+  .agents img {
+    width: 54px;
+    height: 54px;
+    object-fit: contain;
+    opacity: 0;
+    transform: translateY(12px);
+    filter: drop-shadow(0 8px 10px color-mix(in srgb, var(--color-black) 40%, transparent));
+    transition:
+      opacity 0.45s,
+      transform 0.6s var(--ease-hatch);
+  }
+  .agents img.on {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ---------- iPhone ---------- */
+  .iphone {
+    position: absolute;
+    left: 718px;
+    top: 90px;
+    width: 403px;
+    height: 800px;
+    filter: drop-shadow(0 40px 60px color-mix(in srgb, var(--color-black) 70%, transparent));
+  }
+  .vibreur {
+    position: absolute;
+    inset: 0;
+  }
+  .vibreur.vibre {
+    animation: pb-vibre 0.32s linear;
+  }
+  @keyframes pb-vibre {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    20% {
+      transform: translateX(-3px) rotate(-0.4deg);
+    }
+    40% {
+      transform: translateX(3px) rotate(0.4deg);
+    }
+    60% {
+      transform: translateX(-2px);
+    }
+    80% {
+      transform: translateX(2px);
+    }
+  }
+  .cadre {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .ecran {
+    position: absolute;
+    left: 21px;
+    top: 18px;
+    width: 361px;
+    height: 763px;
+    border-radius: 50px;
+    overflow: hidden;
+    background-color: var(--color-orange);
+    background-position: center;
+    background-size: cover;
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    color: var(--color-white);
+  }
+  .statut {
+    position: absolute;
+    top: 19px;
+    left: 34px;
+    right: 26px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .statut .droite {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .cadenas {
+    position: absolute;
+    top: 58px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 15px;
+    height: 15px;
+    fill: currentColor;
+  }
+  .date {
+    position: absolute;
+    top: 84px;
+    width: 100%;
+    text-align: center;
+    font-size: 19px;
+    font-weight: 600;
+    opacity: 0.92;
+  }
+  .heure {
+    position: absolute;
+    top: 100px;
+    width: 100%;
+    text-align: center;
+    font-size: 98px;
+    font-weight: 700;
+    letter-spacing: -2px;
+    line-height: 1.05;
+    font-variant-numeric: tabular-nums;
+  }
+  .bouton {
+    position: absolute;
+    bottom: 44px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: color-mix(in srgb, var(--color-black) 18%, transparent);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  .bouton svg {
+    width: 22px;
+    height: 22px;
+    fill: currentColor;
+  }
+  .bouton.torche {
+    left: 46px;
+  }
+  .bouton.photo {
+    right: 46px;
+  }
+  .barre {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 140px;
+    height: 5px;
+    border-radius: 3px;
+    background: var(--color-white);
+  }
+
+  /* ---------- Notifications ---------- */
+  .notifs {
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    top: 230px;
+    bottom: 104px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+  .notif {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transform: translateY(-10px) scale(0.96);
+    transition:
+      grid-template-rows 0.5s var(--ease-hatch),
+      opacity 0.4s,
+      transform 0.5s var(--ease-hatch);
+  }
+  .notif.on {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    transform: none;
+  }
+  .clip {
+    overflow: hidden;
+    min-height: 0;
+  }
+  .double {
+    display: grid;
+  }
+  .double > * {
+    grid-area: 1 / 1;
+    transition: opacity 0.45s;
+  }
+  .f-agent {
+    opacity: 0;
+  }
+  .notif.repondu .f-notif {
+    opacity: 0;
+  }
+  .notif.repondu .f-agent {
+    opacity: 1;
+  }
+  .carte {
+    position: relative;
+    margin-top: 8px;
+    display: flex;
+    gap: 11px;
+    align-items: center;
+    padding: 12px 14px 12px 12px;
+    border-radius: 22px;
+    background: color-mix(in srgb, var(--color-gray-50) 78%, transparent);
+    backdrop-filter: blur(24px) saturate(1.6);
+    -webkit-backdrop-filter: blur(24px) saturate(1.6);
+    color: var(--color-black);
+  }
+  .app {
+    flex: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 9px;
+    display: grid;
+    place-items: center;
+    box-shadow: inset 0 0 0 0.5px color-mix(in srgb, var(--color-black) 10%, transparent);
+    overflow: hidden;
+    fill: var(--color-white);
+    /* iOS messaging apps are green. */
+    background: linear-gradient(
+      color-mix(in oklab, var(--color-whatsapp-brand) 80%, var(--color-white)),
+      var(--color-whatsapp-brand)
+    );
+  }
+  .app.app-mail {
+    background: linear-gradient(var(--color-mail-light), var(--color-mail));
+  }
+  .app.agent {
+    background: var(--color-peach-2);
+  }
+  .app.agent img {
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+    margin-top: 4px;
+  }
+  .app.hatch-app {
+    background: linear-gradient(
+      color-mix(in oklab, var(--color-orange) 72%, var(--color-white)),
+      var(--color-orange)
+    );
+  }
+  .app.hatch-app img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    margin-top: 5px;
+  }
+  .corps {
+    flex: 1;
+    min-width: 0;
+  }
+  .ligne {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .titre {
+    font-size: 15px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .quand {
+    font-size: 13px;
+    color: color-mix(in srgb, var(--color-black) 48%, transparent);
+    white-space: nowrap;
+  }
+  .message {
+    margin-top: 1px;
+    font-size: 15px;
+    line-height: 1.25;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .pile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 18px;
+    transition: opacity 0.35s;
+  }
+  .pile.cache {
+    opacity: 0;
+  }
+  .pile i {
+    display: block;
+    height: 9px;
+    border-radius: 0 0 16px 16px;
+    background: color-mix(in srgb, var(--color-gray-50) 55%, transparent);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  .pile i:nth-child(1) {
+    width: 92%;
+  }
+  .pile i:nth-child(2) {
+    width: 84%;
+    opacity: 0.7;
+  }
+  .resume {
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    bottom: 104px;
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+    transition:
+      opacity 0.5s,
+      transform 0.6s var(--ease-hatch);
+  }
+  .resume.on {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ---------- Scene, portrait (440 design px wide; height set by probleme.ts) ----------
+     Title and gauge on top, phone below; the phone may run off the bottom edge on short screens. */
+  @media (max-aspect-ratio: 1/1), (max-width: 639.98px) {
+    .scene {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: safe center;
+      padding-top: 88px;
+      mask-image: linear-gradient(to bottom, var(--color-black) calc(100% - 40px), transparent);
+    }
+    .texte {
+      position: relative;
+      flex: none;
+      left: auto;
+      top: auto;
+      width: 400px;
+      height: 160px;
+    }
+    .titre-scene {
+      font-size: 32px;
+      line-height: 1.05;
+      letter-spacing: -0.8px;
+    }
+    /* « Samedi, 21:04. » on its own line, the rest flows. */
+    .titre-scene .l:not(:first-child) {
+      display: inline;
+    }
+    .croissance {
+      width: 100%;
+      margin-top: 18px;
+    }
+    .agents {
+      top: auto;
+      bottom: 4px;
+      gap: 8px;
+    }
+    .agents img {
+      width: 40px;
+      height: 40px;
+    }
+    .iphone {
+      position: relative;
+      flex: none;
+      left: auto;
+      top: auto;
+      margin-top: 12px;
+    }
+    /* The bottom of the phone may be cut: lift the stack so the last card stays clear of the fade. */
+    .notifs,
+    .resume {
+      bottom: var(--bas, 150px);
+    }
+  }
+</style>

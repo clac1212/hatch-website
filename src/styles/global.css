@@ -39,7 +39,13 @@
 
   /* Product UI mockups only (phones, chat threads, app windows) — never for site chrome. */
   --color-success: #16a34a;
-  --color-whatsapp: #d9fdd3;
+  --color-whatsapp: #d9fdd3; /* outgoing chat bubble */
+  --color-whatsapp-brand: #25d366; /* WhatsApp app icon / channel */
+  --color-mail: #1466f2; /* Mail app icon / channel */
+  --color-mail-light: #22c4ff;
+  --color-success-txt: #0e7a3e; /* success as text on cream (AA) */
+  --color-navy: #1b3a60; /* cool shadows over the sea (hero map) */
+  --color-scene: #ded4dc; /* backdrop of the voxel diorama renders */
   --color-gray-50: #fafafa;
   --color-gray-100: #eeeeee;
   --color-gray-400: #bbbbbb;

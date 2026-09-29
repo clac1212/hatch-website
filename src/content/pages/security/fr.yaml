@@ -1,0 +1,67 @@
+seo:
+  title: 'Sécurité & confidentialité — Hatch OS'
+  description: "Vos données restent les vôtres : aucun entraînement IA, zéro rétention côté modèles, hébergement en Europe, contrôle d'accès granulaire et conformité RGPD."
+hero:
+  kicker: 'Sécurité · Confidentialité · Accès'
+  title: 'Vos données restent les vôtres.'
+  lead: "Hatch s'installe dans votre réseau sans jamais s'entraîner sur vos données. Vous choisissez ce que vous partagez avec Hatch, et qui accède à quoi dans Hatch — jusqu'au document."
+  badges:
+    - 'Aucun entraînement IA'
+    - 'Zéro rétention modèles'
+    - 'Hébergement en Europe'
+    - 'Conforme RGPD'
+training:
+  kicker: "01 — L'IA ne s'entraîne jamais sur vous"
+  title: 'Aucun entraînement, zéro rétention.'
+  cards:
+    - icon: shield-check
+      title: 'Aucun entraînement'
+      text: "Vos données ne sont jamais utilisées pour entraîner un modèle d'IA. Ni chez nous, ni chez nos fournisseurs."
+    - icon: lock
+      title: 'Zéro rétention côté modèles'
+      text: "Vous gardez vos données. Nos fournisseurs de modèles n'en conservent rien après traitement."
+sharing:
+  kicker: '02 — Vous choisissez ce que vous partagez'
+  title: 'Hatch ne voit que ce que vous décidez.'
+  text: 'Vous connectez vos sources et choisissez les périmètres, les documents et les espaces partagés. Le reste reste chez vous. Révocable à tout moment, sans perte de contrôle.'
+  items:
+    - 'Sources : Drive, Notion, PDF, Word, Excel — au choix'
+    - 'Périmètres par marque, région, site'
+    - 'Retrait en un clic, traçabilité des accès'
+  example:
+    title: 'Exemple — réseau Nobinobi'
+    rows:
+      - source: 'Siège — tout le manuel'
+        status: 'Partagé'
+        shared: true
+      - source: 'Lyon Part-Dieu — fiches cuisine'
+        status: 'Partagé'
+        shared: true
+      - source: 'Recettes en test — Q4'
+        status: 'Non partagé'
+        shared: false
+access:
+  kicker: '03 — Qui accède à quoi, à chaque niveau'
+  title: "Un contrôle d'accès granulaire."
+  text: "Chaque membre du réseau n'accède qu'à ce qui le concerne. Le franchiseur pilote, les sites voient leur périmètre."
+  cards:
+    - icon: users
+      title: 'Accès par rôle'
+      text: 'Droits distincts franchiseur / franchisés / managers / équipiers. Le siège voit tout, un site ne voit que son site.'
+    - icon: file-text
+      title: 'Permissions fines'
+      text: 'Vous choisissez qui accède à quels documents, au sein de vos équipes. Par dossier, par fiche, par site.'
+    - icon: key
+      title: 'SSO entreprise'
+      text: 'Connexion via votre SSO en SAML. Arrivées, départs et droits suivent votre annuaire.'
+foundation:
+  kicker: '04 — Socle & conformité'
+  cards:
+    - title: 'Hébergement en Europe'
+      text: 'Serveurs AWS situés en Europe. Données isolées par client, aucun partage entre réseaux.'
+    - title: 'Conforme RGPD'
+      text: 'Politique de sécurité partageable, DPA signable. Contact sécurité dédié.'
+cta:
+  title: 'Besoin du dossier complet pour votre DSI ?'
+  label: 'Demander la politique de sécurité et le DPA'
+  href: 'mailto:cesar@gethatch.io?subject=Politique%20de%20s%C3%A9curit%C3%A9%20et%20DPA%20Hatch%20OS'

@@ -1,0 +1,15 @@
+seo:
+  title: 'Réserver une démo — Hatch OS'
+  description: 'Réservez 45 minutes avec Patrick, co-fondateur de Hatch OS : une démo personnalisée sur les cas de votre réseau de franchise.'
+kicker: 'Démo personnalisée · 45 minutes'
+title: 'Vos équipes méritent mieux.'
+titleAccent: 'Voyez comment.'
+lead: 'Choisissez un créneau ci-dessous, renseignez vos informations et confirmez votre rendez-vous directement. On vous montre Hatch OS sur les cas de votre réseau.'
+points:
+  - '45 minutes avec Patrick, co-fondateur'
+  - 'Une démo sur les cas de votre réseau'
+  - 'Ensuite, un pilote de 30 jours sans engagement'
+agendaTitle: 'Réservez votre créneau avec Patrick'
+agendaHint: 'Horaires affichés dans votre fuseau horaire.'
+agendaFallback: "L'agenda se charge…"
+agendaFallbackLink: "Ouvrir l'agenda dans un nouvel onglet"

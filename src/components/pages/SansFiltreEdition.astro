@@ -1,0 +1,928 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import Button from '../ui/Button.astro';
+import wordmark from '../../assets/brand/hatch-os.png';
+import cesar from '../../assets/sans-filtre/cesar.jpg';
+import { routes, type Locale } from '../../i18n/ui';
+
+/**
+ * One Sans Filtre edition, "Dia Weekly"-style editorial layout ported from the v1 site onto the v4
+ * tokens: masthead, issue headline, featured band, alternating update blocks, "Hors des clous",
+ * CTA and the archive of the other editions.
+ */
+interface Props {
+  entry: CollectionEntry<'sansFiltre'>;
+  /** Every edition, newest first (the archive lists the others). */
+  editions: CollectionEntry<'sansFiltre'>[];
+  ui: CollectionEntry<'sansFiltrePage'>['data'];
+  locale: Locale;
+}
+
+const { entry, editions, ui, locale } = Astro.props;
+const e = entry.data;
+const d = e[locale];
+type Agent = NonNullable<typeof d.featured.agent>;
+type Block = typeof d;
+
+const avatars = import.meta.glob<{ default: ImageMetadata }>(
+  '../../assets/sans-filtre/*-avatar.png',
+  {
+    eager: true,
+  },
+);
+const avatar = (agent: Agent) => avatars[`../../assets/sans-filtre/${agent}-avatar.png`].default;
+const videos = import.meta.glob<string>('../../assets/sans-filtre/*.mp4', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+});
+function video(file: string) {
+  const url = videos[`../../assets/sans-filtre/${file}`];
+  if (!url) throw new Error(`Sans Filtre ${e.edition}: missing src/assets/sans-filtre/${file}`);
+  return url;
+}
+
+const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+/** Author photos; anyone else gets their initial in a circle. */
+const photos: Record<string, ImageMetadata> = { César: cesar };
+const author = d.featured.shippedBy;
+const photo = photos[author] as ImageMetadata | undefined;
+const authorLine = [ui.authorRoles[author], d.featured.date].filter(Boolean).join(' · ');
+
+/** Section title → solid words + last word as a hollow italic outline ("Dia Weekly" mix). */
+function mixTitle(title: string) {
+  const tokens = title.trim().split(/\s+/);
+  let i = tokens.length - 1;
+  while (i > 0 && !/\p{L}/u.test(tokens[i])) i--;
+  return { rest: tokens.slice(0, i).join(' '), outline: tokens.slice(i).join(' ') };
+}
+const titles = {
+  more: mixTitle(ui.more),
+  clock: mixTitle(d.horsDesClousTitle),
+  cta: mixTitle(d.ctaTitle),
+  past: mixTitle(ui.pastTitle),
+};
+
+const base = routes.sansFiltre[locale];
+const past = editions.filter((x) => x.data.edition !== e.edition);
+const thumbOf = (b: Block): ImageMetadata | undefined =>
+  b.featured.image ??
+  b.updates.find((u) => u.image)?.image ??
+  (b.featured.agent ? avatar(b.featured.agent) : undefined);
+---
+
+<div class="sf">
+  <div class="sf-wrap">
+    <header class="sf-mast">
+      <div class="sf-mast-meta">
+        <span>ⓘ&nbsp; {d.dateline}</span>
+        <span>◍&nbsp; {e.location}</span>
+      </div>
+      <a href={base} class="sf-mast-center" aria-label={ui.homeLabel}>
+        <span class="sf-mast-title">
+          <Image src={wordmark} alt="" width={360} class="sf-mast-logo" />
+          <span class="sf-monthly" aria-hidden="true">
+            {ui.monthly.split('').map((c) => <span>{c}</span>)}
+          </span>
+        </span>
+        <span class="sf-mast-tag">{ui.tag}</span>
+        <span class="sf-mast-sub">
+          {ui.sub}
+          <span class="sf-dot"></span>
+          {ui.subEnd}
+        </span>
+      </a>
+      <div class="sf-mast-meta sf-mast-meta-droite">
+        <span>
+          {ui.editionLabel}
+          <span class="sf-digits">{e.edition.split('').map((c) => <b>{c}</b>)}</span>
+        </span>
+        <span>
+          {ui.updatesLabel}
+          <span class="sf-digits">{e.updatesCount.split('').map((c) => <b>{c}</b>)}</span>
+        </span>
+      </div>
+    </header>
+
+    <div class="sf-issue">
+      <h1>{d.issueTitle}</h1>
+      <p class="sf-lede">
+        {d.intro}
+        <span class="sf-sig">{d.signature}</span>
+      </p>
+    </div>
+  </div>
+
+  <section class="sf-band" aria-labelledby="sf-une">
+    <div class="sf-wrap sf-feat">
+      <div class="sf-shot">
+        <div class="sf-shot-bar" aria-hidden="true">
+          <i></i><i></i><i></i><span>{d.featured.eyebrow}</span>
+        </div>
+        {
+          d.featured.image ? (
+            <Image
+              src={d.featured.image}
+              alt={d.featured.eyebrow}
+              widths={[440, 880]}
+              sizes="(min-width: 820px) 430px, 100vw"
+              class="sf-shot-screen"
+            />
+          ) : (
+            d.featured.agent && (
+              <div class="sf-shot-body">
+                <Image src={avatar(d.featured.agent)} alt="" width={192} class="sf-shot-avatar" />
+                <div>
+                  <p class="sf-shot-name">{capitalize(d.featured.agent)}</p>
+                  <p class="sf-shot-status">{ui.online}</p>
+                  <p class="sf-shot-role">{ui.agentRole}</p>
+                </div>
+              </div>
+            )
+          )
+        }
+      </div>
+      <div>
+        <p class="sf-eyebrow">{ui.featured}</p>
+        <h2 id="sf-une">{d.featured.title}</h2>
+        {d.featured.body.map((para) => <p>{para}</p>)}
+        <div class="sf-attrib">
+          {
+            photo ? (
+              <Image src={photo} alt="" width={88} class="sf-avatar sf-avatar-photo" />
+            ) : (
+              <span class="sf-avatar" aria-hidden="true">
+                {author.charAt(0)}
+              </span>
+            )
+          }
+          <p class="sf-by">
+            {ui.shippedBy}<b>{author}</b>{authorLine}
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="sf-wrap">
+    <section aria-labelledby="sf-plus">
+      <h2 id="sf-plus" class="sf-title sf-more">
+        {titles.more.rest}
+        <span class="sf-om">{titles.more.outline}</span>
+      </h2>
+      {
+        d.updates.map((u, i) => {
+          const media = u.video ? (
+            <div class="sf-media sf-media-video">
+              <video src={video(u.video)} autoplay loop muted playsinline aria-label={u.title} />
+            </div>
+          ) : u.image ? (
+            <Image
+              src={u.image}
+              alt={u.title}
+              widths={u.highlight ? [892, 1200] : [440, 880]}
+              sizes={
+                u.highlight ? '(min-width: 960px) 892px, 100vw' : '(min-width: 820px) 420px, 100vw'
+              }
+              class="sf-media"
+            />
+          ) : (
+            <div
+              class:list={['sf-card', u.logo ? 'sf-card-wa' : `sf-card-${u.agent ?? 'neutre'}`]}
+              aria-hidden="true"
+            >
+              {u.logo ? (
+                <Image src={u.logo} alt="" class="sf-card-logo" />
+              ) : (
+                u.agent && <Image src={avatar(u.agent)} alt="" width={400} class="sf-card-avatar" />
+              )}
+              {u.emojis?.map((em, j) => (
+                <span class={`sf-emoji sf-emoji-${j + 1}`}>{em}</span>
+              ))}
+            </div>
+          );
+          return (
+            <article
+              class:list={[
+                u.highlight ? 'sf-show' : 'sf-block',
+                !u.highlight && i % 2 === 1 && 'sf-rev',
+              ]}
+            >
+              {media}
+              <div class="sf-block-txt">
+                <h3>{u.title}</h3>
+                <p>{u.desc}</p>
+                <p class="sf-date">{u.date}</p>
+              </div>
+            </article>
+          );
+        })
+      }
+    </section>
+
+    <section class="sf-clock" aria-labelledby="sf-clous">
+      <h2 id="sf-clous" class="sf-title">
+        {titles.clock.rest}
+        <span class="sf-om">{titles.clock.outline}</span>
+      </h2>
+      <div class="sf-clock-body">
+        <h3>{d.horsDesClousHeading}</h3>
+        {d.horsDesClous.map((p) => <p>{p}</p>)}
+        <p class="sf-motto">{ui.quotes[0]}{d.horsDesClousMotto}{ui.quotes[1]}</p>
+      </div>
+    </section>
+
+    <section class="sf-cta" aria-labelledby="sf-cta">
+      <h2 id="sf-cta" class="sf-title">
+        {titles.cta.rest}
+        <span class="sf-om">{titles.cta.outline}</span>
+      </h2>
+      <p>{d.ctaText}</p>
+      <Button href={routes.demo[locale]} size="lg">{d.ctaBtn}</Button>
+    </section>
+
+    <section class="sf-past" aria-labelledby="sf-passees">
+      <h2 id="sf-passees" class="sf-title">
+        {titles.past.rest}
+        <span class="sf-om">{titles.past.outline}</span>
+      </h2>
+      {
+        past.length === 0 ? (
+          <p class="sf-hint">{ui.pastHint}</p>
+        ) : (
+          <ul class="sf-past-grid">
+            {past.map((p) => {
+              const b = p.data[locale];
+              const th = thumbOf(b);
+              return (
+                <li>
+                  <a class="sf-pc" href={`${base}/${p.data.edition}`}>
+                    <span class="sf-pc-meta">
+                      {b.month} · {ui.editionLabel}
+                      {p.data.edition}
+                    </span>
+                    <h3>{b.issueTitle}</h3>
+                    {th && <Image src={th} alt="" width={456} class="sf-pc-thumb" />}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        )
+      }
+    </section>
+  </div>
+</div>
+
+<script>
+  // Respect reduced motion: no autoplaying screen recording, controls instead.
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.querySelectorAll<HTMLVideoElement>('.sf-media-video video').forEach((v) => {
+      v.pause();
+      v.removeAttribute('autoplay');
+      v.controls = true;
+    });
+  }
+</script>
+
+<style>
+  .sf {
+    padding-top: 104px;
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--color-ink);
+    /* Warm glow building up toward the footer, as on the v1 journal. */
+    background-image: linear-gradient(
+      to top,
+      color-mix(in srgb, var(--color-sand) 85%, transparent) 0%,
+      color-mix(in srgb, var(--color-cream-2) 45%, transparent) 28%,
+      transparent 62%
+    );
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    background-size: 100% 78vh;
+    padding-bottom: 72px;
+  }
+  .sf-wrap {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  @media (min-width: 640px) {
+    .sf-wrap {
+      padding: 0 34px;
+    }
+  }
+
+  /* ── Masthead ── */
+  .sf-mast {
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 16px;
+    padding: 16px 0 20px;
+    border-bottom: 3px double var(--color-ink);
+  }
+  .sf-mast-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.4px;
+    color: var(--color-soft);
+    white-space: nowrap;
+  }
+  .sf-mast-center {
+    order: -1;
+    display: block;
+    text-align: center;
+    color: var(--color-ink);
+  }
+  .sf-mast-title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+  }
+  .sf-mast-logo {
+    display: block;
+    width: auto;
+    height: clamp(30px, 4.2vw, 54px);
+  }
+  /* "Mensuel": hollow, jaunty, hand-placed letters. */
+  .sf-monthly {
+    display: inline-block;
+    margin: 0 0.15em;
+    padding: 0.12em 0.06em 0.12em 0;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 600;
+    font-size: clamp(24px, 3.6vw, 44px);
+    line-height: 0.9;
+    white-space: nowrap;
+    color: transparent;
+    -webkit-text-stroke: 1.3px var(--color-ink);
+    transform: rotate(9deg);
+  }
+  .sf-monthly > span {
+    display: inline-block;
+  }
+  .sf-monthly > span:nth-child(odd) {
+    transform: translateY(3px) rotate(-4deg);
+  }
+  .sf-monthly > span:nth-child(even) {
+    transform: translateY(-4px) rotate(3deg);
+  }
+  .sf-monthly > span:nth-child(4n) {
+    transform: translateY(-6px) rotate(4deg);
+  }
+  .sf-mast-tag {
+    display: inline-block;
+    margin-top: 2px;
+    transform: rotate(-7deg);
+    background: var(--color-ink);
+    color: var(--color-cream);
+    font-family: var(--font-mono);
+    font-size: clamp(9px, 1vw, 11px);
+    letter-spacing: 2.5px;
+    padding: 2.5px 9px;
+    white-space: nowrap;
+  }
+  .sf-mast-sub {
+    margin-top: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--color-soft);
+  }
+  .sf-dot {
+    width: 7px;
+    height: 7px;
+    border: 1px solid var(--color-soft);
+    border-radius: 50%;
+  }
+  .sf-digits {
+    display: inline-flex;
+    gap: 3px;
+    margin-left: 5px;
+  }
+  .sf-digits b {
+    width: 15px;
+    padding: 1px 0;
+    border: 1px solid var(--color-line);
+    border-radius: 2px;
+    background: var(--color-surface);
+    text-align: center;
+    font-weight: 400;
+  }
+  @media (min-width: 820px) {
+    .sf-mast {
+      grid-template-columns: 1fr auto 1fr;
+      justify-items: stretch;
+      gap: 48px;
+      padding: 22px 0 24px;
+    }
+    .sf-mast-center {
+      order: 0;
+    }
+    .sf-mast-meta {
+      align-items: flex-start;
+    }
+    .sf-mast-meta-droite {
+      align-items: flex-end;
+    }
+    .sf-mast-tag {
+      transform: translateX(46px) rotate(-7deg);
+    }
+    .sf-mast-sub {
+      margin-top: 34px;
+    }
+  }
+
+  /* ── Issue headline ── */
+  .sf-issue {
+    padding: 50px 0 8px;
+    text-align: center;
+  }
+  .sf-issue h1 {
+    max-width: 780px;
+    margin: 0 auto;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(34px, 5.5vw, 56px);
+    line-height: 1.02;
+    letter-spacing: -1.5px;
+  }
+  .sf-lede {
+    max-width: 620px;
+    margin: 30px auto 0;
+    font-size: clamp(18px, 1.6vw, 20px);
+    line-height: 1.65;
+    color: var(--color-soft);
+  }
+  .sf-sig {
+    display: block;
+    margin-top: 16px;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    letter-spacing: 0.3px;
+    color: var(--color-muted);
+  }
+
+  /* ── Featured band ── */
+  .sf-band {
+    margin-top: 38px;
+    background: linear-gradient(180deg, var(--color-cream) 0%, var(--color-cream-2) 100%);
+  }
+  .sf-feat {
+    display: grid;
+    gap: 28px;
+    align-items: center;
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+  .sf-feat .sf-shot {
+    order: 2;
+  }
+  .sf-feat h2 {
+    margin: 0 0 15px;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 32px;
+    line-height: 1.1;
+    letter-spacing: -0.5px;
+  }
+  .sf-feat p {
+    margin: 0 0 13px;
+    color: var(--color-soft);
+  }
+  .sf-feat .sf-eyebrow {
+    margin: 0 0 14px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--color-orange-txt);
+  }
+  @media (min-width: 820px) {
+    .sf-feat {
+      grid-template-columns: 1fr 1fr;
+      gap: 50px;
+      padding-top: 56px;
+      padding-bottom: 56px;
+    }
+    .sf-feat .sf-shot {
+      order: 0;
+    }
+  }
+  .sf-shot {
+    overflow: hidden;
+    border: 1px solid var(--color-line);
+    border-radius: 12px;
+    background: var(--color-surface);
+    box-shadow: var(--shadow-1);
+  }
+  .sf-shot-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--color-line);
+    background: var(--color-surface-2);
+  }
+  .sf-shot-bar i {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--color-stone);
+  }
+  .sf-shot-bar span {
+    margin-left: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-muted);
+  }
+  .sf-shot-screen {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    object-position: top center;
+  }
+  .sf-shot-body {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 26px 22px;
+  }
+  .sf-shot-avatar {
+    width: 96px;
+    height: 96px;
+    flex-shrink: 0;
+    padding: 6px;
+    border: 1px solid var(--color-line);
+    border-radius: 18px;
+    background: var(--color-surface-2);
+    object-fit: contain;
+  }
+  .sf-feat .sf-shot-name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 20px;
+    color: var(--color-ink);
+  }
+  .sf-feat .sf-shot-status {
+    margin: 2px 0 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-orange-txt);
+  }
+  .sf-feat .sf-shot-role {
+    margin: 8px 0 0;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  .sf-attrib {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 20px;
+  }
+  .sf-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--color-orange-txt);
+    color: var(--color-white);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 17px;
+  }
+  .sf-avatar-photo {
+    object-fit: cover;
+    object-position: center 26%;
+    filter: grayscale(1);
+  }
+  .sf-feat .sf-by {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--color-muted);
+  }
+  .sf-by b {
+    display: block;
+    font-weight: 400;
+    font-size: 13.5px;
+    color: var(--color-ink);
+  }
+
+  /* ── Section titles: solid Fraunces + hollow italic last word ── */
+  .sf-title {
+    margin: 0;
+    text-align: center;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(36px, 6vw, 52px);
+    line-height: 1.1;
+    color: var(--color-ink);
+  }
+  .sf-om {
+    font-style: italic;
+    color: transparent;
+    -webkit-text-stroke: 1.3px var(--color-ink);
+  }
+  .sf-more {
+    padding: 58px 0 48px;
+  }
+
+  /* ── Update blocks ── */
+  .sf-block {
+    display: grid;
+    gap: 24px;
+    align-items: center;
+    padding: 38px 0;
+    border-top: 1px solid var(--color-line);
+  }
+  @media (min-width: 820px) {
+    .sf-block {
+      grid-template-columns: 1fr 1fr;
+      gap: 52px;
+      padding: 50px 0;
+    }
+    .sf-rev > :first-child {
+      order: 2;
+    }
+  }
+  .sf-media {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-card);
+    box-shadow: 0 14px 34px rgb(0 0 0 / 0.12);
+  }
+  .sf-media-video {
+    overflow: hidden;
+    aspect-ratio: 16 / 8;
+    line-height: 0;
+  }
+  .sf-media-video video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Right edge anchored so the whole language menu stays in view. */
+    object-position: right top;
+    transform: scale(1.1);
+    transform-origin: right top;
+  }
+  .sf-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    aspect-ratio: 16 / 11;
+    border-radius: var(--radius-card);
+    background: var(--color-cream-2);
+  }
+  .sf-card-sparrow {
+    background: linear-gradient(135deg, var(--color-cream-2), var(--color-sand));
+  }
+  .sf-card-jay {
+    background: linear-gradient(135deg, var(--color-surface-2), var(--color-stone));
+  }
+  .sf-card-peep {
+    background: linear-gradient(135deg, var(--color-peach-2), var(--color-peach));
+  }
+  .sf-card-finch {
+    background: linear-gradient(135deg, var(--color-cream), var(--color-sand));
+  }
+  .sf-card-pecker {
+    background: linear-gradient(135deg, var(--color-orange-tint), var(--color-peach));
+  }
+  .sf-card-wa {
+    background: linear-gradient(135deg, var(--color-surface-2), var(--color-whatsapp));
+  }
+  .sf-card-avatar {
+    width: 42%;
+    height: auto;
+    filter: drop-shadow(0 12px 26px rgb(0 0 0 / 0.16));
+  }
+  .sf-card-logo {
+    width: 34%;
+    height: auto;
+    filter: drop-shadow(0 10px 22px rgb(0 0 0 / 0.14));
+  }
+  .sf-emoji {
+    position: absolute;
+    font-size: clamp(20px, 2.7vw, 34px);
+    line-height: 1;
+    filter: drop-shadow(0 4px 7px rgb(0 0 0 / 0.14));
+    animation: sf-float 3.4s ease-in-out infinite;
+  }
+  @keyframes sf-float {
+    0%,
+    100% {
+      transform: translateY(3px) rotate(-6deg);
+    }
+    50% {
+      transform: translateY(-9px) rotate(6deg);
+    }
+  }
+  .sf-emoji-1 {
+    top: 15%;
+    left: 19%;
+  }
+  .sf-emoji-2 {
+    top: 13%;
+    right: 21%;
+    animation-delay: 0.5s;
+  }
+  .sf-emoji-3 {
+    bottom: 19%;
+    left: 23%;
+    animation-delay: 1s;
+  }
+  .sf-emoji-4 {
+    bottom: 16%;
+    right: 20%;
+    animation-delay: 1.5s;
+  }
+  .sf-emoji-5 {
+    top: 46%;
+    left: 9%;
+    animation-delay: 2s;
+  }
+  .sf-emoji-6 {
+    top: 49%;
+    right: 9%;
+    animation-delay: 2.5s;
+  }
+  .sf-block-txt h3 {
+    margin: 0 0 13px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 27px;
+    line-height: 1.14;
+    letter-spacing: -0.02em;
+  }
+  .sf-block-txt p {
+    margin: 0;
+    line-height: 1.72;
+    color: var(--color-soft);
+  }
+  .sf-block-txt .sf-date {
+    margin-top: 14px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-muted);
+  }
+  /* Highlighted update: big media on top, text centred below. */
+  .sf-show {
+    padding: 40px 0;
+    border-top: 1px solid var(--color-line);
+  }
+  .sf-show .sf-block-txt {
+    max-width: 640px;
+    margin: 30px auto 0;
+    text-align: center;
+  }
+  .sf-show h3 {
+    font-size: clamp(25px, 3vw, 32px);
+  }
+  @media (min-width: 820px) {
+    .sf-show {
+      padding: 56px 0;
+    }
+  }
+
+  /* ── Hors des clous ── */
+  .sf-clock {
+    padding: 52px 0;
+  }
+  .sf-clock-body {
+    max-width: 620px;
+    margin: 30px auto 0;
+  }
+  .sf-clock-body h3 {
+    margin: 0 0 20px;
+    text-align: center;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(20px, 2.7vw, 27px);
+    line-height: 1.2;
+  }
+  .sf-clock-body p {
+    margin: 0 0 14px;
+    line-height: 1.75;
+    color: var(--color-soft);
+  }
+  .sf-clock-body .sf-motto {
+    margin: 28px 0 0;
+    text-align: center;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 600;
+    font-size: clamp(21px, 3vw, 28px);
+    line-height: 1.3;
+    color: var(--color-ink);
+  }
+
+  /* ── CTA ── */
+  .sf-cta {
+    padding: 22px 0 8px;
+    text-align: center;
+  }
+  .sf-cta p {
+    margin: 12px 0 24px;
+    color: var(--color-soft);
+  }
+
+  /* ── Past editions ── */
+  .sf-past {
+    padding: 60px 0 20px;
+  }
+  .sf-past .sf-title {
+    font-size: 40px;
+  }
+  .sf-hint {
+    margin: 8px 0 0;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--color-muted);
+  }
+  .sf-past-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 32px;
+  }
+  .sf-past-grid > li {
+    width: 100%;
+    max-width: 340px;
+  }
+  @media (min-width: 820px) {
+    .sf-past-grid > li {
+      width: 280px;
+    }
+  }
+  .sf-pc {
+    display: flex;
+    flex-direction: column;
+    height: 320px;
+    overflow: hidden;
+    padding: 30px 26px 0;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-card);
+    background: var(--color-surface);
+    text-align: center;
+    transition:
+      box-shadow 0.35s var(--ease-hatch),
+      transform 0.35s var(--ease-hatch);
+  }
+  .sf-pc:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-2);
+  }
+  .sf-pc-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-muted);
+  }
+  .sf-pc h3 {
+    margin: 12px 0 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 1.12;
+  }
+  .sf-pc-thumb {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    margin-top: 20px;
+    object-fit: cover;
+    object-position: top center;
+    border: 1px solid var(--color-line);
+    border-bottom: 0;
+    border-radius: 12px 12px 0 0;
+    background: var(--color-cream-2);
+  }
+</style>

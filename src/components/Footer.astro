@@ -1,8 +1,15 @@
 ---
-import Logo from './ui/Logo.astro';
+import { Image, Picture } from 'astro:assets';
+import Button from './ui/Button.astro';
+import { section } from '../content/section';
 import { routes, otherLocale, useTranslations, type Locale, type Paths } from '../i18n/ui';
+import logo from '../assets/brand/hatch-os-night.png';
+import immeuble from '../assets/footer/immeuble.jpg';
 
-/** Minimal footer for the foundation; the voxel "immeuble" footer replaces it in lot 3. */
+/**
+ * Site-wide footer — v4 node DbMpt ("Footer D · L'immeuble voxel"): brand + links on the left,
+ * the voxel building (one agent per floor) on the right. Stacked, building first, below 1280 px.
+ */
 interface Props {
   locale: Locale;
   paths: Paths;
@@ -10,68 +17,150 @@ interface Props {
 
 const { locale, paths } = Astro.props;
 const t = useTranslations(locale);
+const data = await section('piedDePage', locale);
 const home = routes.home[locale];
 const other = otherLocale(locale);
-const product = [
+const produit = [
   { href: `${home}#agents`, label: t('nav.agents') },
   { href: `${home}#cas-clients`, label: t('nav.cases') },
   { href: `${home}#tarifs`, label: t('nav.pricing') },
   { href: routes.security[locale], label: t('nav.security') },
 ];
-const social = [
+const reseaux = [
   { href: 'https://www.linkedin.com/company/gethatchos/', label: 'LinkedIn' },
   { href: 'https://www.instagram.com/get_hatch.os/', label: 'Instagram' },
 ];
+const legal = [
+  { href: routes.terms[locale], label: data.legal.conditions },
+  { href: routes.privacy[locale], label: data.legal.confidentialite },
+];
+const annee = new Date().getFullYear();
+const titre = 'font-mono text-[11px] leading-[14px] tracking-[0.16em] text-muted uppercase';
+const lien = 'lien-pied block w-fit text-[14.5px] leading-[normal] text-paper';
 ---
 
-<footer class="bg-night text-white">
-  <div class="mx-auto grid max-w-site gap-12 px-6 py-16 md:grid-cols-[2fr_1fr_1fr] md:px-8">
-    <div class="flex flex-col gap-4">
-      <Logo tone="night" />
-      <p class="text-caption text-white/75">{t('footer.tagline')}</p>
+<footer data-rv-groupe class="bg-black text-paper">
+  <div class="mx-auto flex max-w-[1920px] flex-col lg:flex-row xl:h-[900px]">
+    <div data-rv class="order-1 flex justify-center lg:order-2 lg:w-[40%] lg:shrink-0 xl:w-[720px]">
+      <Picture
+        pictureAttributes={{ class: 'block w-full max-w-[460px] lg:h-full lg:max-w-none' }}
+        src={immeuble}
+        alt={data.immeubleAlt}
+        widths={[480, 720, 1080, 1440]}
+        sizes="(min-width: 1280px) 720px, (min-width: 1024px) 40vw, (min-width: 768px) 460px, 100vw"
+        formats={['avif', 'webp']}
+        class="block h-auto w-full lg:h-full lg:object-contain lg:object-bottom xl:object-cover"
+      />
     </div>
-    <div>
-      <h2 class="font-mono text-kicker text-white/60 uppercase">{t('footer.product')}</h2>
-      <ul class="mt-4 flex flex-col gap-2.5">
-        {
-          product.map((l) => (
-            <li>
-              <a href={l.href} class="text-caption hover:text-orange">
-                {l.label}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
+
+    <div
+      class="order-2 flex flex-1 flex-col justify-between gap-14 px-6 pt-4 pb-10 md:px-12 lg:order-1 lg:gap-10 lg:pt-20 lg:pr-8 xl:pt-[88px] xl:pr-12 xl:pl-24"
+    >
+      <div data-rv class="flex max-w-[420px] flex-col items-start gap-[18px]">
+        <a href={home} aria-label={t('a11y.home')}>
+          <Image src={logo} alt="" width={130} densities={[1, 2]} class="h-auto w-[130px]" />
+        </a>
+        <p class="text-[15px] leading-[23px] text-white/70">{data.signature}</p>
+        <Button href={routes.demo[locale]} variant="cream">{data.cta}</Button>
+      </div>
+
+      <div
+        data-rv
+        class="grid grid-cols-2 gap-x-6 gap-y-10 md:flex md:flex-wrap md:gap-x-11 lg:flex-nowrap lg:gap-x-8 xl:gap-x-11"
+      >
+        <nav aria-labelledby="pied-produit" class="flex flex-col gap-3">
+          <h2 id="pied-produit" class={titre}>{t('footer.product')}</h2>
+          <ul class="flex flex-col gap-3">
+            {
+              produit.map((l) => (
+                <li>
+                  <a href={l.href} class={lien}>
+                    {l.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+
+        <nav aria-labelledby="pied-agents" class="order-last col-span-2 md:order-none">
+          <h2 id="pied-agents" class={titre}>{data.agents.titre}</h2>
+          <ul class="mt-3">
+            {
+              data.agents.residents.map((r) => (
+                <li>
+                  <a
+                    href={`${home}#agents`}
+                    class="lien-pied flex w-fit items-center gap-3 py-1.5 leading-[normal]"
+                  >
+                    <span class="w-[58px] shrink-0 font-mono text-[11px] tracking-[0.8px] text-orange">
+                      {r.etage}
+                    </span>
+                    <span class="text-[14.5px] whitespace-nowrap">{r.libelle}</span>
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+
+        <div class="flex flex-col gap-8">
+          <nav aria-labelledby="pied-hatch" class="flex flex-col gap-3">
+            <h2 id="pied-hatch" class={titre}>{t('footer.company')}</h2>
+            <ul class="flex flex-col gap-3">
+              {
+                reseaux.map((l) => (
+                  <li>
+                    <a href={l.href} rel="noopener" class={lien}>
+                      {l.label}
+                    </a>
+                  </li>
+                ))
+              }
+              <li>
+                <a href={paths[other]} hreflang={other} lang={other} class={lien}>
+                  {t('lang.switch')}
+                </a>
+              </li>
+            </ul>
+          </nav>
+          <nav aria-labelledby="pied-legal" class="flex flex-col gap-3">
+            <h2 id="pied-legal" class={titre}>{data.legal.titre}</h2>
+            <ul class="flex flex-col gap-3">
+              {
+                legal.map((l) => (
+                  <li>
+                    <a href={l.href} class={lien}>
+                      {l.label}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </nav>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-[18px] border-t border-white/12 pt-[18px]">
+        <div
+          class="flex flex-col gap-2 font-mono text-[11px] leading-[14px] tracking-[0.14em] text-stone uppercase sm:flex-row sm:justify-between"
+        >
+          <p>{annee} {data.copyright}</p>
+          <p>{data.mention}</p>
+        </div>
+      </div>
     </div>
-    <div>
-      <h2 class="font-mono text-kicker text-white/60 uppercase">{t('footer.company')}</h2>
-      <ul class="mt-4 flex flex-col gap-2.5">
-        {
-          social.map((l) => (
-            <li>
-              <a href={l.href} rel="noopener" class="text-caption hover:text-orange">
-                {l.label}
-              </a>
-            </li>
-          ))
-        }
-        <li>
-          <a
-            href={paths[other]}
-            hreflang={other}
-            lang={other}
-            class="text-caption hover:text-orange"
-          >
-            {t('lang.switch')}
-          </a>
-        </li>
-      </ul>
-    </div>
-  </div>
-  <div class="border-t border-line-night">
-    <p class="mx-auto max-w-site px-6 py-6 font-mono text-source text-white/60 uppercase md:px-8">
-      © {new Date().getFullYear()} Hatch OS. {t('footer.rights')}
-    </p>
   </div>
 </footer>
+
+<style>
+  .lien-pied {
+    transition:
+      color 0.3s,
+      transform 0.3s var(--ease-hatch);
+  }
+  .lien-pied:hover {
+    color: var(--color-orange);
+    transform: translateX(3px);
+  }
+</style>

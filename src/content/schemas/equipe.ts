@@ -1,6 +1,10 @@
 import { z } from 'astro/zod';
 
-/** Copy of the "equipe" home section (src/content/sections/equipe/{fr,en}.yaml). Placeholder until the section is built. */
+/**
+ * Copy of the "equipe" home section (src/content/sections/equipe/{fr,en}.yaml).
+ * The tiles themselves (name, job, order, page) come from the `agents` collection.
+ */
 export const schema = z.strictObject({
-  todo: z.boolean(),
+  title: z.string(),
+  lead: z.string(),
 });

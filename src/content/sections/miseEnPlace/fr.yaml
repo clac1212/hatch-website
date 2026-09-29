@@ -1,1 +1,68 @@
-todo: true
+title: Opérationnel en moins de 3 heures.
+steps:
+  - Connectez votre savoir-faire
+  - Vos agents se configurent
+  - Vos équipes s'en servent
+next: Continuer
+
+sources:
+  title: Connecter vos sources
+  search: Rechercher un outil
+  documents:
+    label: Vos documents
+    connected: Connecté
+    connect: Connecter
+    items:
+      - { name: Drive, logo: google-drive, connected: true }
+      - { name: Notion, logo: notion, connected: true }
+      - { name: Word, logo: word, connected: true }
+      - { name: PDF, logo: pdf, connected: true }
+      - { name: Excel, logo: excel, connected: true }
+      - { name: OneDrive, logo: onedrive, connected: false }
+  tools:
+    label: La doc de vos outils
+    state: Doc intégrée
+    items:
+      - { name: Caisse, icon: euro }
+      - { name: Planning, icon: calendar }
+      - { name: Hygiène, icon: shield }
+      - { name: RH · paie, icon: users }
+  counter:
+    one: '{n} source prête'
+    other: '{n} sources prêtes'
+
+agents:
+  title: Configuration de vos agents
+  conversation:
+    label: Conversation
+    messages:
+      - { from: agent, bird: sparrow, text: 'Comment recrutez-vous vos franchisés ?' }
+      - { from: you, text: 'Appel, visite, dossier, signature.' }
+      - { from: agent, bird: sparrow, text: "C'est noté. Je reprends vos 23 candidats." }
+  migration:
+    label: Migration
+    rows:
+      - { name: Procédures, bird: jay, done: 212, total: 212 }
+      - { name: Candidats, bird: sparrow, done: 23, total: 23 }
+      - { name: Fiches techniques, bird: owl, done: 96, total: 142 }
+  footer: Vos agents s'en chargent, seuls.
+
+channels:
+  title: Vos agents sont en ligne
+  label: Là où sont vos équipes
+  active: Actif
+  items:
+    - { name: WhatsApp, icon: whatsapp }
+    - { name: Mail, icon: mail }
+    - { name: Tablette, icon: tablet }
+  thread:
+    label: En ce moment · Équipe Lyon Part-Dieu
+    question:
+      initials: IM
+      who: Inès · équipière
+      text: Le poulet, c'est combien de minutes à la friteuse ?
+    answer:
+      who: Owl
+      bird: owl
+      text: 6 min à 170 °C, puis 2 min d'égouttage. La fiche est épinglée.
+  footer: Rien à installer.

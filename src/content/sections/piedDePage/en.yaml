@@ -1,1 +1,26 @@
-todo: true
+signature: The OS for franchise networks. Seven agents backing up your teams, from head office to the shop floor.
+cta: Book a demo
+agents:
+  titre: The agents
+  residents:
+    - etage: ATTIC
+      libelle: On site — Owl
+    - etage: 3rd R
+      libelle: Management — Lark
+    - etage: 2nd L
+      libelle: Training — Pecker
+    - etage: 2nd L
+      libelle: Development — Sparrow
+    - etage: 2nd R
+      libelle: Quality — Finch
+    - etage: 1st L
+      libelle: Network life — Peep
+    - etage: 1st R
+      libelle: Documentation — Jay
+legal:
+  titre: Legal
+  conditions: Terms of service
+  confidentialite: Privacy
+copyright: Hatch · Paris
+mention: Hosted in Europe · GDPR compliant
+immeubleAlt: A cutaway voxel Parisian building where each Hatch agent lives on its own floor

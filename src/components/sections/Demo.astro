@@ -1,6 +1,27 @@
 ---
+/**
+ * 04 — Scroll-driven product demo (v4 node U6VXNJ): three pinned diorama scenes (head office,
+ * kitchen, build site). Each scroll step moves a camera over the image, brings up the step's
+ * overlays (labels, chat threads, cards) and a glass panel. Behaviour: src/scripts/demo.ts.
+ * Without JS or with reduced motion (`.statique`), each scene shows whole, its panels stacked below.
+ */
+import { Image, Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import { section } from '../../content/section';
 import type { Locale } from '../../i18n/ui';
+import siegeFond from '../../assets/demo/siege/fond.jpg';
+import lark from '../../assets/demo/siege/lark.png';
+import finch from '../../assets/demo/siege/finch.png';
+import jay from '../../assets/demo/siege/jay.png';
+import peep from '../../assets/demo/siege/peep.png';
+import cuisineFond from '../../assets/demo/cuisine/fond.jpg';
+import owl from '../../assets/demo/cuisine/owl.png';
+import pecker from '../../assets/demo/cuisine/pecker.png';
+import chantierFond from '../../assets/demo/chantier/fond.jpg';
+import sparrow from '../../assets/demo/chantier/sparrow.png';
+import avPeep from '../../assets/demo/avatars/peep.png';
+import avOwl from '../../assets/demo/avatars/owl.png';
+import avSparrow from '../../assets/demo/avatars/sparrow.png';
 
 interface Props {
   locale: Locale;
@@ -8,6 +29,1018 @@ interface Props {
 
 const { locale } = Astro.props;
 const data = await section('demo', locale);
+const { siege, cuisine, chantier } = data;
+
+interface Agent {
+  a: string;
+  img: ImageMetadata;
+  /** Box of the cut-out agent over the background, in fractions of the image; `d` = breathing delay. */
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  d: number;
+}
+
+interface Scene {
+  cle: 'siege' | 'cuisine' | 'chantier';
+  alt: string;
+  fond: ImageMetadata;
+  /** Last step index (steps run 0 → etapes). */
+  etapes: number;
+  zoom: number;
+  /** Camera focus per step ≥ 1 (fractions of the image), `;`-separated. */
+  focus: string;
+  /** Agent that hops at each step (empty = none). */
+  parle: string;
+  agents: Agent[];
+  panneaux: { surtitre: string; titre: string; texte: string }[];
+  /** Step shown by the first panel. */
+  panneauDepuis: number;
+}
+
+// Geometry lifted verbatim from the v4 prototype (sections/U6VXNJ.html).
+const scenes: Scene[] = [
+  {
+    cle: 'siege',
+    alt: siege.alt,
+    fond: siegeFond,
+    etapes: 4,
+    zoom: 1.6,
+    focus: '.665,.64;.215,.47;.55,.49;.335,.55',
+    parle: ',peep,lark,jay,finch',
+    agents: [
+      { a: 'lark', img: lark, x: 0.1523, y: 0.3743, w: 0.1286, h: 0.2116, d: 0 },
+      { a: 'finch', img: finch, x: 0.2747, y: 0.4577, w: 0.1188, h: 0.1908, d: 0.8 },
+      { a: 'jay', img: jay, x: 0.4873, y: 0.3789, w: 0.1352, h: 0.2324, d: 1.6 },
+      { a: 'peep', img: peep, x: 0.609, y: 0.5645, w: 0.1112, h: 0.1849, d: 2.4 },
+    ],
+    panneaux: siege.panneaux,
+    panneauDepuis: 1,
+  },
+  {
+    cle: 'cuisine',
+    alt: cuisine.alt,
+    fond: cuisineFond,
+    etapes: 2,
+    zoom: 1.5,
+    focus: '.25,.47;.62,.66',
+    parle: ',owl,pecker',
+    agents: [
+      { a: 'owl', img: owl, x: 0.141, y: 0.3874, w: 0.1399, h: 0.2155, d: 0 },
+      { a: 'pecker', img: pecker, x: 0.5487, y: 0.556, w: 0.1126, h: 0.2129, d: 1.2 },
+    ],
+    panneaux: cuisine.panneaux,
+    panneauDepuis: 0,
+  },
+  {
+    cle: 'chantier',
+    alt: chantier.alt,
+    fond: chantierFond,
+    etapes: 2,
+    zoom: 1.45,
+    focus: '.525,.53;.55,.53',
+    parle: ',sparrow,sparrow',
+    agents: [{ a: 'sparrow', img: sparrow, x: 0.4684, y: 0.416, w: 0.1148, h: 0.2396, d: 0 }],
+    panneaux: chantier.panneaux,
+    panneauDepuis: 0,
+  },
+];
+
+/** "Réponses Peep **312**" → text runs, odd ones bold. */
+const gras = (s: string) => s.split('**').map((t, i) => ({ t, b: i % 2 === 1 }));
+const pos = (x: number, y: number) => `--x:${x};--y:${y}`;
 ---
 
-<section data-todo={String(data.todo)}></section>
+<section class="demo statique" aria-labelledby="demo-titre" data-demo>
+  <script is:inline>
+    // Synchronous, before first paint: pinned scenes unless the visitor asked for reduced motion.
+    document.currentScript.parentElement.classList.toggle(
+      'statique',
+      matchMedia('(prefers-reduced-motion: reduce)').matches,
+    );
+  </script>
+  <h2 id="demo-titre" class="sr-only">{data.titre}</h2>
+
+  {
+    scenes.map((sc) => (
+      <div
+        class="piste scene"
+        data-piste={sc.cle}
+        data-etapes={sc.etapes}
+        data-long="120"
+        data-cadence="1300"
+        data-zoom={sc.zoom}
+        data-focus={sc.focus}
+        data-parle={sc.parle}
+      >
+        <div class="collant plateau">
+          <div class="cadre-piste" data-largeur="1440" data-hauteur="900">
+            <div class="pic">
+              <Picture
+                src={sc.fond}
+                alt={sc.alt}
+                widths={[1200, 1800, 2400]}
+                sizes="(max-width: 899px) 300vw, 115vw"
+                formats={['avif', 'webp']}
+                loading="lazy"
+                decoding="async"
+                class="fond"
+              />
+              {sc.agents.map((ag) => (
+                <div
+                  class="agent"
+                  data-a={ag.a}
+                  style={`${pos(ag.x, ag.y)};--w:${ag.w};--h:${ag.h};--d:${ag.d}s`}
+                >
+                  <Picture
+                    src={ag.img}
+                    alt=""
+                    formats={['avif', 'webp']}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+              ))}
+
+              {sc.cle === 'siege' && (
+                <>
+                  <div class="ov dessus" data-step="0" style={pos(0.216, 0.365)}>
+                    <div class="etiquette">
+                      <i />
+                      {siege.etiquettes.lark}
+                    </div>
+                  </div>
+                  <div class="ov dessus" data-step="0" style={pos(0.555, 0.37)}>
+                    <div class="etiquette">
+                      <i />
+                      {siege.etiquettes.jay}
+                    </div>
+                  </div>
+                  <div class="ov dessus" data-step="0" style={pos(0.334, 0.45)}>
+                    <div class="etiquette">
+                      <i />
+                      {siege.etiquettes.finch}
+                    </div>
+                  </div>
+
+                  <div class="ov dessus" data-step="1" style={pos(0.69, 0.555)}>
+                    <div class="fil-msg">
+                      <div class="msg recu">
+                        <b class="qui">{siege.peep.question.qui}</b>
+                        {siege.peep.question.texte}
+                        <span class="meta">{siege.peep.question.meta}</span>
+                      </div>
+                      <div class="msg envoye tape">
+                        <Image src={avPeep} alt="" width={32} densities={[2, 3]} class="av" />
+                        <span class="ecrit" aria-hidden="true">
+                          <i />
+                          <i />
+                          <i />
+                        </span>
+                        <span class="txt">
+                          {siege.peep.reponse.texte}
+                          <span class="meta">
+                            {siege.peep.reponse.meta} <em aria-hidden="true">✓✓</em>
+                          </span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="ov" data-step="2" style={pos(0.04, 0.235)}>
+                    <div class="carte">
+                      <p class="h6">{siege.lark.titre}</p>
+                      <p>
+                        {gras(siege.lark.chiffresGras).map((r) =>
+                          r.b ? <span class="gros">{r.t}</span> : r.t,
+                        )}
+                      </p>
+                      <div class="barres" aria-hidden="true">
+                        {[40, 55, 70, 62, 95].map((h, n) => (
+                          <b style={`--h:${h}%;--n:${n}`} />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="ov" data-step="2" style={pos(0.04, 0.322)}>
+                    <div class="rappel">{siege.lark.rappel}</div>
+                  </div>
+
+                  <div class="ov droite" data-step="3" style={pos(0.482, 0.31)}>
+                    <div class="carte">
+                      <p class="h6">{siege.jay.titre}</p>
+                      <p>
+                        {siege.jay.document}
+                        <br />
+                        <span class="gros">{siege.jay.diffusion}</span>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="ov" data-step="4" style={pos(0.3, 0.665)}>
+                    <div class="carte">
+                      <p class="h6">{siege.finch.titre}</p>
+                      <ul class="coche">
+                        {siege.finch.coches.map((c) => (
+                          <li>
+                            <i />
+                            {c}
+                          </li>
+                        ))}
+                      </ul>
+                      <p class="score">
+                        <b>{siege.finch.score}</b>
+                        <span>{siege.finch.bareme}</span>
+                      </p>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {sc.cle === 'cuisine' && (
+                <>
+                  <div class="ov dessus" data-step="0" style={pos(0.211, 0.38)}>
+                    <div class="etiquette">
+                      <i />
+                      {cuisine.etiquettes.owl}
+                    </div>
+                  </div>
+                  <div class="ov droite" data-step="0" style={pos(0.555, 0.585)}>
+                    <div class="etiquette">
+                      <i />
+                      {cuisine.etiquettes.pecker}
+                    </div>
+                  </div>
+
+                  <div class="ov dessus" data-step="1" style={pos(0.255, 0.375)}>
+                    <div class="fil-msg">
+                      <div class="msg recu vocal">
+                        <b class="qui">{cuisine.owl.question.qui}</b>
+                        <span class="onde" aria-hidden="true">
+                          {Array.from({ length: 12 }, () => (
+                            <i />
+                          ))}
+                        </span>
+                        {cuisine.owl.question.texte}
+                      </div>
+                      <div class="msg envoye tape vocal">
+                        <Image src={avOwl} alt="" width={32} densities={[2, 3]} class="av" />
+                        <span class="ecrit" aria-hidden="true">
+                          <i />
+                          <i />
+                          <i />
+                        </span>
+                        <span class="txt">
+                          <span class="onde" aria-hidden="true">
+                            {Array.from({ length: 14 }, () => (
+                              <i />
+                            ))}
+                          </span>
+                          {cuisine.owl.reponse.texte}
+                          <span class="meta meta-texte">{cuisine.owl.reponse.meta}</span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="ov droite" data-step="2" style={pos(0.54, 0.6)}>
+                    <div class="carte">
+                      <p class="h6">{cuisine.pecker.titre}</p>
+                      <p>{cuisine.pecker.module}</p>
+                      <ul class="coche">
+                        {cuisine.pecker.coches.map((c) => (
+                          <li>
+                            <i />
+                            {c}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {sc.cle === 'chantier' && (
+                <>
+                  <div class="ov dessus" data-step="0" style={pos(0.525, 0.41)}>
+                    <div class="etiquette">
+                      <i />
+                      {chantier.etiquettes.sparrow}
+                    </div>
+                  </div>
+
+                  <div class="ov droite" data-step="1" style={pos(0.46, 0.28)}>
+                    <div class="carte">
+                      <p class="h6">{chantier.avancement.titre}</p>
+                      <p>
+                        {gras(chantier.avancement.ligneGras).map((r) =>
+                          r.b ? <span class="gros">{r.t}</span> : r.t,
+                        )}
+                      </p>
+                      <div class="progres" aria-hidden="true">
+                        <b style={`--w:${chantier.avancement.progression}%`} />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="ov dessus" data-step="2" style={pos(0.555, 0.405)}>
+                    <div class="fil-msg">
+                      <div class="msg envoye">
+                        <Image src={avSparrow} alt="" width={32} densities={[2, 3]} class="av" />
+                        <span class="txt">
+                          {chantier.sparrow.question.texte}
+                          <span class="meta">
+                            <em aria-hidden="true">✓✓</em>
+                          </span>
+                        </span>
+                      </div>
+                      <div class="msg recu tape">
+                        <span class="ecrit" aria-hidden="true">
+                          <i />
+                          <i />
+                          <i />
+                        </span>
+                        <span class="txt">
+                          <b class="qui">{chantier.sparrow.reponse.qui}</b>
+                          {chantier.sparrow.reponse.texte}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div class="projecteur" aria-hidden="true" />
+
+            {sc.panneaux.map((p, i) => (
+              <div class="panneau" data-step={sc.panneauDepuis + i}>
+                <p class="surtitre">{p.surtitre}</p>
+                <h3>{p.titre}</h3>
+                <p class="corps">{p.texte}</p>
+              </div>
+            ))}
+
+            <div class="points" aria-hidden="true">
+              {Array.from({ length: sc.etapes + 1 }, () => (
+                <i />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    ))
+  }
+</section>
+
+<script>
+  import '../../scripts/demo';
+</script>
+
+<style>
+  /*
+   * Everything inside .cadre-piste is in design px: the script sizes the stage to the viewport
+   * (1440 wide on desktop, the viewport width below 900 px) and pistes.ts scales it (--echelle).
+   * Colours: tokens only; `scene` is the edge colour of the renders, visible around the image on narrow screens.
+   */
+  .demo {
+    --scene: var(--color-scene);
+    --ombre-16: color-mix(in srgb, var(--color-shadow) 16%, transparent);
+    --ombre-18: color-mix(in srgb, var(--color-shadow) 18%, transparent);
+    background: var(--scene);
+  }
+  .plateau {
+    background: var(--scene);
+  }
+
+  /* ---------- Picture, agents ---------- */
+  .pic {
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform-origin: 0 0;
+    will-change: transform;
+    transition: transform 1.5s var(--ease-hatch);
+  }
+  .pic :global(picture),
+  .pic :global(img.fond) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .agent {
+    position: absolute;
+    left: calc(var(--x) * 100%);
+    top: calc(var(--y) * 100%);
+    width: calc(var(--w) * 100%);
+    height: calc(var(--h) * 100%);
+    opacity: 0;
+    transform: translateY(3%) scale(0.94);
+    transform-origin: 50% 88%;
+    transition:
+      opacity 0.5s var(--ease-hatch),
+      transform 0.7s var(--ease-hatch);
+  }
+  .agent :global(picture) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .agent :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    transform-origin: 50% 88%;
+    animation: demo-respire 3.4s ease-in-out infinite;
+    animation-delay: var(--d, 0s);
+  }
+  .agent.la {
+    opacity: 1;
+    transform: none;
+  }
+  .agent.actif :global(img) {
+    animation:
+      demo-hop 0.7s var(--ease-hatch),
+      demo-respire 3.4s ease-in-out 0.7s infinite;
+  }
+  @keyframes demo-respire {
+    0%,
+    100% {
+      transform: scale(1, 1);
+    }
+    50% {
+      transform: scale(1.006, 1.012);
+    }
+  }
+  @keyframes demo-hop {
+    0% {
+      transform: translateY(0);
+    }
+    35% {
+      transform: translateY(-4%);
+    }
+    70% {
+      transform: translateY(0.4%);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+
+  /* ---------- Spotlight: a radial vignette around the active agent ---------- */
+  .projecteur {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1.2s var(--ease-hatch);
+    background: radial-gradient(
+      circle var(--r, 675px) at var(--px, 36%) var(--py, 52%),
+      transparent 0,
+      transparent 42%,
+      color-mix(in srgb, var(--color-shadow) 24%, transparent) 100%
+    );
+  }
+  .zoome .projecteur {
+    opacity: 1;
+  }
+
+  /* ---------- Overlays: placed in fractions of the image, counter-scaled to keep their size ---------- */
+  .ov {
+    position: absolute;
+    left: calc(var(--x) * 100% + var(--dx, 0px));
+    top: calc(var(--y) * 100% + var(--dy, 0px));
+    transform: scale(var(--inv, 1));
+    transform-origin: var(--o, 0 0);
+    transition: transform 1.5s var(--ease-hatch);
+    pointer-events: none;
+  }
+  .ov > * {
+    opacity: 0;
+    translate: 0 10px;
+    scale: 0.96;
+    transition:
+      opacity 0.45s var(--ease-hatch),
+      translate 0.6s var(--ease-hatch),
+      scale 0.6s var(--ease-hatch);
+  }
+  .ov.on > * {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+  }
+  .ov.droite {
+    --o: 100% 0;
+    translate: -100% 0;
+  }
+  .ov.dessus {
+    --o: 50% 100%;
+    translate: -50% -100%;
+  }
+
+  .etiquette {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    white-space: nowrap;
+    background: rgb(255 255 255 / 0.72);
+    border: 1px solid rgb(255 255 255 / 0.8);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow: 0 14px 36px var(--ombre-18);
+    font: 600 13px/1 var(--font-sans);
+    color: var(--color-ink);
+  }
+  .etiquette i,
+  .points i {
+    display: block;
+  }
+  .etiquette i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-orange);
+    animation: demo-pulse 1.6s ease-out infinite;
+  }
+  @keyframes demo-pulse {
+    0% {
+      box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-orange) 53%, transparent);
+    }
+    100% {
+      box-shadow: 0 0 0 7px transparent;
+    }
+  }
+
+  /* Chat threads, WhatsApp style: bubbles appear one by one, "typing…" then the text. */
+  .fil-msg {
+    width: 330px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font: 400 14px/1.38 var(--font-sans);
+    color: var(--color-ink);
+  }
+  .msg {
+    position: relative;
+    max-width: 270px;
+    padding: 8px 11px 7px;
+    border-radius: 14px;
+    box-shadow: 0 6px 18px var(--ombre-16);
+    opacity: 0;
+    transform: translateY(8px) scale(0.94);
+    transition:
+      opacity 0.4s var(--ease-hatch),
+      transform 0.5s var(--ease-hatch);
+  }
+  .msg.vu {
+    opacity: 1;
+    transform: none;
+  }
+  .msg.recu {
+    align-self: flex-start;
+    margin-left: 8px;
+    background: var(--color-white);
+    border-top-left-radius: 4px;
+    transform-origin: 0 100%;
+  }
+  .msg.envoye {
+    align-self: flex-end;
+    margin-right: 40px;
+    background: var(--color-whatsapp);
+    border-top-right-radius: 4px;
+    transform-origin: 100% 100%;
+  }
+  .msg.recu::before,
+  .msg.envoye::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    border-style: solid;
+  }
+  .msg.recu::before {
+    left: -8px;
+    border-color: var(--color-white) var(--color-white) transparent transparent;
+    border-width: 0 8px 10px 0;
+  }
+  .msg.envoye::before {
+    right: -8px;
+    border-color: var(--color-whatsapp) transparent transparent var(--color-whatsapp);
+    border-width: 0 0 10px 8px;
+  }
+  .msg .qui {
+    display: block;
+    font-weight: 600;
+    font-size: 12.5px;
+    color: var(--color-orange-txt);
+    margin-bottom: 2px;
+  }
+  .msg .meta {
+    display: block;
+    text-align: right;
+    font-size: 11px;
+    color: var(--color-gray-700);
+    margin-top: 2px;
+  }
+  .msg .meta em {
+    font-style: normal;
+    color: var(--color-gray-500);
+  }
+  .msg :global(.av) {
+    position: absolute;
+    right: -42px;
+    bottom: -2px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: contain;
+    background: var(--color-cream);
+    box-shadow: 0 4px 10px var(--ombre-18);
+  }
+  .msg .ecrit {
+    display: none;
+    gap: 4px;
+    padding: 6px 2px;
+  }
+  .msg .ecrit i,
+  .msg .onde i {
+    display: block;
+  }
+  .msg .ecrit i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-gray-500);
+    animation: demo-ecrit 1s infinite;
+  }
+  .msg .ecrit i:nth-child(2) {
+    animation-delay: 0.15s;
+  }
+  .msg .ecrit i:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+  @keyframes demo-ecrit {
+    0%,
+    60%,
+    100% {
+      opacity: 0.3;
+      transform: none;
+    }
+    30% {
+      opacity: 1;
+      transform: translateY(-2px);
+    }
+  }
+  .msg.tape:not(.repondu) .ecrit {
+    display: inline-flex;
+  }
+  .msg.tape:not(.repondu) .txt {
+    display: none;
+  }
+  .msg .txt {
+    display: block;
+  }
+  /* Measuring a thread at its final size (narrow layout): */
+  .ov.mesure .msg .ecrit {
+    display: none;
+  }
+  .ov.mesure .msg .txt {
+    display: block;
+  }
+  .msg .onde {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    height: 22px;
+    margin: 2px 0 4px;
+  }
+  .msg .onde i {
+    width: 3px;
+    border-radius: 2px;
+    background: var(--color-gray-500);
+    height: 30%;
+    animation: demo-onde 1.1s ease-in-out infinite;
+  }
+  .msg.envoye .onde i {
+    background: var(--color-success);
+  }
+  .msg .onde i:nth-child(3n) {
+    animation-delay: 0.2s;
+  }
+  .msg .onde i:nth-child(3n + 1) {
+    animation-delay: 0.45s;
+  }
+  .msg .onde i:nth-child(4n) {
+    animation-delay: 0.7s;
+  }
+  @keyframes demo-onde {
+    0%,
+    100% {
+      height: 25%;
+    }
+    50% {
+      height: 95%;
+    }
+  }
+
+  /* Cards */
+  .carte {
+    width: 270px;
+    padding: 13px 15px;
+    border-radius: 16px;
+    background: rgb(255 255 255 / 0.95);
+    box-shadow: 0 10px 28px var(--ombre-16);
+    font: 400 13.5px/1.4 var(--font-sans);
+    color: var(--color-ink);
+  }
+  .carte .h6 {
+    font: 400 10.5px/1 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-orange-txt);
+    margin: 0 0 8px;
+  }
+  .gros {
+    font-weight: 600;
+  }
+  .barres {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 44px;
+    margin-top: 10px;
+  }
+  .barres b {
+    flex: 1;
+    height: var(--h);
+    border-radius: 3px 3px 0 0;
+    background: var(--color-line);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 0.7s var(--ease-hatch);
+    transition-delay: calc(var(--n) * 90ms + 250ms);
+  }
+  .barres b:last-child {
+    background: var(--color-orange);
+  }
+  .on .barres b {
+    transform: none;
+  }
+  .progres {
+    height: 6px;
+    margin-top: 10px;
+    border-radius: 3px;
+    background: var(--color-cream-2);
+    overflow: hidden;
+  }
+  .progres b {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: var(--color-orange);
+    border-radius: 3px;
+    transition: width 1.1s var(--ease-hatch) 0.3s;
+  }
+  .on .progres b {
+    width: var(--w);
+  }
+  .rappel {
+    margin-top: 10px;
+    padding: 9px 12px;
+    border-radius: 12px;
+    background: rgb(255 255 255 / 0.95);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--color-shadow) 14%, transparent);
+    font: 400 13px/1.4 var(--font-sans);
+    width: 270px;
+    color: var(--color-ink);
+  }
+  .coche {
+    list-style: none;
+    padding: 0;
+    margin: 4px 0 0;
+  }
+  .coche li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 6px 0;
+    opacity: 0.35;
+    transition: opacity 0.4s;
+  }
+  .coche li i {
+    display: block;
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    border: 1.5px solid var(--color-gray-400);
+    position: relative;
+    flex: none;
+    transition:
+      background 0.3s,
+      border-color 0.3s;
+  }
+  .coche li.fait {
+    opacity: 1;
+  }
+  .coche li.fait i {
+    background: var(--color-orange);
+    border-color: var(--color-orange);
+  }
+  .coche li.fait i::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 3px;
+    height: 7px;
+    border: solid var(--color-white);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+  .score {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .score b {
+    font: 700 22px/1 var(--font-display);
+  }
+
+  /* ---------- Glass panel, one per step ---------- */
+  .panneau {
+    position: absolute;
+    z-index: 5;
+    right: 40px;
+    top: 50%;
+    translate: 0 -50%;
+    width: 428px;
+    padding: 28px;
+    border-radius: 24px;
+    background: rgb(255 255 255 / 0.35);
+    border: 1px solid rgb(255 255 255 / 0.8);
+    backdrop-filter: blur(18px) saturate(1.2);
+    -webkit-backdrop-filter: blur(18px) saturate(1.2);
+    box-shadow: 0 14px 36px var(--ombre-18);
+    color: var(--color-ink);
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 0.3s,
+      transform 0s 0.3s;
+    pointer-events: none;
+  }
+  .panneau.on {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+    transition:
+      opacity 0.6s 0.45s var(--ease-hatch),
+      transform 0.8s 0.45s var(--ease-hatch);
+  }
+  .panneau .surtitre {
+    font: 400 11px/1.3 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-orange-txt);
+  }
+  .panneau h3 {
+    font: 700 30px/1.12 var(--font-display);
+    margin: 12px 0 0;
+    letter-spacing: -0.01em;
+  }
+  .panneau .corps {
+    margin: 12px 0 0;
+    color: color-mix(in srgb, var(--color-ink) 90%, transparent);
+    font: 400 15.5px/1.5 var(--font-sans);
+  }
+
+  /* ---------- Step dots ---------- */
+  .points {
+    position: absolute;
+    z-index: 6;
+    left: 50%;
+    bottom: 44px;
+    translate: -50% 0;
+    display: flex;
+    gap: 6px;
+  }
+  .points i {
+    width: 18px;
+    height: 5px;
+    border-radius: 3px;
+    background: color-mix(in srgb, var(--color-ink) 15%, transparent);
+    transition:
+      background 0.4s,
+      width 0.4s var(--ease-hatch);
+  }
+  .points i.on {
+    width: 36px;
+    background: var(--color-orange);
+  }
+
+  /* No transition for the very first placement (and on resize). */
+  .sans-transition :is(.pic, .ov) {
+    transition: none;
+  }
+
+  /* ---------- Narrow screens (< 900 px, stage = viewport, see demo.ts) ----------
+   * The step's overlays stack under the nav, the camera frames the active agent tighter in the
+   * space left, and the glass panel sits full width at the bottom. */
+  .etroit .pic :global(picture) {
+    mask-image: linear-gradient(
+      transparent,
+      var(--color-black) 14%,
+      var(--color-black) 86%,
+      transparent
+    );
+  }
+  .etroit .ov {
+    left: var(--lx, 0);
+    top: var(--ly, 0);
+    translate: none;
+    --o: 0 0;
+  }
+  .etroit .fil-msg {
+    width: 330px;
+  }
+  .etroit .msg .qui {
+    font-size: 13px;
+  }
+  .etroit .msg .meta {
+    display: none;
+  }
+  .etroit .msg .meta-texte {
+    display: block;
+    font-size: 13px;
+  }
+  .etroit .panneau {
+    left: 12px;
+    right: 12px;
+    top: auto;
+    bottom: 34px;
+    width: auto;
+    translate: none;
+    padding: 18px 20px 20px;
+    border-radius: 20px;
+    background: rgb(255 255 255 / 0.55);
+  }
+  .etroit .panneau h3 {
+    font-size: 22px;
+    margin-top: 8px;
+  }
+  .etroit .panneau .corps {
+    font-size: 14.5px;
+    margin-top: 8px;
+  }
+  .etroit .points {
+    bottom: 16px;
+  }
+
+  /* ---------- Static: no JS, or reduced motion ---------- */
+  .statique .collant {
+    position: relative;
+    height: auto;
+    overflow: visible;
+  }
+  .statique .cadre-piste {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    gap: 16px;
+    max-width: 1440px;
+    margin-inline: auto;
+    padding: 16px 16px 64px;
+  }
+  .statique .pic {
+    position: relative;
+    grid-column: 1 / -1;
+    width: 100%;
+    aspect-ratio: 2752 / 1536;
+    transform: none;
+    transition: none;
+  }
+  .statique .agent {
+    opacity: 1;
+    transform: none;
+  }
+  .statique .agent :global(img) {
+    animation: none;
+  }
+  .statique :is(.ov, .projecteur, .points) {
+    display: none;
+  }
+  .statique .panneau {
+    position: static;
+    width: auto;
+    opacity: 1;
+    transform: none;
+    translate: none;
+    background: rgb(255 255 255 / 0.55);
+  }
+  .statique .panneau h3 {
+    font-size: 24px;
+  }
+</style>

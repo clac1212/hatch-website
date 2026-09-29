@@ -1,1 +1,78 @@
-todo: true
+titreAvant:
+  - Samedi, 21:04.
+  - Votre réseau
+  - vous écrit.
+titreApres:
+  - Samedi, 21:08.
+  - Hatch
+  - s’en occupe.
+paliers:
+  - 3 SITES
+  - 12 SITES
+  - 30 SITES
+
+telephone:
+  operateur: Orange F
+  date: samedi 25 septembre
+  horloge: ['21:04', '21:05', '21:06', '21:07', '21:08']
+  quand:
+    - maintenant
+    - il y a 1 min
+    - il y a 2 min
+  apps:
+    whatsapp: WhatsApp
+    appel: Appel manqué
+    mail: E-mail
+    sms: SMS
+
+# Le téléphone est celui du siège de BunBun (concept fictif). Du plus ancien au plus récent.
+notifications:
+  - app: whatsapp
+    de: Kevin · Lyon Part-Dieu
+    a: Kevin
+    message: Le poulet, c'est combien de minutes à la friteuse déjà ?
+    agent: owl
+    reponse: 6 min à 170 °C, puis 2 min d’égouttage. Fiche cuisson envoyée.
+  - app: appel
+    de: Sarah · Lille
+    a: Sarah
+    message: "Message vocal : « La chambre froide est à 9 °C, j'appelle qui ? »"
+    agent: lark
+    reponse: Frigoriste prévenu, passage demain 8 h. En attendant, produits sensibles à transférer.
+  - app: mail
+    de: Julien Morel
+    a: Julien
+    message: 'Candidature Rennes : toujours pas de retour sur mon dossier…'
+    agent: sparrow
+    reponse: Dossier complet. Entretien proposé mardi 10 h avec la direction réseau.
+  - app: whatsapp
+    de: Inès · Nantes
+    a: Inès
+    message: Je commence demain, je dois regarder quoi avant ?
+    agent: pecker
+    reponse: 'Bienvenue ! Ton parcours du premier jour : 3 modules, 12 minutes.'
+  - app: whatsapp
+    de: Franchisés BunBun
+    a: Karim
+    message: 'Karim : Le nouveau burger sort quand ? On a rien reçu à Bordeaux.'
+    agent: peep
+    reponse: Lancement le 2 octobre. Fiche recette et affiches envoyées à tous les sites.
+  - app: sms
+    de: Thomas · Toulouse
+    a: Thomas
+    message: Quelqu'un a la dernière fiche allergènes ?
+    agent: jay
+    reponse: Voici la version à jour (septembre). Elle est aussi épinglée en cuisine.
+  - app: mail
+    de: Audit qualité
+    a: Marseille
+    message: "Marseille : plan d'action toujours pas envoyé (J+12)."
+    agent: finch
+    reponse: Franchisé relancé. Plan d’action attendu vendredi, rappel prévu jeudi.
+
+resume:
+  titre: Hatch
+  message: 7 demandes réglées par vos agents. Bonne soirée.
+
+listeLabel: Les demandes de la soirée et la réponse de chaque agent
+regle: Réglé

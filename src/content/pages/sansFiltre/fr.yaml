@@ -1,0 +1,22 @@
+seo:
+  title: 'Hatch OS Sans Filtre · Le journal des nouveautés'
+  description: "Chaque mois, ce qu'on a réellement livré chez Hatch OS, l'OS des réseaux de restauration. Sans teasing, sans roadmap fantôme. Sans filtre."
+titleSuffix: 'Hatch OS Sans Filtre'
+homeLabel: 'Hatch OS Sans Filtre, dernière édition'
+monthly: 'Mensuel'
+tag: 'SANS FILTRE'
+sub: 'Nouvelles fonctionnalités'
+subEnd: 'Chaque mois'
+editionLabel: 'Édition N°'
+updatesLabel: 'Nouveautés'
+featured: 'À la une'
+online: '● en ligne'
+agentRole: 'Agent WhatsApp · Développement réseau'
+shippedBy: 'shippé par'
+more: 'Encore quelques nouveautés'
+pastTitle: 'Éditions précédentes'
+pastHint: "Les éditions passées s'afficheront ici."
+authorRoles:
+  César: 'CPTO'
+  Patrick: 'Co-fondateur'
+quotes: ['« ', ' »']

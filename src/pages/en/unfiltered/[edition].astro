@@ -1,0 +1,12 @@
+---
+import SansFiltrePage from '../../../views/SansFiltrePage.astro';
+import { sortedEditions } from '../../../content/pages/editions';
+
+export async function getStaticPaths() {
+  return (await sortedEditions()).map((e) => ({ params: { edition: e.data.edition } }));
+}
+
+const { edition } = Astro.params;
+---
+
+<SansFiltrePage locale="en" edition={edition} />

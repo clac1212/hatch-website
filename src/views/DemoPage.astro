@@ -1,0 +1,164 @@
+---
+import { getEntry } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Check from '../components/pages/Check.astro';
+import { routes, type Locale } from '../i18n/ui';
+
+/** Demo booking page with the inline Cal.com agenda, shared by /demo and /en/demo. */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const entry = await getEntry('demoPage', locale);
+if (!entry) throw new Error(`Missing src/content/pages/demo/${locale}.yaml`);
+const d = entry.data;
+const calLink = 'patrick-rakotondrajao-bjremk/presentation-hatch';
+---
+
+<Base locale={locale} paths={routes.demo} title={d.seo.title} description={d.seo.description}>
+  <div class="mx-auto max-w-[1440px] px-6 pt-32 pb-20 md:px-12 md:pt-40 xl:px-24">
+    <header class="flex flex-col items-start gap-5">
+      <p class="font-mono text-[15px] tracking-[1px] text-orange-txt uppercase">{d.kicker}</p>
+      <h1
+        class="font-display text-[40px] leading-[1.05] font-bold tracking-[-1px] text-ink md:text-[56px] md:leading-[57px]"
+      >
+        {d.title}
+        <em class="text-orange-txt">{d.titleAccent}</em>
+      </h1>
+      <p
+        class="max-w-[760px] text-[17px] leading-[27px] text-soft md:text-[19px] md:leading-[29px]"
+      >
+        {d.lead}
+      </p>
+      <ul class="flex flex-wrap gap-3">
+        {
+          d.points.map((point) => (
+            <li class="flex items-center gap-2 rounded-full bg-surface px-4 py-2.5 text-[13px] font-semibold text-ink outline outline-1 -outline-offset-1 outline-line">
+              <Check class="size-4 text-orange" />
+              {point}
+            </li>
+          ))
+        }
+      </ul>
+    </header>
+
+    <section
+      aria-labelledby="agenda-titre"
+      class="mt-12 rounded-glass bg-surface p-4 shadow-1 outline outline-1 -outline-offset-1 outline-line md:mt-14 md:p-8"
+    >
+      <div class="flex flex-col gap-1 px-2 pt-2 md:flex-row md:items-baseline md:justify-between">
+        <h2
+          id="agenda-titre"
+          class="font-display text-[24px] leading-tight font-bold text-ink md:text-[28px]"
+        >
+          {d.agendaTitle}
+        </h2>
+        <p class="text-caption text-muted">{d.agendaHint}</p>
+      </div>
+      <div class="relative mt-4 min-h-[650px]">
+        <p
+          id="cal-attente"
+          class="absolute inset-x-0 top-24 text-center font-mono text-caption text-muted uppercase"
+          aria-live="polite"
+        >
+          {d.agendaFallback}
+        </p>
+        <div
+          id="cal-inline"
+          data-cal-link={calLink}
+          class="relative w-full overflow-hidden rounded-card"
+        >
+        </div>
+      </div>
+      <p class="px-2 pt-3 text-caption">
+        <a
+          href={`https://cal.com/${calLink}`}
+          target="_blank"
+          rel="noopener"
+          class="text-orange-txt underline underline-offset-2 hover:text-orange-hover"
+        >
+          {d.agendaFallbackLink}
+        </a>
+      </p>
+    </section>
+  </div>
+</Base>
+
+<script>
+  // Cal.com inline embed (official loader snippet, typed). Only bundled on this page.
+  type CalApi = ((...args: unknown[]) => void) & {
+    loaded?: boolean;
+    ns?: Record<string, unknown>;
+    q?: unknown[][];
+  };
+  const w = window as unknown as { Cal?: CalApi };
+
+  function loadCal(src: string) {
+    const push = (api: CalApi, args: unknown[]) => api.q!.push(args);
+    w.Cal =
+      w.Cal ??
+      (function (this: unknown, ...args: unknown[]) {
+        const cal = w.Cal!;
+        if (!cal.loaded) {
+          cal.ns = {};
+          cal.q = cal.q ?? [];
+          const s = document.createElement('script');
+          s.src = src;
+          document.head.appendChild(s);
+          cal.loaded = true;
+        }
+        if (args[0] === 'init') {
+          const api: CalApi = (...a: unknown[]) => push(api, a);
+          api.q = [];
+          const namespace = args[1];
+          if (typeof namespace === 'string') {
+            cal.ns![namespace] = api;
+            push(api, args);
+          } else push(cal, args);
+          return;
+        }
+        push(cal, args);
+      } as CalApi);
+    return w.Cal;
+  }
+
+  const el = document.getElementById('cal-inline')!;
+  const Cal = loadCal('https://app.cal.com/embed/embed.js');
+  // Brand the booker with the design tokens (read at runtime, so no colour is duplicated here).
+  const token = (name: string) =>
+    getComputedStyle(document.documentElement).getPropertyValue(`--color-${name}`).trim();
+
+  Cal('init', { origin: 'https://cal.com' });
+  Cal('inline', {
+    elementOrSelector: '#cal-inline',
+    calLink: el.dataset.calLink,
+    config: { layout: 'month_view', theme: 'light' },
+  });
+  Cal('ui', {
+    theme: 'light',
+    hideEventTypeDetails: false,
+    layout: 'month_view',
+    cssVarsPerTheme: {
+      light: {
+        'cal-brand': token('orange'),
+        'cal-brand-emphasis': token('orange-hover'),
+        'cal-brand-text': token('white'),
+        'cal-text-emphasis': token('ink'),
+        'cal-text': token('soft'),
+        'cal-text-subtle': token('muted'),
+        'cal-bg': token('surface'),
+        'cal-bg-subtle': token('surface-2'),
+        'cal-bg-emphasis': token('orange-tint'),
+        'cal-bg-muted': token('cream'),
+        'cal-border': token('line'),
+        'cal-border-subtle': token('line'),
+        'cal-border-booker': token('line'),
+      },
+    },
+  });
+  Cal('on', {
+    action: 'linkReady',
+    callback: () => document.getElementById('cal-attente')?.remove(),
+  });
+</script>

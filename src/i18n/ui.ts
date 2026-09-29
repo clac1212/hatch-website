@@ -28,10 +28,8 @@ const fr = {
   'nav.security': 'Sécurité',
   'cta.demo': 'Réserver une démo',
   'lang.switch': 'English',
-  'footer.tagline': "L'OS des réseaux de franchise.",
   'footer.product': 'Produit',
   'footer.company': 'Hatch',
-  'footer.rights': 'Tous droits réservés.',
 } as const;
 
 const en: Record<keyof typeof fr, string> = {
@@ -45,10 +43,8 @@ const en: Record<keyof typeof fr, string> = {
   'nav.security': 'Security',
   'cta.demo': 'Book a demo',
   'lang.switch': 'Français',
-  'footer.tagline': 'The OS for franchise networks.',
   'footer.product': 'Product',
   'footer.company': 'Hatch',
-  'footer.rights': 'All rights reserved.',
 };
 
 const ui = { fr, en } satisfies Record<Locale, Record<keyof typeof fr, string>>;

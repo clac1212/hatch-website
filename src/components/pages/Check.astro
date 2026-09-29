@@ -1,0 +1,20 @@
+---
+/** Lucide "check", used in the reassurance badges and lists of the secondary pages. */
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<svg
+  viewBox="0 0 24 24"
+  class:list={['shrink-0', className]}
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2.25"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+>
+  <path d="M20 6 9 17l-5-5"></path>
+</svg>

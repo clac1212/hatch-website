@@ -1,1 +1,45 @@
-todo: true
+kicker: Customer stories
+title: They rolled it out across their network
+label: Customer stories
+with: With
+readCase: Read the story
+controls:
+  carousel: carousel
+  slideRole: slide
+  previous: Previous story
+  next: Next story
+  pause: Pause the slideshow
+  play: Resume the slideshow
+  slide: '{n} of {total}'
+  dot: 'Show the {client} story'
+cases:
+  - id: la-meulerie
+    client: La Meulerie
+    agent: jay
+    visualAlt: The La Meulerie storefront, in voxels.
+    figures:
+      - value: '4'
+        label: locations equipped
+      - value: '[X]'
+        label: procedures updated
+    href: null
+  - id: nobinobi
+    client: Nobinobi
+    agent: peep
+    visualAlt: The Nobinobi storefront, in voxels, with Peep at the door.
+    figures:
+      - value: '12'
+        label: locations equipped
+      - value: '[Y] wks'
+        label: to roll everything out
+    href: null
+  - id: pny
+    client: PNY
+    agent: owl
+    visualAlt: The PNY storefront, in voxels.
+    figures:
+      - value: '13'
+        label: locations equipped
+      - value: '[X]'
+        label: questions handled per month
+    href: null

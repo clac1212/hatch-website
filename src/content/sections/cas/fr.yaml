@@ -1,1 +1,45 @@
-todo: true
+kicker: Cas clients
+title: Ils l’ont déployé dans leur réseau
+label: Cas clients
+with: Avec
+readCase: Lire le cas
+controls:
+  carousel: carrousel
+  slideRole: diapositive
+  previous: Cas précédent
+  next: Cas suivant
+  pause: Mettre en pause le défilement
+  play: Relancer le défilement
+  slide: '{n} sur {total}'
+  dot: 'Afficher le cas {client}'
+cases:
+  - id: la-meulerie
+    client: La Meulerie
+    agent: jay
+    visualAlt: La devanture de La Meulerie, en voxels.
+    figures:
+      - value: '4'
+        label: sites équipés
+      - value: '[X]'
+        label: procédures mises à jour
+    href: null
+  - id: nobinobi
+    client: Nobinobi
+    agent: peep
+    visualAlt: La devanture de Nobinobi, en voxels, avec Peep à l'entrée.
+    figures:
+      - value: '12'
+        label: sites équipés
+      - value: '[Y] sem.'
+        label: pour tout déployer
+    href: null
+  - id: pny
+    client: PNY
+    agent: owl
+    visualAlt: La devanture de PNY, en voxels.
+    figures:
+      - value: '13'
+        label: sites équipés
+      - value: '[X]'
+        label: questions traitées par mois
+    href: null

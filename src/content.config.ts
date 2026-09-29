@@ -11,6 +11,7 @@ import { schema as miseEnPlace } from './content/schemas/miseEnPlace';
 import { schema as securite } from './content/schemas/securite';
 import { schema as tarifs } from './content/schemas/tarifs';
 import { schema as piedDePage } from './content/schemas/piedDePage';
+import { demoPage, securityPage, sansFiltrePage, sansFiltreEdition } from './content/pages/schemas';
 
 /**
  * One collection per home section (+ the footer): `src/content/sections/<name>/{fr,en}.yaml`,
@@ -46,7 +47,39 @@ const agents = defineCollection({
   }),
 });
 
+/**
+ * Secondary pages: one folder per page, `src/content/pages/<name>/{fr,en}.yaml`, validated by
+ * `src/content/pages/schemas.ts`.
+ */
+const pageCollection = <S extends z.ZodType>(name: string, schema: S) =>
+  defineCollection({
+    loader: glob({ pattern: '*.yaml', base: `./src/content/pages/${name}` }),
+    schema,
+  });
+
+/** Legal pages in Markdown, one file per page and per locale (`fr/terms.md`, `en/privacy.md`). */
+const legal = defineCollection({
+  loader: glob({ pattern: '*/*.md', base: './src/content/legal' }),
+  schema: z.strictObject({
+    seo: z.strictObject({ title: z.string(), description: z.string() }),
+    title: z.string(),
+    /** "Mise à jour : … · Entrée en vigueur : …" line under the title. */
+    meta: z.string(),
+  }),
+});
+
+/** Hatch OS Sans Filtre: one Markdown file per monthly edition, both locales inside. */
+const sansFiltre = defineCollection({
+  loader: glob({ pattern: '*.md', base: './src/content/sans-filtre' }),
+  schema: sansFiltreEdition,
+});
+
 export const collections = {
+  legal,
+  sansFiltre,
+  demoPage: pageCollection('demo', demoPage),
+  securityPage: pageCollection('security', securityPage),
+  sansFiltrePage: pageCollection('sansFiltre', sansFiltrePage),
   home,
   agents,
   hero: sectionCollection('hero', hero),

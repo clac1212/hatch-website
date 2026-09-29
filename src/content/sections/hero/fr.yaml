@@ -1,1 +1,23 @@
-todo: true
+# Une entrée par ligne du titre en desktop (sur mobile, le titre se recompose en un seul paragraphe).
+title:
+  - Recrutez des agents IA
+  - pour piloter et
+  - développer votre
+  - réseau d'établissements
+lead: Vos sites vous écrivent tous en même temps. Vos agents répondent, vous préparez la prochaine ouverture.
+# Cartes de tâches animées sur la carte, dans l'ordre de la boucle (Peep à Lyon, Lark au siège, Sparrow à Marseille, puis Barcelone).
+tasks:
+  status:
+    running: En cours
+    done: Terminé
+  lyon:
+    - Question de l'équipe de Lyon
+    - Fiche allergènes envoyée
+  headOffice:
+    - État du réseau ce matin
+    - 3 relances à faire
+  marseille:
+    - Ouverture Marseille · J-18
+    - Formation de l'équipe calée jeudi
+  barcelona:
+    - Réponse en espagnol · Barcelone

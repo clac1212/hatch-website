@@ -17,13 +17,13 @@ export default defineConfig({
     },
   },
 
-  // Self-hosted at build time. Weights limited to what the DS v4 uses.
+  // Self-hosted at build time. Weights limited to what the v4 mockups use.
   fonts: [
     {
       name: 'Fraunces',
       cssVariable: '--font-fraunces',
       provider: fontProviders.fontsource(),
-      weights: [600, 700],
+      weights: [400, 600, 700],
       styles: ['normal', 'italic'],
       subsets: ['latin', 'latin-ext'],
       fallbacks: ['Georgia', 'serif'],
@@ -32,7 +32,7 @@ export default defineConfig({
       name: 'Inter',
       cssVariable: '--font-inter',
       provider: fontProviders.fontsource(),
-      weights: [400, 500, 600],
+      weights: [400, 500, 600, 700],
       styles: ['normal'],
       subsets: ['latin', 'latin-ext'],
       fallbacks: ['system-ui', 'sans-serif'],

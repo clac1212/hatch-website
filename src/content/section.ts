@@ -1,7 +1,10 @@
 import { getEntry, type CollectionKey } from 'astro:content';
 import type { Locale } from '../i18n/ui';
 
-type Section = Exclude<CollectionKey, 'home' | 'agents'>;
+type Section = Exclude<
+  CollectionKey,
+  'home' | 'agents' | 'legal' | 'sansFiltre' | 'demoPage' | 'securityPage' | 'sansFiltrePage'
+>;
 
 /** Loads a section's copy for a locale; a missing file is a build error, not a silent blank. */
 export async function section<S extends Section>(name: S, locale: Locale) {

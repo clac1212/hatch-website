@@ -1,1 +1,78 @@
-todo: true
+titreAvant:
+  - Saturday, 9:04 pm.
+  - Your network
+  - is texting you.
+titreApres:
+  - Saturday, 9:08 pm.
+  - Hatch
+  - has it covered.
+paliers:
+  - 3 SITES
+  - 12 SITES
+  - 30 SITES
+
+telephone:
+  operateur: Orange F
+  date: Saturday, September 25
+  horloge: ['9:04', '9:05', '9:06', '9:07', '9:08']
+  quand:
+    - now
+    - 1m ago
+    - 2m ago
+  apps:
+    whatsapp: WhatsApp
+    appel: Missed call
+    mail: Email
+    sms: Text message
+
+# The phone belongs to the head office of BunBun (a made-up brand). Oldest first.
+notifications:
+  - app: whatsapp
+    de: Kevin · Lyon Part-Dieu
+    a: Kevin
+    message: How many minutes does the chicken go in the fryer again?
+    agent: owl
+    reponse: 6 min at 170 °C, then 2 min to drain. Cooking sheet sent.
+  - app: appel
+    de: Sarah · Lille
+    a: Sarah
+    message: 'Voicemail: “The walk-in fridge is at 9 °C, who do I call?”'
+    agent: lark
+    reponse: Refrigeration tech booked for 8 am tomorrow. Meanwhile, move the sensitive products.
+  - app: mail
+    de: Julien Morel
+    a: Julien
+    message: 'Rennes application: still no news about my file…'
+    agent: sparrow
+    reponse: File complete. Interview offered Tuesday at 10 am with the network team.
+  - app: whatsapp
+    de: Inès · Nantes
+    a: Inès
+    message: I start tomorrow, what should I look at first?
+    agent: pecker
+    reponse: 'Welcome! Your day-one path: 3 modules, 12 minutes.'
+  - app: whatsapp
+    de: BunBun franchisees
+    a: Karim
+    message: 'Karim: When does the new burger launch? Nothing has arrived in Bordeaux.'
+    agent: peep
+    reponse: Launching October 2. Recipe card and posters sent to every site.
+  - app: sms
+    de: Thomas · Toulouse
+    a: Thomas
+    message: Does anyone have the latest allergen sheet?
+    agent: jay
+    reponse: Here’s the current version (September). It’s also pinned in the kitchen.
+  - app: mail
+    de: Quality audit
+    a: Marseille
+    message: 'Marseille: action plan still not sent (day 12).'
+    agent: finch
+    reponse: Franchisee chased. Action plan due Friday, reminder set for Thursday.
+
+resume:
+  titre: Hatch
+  message: 7 requests handled by your agents. Enjoy your evening.
+
+listeLabel: Tonight’s requests and each agent’s answer
+regle: Done

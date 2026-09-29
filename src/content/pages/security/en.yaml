@@ -1,0 +1,67 @@
+seo:
+  title: 'Security & privacy — Hatch OS'
+  description: 'Your data stays yours: no AI training, zero retention on the model side, hosting in Europe, granular access control and GDPR compliance.'
+hero:
+  kicker: 'Security · Privacy · Access'
+  title: 'Your data stays yours.'
+  lead: 'Hatch runs across your network without ever training on your data. You choose what you share with Hatch, and who can see what inside Hatch — down to the single document.'
+  badges:
+    - 'No AI training'
+    - 'Zero model retention'
+    - 'Hosted in Europe'
+    - 'GDPR compliant'
+training:
+  kicker: '01 — The AI never trains on you'
+  title: 'No training, zero retention.'
+  cards:
+    - icon: shield-check
+      title: 'No training'
+      text: 'Your data is never used to train an AI model. Not by us, not by our providers.'
+    - icon: lock
+      title: 'Zero retention on the model side'
+      text: 'Your data stays with you. Our model providers keep nothing once it has been processed.'
+sharing:
+  kicker: '02 — You choose what you share'
+  title: 'Hatch only sees what you decide.'
+  text: 'You connect your sources and pick the scopes, documents and shared spaces. Everything else stays with you. Revocable at any time, without losing control.'
+  items:
+    - 'Sources: Drive, Notion, PDF, Word, Excel — your call'
+    - 'Scopes by brand, region, location'
+    - 'One-click removal, full access trail'
+  example:
+    title: 'Example — the Nobinobi network'
+    rows:
+      - source: 'HQ — the full manual'
+        status: 'Shared'
+        shared: true
+      - source: 'Lyon Part-Dieu — kitchen sheets'
+        status: 'Shared'
+        shared: true
+      - source: 'Recipes in testing — Q4'
+        status: 'Not shared'
+        shared: false
+access:
+  kicker: '03 — Who sees what, at every level'
+  title: 'Granular access control.'
+  text: 'Every member of the network only sees what concerns them. The franchisor runs the show, each location sees its own scope.'
+  cards:
+    - icon: users
+      title: 'Role-based access'
+      text: 'Separate rights for franchisor, franchisees, managers and crew. HQ sees everything, a location only sees itself.'
+    - icon: file-text
+      title: 'Fine-grained permissions'
+      text: 'You decide who can open which documents within your teams. By folder, by sheet, by location.'
+    - icon: key
+      title: 'Enterprise SSO'
+      text: 'Sign in through your SAML SSO. Arrivals, departures and rights follow your directory.'
+foundation:
+  kicker: '04 — Foundation & compliance'
+  cards:
+    - title: 'Hosted in Europe'
+      text: 'AWS servers located in Europe. Data isolated per customer, never shared across networks.'
+    - title: 'GDPR compliant'
+      text: 'Shareable security policy, signable DPA. A dedicated security contact.'
+cta:
+  title: 'Need the full file for your IT team?'
+  label: 'Request the security policy and DPA'
+  href: 'mailto:cesar@gethatch.io?subject=Hatch%20OS%20security%20policy%20and%20DPA'

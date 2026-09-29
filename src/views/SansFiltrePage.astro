@@ -1,0 +1,35 @@
+---
+import { getEntry } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import SansFiltreEdition from '../components/pages/SansFiltreEdition.astro';
+import { sortedEditions } from '../content/pages/editions';
+import { routes, type Locale, type Paths } from '../i18n/ui';
+
+/**
+ * Hatch OS Sans Filtre, shared by FR (/sans-filtre[/<edition>]) and EN (/en/unfiltered[/<edition>]).
+ * Without `edition`, renders the latest one. Adding an edition = dropping a Markdown file in
+ * src/content/sans-filtre, nothing here changes.
+ */
+interface Props {
+  locale: Locale;
+  edition?: string;
+}
+
+const { locale, edition } = Astro.props;
+const ui = (await getEntry('sansFiltrePage', locale))?.data;
+if (!ui) throw new Error(`Missing src/content/pages/sansFiltre/${locale}.yaml`);
+const editions = await sortedEditions();
+const entry = edition ? editions.find((x) => x.data.edition === edition) : editions[0];
+if (!entry) throw new Error(`Unknown Sans Filtre edition "${edition}"`);
+const d = entry.data[locale];
+
+const paths: Paths = edition
+  ? { fr: `${routes.sansFiltre.fr}/${edition}`, en: `${routes.sansFiltre.en}/${edition}` }
+  : routes.sansFiltre;
+const title = edition ? `${d.month} · ${ui.titleSuffix}` : ui.seo.title;
+const description = edition ? d.intro.slice(0, 155) : ui.seo.description;
+---
+
+<Base locale={locale} paths={paths} title={title} description={description}>
+  <SansFiltreEdition entry={entry} editions={editions} ui={ui} locale={locale} />
+</Base>

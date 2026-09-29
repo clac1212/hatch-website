@@ -1,1 +1,68 @@
-todo: true
+title: Up and running in under 3 hours.
+steps:
+  - Connect your know-how
+  - Your agents set themselves up
+  - Your teams put them to work
+next: Continue
+
+sources:
+  title: Connect your sources
+  search: Search for a tool
+  documents:
+    label: Your documents
+    connected: Connected
+    connect: Connect
+    items:
+      - { name: Drive, logo: google-drive, connected: true }
+      - { name: Notion, logo: notion, connected: true }
+      - { name: Word, logo: word, connected: true }
+      - { name: PDF, logo: pdf, connected: true }
+      - { name: Excel, logo: excel, connected: true }
+      - { name: OneDrive, logo: onedrive, connected: false }
+  tools:
+    label: Your tools' documentation
+    state: Docs built in
+    items:
+      - { name: POS, icon: euro }
+      - { name: Scheduling, icon: calendar }
+      - { name: Food safety, icon: shield }
+      - { name: HR · payroll, icon: users }
+  counter:
+    one: '{n} source ready'
+    other: '{n} sources ready'
+
+agents:
+  title: Setting up your agents
+  conversation:
+    label: Conversation
+    messages:
+      - { from: agent, bird: sparrow, text: 'How do you recruit your franchisees?' }
+      - { from: you, text: 'Call, visit, application, signing.' }
+      - { from: agent, bird: sparrow, text: "Got it. I'm picking up your 23 candidates." }
+  migration:
+    label: Migration
+    rows:
+      - { name: Procedures, bird: jay, done: 212, total: 212 }
+      - { name: Candidates, bird: sparrow, done: 23, total: 23 }
+      - { name: Recipe cards, bird: owl, done: 96, total: 142 }
+  footer: Your agents take it from here.
+
+channels:
+  title: Your agents are live
+  label: Where your teams already are
+  active: Active
+  items:
+    - { name: WhatsApp, icon: whatsapp }
+    - { name: Email, icon: mail }
+    - { name: Tablet, icon: tablet }
+  thread:
+    label: Right now · Lyon Part-Dieu team
+    question:
+      initials: IM
+      who: Inès · crew member
+      text: How many minutes does the chicken need in the fryer?
+    answer:
+      who: Owl
+      bird: owl
+      text: 6 min at 170 °C, then 2 min to drain. The recipe card is pinned.
+  footer: Nothing to install.

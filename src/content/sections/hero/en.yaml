@@ -1,1 +1,22 @@
-todo: true
+# One entry per line of the desktop title (on mobile, the title reflows as a single paragraph).
+title:
+  - Hire AI agents
+  - to run and grow your
+  - network of locations
+lead: All your locations message you at once. Your agents answer, while you get the next opening ready.
+# Task cards animated on the map, in loop order (Peep in Lyon, Lark at head office, Sparrow in Marseille, then Barcelona).
+tasks:
+  status:
+    running: In progress
+    done: Done
+  lyon:
+    - Question from the Lyon team
+    - Allergen sheet sent
+  headOffice:
+    - Network status this morning
+    - 3 follow-ups to send
+  marseille:
+    - Marseille opening · D-18
+    - Team training booked for Thursday
+  barcelona:
+    - Replied in Spanish · Barcelona

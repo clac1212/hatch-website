@@ -1,13 +1,598 @@
 ---
+import { Image, Picture } from 'astro:assets';
+import Button from '../ui/Button.astro';
 import { section } from '../../content/section';
-import type { Locale } from '../../i18n/ui';
+import { routes, useTranslations, type Locale } from '../../i18n/ui';
+import carte from '../../assets/hero/carte-reseau.jpg';
+import peep from '../../assets/hero/peep.jpg';
+import lark from '../../assets/hero/lark.jpg';
+import sparrow from '../../assets/hero/sparrow.jpg';
 
+/**
+ * Hero of the home (v4 node EnmYf, animation from prototypes/hero/hero-c1.html): full-screen voxel
+ * map of the network, liquid-glass title card, and a living scene on top of the map: task cards
+ * stacked above each agent + human duo (Peep → Lark → Sparrow → Barcelona, 17 s loop), orange pings
+ * on the shops, cloud shadows and sea glints.
+ *
+ * Every scene coordinate below is in the prototype's frame: the image reduced to 1440 × 804. The
+ * scene (`--sw` × `--sh`) is that frame covering the section, pinned right (we lose sea on the left,
+ * never France), so pings and stacks stay on their cube whatever the crop.
+ */
 interface Props {
   locale: Locale;
 }
 
 const { locale } = Astro.props;
 const data = await section('hero', locale);
+const t = useTranslations(locale);
+const { status } = data.tasks;
+
+const W = 1440;
+const H = 804;
+const pos = ([x, y]: readonly [number, number]) =>
+  `left:${((x / W) * 100).toFixed(3)}%;top:${((y / H) * 100).toFixed(3)}%`;
+
+type Anchor = 'left' | 'right' | 'center';
+const anchors: Record<Anchor, { dx: string; align: string }> = {
+  left: { dx: '0%', align: 'flex-start' },
+  right: { dx: '-100%', align: 'flex-end' },
+  center: { dx: '-50%', align: 'center' },
+};
+
+/** A card is "done" from the start, or "running" until `switchAt` seconds into its scene. */
+type Card = { text: string; done: true } | { text: string; done: false; switchAt?: number };
+
+const scenes: {
+  avatar: ImageMetadata;
+  start: number;
+  duration: number;
+  ping: [number, number];
+  stack: { at: [number, number]; anchor: Anchor };
+  cards: Card[];
+}[] = [
+  {
+    avatar: peep,
+    start: 0,
+    duration: 4.6,
+    ping: [1116, 322],
+    stack: { at: [1428, 440], anchor: 'right' },
+    cards: [
+      { text: data.tasks.lyon[0], done: false, switchAt: 2 },
+      { text: data.tasks.lyon[1], done: true },
+    ],
+  },
+  {
+    avatar: lark,
+    start: 4.6,
+    duration: 4.6,
+    ping: [875, 272],
+    stack: { at: [1118, 190], anchor: 'left' },
+    cards: [
+      { text: data.tasks.headOffice[0], done: true },
+      { text: data.tasks.headOffice[1], done: false },
+    ],
+  },
+  {
+    avatar: sparrow,
+    start: 9.2,
+    duration: 4.6,
+    ping: [1033, 640],
+    stack: { at: [878, 640], anchor: 'right' },
+    cards: [
+      { text: data.tasks.marseille[0], done: false },
+      { text: data.tasks.marseille[1], done: true },
+    ],
+  },
+  {
+    avatar: peep,
+    start: 13.8,
+    duration: 3.2,
+    ping: [670, 767],
+    stack: { at: [670, 742], anchor: 'center' },
+    cards: [{ text: data.tasks.barcelona[0], done: true }],
+  },
+];
+
+/** Shops that ping now and then between two task scenes ("your sites write to you"). */
+const cubes: [number, number][] = [
+  [688, 175],
+  [590, 265],
+  [742, 384],
+  [666, 535],
+  [1199, 186],
+  [1307, 222],
+  [1386, 333],
+  [1292, 369],
+  [1397, 499],
+  [724, 31],
+  [1048, 42],
+  [1231, 42],
+  [482, 675],
+  [662, 758],
+];
+
+/** Glints on the sea. */
+const glints: [number, number][] = [
+  [118, 352],
+  [262, 298],
+  [384, 428],
+  [204, 522],
+  [470, 610],
+  [332, 700],
+  [92, 640],
+  [520, 500],
+  [1186, 706],
+  [1300, 770],
+  [430, 230],
+  [160, 450],
+];
+
+/** Cloud shadows: top (scene px), loop duration (s). */
+const clouds: [number, number][] = [
+  [80, 90],
+  [320, 70],
+  [560, 110],
+];
+
+/** The second card of a stack slides in once the first one has been read. */
+const entries = [0.5, 2.4];
+const tick =
+  'M10 18H8v-2h2v2Zm-2-2H6v-2h2v2Zm4-2v2h-2v-2h2Zm-6 0H4v-2h2v2Zm8 0h-2v-2h2v2Zm2-2h-2v-2h2v2Zm2-2h-2V8h2v2Zm2-2h-2V6h2v2Z';
 ---
 
-<section data-todo={String(data.todo)}></section>
+<section
+  class="hero relative h-dvh min-h-[640px] overflow-hidden bg-night [container-type:size]"
+  aria-labelledby="hero-titre"
+  data-rv-groupe
+>
+  <div class="h-decor" aria-hidden="true">
+    <Picture
+      src={carte}
+      formats={['avif', 'webp']}
+      widths={[800, 1200, 1600, 2000, 2400]}
+      sizes="max(100vw, 179.1vh, 1146px)"
+      alt=""
+      loading="eager"
+      fetchpriority="high"
+      class="absolute inset-0 size-full object-cover"
+    />
+    {
+      clouds.map(([top, duration], i) => (
+        <div
+          class="h-nuage"
+          style={`top:${((top / H) * 100).toFixed(3)}%;animation-duration:${duration}s;animation-delay:${-i * 23}s`}
+        />
+      ))
+    }
+    {
+      glints.map((p, i) => (
+        <div
+          class="h-reflet"
+          style={`${pos(p)};animation-duration:${(5 + (i % 4) * 1.3).toFixed(1)}s;animation-delay:${(-i * 1.7).toFixed(1)}s`}
+        />
+      ))
+    }
+    {scenes.map((s) => <div class="h-ping" data-ping="scene" style={pos(s.ping)} />)}
+    {cubes.map((c) => <div class="h-ping" data-ping="cube" style={pos(c)} />)}
+  </div>
+
+  <div
+    class="relative z-1 mx-auto flex h-full max-w-[1440px] flex-col justify-end gap-2 px-4 pt-24 pb-4 sm:px-6 sm:pb-6 lg:static lg:justify-center lg:gap-0 lg:px-14 lg:pt-16 lg:pb-[149px]"
+  >
+    <div class="h-piles" aria-hidden="true">
+      {
+        scenes.map((s) => (
+          <div
+            class="h-pile"
+            data-debut={s.start}
+            data-duree={s.duration}
+            style={`--x:${((s.stack.at[0] / W) * 100).toFixed(3)}%;--y:${((s.stack.at[1] / H) * 100).toFixed(3)}%;--dx:${anchors[s.stack.anchor].dx};--align:${anchors[s.stack.anchor].align}`}
+          >
+            {s.cards.map((card, j) => (
+              <div
+                class="h-slot"
+                data-entree={entries[j]}
+                data-bascule={!card.done && card.switchAt !== undefined ? card.switchAt : undefined}
+              >
+                <div>
+                  <div class:list={['h-tache', card.done && 'fait']}>
+                    <Image
+                      src={s.avatar}
+                      width={24}
+                      height={24}
+                      densities={[1, 2]}
+                      format="webp"
+                      alt=""
+                      class="size-6 shrink-0 rounded-full bg-white object-cover"
+                    />
+                    <span class="h-statut">
+                      <span class="h-point" />
+                      <svg class="h-coche" viewBox="0 0 24 24">
+                        <path d={tick} />
+                      </svg>
+                      <span class="lib-cours">{status.running}</span>
+                      <span class="lib-fait">{status.done}</span>
+                    </span>
+                    <span class="h-sep" />
+                    <span class="h-texte">{card.text}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ))
+      }
+    </div>
+
+    <div
+      class="carte-hero relative z-2 flex flex-col items-start gap-[18px] rounded-[28px] px-5 pt-6 pb-6 sm:gap-6 sm:px-8 sm:pt-8 sm:pb-9 md:max-w-[600px] lg:w-[clamp(480px,45.56vw,656px)] lg:max-w-none lg:gap-[26px] lg:rounded-[36px] lg:px-[clamp(36px,3.334vw,48px)] lg:pt-[clamp(34px,3.195vw,46px)] lg:pb-[clamp(38px,3.473vw,50px)]"
+      data-rv
+      style="--rd: 0.2s"
+    >
+      <h1
+        id="hero-titre"
+        class="titre-hero font-mono text-[26px] leading-[1.14] tracking-[-0.01em] text-ink sm:text-[30px] md:text-[34px] lg:text-[clamp(28px,2.604vw,37.5px)]"
+      >
+        {
+          data.title.map((line, i) => (
+            <>
+              {line}
+              {i < data.title.length - 1 && (
+                <>
+                  {' '}
+                  <br class="max-lg:hidden" />
+                </>
+              )}
+            </>
+          ))
+        }
+      </h1>
+      <p
+        class="lead text-base leading-6 font-medium text-ink sm:text-[17px] lg:text-lg lg:leading-[27px]"
+      >
+        {data.lead}
+      </p>
+      <Button href={routes.demo[locale]} variant="orange" size="lg">{t('cta.demo')}</Button>
+    </div>
+  </div>
+</section>
+
+<script>
+  /**
+   * Hero loop (prototypes/hero/hero-c1.html): one duo at a time, its cube pings, then its task cards
+   * stack up ("running" → "done") and fade out. Paused off screen. `?t=<s>` freezes the loop at an
+   * instant (captures); reduced motion shows a still frame.
+   */
+  const hero = document.querySelector<HTMLElement>('.hero')!;
+  const CYCLE = 17;
+  const piles = [...hero.querySelectorAll<HTMLElement>('.h-pile')].map((pile) => ({
+    pile,
+    debut: Number(pile.dataset.debut),
+    duree: Number(pile.dataset.duree),
+    slots: [...pile.querySelectorAll<HTMLElement>('.h-slot')].map((slot) => ({
+      slot,
+      tache: slot.querySelector<HTMLElement>('.h-tache')!,
+      entree: Number(slot.dataset.entree),
+      bascule: slot.dataset.bascule === undefined ? null : Number(slot.dataset.bascule),
+    })),
+  }));
+  const pings = [...hero.querySelectorAll<HTMLElement>('[data-ping="scene"]')];
+  const cubes = [...hero.querySelectorAll<HTMLElement>('[data-ping="cube"]')];
+
+  function ping(el: HTMLElement, opacite: number, echelle: number) {
+    el.style.opacity = String(opacite);
+    el.style.transform = `translate(-50%, -50%) scale(${echelle})`;
+  }
+
+  function rendu(t: number) {
+    const tc = t % CYCLE;
+    piles.forEach(({ pile, debut, duree, slots }, i) => {
+      const r = tc - debut;
+      const actif = r >= 0 && r < duree;
+      const p = actif ? r / 1.2 : 2;
+      ping(pings[i], p < 1 ? 1 - p : 0, 0.4 + 1.3 * Math.min(p, 1));
+      pile.classList.toggle('sort', actif && r >= duree - 0.5);
+      for (const { slot, tache, entree, bascule } of slots) {
+        slot.classList.toggle('on', actif && r >= entree);
+        if (bascule !== null) tache.classList.toggle('fait', r >= bascule);
+      }
+    });
+    // Ambient pings: every 2.3 s, one cube (5 steps apart) sends a soft wave.
+    const n = Math.floor(t / 2.3);
+    const q = (t % 2.3) / 1.4;
+    cubes.forEach((el, k) => {
+      const on = k === (n * 5) % cubes.length && q < 1;
+      ping(el, on ? (1 - q) * 0.7 : 0, 0.4 + 1.1 * Math.min(q, 1));
+    });
+  }
+
+  const fige = new URLSearchParams(location.search).get('t');
+  if (fige !== null) rendu(Number.parseFloat(fige));
+  else if (matchMedia('(prefers-reduced-motion: reduce)').matches) rendu(1.2);
+  else {
+    let t = 0;
+    let avant: number | null = null;
+    let raf = 0;
+    const boucle = (maintenant: number) => {
+      // Capped step: a background tab resumes where it left off instead of jumping ahead.
+      if (avant !== null) t += Math.min(maintenant - avant, 100) / 1000;
+      avant = maintenant;
+      rendu(t);
+      raf = requestAnimationFrame(boucle);
+    };
+    new IntersectionObserver(([e]) => {
+      hero.classList.toggle('h-pause', !e.isIntersecting);
+      if (e.isIntersecting) raf ||= requestAnimationFrame(boucle);
+      else {
+        cancelAnimationFrame(raf);
+        raf = 0;
+        avant = null;
+      }
+    }).observe(hero);
+  }
+</script>
+
+<style>
+  /* The scene: the image's 1440 × 804 frame, covering the section (container units), pinned right. */
+  .hero {
+    --sw: max(100cqw, calc(100cqh * 1440 / 804));
+    --sh: calc(var(--sw) * 804 / 1440);
+    --fx: 0.78;
+  }
+  .h-decor {
+    position: absolute;
+    z-index: 0;
+    width: var(--sw);
+    height: var(--sh);
+    left: calc((100cqw - var(--sw)) * var(--fx));
+    top: calc((100cqh - var(--sh)) / 2);
+    pointer-events: none;
+  }
+
+  .h-nuage {
+    position: absolute;
+    left: 0;
+    width: 52.78%;
+    height: 52.24%;
+    border-radius: 50%;
+    background: radial-gradient(
+      closest-side,
+      color-mix(in srgb, var(--color-navy) 20%, transparent),
+      transparent
+    );
+    mix-blend-mode: multiply;
+    filter: blur(18px);
+    animation: h-nuage linear infinite;
+  }
+  @keyframes h-nuage {
+    from {
+      transform: translate(-118.4%, 0);
+    }
+    to {
+      transform: translate(223.7%, -33.3%);
+    }
+  }
+  .h-reflet {
+    position: absolute;
+    width: 1.25%;
+    height: max(2px, 0.373%);
+    border-radius: 3px;
+    background: var(--color-white);
+    opacity: 0;
+    filter: blur(0.4px);
+    animation: h-reflet ease-in-out infinite;
+  }
+  @keyframes h-reflet {
+    0%,
+    100% {
+      opacity: 0;
+      transform: scaleX(0.4);
+    }
+    45% {
+      opacity: 0.75;
+      transform: scaleX(1);
+    }
+    60% {
+      opacity: 0.2;
+    }
+  }
+  .h-ping {
+    position: absolute;
+    width: 4.444%;
+    height: 3.731%;
+    border-radius: 50%;
+    border: 2px solid var(--color-orange);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--color-orange) 40%, transparent);
+    opacity: 0;
+  }
+
+  /* Task stacks. Mobile: a single slot just above the title card; lg+: on their duo, in the scene. */
+  .h-piles {
+    position: relative;
+    height: 84px;
+    flex: none;
+    pointer-events: none;
+  }
+  .h-pile {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: max-content;
+    max-width: 100%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+  }
+  @media (min-width: 64rem) {
+    .hero {
+      --fx: 1;
+    }
+    .h-piles {
+      position: absolute;
+      z-index: 1;
+      width: var(--sw);
+      height: var(--sh);
+      left: calc((100cqw - var(--sw)) * var(--fx));
+      top: calc((100cqh - var(--sh)) / 2);
+    }
+    .h-pile {
+      left: var(--x);
+      top: var(--y);
+      bottom: auto;
+      width: 420px;
+      max-width: none;
+      transform: translate(var(--dx), -100%);
+      align-items: var(--align);
+    }
+  }
+  .h-slot {
+    display: grid;
+    grid-template-rows: 0fr;
+    max-width: 100%;
+    transition: grid-template-rows 0.6s var(--ease-hatch);
+  }
+  .h-slot > div {
+    min-height: 0;
+    overflow: hidden;
+    padding: 3px 2px;
+  }
+  .h-slot.on {
+    grid-template-rows: 1fr;
+  }
+  .h-tache {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 6px 13px 6px 6px;
+    border-radius: 12px;
+    white-space: nowrap;
+    background: color-mix(in srgb, var(--color-night) 62%, transparent);
+    backdrop-filter: blur(10px) saturate(1.2);
+    -webkit-backdrop-filter: blur(10px) saturate(1.2);
+    border: 1px solid color-mix(in srgb, var(--color-white) 14%, transparent);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--color-navy) 25%, transparent);
+    color: var(--color-white);
+    font: 600 12px/1.2 var(--font-sans);
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+    transition:
+      opacity 0.5s var(--ease-hatch),
+      transform 0.6s var(--ease-hatch);
+  }
+  @media (min-width: 40rem) {
+    .h-tache {
+      font-size: 13px;
+    }
+  }
+  .h-slot.on .h-tache {
+    opacity: 1;
+    transform: none;
+  }
+  .h-pile.sort .h-tache {
+    opacity: 0;
+    transform: translateY(-8px);
+    transition-duration: 0.5s;
+  }
+  .h-texte {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .h-statut {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 6px;
+    font: 400 10.5px/1 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--color-orange) 60%, var(--color-white));
+  }
+  .h-point {
+    width: 7px;
+    height: 7px;
+    border-radius: 1px;
+    background: var(--color-orange);
+    animation: h-pulse 1.4s ease-out infinite;
+  }
+  @keyframes h-pulse {
+    from {
+      box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-orange) 53%, transparent);
+    }
+    to {
+      box-shadow: 0 0 0 7px transparent;
+    }
+  }
+  .h-coche {
+    width: 11px;
+    height: 11px;
+    display: none;
+    fill: var(--color-white);
+  }
+  .h-tache.fait .h-statut {
+    color: color-mix(in srgb, var(--color-white) 70%, transparent);
+  }
+  .h-tache.fait .h-point,
+  .h-tache.fait .lib-cours,
+  .h-tache:not(.fait) .lib-fait {
+    display: none;
+  }
+  .h-tache.fait .h-coche {
+    display: block;
+  }
+  .h-sep {
+    flex: none;
+    width: 1px;
+    height: 12px;
+    background: color-mix(in srgb, var(--color-white) 22%, transparent);
+  }
+  .h-pause :is(.h-nuage, .h-reflet, .h-point) {
+    animation-play-state: paused;
+  }
+
+  /* Liquid-glass title card; the gradient rim is a masked layer so it follows the radius. */
+  .carte-hero {
+    isolation: isolate;
+    background-image: linear-gradient(
+      -123deg,
+      color-mix(in srgb, var(--color-white) 55%, transparent) 14.6%,
+      color-mix(in srgb, var(--color-white) 20%, transparent) 53.5%,
+      color-mix(in srgb, var(--color-peach-2) 5%, transparent) 85.4%
+    );
+    box-shadow:
+      0 30px 70px color-mix(in srgb, var(--color-navy) 22%, transparent),
+      inset 0 2px 1px color-mix(in srgb, var(--color-white) 70%, transparent),
+      inset 0 -12px 30px color-mix(in srgb, var(--color-white) 20%, transparent);
+    backdrop-filter: blur(18px) saturate(1.15);
+    -webkit-backdrop-filter: blur(18px) saturate(1.15);
+  }
+  .carte-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.5px;
+    pointer-events: none;
+    background: linear-gradient(
+      -123deg,
+      var(--color-white) 14%,
+      color-mix(in srgb, var(--color-white) 15%, transparent) 50%,
+      color-mix(in srgb, var(--color-white) 60%, transparent) 85%
+    );
+    -webkit-mask:
+      linear-gradient(var(--color-black) 0 0) content-box,
+      linear-gradient(var(--color-black) 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(var(--color-black) 0 0) content-box exclude,
+      linear-gradient(var(--color-black) 0 0);
+  }
+  .titre-hero {
+    text-shadow: 0 0 10px color-mix(in srgb, var(--color-white) 50%, transparent);
+  }
+  .lead {
+    filter: drop-shadow(0 0 5px color-mix(in srgb, var(--color-white) 50%, transparent));
+  }
+</style>
