@@ -77,10 +77,8 @@ const agents = [peep, owl, pecker, lark, jay, finch, sparrow];
             <li data-rv class="offre">
               <article
                 class:list={[
-                  'carte flex h-full flex-col overflow-hidden rounded-[24px] lg:min-h-[605px]',
-                  nuit
-                    ? 'bg-night outline-2 outline-orange -outline-offset-1'
-                    : 'bg-white outline outline-line -outline-offset-1',
+                  'carte relative flex h-full flex-col overflow-hidden rounded-[24px] lg:min-h-[605px]',
+                  nuit ? 'carte-nuit bg-night' : 'bg-white',
                 ]}
               >
                 <div class="h-[260px] shrink-0 overflow-hidden sm:h-[340px]">
@@ -273,13 +271,24 @@ const agents = [peep, owl, pecker, lark, jay, finch, sparrow];
     transition-delay: calc(220ms + var(--i) * 60ms);
   }
 
-  /* ---- Offer cards: static card, orange rim and diorama zoom on hover ---- */
-  .carte {
-    transition: outline-color 0.4s;
+  /* ---- Offer cards: static card, orange rim and diorama zoom on hover ----
+     The rim is an overlay above the diorama (an outline or border on the card itself is painted
+     under the picture, so it only showed around the text part). */
+  .carte::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+    border: 1px solid var(--color-line);
+    pointer-events: none;
+    transition:
+      border-color 0.4s,
+      border-width 0.2s;
   }
-  .offre:hover .carte {
-    outline: 2px solid var(--color-orange);
-    outline-offset: -2px;
+  .carte-nuit::after,
+  .offre:hover .carte::after {
+    border: 2px solid var(--color-orange);
   }
   .diorama {
     transition: transform 1.2s var(--ease-hatch);
