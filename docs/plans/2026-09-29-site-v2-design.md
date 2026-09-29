@@ -12,16 +12,16 @@ Date : 29/09/2026 · Branche : `feat/site-v2`
 
 ## Décisions
 
-| Sujet | Décision |
-|---|---|
-| Stack | Astro 6 + TypeScript strict + Tailwind v4 + Vercel (statique). Reconstruction de zéro sur `feat/site-v2`, dans le même repo. |
-| Édition du contenu | Markdown dans le repo, via Claude et une PR. Pas de CMS. |
-| Langues | FR sur `/`, EN sur `/en`, dès la v1. Toute nouvelle page est traduite dès qu'elle existe. |
-| Mobile | Règles d'adaptation par section, codées directement et validées sur la preview Vercel. Pas de maquette mobile dans Pencil. |
-| Conversion | Un seul CTA sur tout le site, « Demander une démo », qui mène à `/demo` : Cal.com intégré (`presentation-hatch`) avec des questions de qualification configurées dans Cal.com. |
-| Design system | Pencil fait foi : les variables de `pencil-new.pen` deviennent le `@theme` Tailwind. Les notes Notion plus anciennes (Instrument Serif, Manrope, orange `#EA580C`, golden hour) sont caduques. |
-| Animations | JS vanilla en TypeScript, sans librairie. Le moteur de pistes épinglées du prototype est porté tel quel. Pas de GSAP ni de Three.js en v1. |
-| Tarifs | Validés : 16 / 25 / 33 € par établissement et par mois en annuel. Le mensuel en est déduit (÷ 0,85 → 19 / 29 / 39 €). |
+| Sujet              | Décision                                                                                                                                                                                       |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Stack              | Astro 6 + TypeScript strict + Tailwind v4 + Vercel (statique). Reconstruction de zéro sur `feat/site-v2`, dans le même repo.                                                                   |
+| Édition du contenu | Markdown dans le repo, via Claude et une PR. Pas de CMS.                                                                                                                                       |
+| Langues            | FR sur `/`, EN sur `/en`, dès la v1. Toute nouvelle page est traduite dès qu'elle existe.                                                                                                      |
+| Mobile             | Règles d'adaptation par section, codées directement et validées sur la preview Vercel. Pas de maquette mobile dans Pencil.                                                                     |
+| Conversion         | Un seul CTA sur tout le site, « Demander une démo », qui mène à `/demo` : Cal.com intégré (`presentation-hatch`) avec des questions de qualification configurées dans Cal.com.                 |
+| Design system      | Pencil fait foi : les variables de `pencil-new.pen` deviennent le `@theme` Tailwind. Les notes Notion plus anciennes (Instrument Serif, Manrope, orange `#EA580C`, golden hour) sont caduques. |
+| Animations         | JS vanilla en TypeScript, sans librairie. Le moteur de pistes épinglées du prototype est porté tel quel. Pas de GSAP ni de Three.js en v1.                                                     |
+| Tarifs             | Validés : 16 / 25 / 33 € par établissement et par mois en annuel. Le mensuel en est déduit (÷ 0,85 → 19 / 29 / 39 €).                                                                          |
 
 ## Périmètre v1
 

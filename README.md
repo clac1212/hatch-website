@@ -2,7 +2,7 @@
 
 Le site marketing de **Hatch** — l'OS AI-native pour les réseaux de franchises.
 
-Ce dépôt contient le code de la landing page (`hatch.example.com` une fois le domaine en place) et les contenus FR + EN.
+Ce dépôt contient le code de [gethatch.io](https://www.gethatch.io) et ses contenus FR + EN.
 
 > 🤖 Tu es un agent IA (Claude Code, Cursor) ? Lis [`CLAUDE.md`](./CLAUDE.md) à la place — c'est la doc faite pour toi.
 
@@ -35,10 +35,10 @@ Pour arrêter : `Ctrl + C` dans le terminal.
 
 ## ✏️ Je veux changer un texte
 
-Tous les textes de la landing (hero, sections, FAQ, etc.) vivent dans **deux fichiers Markdown** :
+Tous les textes vivent dans `src/content/`, un fichier par langue :
 
-- 🇫🇷 `src/content/landing/fr.md`
-- 🇬🇧 `src/content/landing/en.md`
+- la home : 🇫🇷 `src/content/home/fr.yaml` et 🇬🇧 `src/content/home/en.yaml` (un bloc par section) ;
+- les agents : `src/content/agents/fr/<agent>.md` et `src/content/agents/en/<agent>.md`.
 
 ### Workflow
 
@@ -46,10 +46,10 @@ Tous les textes de la landing (hero, sections, FAQ, etc.) vivent dans **deux fic
    ```bash
    git checkout -b content/maj-hero
    ```
-2. **Ouvre le fichier** que tu veux modifier (ex: `src/content/landing/fr.md`)
-3. **Modifie le texte** comme tu modifierais un Google Doc — c'est du Markdown (`#` = titre, `**gras**`, etc.)
+2. **Ouvre le fichier** que tu veux modifier (ex: `src/content/home/fr.yaml`)
+3. **Modifie le texte** entre les guillemets, sans toucher aux noms des champs (`hero:`, `h1:`…) : le build refuse un champ manquant ou en trop
 4. **Vérifie en local** que le rendu te plaît sur `http://localhost:4321/` (pendant que `pnpm dev` tourne)
-5. **N'oublie pas l'autre langue** : si tu modifies `fr.md`, fais l'équivalent dans `en.md` (ou demande à Claude `/translate` de le faire)
+5. **N'oublie pas l'autre langue** : si tu modifies le FR, fais l'équivalent en EN (ou demande à Claude `/translate` de le faire)
 6. **Commit + push** :
    ```bash
    git add .
@@ -71,21 +71,21 @@ Le plus simple : demande à Claude Code de le faire pour toi.
 
 Il va :
 
-- créer un composant `src/components/Pricing.astro`
-- ajouter les champs nécessaires dans `fr.md` et `en.md`
-- importer la section dans les pages FR et EN
+- créer un composant `src/components/sections/Pricing.astro`
+- ajouter son bloc de texte dans `fr.yaml` et `en.yaml`
+- l'afficher sur la home FR et EN
 
-Ensuite tu remplis les champs dans les `.md`, tu vérifies en local, tu push, tu mergues.
+Ensuite tu vérifies en local, tu push, tu mergues.
 
 ---
 
 ## 🌍 Je veux ajouter / corriger une traduction
 
 ```
-/translate fr en src/content/landing/fr.md
+/translate fr en src/content/home/fr.yaml
 ```
 
-Claude lit le fichier FR et met à jour `en.md` en gardant le même format. À toi de relire.
+Claude lit le fichier FR et met à jour son équivalent EN en gardant le même format. À toi de relire.
 
 ---
 

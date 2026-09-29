@@ -1,141 +1,112 @@
 ---
-import { ui, demoUrl, type Locale } from '../i18n/ui';
-import type { CollectionEntry } from 'astro:content';
+import Logo from './ui/Logo.astro';
+import Button from './ui/Button.astro';
+import { routes, otherLocale, useTranslations, type Locale, type Route } from '../i18n/ui';
 
 interface Props {
   locale: Locale;
-  data: CollectionEntry<'landing'>['data']['nav'];
+  route: Route;
 }
 
-const { locale, data } = Astro.props;
-const t = ui[locale];
-const otherLocale: Locale = locale === 'fr' ? 'en' : 'fr';
-const otherLocaleUrl = otherLocale === 'fr' ? '/' : '/en/';
-const securityUrl = locale === 'en' ? '/en/security' : '/security';
-const sansFiltreUrl = locale === 'en' ? '/en/unfiltered' : '/sans-filtre';
-const sfEyebrow = locale === 'en' ? 'Monthly' : 'Mensuel';
-// Anchor links (#pourquoi, #agents, …) only resolve on the homepage.
-// From any other page (e.g. /security), prefix with the home URL so they
-// navigate home first, then jump to the section.
-const homeUrl = locale === 'en' ? '/en/' : '/';
-const anchor = (id: string) => `${homeUrl}#${id}`;
+const { locale, route } = Astro.props;
+const t = useTranslations(locale);
+const home = routes.home[locale];
+const links = [
+  { href: `${home}#agents`, label: t('nav.agents') },
+  { href: `${home}#cas-clients`, label: t('nav.cases') },
+  { href: `${home}#tarifs`, label: t('nav.pricing') },
+  { href: routes.security[locale], label: t('nav.security') },
+];
+const other = otherLocale(locale);
 ---
 
-<nav>
-  <div class="nav-inner mx-auto flex h-16 max-w-[1120px] items-center justify-between px-8 md:px-8">
-    <a href={locale === 'fr' ? '/' : '/en/'} class="logo flex items-center" aria-label="Hatch OS">
-      <img class="logo-img block h-7 w-auto" src="/logos/hatch-os.png" alt="Hatch OS" />
+<header class="fixed inset-x-0 top-4 z-50 px-4">
+  <nav
+    aria-label={t('a11y.mainNav')}
+    class="mx-auto flex max-w-[78rem] items-center justify-between gap-6 rounded-full border border-white/80 bg-cream/85 py-2.5 pr-2.5 pl-6 shadow-2 backdrop-blur-[18px]"
+  >
+    <a href={home} aria-label={t('a11y.home')} class="shrink-0">
+      <Logo class="w-[88px] md:w-[100px]" />
     </a>
 
-    <ul class="nav-links hidden gap-8 md:flex" aria-label={t.ariaLabels.primaryNav}>
-      <li>
-        <a class="nav-link text-sm font-medium transition" href={anchor('pourquoi')}>{data.why}</a>
-      </li>
-      <li>
-        <a class="nav-link text-sm font-medium transition" href={anchor('agents')}>{data.product}</a
-        >
-      </li>
-      <li>
-        <a class="nav-link text-sm font-medium transition" href={anchor('pricing')}
-          >{data.pricing}</a
-        >
-      </li>
-      <li>
-        <a class="nav-link text-sm font-medium transition" href={anchor('faq')}>{data.faq}</a>
-      </li>
-      <li>
-        <a class="nav-link text-sm font-medium transition" href={securityUrl}>{data.security}</a>
-      </li>
-      <li class="flex items-center">
-        <a
-          class="sf-navlink inline-flex -translate-y-[3px] -rotate-3 flex-col items-start leading-none transition hover:scale-[1.06]"
-          href={sansFiltreUrl}
-        >
-          <span class="-rotate-2 text-[8px] font-bold uppercase tracking-[0.18em] text-hatch-accent"
-            >{sfEyebrow}</span
-          >
-          <span class="whitespace-nowrap text-[13px] font-semibold text-hatch-accent"
-            >{data.sansFiltre}</span
-          >
-        </a>
-      </li>
+    <ul class="hidden items-center gap-8 lg:flex">
+      {
+        links.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              class="text-[0.9375rem] font-medium transition-colors hover:text-orange-txt"
+            >
+              {link.label}
+            </a>
+          </li>
+        ))
+      }
     </ul>
 
-    <div class="nav-right flex items-center gap-2.5">
-      <div
-        class="lang-switcher flex items-center gap-[3px] rounded-lg p-[3px] transition"
-        role="group"
-        aria-label={t.languageSwitcher.ariaLabel}
-      >
-        <a
-          href="/"
-          class:list={[
-            'lang-btn rounded-md border-none px-2.5 py-1 text-[11px] font-bold tracking-[0.08em] transition',
-            locale === 'fr' && 'active shadow-[0_1px_4px_rgba(0,0,0,0.12)]',
-          ]}
-        >
-          {t.languageSwitcher.fr}
-        </a>
-        <a
-          href="/en/"
-          class:list={[
-            'lang-btn rounded-md border-none px-2.5 py-1 text-[11px] font-bold tracking-[0.08em] transition',
-            locale === 'en' && 'active shadow-[0_1px_4px_rgba(0,0,0,0.12)]',
-          ]}
-        >
-          {t.languageSwitcher.en}
-        </a>
-      </div>
+    <div class="flex items-center gap-5">
       <a
-        href={demoUrl(locale)}
-        id="nav-btn-demo"
-        class="btn-primary hidden items-center gap-[7px] whitespace-nowrap rounded-[9px] bg-hatch-cta px-5 py-2.5 text-sm font-semibold text-hatch-text transition hover:-translate-y-px hover:bg-hatch-cta-hover hover:shadow-[0_6px_22px_rgba(255,244,164,0.28)] sm:inline-flex"
+        href={routes[route][other]}
+        hreflang={other}
+        lang={other}
+        class="hidden font-mono text-kicker uppercase transition-colors hover:text-orange-txt sm:block"
       >
-        {t.nav.demo}
+        {other}<span class="sr-only"> · {t('lang.switch')}</span>
       </a>
+      <Button href={routes.demo[locale]} class="hidden rounded-full sm:inline-flex">
+        {t('cta.demo')}
+      </Button>
+
+      <details class="group relative lg:hidden">
+        <summary
+          class="flex size-11 cursor-pointer list-none items-center justify-center rounded-full bg-ink text-white [&::-webkit-details-marker]:hidden"
+        >
+          <span class="sr-only">{t('a11y.menu')}</span>
+          <svg
+            viewBox="0 0 24 24"
+            class="size-5"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <path d="M4 7h16M4 12h16M4 17h16" class="group-open:hidden"></path>
+            <path d="M6 6l12 12M18 6L6 18" class="hidden group-open:block"></path>
+          </svg>
+        </summary>
+        <div
+          class="absolute top-full right-0 mt-3 w-64 rounded-card border border-line bg-surface p-3 shadow-3"
+        >
+          <ul class="flex flex-col">
+            {
+              links.map((link) => (
+                <li>
+                  <a
+                    href={link.href}
+                    class="block rounded-btn px-3 py-2.5 font-medium hover:bg-cream-2"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))
+            }
+            <li>
+              <a
+                href={routes[route][other]}
+                hreflang={other}
+                lang={other}
+                class="block rounded-btn px-3 py-2.5 font-medium hover:bg-cream-2"
+              >
+                {t('lang.switch')}
+              </a>
+            </li>
+          </ul>
+          <Button href={routes.demo[locale]} class="mt-2 w-full justify-center">
+            {t('cta.demo')}
+          </Button>
+        </div>
+      </details>
     </div>
-  </div>
-</nav>
-
-<script is:inline>
-  // Sticky nav: adds .scrolled past 60px, uses getBoundingClientRect on
-  // actual sections to decide dark/light theme — avoids hitting nav itself.
-  const DARK_SECTIONS = ['hero', 'agents', 'agents-section'];
-
-  const navEl = document.querySelector('nav');
-  if (navEl) {
-    const updateNavTheme = () => {
-      if (!navEl.classList.contains('scrolled')) {
-        navEl.classList.remove('nav-on-light');
-        return;
-      }
-      const probeY = 32;
-      const sections = document.querySelectorAll('section');
-      for (const section of sections) {
-        const rect = section.getBoundingClientRect();
-        if (rect.top <= probeY && rect.bottom > probeY) {
-          const id = section.id || '';
-          const cls = section.className || '';
-          const isDark = DARK_SECTIONS.includes(id) || DARK_SECTIONS.some((d) => cls.includes(d));
-          navEl.classList.toggle('nav-on-light', !isDark);
-          return;
-        }
-      }
-      navEl.classList.remove('nav-on-light');
-    };
-
-    const onScroll = () => {
-      if (window.scrollY > 60) {
-        navEl.classList.add('scrolled');
-      } else {
-        navEl.classList.remove('scrolled');
-        navEl.classList.remove('nav-on-light');
-      }
-      updateNavTheme();
-    };
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('load', onScroll);
-    onScroll();
-  }
-</script>
+  </nav>
+</header>

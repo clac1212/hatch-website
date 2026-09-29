@@ -1,0 +1,21 @@
+---
+import { Image } from 'astro:assets';
+import day from '../../assets/brand/hatch-os.png';
+import night from '../../assets/brand/hatch-os-night.png';
+
+interface Props {
+  /** `night` for dark backgrounds. */
+  tone?: 'day' | 'night';
+  class?: string;
+}
+
+const { tone = 'day', class: className } = Astro.props;
+---
+
+<Image
+  src={tone === 'night' ? night : day}
+  alt="Hatch OS"
+  width={100}
+  densities={[1, 2]}
+  class:list={['h-auto', className]}
+/>
