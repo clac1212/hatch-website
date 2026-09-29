@@ -140,7 +140,7 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
       <ol class="mep-etats relative mt-12 flex flex-col gap-14 md:mt-16 md:gap-20">
         {
           [sources.title, agents.title, channels.title].map((windowTitle, i) => (
-            <li class:list={['mep-etat', i === 0 && 'actif']} data-mep-etat={i}>
+            <li class="mep-etat" data-mep-etat={i} data-d={i}>
               <h3 class="mep-etat-titre mx-auto mb-4 flex max-w-[760px] items-center gap-2.5 text-[15px] font-medium text-white">
                 <span class="grid size-6 shrink-0 place-items-center rounded-full bg-orange font-mono text-[13px] text-white">
                   {i + 1}
@@ -532,25 +532,43 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
     position: static;
     margin: 0;
   }
+  /*
+   * "Time Machine" stack: the three windows sit one behind the other (data-d = distance from the
+   * current step, set by the script). The front one is the current step; those behind are smaller,
+   * higher and dimmed; a finished step flies towards the viewer and fades out. Shows the sequence.
+   */
   .epingle .mep-etat {
     position: absolute;
     left: 120px;
-    top: 290px;
+    top: 330px;
     width: 760px;
-    opacity: 0;
+    transform-origin: 50% 0;
     pointer-events: none;
-    transform: translateX(48px) scale(0.98);
     transition:
+      transform 1s var(--ease-hatch),
       opacity 0.8s var(--ease-hatch),
-      transform 1s var(--ease-hatch);
+      filter 0.8s var(--ease-hatch);
   }
-  .epingle .mep-etat.apres {
-    transform: translateX(-48px) scale(0.98);
-  }
-  .epingle .mep-etat.actif {
-    opacity: 1;
+  .epingle .mep-etat[data-d='0'] {
+    z-index: 3;
     pointer-events: auto;
-    transform: none;
+  }
+  .epingle .mep-etat[data-d='1'] {
+    z-index: 2;
+    opacity: 0.75;
+    transform: translateY(-48px) scale(0.93);
+    filter: brightness(0.62);
+  }
+  .epingle .mep-etat[data-d='2'] {
+    z-index: 1;
+    opacity: 0.45;
+    transform: translateY(-90px) scale(0.86);
+    filter: brightness(0.45);
+  }
+  .epingle .mep-etat:is([data-d='-1'], [data-d='-2']) {
+    z-index: 4;
+    opacity: 0;
+    transform: translateY(90px) scale(1.12);
   }
   .epingle .mep-etat-titre {
     position: absolute;

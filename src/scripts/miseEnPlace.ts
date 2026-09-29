@@ -2,8 +2,9 @@
  * "Mise en place" pinned track (ported from the v4 prototype, site.js `miseEnPlace()`).
  *
  * The markup renders the stacked layout in its final state (mobile, no JS, reduced motion). From md up,
- * when motion is allowed, the section gets `.epingle`: the three windows share one stage and cross-fade
- * on each `etape` event of the shared engine (src/scripts/pistes.ts), and each window plays its
+ * when motion is allowed, the section gets `.epingle`: the three windows are stacked one behind the
+ * other ("Time Machine": on each `etape` event of the shared engine, src/scripts/pistes.ts, the front
+ * window flies towards the viewer and the next one comes forward), and each window plays its
  * animation — sources connecting one by one with a counter, then the conversation and the migration
  * bars, then the channels and the Inès → Owl exchange.
  *
@@ -139,10 +140,8 @@ function init(section: HTMLElement) {
   let k = 0;
 
   function afficher() {
-    etats.forEach((el, i) => {
-      el.classList.toggle('actif', i === k);
-      el.classList.toggle('apres', i < k);
-    });
+    // Distance from the current step: drives the "Time Machine" stack in the component's CSS.
+    etats.forEach((el, i) => (el.dataset.d = String(i - k)));
     pas.forEach((p, i) => (p.dataset.etat = i < k ? 'fait' : i === k ? 'actif' : 'a-venir'));
     // Hidden windows keep their CTA out of the tab order.
     if (epingle && k !== 2) cta?.setAttribute('tabindex', '-1');
