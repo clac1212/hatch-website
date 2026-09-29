@@ -63,15 +63,17 @@ if (agents.length !== slotCount) {
   throw new Error(`The agents mosaic has ${slotCount} slots, found ${agents.length} agents`);
 }
 
+// Desktop ratios = the v4 mosaic flattened to ~70 % of its height (César: keep the masonry, make it
+// more compact), so the whole section fits in one screen at 1440 × 900.
 const sizeClass: Record<Size, string> = {
-  tall: 'col-span-2 aspect-[4/5] md:aspect-[16/10] lg:aspect-[403/537]',
-  mid: 'aspect-[4/5] lg:aspect-square',
-  short: 'aspect-[4/5] lg:aspect-[403/302]',
+  tall: 'col-span-2 aspect-[4/3] md:aspect-[16/10] lg:aspect-[403/376]',
+  mid: 'aspect-square lg:aspect-[403/282]',
+  short: 'aspect-square lg:aspect-[403/211]',
 };
 const sizes: Record<Size, string> = {
-  tall: '(min-width: 1024px) 31vw, (min-width: 768px) 672px, 100vw',
-  mid: '(min-width: 1024px) 31vw, 50vw',
-  short: '(min-width: 1024px) 31vw, 50vw',
+  tall: '(min-width: 1024px) 360px, (min-width: 768px) 672px, 100vw',
+  mid: '(min-width: 1024px) 360px, 50vw',
+  short: '(min-width: 1024px) 360px, 50vw',
 };
 
 let next = 0;
@@ -80,20 +82,20 @@ const pageHref = (slug: string) => (locale === 'fr' ? `/agents/${slug}` : `/en/a
 ---
 
 <section id="agents" aria-labelledby="equipe-titre" class="bg-white" data-rv-groupe>
-  <div class="mx-auto max-w-[1440px] px-5 py-20 md:px-12 lg:px-24 lg:py-28">
-    <div class="grid grid-cols-2 gap-3 md:gap-5 lg:flex lg:items-start">
+  <div class="mx-auto max-w-[1216px] px-5 py-16 md:px-12 lg:py-20">
+    <div class="grid grid-cols-2 gap-3 md:gap-4 lg:flex lg:items-start">
       {
         mosaic.map((col, c) => (
-          <div class="contents lg:flex lg:flex-1 lg:flex-col lg:gap-5">
+          <div class="contents lg:flex lg:flex-1 lg:flex-col lg:gap-4">
             {c === 0 && (
-              <div data-rv class="col-span-2 flex flex-col gap-4 pt-2 pr-2 pb-3 lg:pb-5">
+              <div data-rv class="col-span-2 flex flex-col gap-3 pt-1 pr-2 pb-2 lg:pb-3">
                 <h2
                   id="equipe-titre"
-                  class="font-display text-[34px] leading-[1.08] font-bold tracking-[-1px] text-ink lg:text-[44px] lg:leading-[47px]"
+                  class="font-display text-[32px] leading-[1.08] font-bold tracking-[-1px] text-ink lg:text-[38px] lg:leading-[41px]"
                 >
                   {data.title}
                 </h2>
-                <p class="max-w-[34rem] text-base leading-[25px] text-soft">{data.lead}</p>
+                <p class="max-w-[34rem] text-[15px] leading-[23px] text-soft">{data.lead}</p>
               </div>
             )}
             {col.map(({ size, rd, agent }) => {
@@ -110,11 +112,11 @@ const pageHref = (slug: string) => (locale === 'fr' ? `/agents/${slug}` : `/en/a
                       formats={['avif', 'webp']}
                       widths={[360, 540, 720, 820]}
                       sizes={sizes[size]}
-                      class="absolute inset-0 size-full object-cover transition-transform duration-[1.4s] ease-hatch group-hover:scale-[1.07] group-focus-visible:scale-[1.07]"
+                      class="absolute inset-0 size-full object-cover lg:object-[center_28%] transition-transform duration-[1.4s] ease-hatch group-hover:scale-[1.07] group-focus-visible:scale-[1.07]"
                     />
-                    <div class="absolute inset-x-2 bottom-2 flex min-h-[56px] items-center justify-between gap-2 rounded-[14px] bg-white/55 py-2 pr-2 pl-3 shadow-[0_8px_20px_color-mix(in_srgb,var(--color-shadow)_12%,transparent)] outline outline-1 -outline-offset-[0.5px] outline-white/80 backdrop-blur-[7px] transition-[translate,background-color] duration-600 ease-hatch group-hover:-translate-y-[3px] group-hover:bg-white/80 group-focus-visible:-translate-y-[3px] group-focus-visible:bg-white/80 md:inset-x-3.5 md:bottom-3.5 md:h-16 md:py-0 md:pr-2.5 md:pl-4">
+                    <div class="absolute inset-x-2 bottom-2 flex min-h-[56px] items-center justify-between gap-2 rounded-[14px] bg-white/55 py-2 pr-2 pl-3 shadow-[0_8px_20px_color-mix(in_srgb,var(--color-shadow)_12%,transparent)] outline outline-1 -outline-offset-[0.5px] outline-white/80 backdrop-blur-[7px] transition-[translate,background-color] duration-600 ease-hatch group-hover:-translate-y-[3px] group-hover:bg-white/80 group-focus-visible:-translate-y-[3px] group-focus-visible:bg-white/80 md:inset-x-3 md:bottom-3 md:h-14 md:py-0 md:pr-2 md:pl-3.5">
                       <div class="flex min-w-0 flex-col-reverse gap-[3px]">
-                        <h3 class="font-display text-[19px] leading-tight font-bold text-ink md:text-[21px]">
+                        <h3 class="font-display text-[18px] leading-tight font-bold text-ink md:text-[19px]">
                           {agent.name}
                         </h3>
                         <p class="font-mono text-[10px] leading-[1.27] tracking-[0.05em] text-orange-txt uppercase md:tracking-[0.1em]">
@@ -123,7 +125,7 @@ const pageHref = (slug: string) => (locale === 'fr' ? `/agents/${slug}` : `/en/a
                       </div>
                       <span
                         aria-hidden="true"
-                        class="flex size-8 shrink-0 items-center justify-center rounded-full bg-ink transition-[background-color,translate] duration-[350ms] ease-hatch group-hover:translate-x-[3px] group-hover:bg-orange group-focus-visible:translate-x-[3px] group-focus-visible:bg-orange md:size-10"
+                        class="flex size-8 shrink-0 items-center justify-center rounded-full bg-ink transition-[background-color,translate] duration-[350ms] ease-hatch group-hover:translate-x-[3px] group-hover:bg-orange group-focus-visible:translate-x-[3px] group-focus-visible:bg-orange md:size-9"
                       >
                         <svg viewBox="0 0 24 24" class="size-4 fill-white">
                           <path d="M4 11v2h16v-2zm12 2v2h2v-2zm-2 2v2h2v-2zm-2 2v2h2v-2zm4-6V9h2v2zm-2 4V7h2v8zm-2 2V5h2v12z" />
