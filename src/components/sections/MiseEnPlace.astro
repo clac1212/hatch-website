@@ -561,27 +561,34 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
     inset: 0;
     background: var(--color-white);
     pointer-events: none;
-    transition: opacity 0.45s ease-out 0.3s;
+    transition:
+      opacity 0.45s ease-out 0.3s,
+      background-color 0.6s var(--courbe-apple);
   }
   .epingle .mep-etat[data-d='0'] {
     z-index: 3;
     pointer-events: auto;
   }
-  .epingle .mep-etat[data-d='0'] .fenetre::after {
+  .epingle .mep-etat:is([data-d='0'], [data-d='-1'], [data-d='-2']) .fenetre::after {
     opacity: 0;
   }
   .epingle .mep-etat:not([data-d='0']) .fenetre {
     box-shadow: none;
   }
+  /* Sheets are opaque (no see-through between them): a solid tint, darker with depth. */
   .epingle .mep-etat[data-d='1'] {
     z-index: 2;
-    opacity: 0.32;
     transform: translateY(-14px) scale(0.95);
+  }
+  .epingle .mep-etat[data-d='1'] .fenetre::after {
+    background-color: color-mix(in srgb, var(--color-white) 34%, var(--color-night));
   }
   .epingle .mep-etat[data-d='2'] {
     z-index: 1;
-    opacity: 0.14;
     transform: translateY(-27px) scale(0.9);
+  }
+  .epingle .mep-etat[data-d='2'] .fenetre::after {
+    background-color: color-mix(in srgb, var(--color-white) 17%, var(--color-night));
   }
   .epingle .mep-etat:is([data-d='1'], [data-d='2']) .fenetre::after {
     transition-delay: 0s;
