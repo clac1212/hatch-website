@@ -11,6 +11,7 @@ import jay from '../../assets/equipe/jay.jpg';
 import pecker from '../../assets/equipe/pecker.jpg';
 import lark from '../../assets/equipe/lark.jpg';
 import sparrow from '../../assets/equipe/sparrow.jpg';
+import { cadrage } from './equipe-cadrage';
 
 /**
  * 05 — "Rencontrez vos nouveaux collègues" (v4 node W8OOQW): a 3-column mosaic of the seven agents.
@@ -34,8 +35,18 @@ const agents = (await getCollection('agents', (e) => e.id.startsWith(`${locale}/
   .map((e) => {
     const slug = e.id.slice(locale.length + 1);
     const photo = photos[slug];
-    if (!photo) throw new Error(`No tile photo for agent "${slug}" in src/assets/equipe/`);
-    return { slug, photo, ...e.data };
+    const cadre = cadrage[slug];
+    if (!photo || !cadre) throw new Error(`No tile photo or framing for agent "${slug}"`);
+    const [x0, y0, x1, y1] = cadre.sujet;
+    const style = [
+      `--sx:${x0}`,
+      `--sy:${y0}`,
+      `--sw:${x1 - x0}`,
+      `--sh:${y1 - y0}`,
+      `--ratio:${photo.height / photo.width}`,
+      `background-color:${cadre.fond}`,
+    ].join(';');
+    return { slug, photo, style, ...e.data };
   });
 
 /**
@@ -70,10 +81,11 @@ const sizeClass: Record<Size, string> = {
   mid: 'aspect-square lg:aspect-[403/282]',
   short: 'aspect-square lg:aspect-[403/211]',
 };
+// The framed photo can be wider than its tile (it is sized on the subject, not on the tile).
 const sizes: Record<Size, string> = {
-  tall: '(min-width: 1024px) 360px, (min-width: 768px) 672px, 100vw',
-  mid: '(min-width: 1024px) 360px, 50vw',
-  short: '(min-width: 1024px) 360px, 50vw',
+  tall: '(min-width: 1024px) 520px, (min-width: 768px) 720px, 100vw',
+  mid: '(min-width: 1024px) 460px, 60vw',
+  short: '(min-width: 1024px) 420px, 60vw',
 };
 
 let next = 0;
@@ -104,6 +116,7 @@ const pageHref = (slug: string) => (locale === 'fr' ? `/agents/${slug}` : `/en/a
                 <div data-rv style={`--rd:${rd * 0.09}s`} class={sizeClass[size]}>
                   <Tag
                     href={agent.page ? pageHref(agent.slug) : undefined}
+                    style={agent.style}
                     class="tuile group relative block size-full overflow-hidden rounded-[20px] after:pointer-events-none after:absolute after:inset-0 after:rounded-[20px] after:border-2 after:border-transparent after:transition-colors after:duration-400 hover:after:border-orange focus-visible:after:border-orange"
                   >
                     <Picture
@@ -112,7 +125,7 @@ const pageHref = (slug: string) => (locale === 'fr' ? `/agents/${slug}` : `/en/a
                       formats={['avif', 'webp']}
                       widths={[360, 540, 720, 820]}
                       sizes={sizes[size]}
-                      class="absolute inset-0 size-full object-cover lg:object-[center_28%] transition-transform duration-[1.4s] ease-hatch group-hover:scale-[1.07] group-focus-visible:scale-[1.07]"
+                      class="photo-cadree transition-transform duration-[1.4s] ease-hatch group-hover:scale-[1.07] group-focus-visible:scale-[1.07]"
                     />
                     <div class="absolute inset-x-2 bottom-2 flex min-h-[56px] items-center justify-between gap-2 rounded-[14px] bg-white/55 py-2 pr-2 pl-3 shadow-[0_8px_20px_color-mix(in_srgb,var(--color-shadow)_12%,transparent)] outline outline-1 -outline-offset-[0.5px] outline-white/80 backdrop-blur-[7px] transition-[translate,background-color] duration-600 ease-hatch group-hover:-translate-y-[3px] group-hover:bg-white/80 group-focus-visible:-translate-y-[3px] group-focus-visible:bg-white/80 md:inset-x-3 md:bottom-3 md:h-14 md:py-0 md:pr-2 md:pl-3.5">
                       <div class="flex min-w-0 flex-col-reverse gap-[3px]">
@@ -142,3 +155,35 @@ const pageHref = (slug: string) => (locale === 'fr' ? `/agents/${slug}` : `/en/a
     </div>
   </div>
 </section>
+
+<style>
+  /*
+   * Per-agent framing (values in equipe-cadrage.ts): the photo is sized so that its subject box fits
+   * 88 % of the tile width and 94 % of the zone above the label, then centred in that zone. Where the
+   * photo doesn't reach the tile edges, the tile shows the render's backdrop colour; the photo's own
+   * edges are feathered so the seam disappears.
+   */
+  .tuile {
+    container-type: size;
+    --etiquette: 72px;
+  }
+  @media (min-width: 768px) {
+    .tuile {
+      --etiquette: 70px;
+    }
+  }
+  .tuile :global(img.photo-cadree) {
+    --zone: calc(100cqh - var(--etiquette));
+    --largeur: min(calc(88cqw / var(--sw)), calc(var(--zone) * 0.94 / (var(--sh) * var(--ratio))));
+    position: absolute;
+    max-width: none;
+    width: var(--largeur);
+    height: auto;
+    left: calc(50cqw - (var(--sx) + var(--sw) / 2) * var(--largeur));
+    top: calc(var(--zone) / 2 - (var(--sy) + var(--sh) / 2) * var(--ratio) * var(--largeur));
+    mask-image:
+      linear-gradient(to right, transparent, black 7%, black 93%, transparent),
+      linear-gradient(to bottom, transparent, black 7%, black 93%, transparent);
+    mask-composite: intersect;
+  }
+</style>
