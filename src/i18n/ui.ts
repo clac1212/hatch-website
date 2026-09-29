@@ -2,15 +2,19 @@ export const locales = ['fr', 'en'] as const;
 export type Locale = (typeof locales)[number];
 
 /**
- * Every page of the site, with its URL in each locale. Pages pass their key to <Base>,
- * which derives the language switch and the hreflang alternates from it.
+ * Every static page of the site, with its URL in each locale. Pages pass `routes.<key>` to <Base>
+ * as `paths`, which derives the language switch and the hreflang alternates from it
+ * (dynamic pages, e.g. a Sans Filtre edition, build their own `paths` object).
  */
 export const routes = {
   home: { fr: '/', en: '/en/' },
   demo: { fr: '/demo', en: '/en/demo' },
   security: { fr: '/securite', en: '/en/security' },
+  terms: { fr: '/conditions', en: '/en/terms' },
+  privacy: { fr: '/confidentialite', en: '/en/privacy' },
+  sansFiltre: { fr: '/sans-filtre', en: '/en/unfiltered' },
 } as const satisfies Record<string, Record<Locale, string>>;
-export type Route = keyof typeof routes;
+export type Paths = Record<Locale, string>;
 
 /** Short UI strings (nav, footer, buttons, accessibility labels). Marketing copy lives in src/content/. */
 const fr = {
@@ -22,7 +26,7 @@ const fr = {
   'nav.cases': 'Cas clients',
   'nav.pricing': 'Tarifs',
   'nav.security': 'Sécurité',
-  'cta.demo': 'Demander une démo',
+  'cta.demo': 'Réserver une démo',
   'lang.switch': 'English',
   'footer.tagline': "L'OS des réseaux de franchise.",
   'footer.product': 'Produit',

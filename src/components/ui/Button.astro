@@ -2,24 +2,44 @@
 import type { HTMLAttributes } from 'astro/types';
 
 /**
- * "Bouton principal" from the DS: ink on light backgrounds, cream on night.
- * The site has a single call to action (book a demo), so this is the only button style.
+ * Buttons of the v4 mockups. The site has a single call to action (book a demo), in three looks:
+ * - `orange`: the pill of the nav and the hero (`size` sm | lg);
+ * - `ink`: dark block button of the pricing cards, turns orange on hover;
+ * - `cream`: its counterpart on night backgrounds (footer, dark pricing card).
+ * All are "vif": they lift on hover, the arrow slides and a light sweep crosses them.
  */
 interface Props extends HTMLAttributes<'a'> {
   href: string;
-  tone?: 'day' | 'night';
+  variant?: 'orange' | 'ink' | 'cream';
+  size?: 'sm' | 'lg';
+  block?: boolean;
 }
 
-const { href, tone = 'day', class: className, ...rest } = Astro.props;
+const {
+  href,
+  variant = 'orange',
+  size = 'sm',
+  block = false,
+  class: className,
+  ...rest
+} = Astro.props;
 ---
 
 <a
   href={href}
   class:list={[
-    'group inline-flex items-center gap-2.5 rounded-btn px-5.5 py-3.5 text-[0.9375rem] font-semibold transition-colors duration-200',
-    tone === 'day'
-      ? 'bg-ink text-white hover:bg-orange-hover'
-      : 'bg-cream text-ink hover:bg-orange-tint',
+    'btn-vif inline-flex items-center whitespace-nowrap',
+    block && 'w-full justify-center',
+    variant === 'orange' && [
+      'rounded-full bg-orange font-bold text-white',
+      size === 'sm'
+        ? 'gap-2 px-5 py-3 text-[0.875rem] shadow-[0_6px_16px_rgb(248_122_1/0.35)]'
+        : 'gap-2.5 px-6 py-4 text-base shadow-[0_10px_24px_rgb(248_122_1/0.4)]',
+    ],
+    variant === 'ink' &&
+      'gap-2.5 rounded-btn bg-ink px-5.5 py-3.5 text-[0.9375rem] font-semibold text-white hover:bg-orange',
+    variant === 'cream' &&
+      'gap-2.5 rounded-btn bg-cream px-5.5 py-3.5 text-[0.9375rem] font-semibold text-ink',
     className,
   ]}
   {...rest}
@@ -27,10 +47,7 @@ const { href, tone = 'day', class: className, ...rest } = Astro.props;
   <slot />
   <svg
     viewBox="0 0 24 24"
-    class:list={[
-      'size-4 transition-transform duration-200 ease-hatch group-hover:translate-x-0.5',
-      tone === 'day' ? 'text-orange' : 'text-ink',
-    ]}
+    class:list={[variant === 'orange' && size === 'lg' ? 'size-[18px]' : 'size-4']}
     fill="none"
     stroke="currentColor"
     stroke-width="2.25"
@@ -38,6 +55,6 @@ const { href, tone = 'day', class: className, ...rest } = Astro.props;
     stroke-linejoin="round"
     aria-hidden="true"
   >
-    <path d="M5 12h14M13 6l6 6-6 6"></path>
+    <path d="M5 12h14M12 5l7 7-7 7"></path>
   </svg>
 </a>

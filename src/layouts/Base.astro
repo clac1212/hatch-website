@@ -3,17 +3,18 @@ import { Font } from 'astro:assets';
 import SpeedInsights from '@vercel/speed-insights/astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
-import { locales, routes, useTranslations, type Locale, type Route } from '../i18n/ui';
+import { locales, useTranslations, type Locale, type Paths } from '../i18n/ui';
 import '../styles/global.css';
 
 interface Props {
   locale: Locale;
-  route: Route;
+  /** This page's URL in each locale (usually `routes.<key>`). */
+  paths: Paths;
   title: string;
   description: string;
 }
 
-const { locale, route, title, description } = Astro.props;
+const { locale, paths, title, description } = Astro.props;
 const t = useTranslations(locale);
 // `site` is set in astro.config.mjs, so Astro.site is always defined.
 const site = Astro.site!;
@@ -21,38 +22,46 @@ const url = (path: string) => new URL(path, site).href;
 ---
 
 <!doctype html>
-<html lang={locale}>
+<html lang={locale} class="no-js scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>
+      document.documentElement.classList.remove('no-js');
+    </script>
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={url(routes[route][locale])} />
-    {locales.map((l) => <link rel="alternate" hreflang={l} href={url(routes[route][l])} />)}
-    <link rel="alternate" hreflang="x-default" href={url(routes[route].fr)} />
+    <link rel="canonical" href={url(paths[locale])} />
+    {locales.map((l) => <link rel="alternate" hreflang={l} href={url(paths[l])} />)}
+    <link rel="alternate" hreflang="x-default" href={url(paths.fr)} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={url(routes[route][locale])} />
+    <meta property="og:url" content={url(paths[locale])} />
     <meta property="og:locale" content={locale === 'fr' ? 'fr_FR' : 'en_US'} />
     <Font cssVariable="--font-fraunces" />
     <Font cssVariable="--font-inter" preload />
     <Font cssVariable="--font-departure" preload />
   </head>
-  <body class="min-h-dvh">
+  <body class="min-h-dvh overflow-x-clip">
     <a
       href="#contenu"
-      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[60] focus:rounded-btn focus:bg-ink focus:px-4 focus:py-2 focus:text-white"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[70] focus:rounded-btn focus:bg-ink focus:px-4 focus:py-2 focus:text-white"
     >
       {t('a11y.skip')}
     </a>
-    <Nav locale={locale} route={route} />
+    <Nav locale={locale} paths={paths} />
     <main id="contenu">
       <slot />
     </main>
-    <Footer locale={locale} route={route} />
+    <Footer locale={locale} paths={paths} />
     <SpeedInsights />
+    <script>
+      // After every section script, so their `etape` / `apparition` listeners are in place.
+      import '../scripts/reveal';
+      import '../scripts/pistes';
+    </script>
   </body>
 </html>

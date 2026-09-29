@@ -17,6 +17,13 @@
   --color-night-2: #1a1a18; /* card on night */
   --color-line-night: #2a2a27; /* rule on night */
   --color-white: #ffffff;
+  --color-black: #000000;
+  --color-paper: #f7f4ee; /* light card variant used in the v4 mockups */
+  --color-stone: #d9d3c7; /* muted rule / chip on cream */
+  --color-muted: #8a847a; /* tertiary text, metadata */
+  --color-peach: #ffd2b8; /* orange-tinted fills in mockups */
+  --color-peach-2: #fff1e8;
+  --color-shadow: #2a1003; /* warm shadow tint, use with an alpha (/10, /20…) */
 
   /* Text and rules */
   --color-ink: #12120f; /* 17.7:1 on cream */
@@ -29,6 +36,16 @@
   --color-orange-hover: #8a4300;
   --color-orange-tint: #fdeadb;
   --color-copper: #c98a4b; /* secondary chart series */
+
+  /* Product UI mockups only (phones, chat threads, app windows) — never for site chrome. */
+  --color-success: #16a34a;
+  --color-whatsapp: #d9fdd3;
+  --color-gray-50: #fafafa;
+  --color-gray-100: #eeeeee;
+  --color-gray-400: #bbbbbb;
+  --color-gray-500: #888888;
+  --color-gray-700: #555555;
+  --color-gray-800: #333333;
 
   /* Type scale — fluid between mobile and the 1440 px desktop mockups */
   --text-h1: clamp(2.25rem, 1.4rem + 3.4vw, 4rem);
@@ -109,5 +126,85 @@
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
     }
+  }
+}
+
+/* ---------- Shared behaviours (ported from the v4 prototype) ---------- */
+@layer components {
+  /* "Bouton vif": lifts on hover, arrow slides, a light sweep crosses it. */
+  .btn-vif {
+    position: relative;
+    overflow: hidden;
+    transition:
+      transform 0.35s var(--ease-hatch),
+      box-shadow 0.35s var(--ease-hatch),
+      background-color 0.35s;
+  }
+  .btn-vif:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgb(248 122 1 / 0.32);
+  }
+  .btn-vif:active {
+    transform: translateY(0) scale(0.98);
+  }
+  .btn-vif svg {
+    transition: transform 0.35s var(--ease-hatch);
+  }
+  .btn-vif:hover svg {
+    transform: translateX(4px);
+  }
+  .btn-vif::after {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    width: 40%;
+    left: -60%;
+    background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.35), transparent);
+    transform: skewX(-18deg);
+    transition: left 0.7s var(--ease-hatch);
+    pointer-events: none;
+  }
+  .btn-vif:hover::after {
+    left: 130%;
+  }
+
+  /* Reveal on scroll: elements marked [data-rv] fade up once their section enters (src/scripts/reveal.ts). */
+  [data-rv] {
+    opacity: 0;
+    translate: 0 22px;
+    transition:
+      opacity 0.8s var(--ease-hatch),
+      translate 0.9s var(--ease-hatch);
+    transition-delay: var(--rd, 0s);
+  }
+  [data-rv].vu,
+  .no-js [data-rv] {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  /* Pinned tracks (src/scripts/pistes.ts): the section sticks while its track scrolls. */
+  .piste {
+    position: relative;
+  }
+  .collant {
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    overflow: hidden;
+  }
+  /* A fixed-size stage (design px) scaled to fit the viewport, centred. */
+  .cadre-piste {
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform-origin: 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-rv] {
+    opacity: 1;
+    translate: none;
   }
 }

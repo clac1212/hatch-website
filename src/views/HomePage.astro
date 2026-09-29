@@ -1,29 +1,36 @@
 ---
 import { getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import Button from '../components/ui/Button.astro';
-import { routes, useTranslations, type Locale } from '../i18n/ui';
+import Hero from '../components/sections/Hero.astro';
+import Clients from '../components/sections/Clients.astro';
+import Probleme from '../components/sections/Probleme.astro';
+import Demo from '../components/sections/Demo.astro';
+import Equipe from '../components/sections/Equipe.astro';
+import Cas from '../components/sections/Cas.astro';
+import MiseEnPlace from '../components/sections/MiseEnPlace.astro';
+import Securite from '../components/sections/Securite.astro';
+import Tarifs from '../components/sections/Tarifs.astro';
+import { routes, type Locale } from '../i18n/ui';
 
-/** The home page, shared by src/pages/index.astro (FR) and src/pages/en/index.astro (EN). */
+/** The home page, shared by src/pages/index.astro (FR) and src/pages/en/index.astro (EN). Order = v4 prototype. */
 interface Props {
   locale: Locale;
 }
 
 const { locale } = Astro.props;
-const t = useTranslations(locale);
 const home = await getEntry('home', locale);
 if (!home) throw new Error(`Missing src/content/home/${locale}.yaml`);
-const { seo, hero } = home.data;
+const { seo } = home.data;
 ---
 
-<Base locale={locale} route="home" title={seo.title} description={seo.description}>
-  <section
-    class="mx-auto flex min-h-dvh max-w-site flex-col justify-center gap-6 px-6 pt-32 pb-20 md:px-8"
-  >
-    <h1 class="max-w-4xl font-mono text-h1">{hero.h1}</h1>
-    <p class="max-w-prose text-body text-soft">{hero.lead}</p>
-    <div>
-      <Button href={routes.demo[locale]}>{t('cta.demo')}</Button>
-    </div>
-  </section>
+<Base locale={locale} paths={routes.home} title={seo.title} description={seo.description}>
+  <Hero locale={locale} />
+  <Clients locale={locale} />
+  <Probleme locale={locale} />
+  <Demo locale={locale} />
+  <Equipe locale={locale} />
+  <Cas locale={locale} />
+  <MiseEnPlace locale={locale} />
+  <Securite locale={locale} />
+  <Tarifs locale={locale} />
 </Base>

@@ -1,0 +1,13 @@
+---
+import { section } from '../../content/section';
+import type { Locale } from '../../i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const data = await section('probleme', locale);
+---
+
+<section data-todo={String(data.todo)}></section>

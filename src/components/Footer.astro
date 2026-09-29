@@ -1,14 +1,14 @@
 ---
 import Logo from './ui/Logo.astro';
-import { routes, otherLocale, useTranslations, type Locale, type Route } from '../i18n/ui';
+import { routes, otherLocale, useTranslations, type Locale, type Paths } from '../i18n/ui';
 
 /** Minimal footer for the foundation; the voxel "immeuble" footer replaces it in lot 3. */
 interface Props {
   locale: Locale;
-  route: Route;
+  paths: Paths;
 }
 
-const { locale, route } = Astro.props;
+const { locale, paths } = Astro.props;
 const t = useTranslations(locale);
 const home = routes.home[locale];
 const other = otherLocale(locale);
@@ -58,7 +58,7 @@ const social = [
         }
         <li>
           <a
-            href={routes[route][other]}
+            href={paths[other]}
             hreflang={other}
             lang={other}
             class="text-caption hover:text-orange"

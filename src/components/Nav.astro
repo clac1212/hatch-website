@@ -1,14 +1,15 @@
 ---
 import Logo from './ui/Logo.astro';
 import Button from './ui/Button.astro';
-import { routes, otherLocale, useTranslations, type Locale, type Route } from '../i18n/ui';
+import { routes, otherLocale, useTranslations, type Locale, type Paths } from '../i18n/ui';
 
+/** v4 nav: liquid-glass pill, centred and fixed at the top; a drop shadow appears once the page scrolls. */
 interface Props {
   locale: Locale;
-  route: Route;
+  paths: Paths;
 }
 
-const { locale, route } = Astro.props;
+const { locale, paths } = Astro.props;
 const t = useTranslations(locale);
 const home = routes.home[locale];
 const links = [
@@ -20,93 +21,106 @@ const links = [
 const other = otherLocale(locale);
 ---
 
-<header class="fixed inset-x-0 top-4 z-50 px-4">
+<header class="pointer-events-none fixed inset-x-0 top-3 z-60 flex justify-center px-3 md:top-5">
   <nav
+    id="nav"
     aria-label={t('a11y.mainNav')}
-    class="mx-auto flex max-w-[78rem] items-center justify-between gap-6 rounded-full border border-white/80 bg-cream/85 py-2.5 pr-2.5 pl-6 shadow-2 backdrop-blur-[18px]"
+    class="pointer-events-auto flex w-full max-w-max items-center gap-1.5 rounded-full bg-white/48 py-2 pr-2 pl-5 shadow-[0_12px_32px_rgb(26_14_0/0.18),inset_0_1px_0_rgb(255_255_255/0.9),inset_0_-1px_2px_rgb(255_255_255/0.35)] outline outline-1 -outline-offset-1 outline-white/70 backdrop-blur-[15px] transition-[filter] duration-500 max-sm:justify-between md:pl-6 [&.defile]:drop-shadow-[0_10px_24px_rgb(20_10_0/0.18)]"
   >
     <a href={home} aria-label={t('a11y.home')} class="shrink-0">
-      <Logo class="w-[88px] md:w-[100px]" />
+      <Logo class="w-[80px] md:w-[92px]" />
     </a>
+    <span class="mx-2 hidden h-[22px] w-px bg-ink/15 lg:block" aria-hidden="true"></span>
 
-    <ul class="hidden items-center gap-8 lg:flex">
+    <ul class="hidden items-center gap-0.5 lg:flex">
       {
         links.map((link) => (
           <li>
             <a
               href={link.href}
-              class="text-[0.9375rem] font-medium transition-colors hover:text-orange-txt"
+              class="block rounded-full px-3.5 py-2.5 text-[0.875rem] font-semibold transition-colors duration-300 hover:bg-orange/14 hover:text-orange-hover"
             >
               {link.label}
             </a>
           </li>
         ))
       }
+      <li>
+        <a
+          href={paths[other]}
+          hreflang={other}
+          lang={other}
+          class="block rounded-full px-3 py-2.5 font-mono text-[0.75rem] uppercase transition-colors duration-300 hover:bg-orange/14 hover:text-orange-hover"
+        >
+          {other}<span class="sr-only"> · {t('lang.switch')}</span>
+        </a>
+      </li>
     </ul>
 
-    <div class="flex items-center gap-5">
-      <a
-        href={routes[route][other]}
-        hreflang={other}
-        lang={other}
-        class="hidden font-mono text-kicker uppercase transition-colors hover:text-orange-txt sm:block"
-      >
-        {other}<span class="sr-only"> · {t('lang.switch')}</span>
-      </a>
-      <Button href={routes.demo[locale]} class="hidden rounded-full sm:inline-flex">
-        {t('cta.demo')}
-      </Button>
+    <Button href={routes.demo[locale]} class="max-sm:px-4 max-sm:text-[0.8125rem]">
+      {t('cta.demo')}
+    </Button>
 
-      <details class="group relative lg:hidden">
-        <summary
-          class="flex size-11 cursor-pointer list-none items-center justify-center rounded-full bg-ink text-white [&::-webkit-details-marker]:hidden"
+    <details class="group relative lg:hidden">
+      <summary
+        class="flex size-10 cursor-pointer list-none items-center justify-center rounded-full text-ink hover:bg-orange/14 [&::-webkit-details-marker]:hidden"
+      >
+        <span class="sr-only">{t('a11y.menu')}</span>
+        <svg
+          viewBox="0 0 24 24"
+          class="size-5"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          aria-hidden="true"
         >
-          <span class="sr-only">{t('a11y.menu')}</span>
-          <svg
-            viewBox="0 0 24 24"
-            class="size-5"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            aria-hidden="true"
-          >
-            <path d="M4 7h16M4 12h16M4 17h16" class="group-open:hidden"></path>
-            <path d="M6 6l12 12M18 6L6 18" class="hidden group-open:block"></path>
-          </svg>
-        </summary>
-        <div
-          class="absolute top-full right-0 mt-3 w-64 rounded-card border border-line bg-surface p-3 shadow-3"
-        >
-          <ul class="flex flex-col">
-            {
-              links.map((link) => (
-                <li>
-                  <a
-                    href={link.href}
-                    class="block rounded-btn px-3 py-2.5 font-medium hover:bg-cream-2"
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))
-            }
-            <li>
-              <a
-                href={routes[route][other]}
-                hreflang={other}
-                lang={other}
-                class="block rounded-btn px-3 py-2.5 font-medium hover:bg-cream-2"
-              >
-                {t('lang.switch')}
-              </a>
-            </li>
-          </ul>
-          <Button href={routes.demo[locale]} class="mt-2 w-full justify-center">
-            {t('cta.demo')}
-          </Button>
-        </div>
-      </details>
-    </div>
+          <path d="M4 7h16M4 12h16M4 17h16" class="group-open:hidden"></path>
+          <path d="M6 6l12 12M18 6L6 18" class="hidden group-open:block"></path>
+        </svg>
+      </summary>
+      <div
+        class="absolute top-full right-0 mt-3 w-64 rounded-card border border-line bg-surface p-2 shadow-3"
+      >
+        <ul class="flex flex-col">
+          {
+            links.map((link) => (
+              <li>
+                <a
+                  href={link.href}
+                  class="block rounded-btn px-3 py-2.5 font-semibold hover:bg-orange-tint"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
+          <li>
+            <a
+              href={paths[other]}
+              hreflang={other}
+              lang={other}
+              class="block rounded-btn px-3 py-2.5 font-semibold hover:bg-orange-tint"
+            >
+              {t('lang.switch')}
+            </a>
+          </li>
+        </ul>
+      </div>
+    </details>
   </nav>
 </header>
+
+<script>
+  // Rendered by this component, so it always exists.
+  const nav = document.getElementById('nav')!;
+  const maj = () => nav.classList.toggle('defile', scrollY > 20);
+  addEventListener('scroll', maj, { passive: true });
+  maj();
+  // Close the mobile menu once a link is followed (same-page anchors don't reload the page).
+  document
+    .querySelectorAll<HTMLAnchorElement>('#nav details a')
+    .forEach((a) =>
+      a.addEventListener('click', () => a.closest('details')!.removeAttribute('open')),
+    );
+</script>
