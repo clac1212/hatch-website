@@ -1,9 +1,14 @@
 /**
- * 03 — Problème: renders each step of the pinned track (ported from the v4 prototype, `etatProbleme`).
+ * 03 — Problème: three beats on a short pinned track (ported from the v4 prototype `etatProbleme`,
+ * then condensed after César's review: the 15 scroll steps were too long and hard to follow).
  *
- * Steps (16, driven by src/scripts/pistes.ts):
- *   0 empty lock screen · 1-7 a notification arrives (the phone vibrates) · 8-14 an agent answers
- *   (most recent first) · 15 only Hatch's summary is left.
+ * Scroll steps (driven by src/scripts/pistes.ts):
+ *   0 the avalanche — once the section is on screen, the 7 notifications drop on their own
+ *     (the phone vibrates, the clock and the 3 / 12 / 30 sites gauge move), no scrolling needed;
+ *   1 "Hatch s'en occupe" — every card flips to its agent's answer, in a quick cascade;
+ *   2 only Hatch's summary is left.
+ * Inside a step, time plays the animation: an internal counter walks the prototype's 16 states
+ * (0 empty · 1-7 arrivals · 8-14 answers · 15 summary) one at a time.
  *
  * Runs before the engine (Base.astro imports it last), so it can drop the track under reduced motion
  * and size the portrait stage before the engine's first framing.
@@ -69,14 +74,13 @@ function animer(section: HTMLElement) {
   const palier = (n: number) => (n <= 1 ? 0 : n <= 3 ? 1 : 2);
   let precedente = -1;
 
-  section.addEventListener('etape', (ev) => {
-    const e = (ev as CustomEvent<number>).detail;
+  const rendre = (e: number) => {
     const arrivees = Math.min(e, 7);
     const reponses = e >= 8 ? Math.min(e - 7, 7) : 0;
     const fin = e >= 15;
     const arrivee = (j: number) => 6 - j < arrivees;
-    // A card leaves once the next agent has answered; everything but the summary leaves at the end.
-    const presente = (j: number) => arrivee(j) && !(fin || j < reponses - 1);
+    // Answered cards stay on screen (the answers are the point of beat 2); all leave for the summary.
+    const presente = (j: number) => arrivee(j) && !fin;
 
     cartes.forEach((el, k) => {
       const repondu = k < reponses;
@@ -109,5 +113,51 @@ function animer(section: HTMLElement) {
       vibreur.classList.add('vibre');
     }
     precedente = e;
+  };
+
+  // Internal state reached at the end of each scroll step, and the pace of each kind of change.
+  const FIN_ETAPE = [7, 14, 15];
+  const delai = (vers: number) => (vers <= 7 ? 450 : vers <= 14 ? 230 : 500);
+  const RETOUR = 60; // scrolling back up rewinds fast
+  let interne = 0;
+  let cible = 0;
+  let etapeScroll = 0;
+  let vue = false;
+  let minuterie: number | null = null;
+
+  const pas = () => {
+    minuterie = null;
+    if (interne === cible) return;
+    interne += Math.sign(cible - interne);
+    rendre(interne);
+    if (interne !== cible)
+      minuterie = window.setTimeout(pas, cible > interne ? delai(interne + 1) : RETOUR);
+  };
+  const viser = () => {
+    // The avalanche waits until the section is actually seen (the engine announces step 0 at load).
+    cible = etapeScroll === 0 && !vue ? 0 : FIN_ETAPE[etapeScroll];
+    if (minuterie === null) minuterie = window.setTimeout(pas, cible > interne ? 250 : RETOUR);
+  };
+
+  const force = new URLSearchParams(location.search).get('etape')?.match(/^probleme:(\d)$/);
+  section.addEventListener('etape', (ev) => {
+    etapeScroll = (ev as CustomEvent<number>).detail;
+    if (force) {
+      // Capture mode (?etape=probleme:k): show the end state of the step at once.
+      interne = FIN_ETAPE[etapeScroll];
+      rendre(interne);
+      return;
+    }
+    viser();
   });
+  new IntersectionObserver(
+    (entrees, obs) => {
+      if (!entrees.some((e) => e.isIntersecting)) return;
+      vue = true;
+      obs.disconnect();
+      viser();
+    },
+    { threshold: 0.5 },
+  ).observe(collant);
+  rendre(0);
 }
