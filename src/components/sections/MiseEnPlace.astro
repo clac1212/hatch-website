@@ -533,11 +533,13 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
     margin: 0;
   }
   /*
-   * "Time Machine" stack: the three windows sit one behind the other (data-d = distance from the
-   * current step, set by the script). The front one is the current step; those behind are smaller,
-   * higher and dimmed; a finished step flies towards the viewer and fades out. Shows the sequence.
+   * "Time Machine" stack (data-d = distance from the current step, set by the script). Only the front
+   * window shows content; the next ones are blank sheets peeking a few pixels above it, so the sequence
+   * reads without adding noise (the step bar below already names the steps). A finished window lifts
+   * towards the viewer and dissolves; the next sheet glides forward, then its content fades in.
    */
   .epingle .mep-etat {
+    --courbe-apple: cubic-bezier(0.32, 0.72, 0, 1);
     position: absolute;
     left: 120px;
     top: 330px;
@@ -545,30 +547,51 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
     transform-origin: 50% 0;
     pointer-events: none;
     transition:
-      transform 1s var(--ease-hatch),
-      opacity 0.8s var(--ease-hatch),
-      filter 0.8s var(--ease-hatch);
+      transform 0.95s var(--courbe-apple),
+      opacity 0.7s var(--courbe-apple),
+      filter 0.7s var(--courbe-apple);
+  }
+  .epingle .mep-etat .fenetre {
+    position: relative;
+  }
+  /* Blank sheet: a white veil over the window's content, lifted once the window is in front. */
+  .epingle .mep-etat .fenetre::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--color-white);
+    pointer-events: none;
+    transition: opacity 0.45s ease-out 0.3s;
   }
   .epingle .mep-etat[data-d='0'] {
     z-index: 3;
     pointer-events: auto;
   }
+  .epingle .mep-etat[data-d='0'] .fenetre::after {
+    opacity: 0;
+  }
+  .epingle .mep-etat:not([data-d='0']) .fenetre {
+    box-shadow: none;
+  }
   .epingle .mep-etat[data-d='1'] {
     z-index: 2;
-    opacity: 0.75;
-    transform: translateY(-48px) scale(0.93);
-    filter: brightness(0.62);
+    opacity: 0.32;
+    transform: translateY(-14px) scale(0.95);
   }
   .epingle .mep-etat[data-d='2'] {
     z-index: 1;
-    opacity: 0.45;
-    transform: translateY(-90px) scale(0.86);
-    filter: brightness(0.45);
+    opacity: 0.14;
+    transform: translateY(-27px) scale(0.9);
+  }
+  .epingle .mep-etat:is([data-d='1'], [data-d='2']) .fenetre::after {
+    transition-delay: 0s;
   }
   .epingle .mep-etat:is([data-d='-1'], [data-d='-2']) {
     z-index: 4;
     opacity: 0;
-    transform: translateY(90px) scale(1.12);
+    transform: translateY(18px) scale(1.04);
+    filter: blur(6px);
+    transition-duration: 0.7s, 0.5s, 0.5s;
   }
   .epingle .mep-etat-titre {
     position: absolute;
