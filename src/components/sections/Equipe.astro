@@ -38,12 +38,14 @@ const agents = (await getCollection('agents', (e) => e.id.startsWith(`${locale}/
     const cadre = cadrage[slug];
     if (!photo || !cadre) throw new Error(`No tile photo or framing for agent "${slug}"`);
     const [x0, y0, x1, y1] = cadre.sujet;
+    const [o0, o1] = cadre.oiseau;
     const style = [
       `--sx:${x0}`,
       `--sy:${y0}`,
       `--sw:${x1 - x0}`,
       `--sh:${y1 - y0}`,
       `--ratio:${photo.height / photo.width}`,
+      `--oiseau:${((o1 - o0) * photo.height) / photo.width}`,
       `background-color:${cadre.fond}`,
     ].join(';');
     return { slug, photo, style, ...e.data };
@@ -74,12 +76,12 @@ if (agents.length !== slotCount) {
   throw new Error(`The agents mosaic has ${slotCount} slots, found ${agents.length} agents`);
 }
 
-// Desktop ratios = the v4 mosaic flattened to ~70 % of its height (César: keep the masonry, make it
+// Desktop ratios = the v4 mosaic flattened to ~70-80 % of its height (César: keep the masonry, make it
 // more compact), so the whole section fits in one screen at 1440 × 900.
 const sizeClass: Record<Size, string> = {
   tall: 'col-span-2 aspect-[4/3] md:aspect-[16/10] lg:aspect-[403/376]',
   mid: 'aspect-square lg:aspect-[403/282]',
-  short: 'aspect-square lg:aspect-[403/211]',
+  short: 'aspect-square lg:aspect-[403/280]',
 };
 // The framed photo can be wider than its tile (it is sized on the subject, not on the tile).
 const sizes: Record<Size, string> = {
@@ -94,7 +96,7 @@ const pageHref = (slug: string) => (locale === 'fr' ? `/agents/${slug}` : `/en/a
 ---
 
 <section id="agents" aria-labelledby="equipe-titre" class="bg-white" data-rv-groupe>
-  <div class="mx-auto max-w-[1216px] px-5 py-16 md:px-12 lg:py-20">
+  <div class="section-y mx-auto max-w-[1216px] px-5 md:px-12">
     <div class="grid grid-cols-2 gap-3 md:gap-4 lg:flex lg:items-start">
       {
         mosaic.map((col, c) => (
@@ -158,10 +160,10 @@ const pageHref = (slug: string) => (locale === 'fr' ? `/agents/${slug}` : `/en/a
 
 <style>
   /*
-   * Per-agent framing (values in equipe-cadrage.ts): the photo is sized so that its subject box fits
-   * 88 % of the tile width and 94 % of the zone above the label, then centred in that zone. Where the
-   * photo doesn't reach the tile edges, the tile shows the render's backdrop colour; the photo's own
-   * edges are feathered so the seam disappears.
+   * Per-agent framing (values in equipe-cadrage.ts): every photo is sized so that its bird's body is
+   * --taille-oiseau tall — the same in all tiles, so the seven read as one team — then its subject is
+   * centred in the zone above the label. Where the photo doesn't reach the tile edges, the tile shows
+   * the render's backdrop colour and the photo's edges are feathered, so no seam shows.
    */
   .tuile {
     container-type: size;
@@ -173,17 +175,25 @@ const pageHref = (slug: string) => (locale === 'fr' ? `/agents/${slug}` : `/en/a
     }
   }
   .tuile :global(img.photo-cadree) {
+    /* Container units resolve against the tile here (not on .tuile itself, which can't query itself). */
     --zone: calc(100cqh - var(--etiquette));
-    --largeur: min(calc(88cqw / var(--sw)), calc(var(--zone) * 0.94 / (var(--sh) * var(--ratio))));
+    /* Same bird height in every tile (desktop columns share one width). */
+    --taille-oiseau: 26cqw;
+    --largeur: min(calc(var(--taille-oiseau) / var(--oiseau)), calc(88cqw / var(--sw)));
     position: absolute;
     max-width: none;
     width: var(--largeur);
     height: auto;
     left: calc(50cqw - (var(--sx) + var(--sw) / 2) * var(--largeur));
-    top: calc(var(--zone) / 2 - (var(--sy) + var(--sh) / 2) * var(--ratio) * var(--largeur));
+    /* Subject centred in the zone above the label, but never cut at the top: a subject taller than the
+       zone slides down, its bottom going under the glass label. */
+    top: max(
+      calc(var(--zone) / 2 - (var(--sy) + var(--sh) / 2) * var(--ratio) * var(--largeur)),
+      calc(4cqh - var(--sy) * var(--ratio) * var(--largeur))
+    );
     mask-image:
-      linear-gradient(to right, transparent, black 7%, black 93%, transparent),
-      linear-gradient(to bottom, transparent, black 7%, black 93%, transparent);
+      linear-gradient(to right, transparent, black 14%, black 86%, transparent),
+      linear-gradient(to bottom, transparent, black 14%, black 86%, transparent);
     mask-composite: intersect;
   }
 </style>
