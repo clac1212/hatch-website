@@ -4,6 +4,7 @@ import Button from '../ui/Button.astro';
 import { section } from '../../content/section';
 import { routes, useTranslations, type Locale } from '../../i18n/ui';
 import carte from '../../assets/hero/carte-reseau.jpg';
+import grain from '../../assets/hero/grain.png';
 import peep from '../../assets/hero/peep.jpg';
 import lark from '../../assets/hero/lark.jpg';
 import sparrow from '../../assets/hero/sparrow.jpg';
@@ -177,6 +178,10 @@ const tick =
     {cubes.map((c) => <div class="h-ping" data-ping="cube" style={pos(c)} />)}
   </div>
 
+  <!-- Film grain at screen scale (the photo itself is denoised): hides the AI micro-texture and the
+       banding, stays fine whatever image size is served. Under the piles and the glass card. -->
+  <div class="h-grain" aria-hidden="true" style={`background-image:url(${grain.src})`}></div>
+
   <div
     class="relative z-1 mx-auto flex h-full max-w-[1440px] flex-col justify-end gap-2 px-4 pt-24 pb-4 sm:px-6 sm:pb-6 lg:static lg:justify-center lg:gap-0 lg:px-14 lg:pt-16 lg:pb-[149px]"
   >
@@ -339,6 +344,15 @@ const tick =
     --sw: max(100cqw, calc(100cqh * 1440 / 804));
     --sh: calc(var(--sw) * 804 / 1440);
     --fx: 0.78;
+  }
+  .h-grain {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-size: 128px 128px;
+    mix-blend-mode: soft-light;
+    opacity: 0.08;
   }
   .h-decor {
     position: absolute;
