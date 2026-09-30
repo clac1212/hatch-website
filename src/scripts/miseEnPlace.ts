@@ -19,6 +19,7 @@ function init(section: HTMLElement) {
   const etats = $$(section, '[data-mep-etat]');
   const pas = $$(section, '[data-mep-pas]');
   const cta = section.querySelector<HTMLElement>('[data-mep-cta]');
+  const suivants = $$(section, '[data-mep-suivant]');
   const collant = section.querySelector<HTMLElement>('.collant');
   if (etats.length !== 3 || !collant) throw new Error('MiseEnPlace: unexpected markup');
 
@@ -143,9 +144,13 @@ function init(section: HTMLElement) {
     // Distance from the current step: drives the "Time Machine" stack in the component's CSS.
     etats.forEach((el, i) => (el.dataset.d = String(i - k)));
     pas.forEach((p, i) => (p.dataset.etat = i < k ? 'fait' : i === k ? 'actif' : 'a-venir'));
-    // Hidden windows keep their CTA out of the tab order.
+    // Windows behind the front one keep their buttons out of the tab order.
     if (epingle && k !== 2) cta?.setAttribute('tabindex', '-1');
     else cta?.removeAttribute('tabindex');
+    suivants.forEach((b) => {
+      if (epingle && Number(b.dataset.mepSuivant) !== k) b.setAttribute('tabindex', '-1');
+      else b.removeAttribute('tabindex');
+    });
   }
 
   function rejouer() {
@@ -179,6 +184,24 @@ function init(section: HTMLElement) {
     },
     { threshold: 0.5 },
   ).observe(collant);
+
+  // "Continuer" goes to the next step as if the visitor had scrolled there: pinned, it scrolls to the
+  // start of that step on the track (lengths from data-longueurs, in % of the pinned view's height);
+  // stacked, it scrolls to the next window.
+  const longueurs = section.dataset.longueurs!.split(',').map(Number);
+  suivants.forEach((bouton) =>
+    bouton.addEventListener('click', () => {
+      const suivant = Number(bouton.dataset.mepSuivant) + 1;
+      const behavior = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+      if (!epingle) {
+        etats[suivant].scrollIntoView({ behavior, block: 'start' });
+        return;
+      }
+      const debut = longueurs.slice(0, suivant).reduce((a, l) => a + l, 0) + 4;
+      const haut = section.getBoundingClientRect().top + scrollY;
+      scrollTo({ top: haut + (debut / 100) * collant.clientHeight, behavior });
+    }),
+  );
 
   mq.addEventListener('change', mode);
   mode();

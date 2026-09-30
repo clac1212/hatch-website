@@ -190,7 +190,7 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
                           {sources.documents.items.map((src) => (
                             <li
                               class:list={[
-                                'flex min-w-0 flex-1 flex-col gap-2.5 rounded-lg bg-white p-3 outline-1 -outline-offset-1 md:p-3.5',
+                                'carte-ui flex min-w-0 flex-1 flex-col gap-2.5 rounded-lg bg-white p-3 outline-1 -outline-offset-1 md:p-3.5',
                                 src.connected ? 'outline-peach' : 'outline-gray-100',
                               ]}
                               data-source={src.connected ? 'connecte' : undefined}
@@ -229,7 +229,7 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
                         <p class={label}>{sources.tools.label}</p>
                         <ul class="grid grid-cols-2 gap-2 md:flex md:gap-3">
                           {sources.tools.items.map((tool) => (
-                            <li class="flex min-w-0 flex-1 flex-col gap-2.5 rounded-lg bg-white p-3 outline-1 -outline-offset-1 outline-peach md:p-3.5">
+                            <li class="carte-ui flex min-w-0 flex-1 flex-col gap-2.5 rounded-lg bg-white p-3 outline-1 -outline-offset-1 outline-peach md:p-3.5">
                               <span class="grid size-7 place-items-center rounded-md bg-peach-2 text-orange">
                                 <svg viewBox="0 0 24 24" class="size-4" aria-hidden="true">
                                   <path d={icons[tool.icon]} fill="currentColor" />
@@ -360,7 +360,7 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
                         <ul class="grid gap-2 sm:grid-cols-3 md:flex md:gap-3">
                           {channels.items.map((ch) => (
                             <li
-                              class="anim flex min-w-0 flex-1 items-center gap-3 rounded-lg bg-white p-3.5 outline-1 -outline-offset-1 outline-peach"
+                              class="anim carte-ui flex min-w-0 flex-1 items-center gap-3 rounded-lg bg-white p-3.5 outline-1 -outline-offset-1 outline-peach"
                               data-canal
                             >
                               <span
@@ -442,15 +442,16 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
                     {i === 0 ? counterText : i === 1 ? agents.footer : channels.footer}
                   </p>
                   {i < 2 ? (
-                    <span
-                      class="inline-flex items-center gap-2 rounded-[4px] bg-orange px-[18px] py-2.5 text-[14px] font-semibold text-white"
-                      aria-hidden="true"
+                    <button
+                      type="button"
+                      class="btn-vif inline-flex cursor-pointer items-center gap-2 rounded-[4px] bg-orange px-[18px] py-2.5 text-[14px] font-semibold text-white"
+                      data-mep-suivant={i}
                     >
                       {data.next}
-                      <svg viewBox="0 0 24 24" class="size-4">
+                      <svg viewBox="0 0 24 24" class="size-4" aria-hidden="true">
                         <path d={icons.arrow} fill="currentColor" />
                       </svg>
-                    </span>
+                    </button>
                   ) : (
                     <Button href={routes.demo[locale]} variant="orange" size="sm" data-mep-cta>
                       {t('cta.demo')}
@@ -683,5 +684,28 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
     40% {
       transform: scale(1.35);
     }
+  }
+
+  /* Product cards react like a real interface: they lift, their rim turns orange, the icon grows. */
+  .mep .carte-ui {
+    transition:
+      opacity 0.45s var(--ease-hatch),
+      transform 0.35s var(--ease-hatch),
+      box-shadow 0.35s var(--ease-hatch),
+      outline-color 0.35s;
+  }
+  .mep .carte-ui:hover {
+    transform: translateY(-3px);
+    outline-color: var(--color-orange);
+    box-shadow: 0 10px 22px color-mix(in srgb, var(--color-shadow) 12%, transparent);
+  }
+  .mep .carte-ui:active {
+    transform: translateY(-1px) scale(0.98);
+  }
+  .carte-ui > :first-child {
+    transition: scale 0.35s var(--ease-hatch);
+  }
+  .carte-ui:hover > :first-child {
+    scale: 1.1;
   }
 </style>
