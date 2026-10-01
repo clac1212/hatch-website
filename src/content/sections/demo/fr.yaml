@@ -15,10 +15,10 @@ lieux:
         titre: Le terrain écrit, Peep répond.
         carte:
           qui: Crousty One Lille
-          texte: Où est la fiche allergènes du nouveau burger ?
+          texte: Où est la fiche allergènes du nouveau burger ?
           reponse:
             qui: Peep
-            texte: Fiche « Allergènes carte été » v3, la voici.
+            texte: Fiche « Allergènes carte été » v3, la voici.
       - cle: lark
         nom: Lark
         role: prépare votre point du matin
@@ -36,7 +36,7 @@ lieux:
         carte:
           lignes:
             - agent: Jay
-              texte: « Nettoyage friteuse » v4 diffusée à 30 sites
+              texte: « Nettoyage friteuse » v4 diffusée à 30 sites
       - cle: finch
         nom: Finch
         role: transforme les audits en actions
@@ -56,16 +56,18 @@ lieux:
         titre: Une question à voix haute, la procédure lue étape par étape.
         ecran:
           appareil: tablette
+          heure: "15:02"
           entete: Owl · Tablette cuisine
           ecoute: Je vous écoute
           lit: Je lis la fiche
-          question: Owl, comment on ouvre la caisse ?
+          question: Owl, comment on ouvre la caisse ?
           fiche: Ouverture de caisse
           source: Manuel BunBun · fiche Caisse v4
           etapes:
             - Saisis ton code manager sur l'écran
             - Compte le fond de caisse, 150 €
             - Valide l'ouverture, le ticket sort
+          compteur: Étape {n} sur {total}
           pied: Lu à voix haute, étape par étape
       - cle: pecker
         nom: Pecker
@@ -73,25 +75,32 @@ lieux:
         titre: Cinq minutes de formation pendant la pause, et le siège sait qui a validé.
         ecran:
           appareil: telephone
+          heure: "15:02"
           contact: Pecker
           statut: Formation
+          ecrit: écrit…
+          jour: Aujourd'hui
+          saisie: Message
           fil:
             - de: agent
-              texte: Salut Inès ! Ton module du jour, « Ouverture du restaurant », 5 min. On y va ?
+              texte: Salut Inès ! Ton module du jour, « Ouverture du restaurant », 5 min. On y va ?
             - de: equipe
               texte: C'est parti
             - quiz:
                 question: Avant d'ouvrir la caisse, tu dois…
+                aide: Choisis une réponse.
                 options:
                   - Allumer la friteuse
                   - Compter le fond de caisse
                   - Lancer la musique
                 bonne: 1
             - de: agent
-              texte: Bravo, module validé ! Prochain module demain à la pause.
+              texte: Bravo, module validé ! Prochain module demain à la pause.
           suivi:
+            app: Hatch OS
+            quand: maintenant
             titre: Siège · suivi des formations
-            texte: Inès a validé « Ouverture du restaurant »
+            texte: Inès a validé « Ouverture du restaurant »
 
   - surtitre: Sur le chantier
     titre: Du premier contact au jour J.
@@ -103,17 +112,17 @@ lieux:
         titre: Chaque candidat qualifié, sans attendre.
         carte:
           qui: Julien · candidat à Rennes
-          texte: Bonjour, la franchise m'intéresse. Comment on démarre ?
+          texte: Bonjour, la franchise m'intéresse. Comment on démarre ?
           reponse:
             qui: Sparrow
-            texte: Avec plaisir ! Ville visée, apport, date souhaitée ? Je prépare votre dossier.
+            texte: Avec plaisir ! Ville visée, apport, date souhaitée ? Je prépare votre dossier.
       - cle: sparrow-ouverture
         nom: Sparrow · Ouverture
         role: suit chaque ouverture jusqu'au jour J
         titre: Chaque ouverture suivie jusqu'au jour J.
         carte:
           qui: Sparrow
-          texte: Le carrelage est posé ? Il reste la formation de l'équipe à planifier.
+          texte: Le carrelage est posé ? Il reste la formation de l'équipe à planifier.
           reponse:
             qui: Karim · franchisé
-            texte: Oui, terminé hier. On cale ça jeudi ?
+            texte: Oui, terminé hier. On cale ça jeudi ?

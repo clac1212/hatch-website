@@ -40,7 +40,7 @@ const $ = (racine: Element, sel: string) => racine.querySelector<HTMLElement>(se
 const $$ = (racine: Element, sel: string) => [...racine.querySelectorAll<HTMLElement>(sel)];
 const temps = (el: HTMLElement, cle = 't') => Number(el.dataset[cle]);
 
-/** Owl's kitchen tablet: listening (waveform, words), then the sheet read step by step. */
+/** Owl's iPad app: listening (orb, waveform, transcript), then the sheet read step by step. */
 function tablette(ecr: HTMLElement, o: number) {
   const tl = gsap.timeline();
   /** `tl` resets the screen from the demo start; `b` holds the beats, from the content start `o`. */
@@ -51,8 +51,9 @@ function tablette(ecr: HTMLElement, o: number) {
   const mots = $$(ecr, '.t-mot');
   const barres = $$(ecr, '.t-onde span');
   const anneaux = $$(ecr, '.t-anneau');
-  const droite = $(ecr, '.t-droite');
+  const fiche = $(ecr, '.t-fiche');
   const etapes = $$(ecr, '.t-etapes li');
+  const roue = $(ecr, '.t-roue');
   const pied = $(ecr, '.t-pied');
 
   // Back to the start state (the markup is the final state), as soon as the demo starts.
@@ -61,14 +62,17 @@ function tablette(ecr: HTMLElement, o: number) {
     .set($(ecr, '.t-lit'), { opacity: 0 }, 0)
     .set(barres, { scaleY: 0.12 }, 0)
     .set(anneaux, { opacity: 0, scale: 1 }, 0)
-    .set(droite, { autoAlpha: 0, x: 18 }, 0)
-    .set(etapes, { autoAlpha: 0, y: 10 }, 0)
-    .set($$(ecr, '.t-surligne, .t-hp'), { opacity: 0 }, 0)
-    .set($$(ecr, '.t-ok'), { autoAlpha: 0, scale: 0.4 }, 0)
+    .set($(ecr, '.t-coeur'), { scale: 1 }, 0)
+    .set(fiche, { autoAlpha: 0, x: 24 }, 0)
+    .set(etapes, { autoAlpha: 0, y: 12 }, 0)
+    .set($$(ecr, '.t-surligne, .t-eq'), { opacity: 0 }, 0)
+    .set($$(ecr, '.t-num'), { opacity: 1 }, 0)
+    .set($$(ecr, '.t-fait'), { autoAlpha: 0, scale: 0.4 }, 0)
     .set($$(ecr, '.t-lu'), { scaleX: 0, opacity: 1 }, 0)
+    .set(roue, { yPercent: 0, y: 0 }, 0)
     .set(pied, { autoAlpha: 0, y: 6 }, 0);
 
-  // Listening: the record dot blinks, rings leave the mic, the waveform follows the voice.
+  // Listening: the live dot blinks, rings leave the orb, the waveform follows the voice.
   const ecoute = reponse - debut;
   b.to(
     $(ecr, '.t-rec'),
@@ -80,34 +84,44 @@ function tablette(ecr: HTMLElement, o: number) {
       repeat: 2 * Math.ceil(reponse / 0.9) - 1,
     },
     0,
+  ).to(
+    $(ecr, '.t-coeur'),
+    {
+      scale: 1.06,
+      duration: 0.5,
+      ease: 'sine.inOut',
+      yoyo: true,
+      repeat: 2 * Math.ceil(ecoute) - 1,
+    },
+    debut - 0.3,
   );
   anneaux.forEach((a, i) =>
     b.fromTo(
       a,
-      { opacity: 0.7, scale: 1 },
+      { opacity: 0.6, scale: 1 },
       {
         opacity: 0,
-        scale: 1.8,
-        duration: 1.2,
+        scale: 1.7,
+        duration: 1.5,
         ease: 'power1.out',
-        repeat: Math.max(0, Math.floor((ecoute - 0.6 * i) / 1.2) - 1),
+        repeat: Math.max(0, Math.floor((ecoute - 0.5 * i) / 1.5) - 1),
         immediateRender: false,
       },
-      debut - 0.3 + 0.6 * i,
+      debut - 0.3 + 0.5 * i,
     ),
   );
   barres.forEach((barre, i) =>
     b.to(
       barre,
       {
-        scaleY: () => gsap.utils.random(0.3, 1),
-        duration: 0.17,
+        scaleY: () => gsap.utils.random(0.25, 1),
+        duration: 0.16,
         ease: 'sine.inOut',
         yoyo: true,
-        repeat: Math.floor(ecoute / 0.17),
+        repeat: Math.floor(ecoute / 0.16),
         repeatRefresh: true,
       },
-      debut + i * 0.015,
+      debut + i * 0.012,
     ),
   );
   b.to(barres, { scaleY: 0.12, duration: 0.35, ease: EASE.doux }, reponse);
@@ -118,54 +132,97 @@ function tablette(ecr: HTMLElement, o: number) {
   // Answer: status swaps, the sheet slides in, its steps cascade.
   b.to($(ecr, '.t-ecoute'), { opacity: 0, duration: 0.2, ease: EASE.sortie }, reponse)
     .to($(ecr, '.t-lit'), { opacity: 1, duration: 0.3, ease: EASE.doux }, reponse + 0.15)
-    .to(droite, { autoAlpha: 1, x: 0, duration: 0.8, ease: EASE.entree }, reponse + 0.1)
+    .to(fiche, { autoAlpha: 1, x: 0, duration: 0.9, ease: EASE.entree }, reponse + 0.1)
     .to(
       etapes,
-      { autoAlpha: 1, y: 0, duration: 0.6, ease: EASE.entree, stagger: 0.07 },
+      { autoAlpha: 1, y: 0, duration: 0.7, ease: EASE.entree, stagger: 0.08 },
       reponse + 0.35,
     );
 
-  // Each step is read out: tinted, speaker on, reading bar fills, then it gets its check.
+  // Each step is read out: tinted, equaliser on, reading bar fills, the counter rolls, then a check.
   const lu = etape * 0.85;
-  etapes.forEach((li) => {
+  etapes.forEach((li, i) => {
     const t = temps(li);
     b.to($(li, '.t-surligne'), { opacity: 1, duration: 0.3, ease: EASE.doux }, t)
-      .to($(li, '.t-hp'), { opacity: 1, duration: 0.2 }, t)
+      .to($(li, '.t-eq'), { opacity: 1, duration: 0.2 }, t)
+      .to(
+        $$(li, '.t-eq span'),
+        {
+          scaleY: () => gsap.utils.random(0.4, 1),
+          duration: 0.18,
+          ease: 'sine.inOut',
+          yoyo: true,
+          repeat: Math.floor(lu / 0.18),
+          repeatRefresh: true,
+          stagger: 0.06,
+        },
+        t,
+      )
       .to($(li, '.t-lu'), { scaleX: 1, duration: lu, ease: 'none' }, t)
-      .to($$(li, '.t-surligne, .t-hp'), { opacity: 0, duration: 0.3, ease: EASE.sortie }, t + lu)
+      .to($$(li, '.t-surligne, .t-eq'), { opacity: 0, duration: 0.3, ease: EASE.sortie }, t + lu)
       .to($(li, '.t-lu'), { opacity: 0, duration: 0.3 }, t + lu)
-      .to($(li, '.t-ok'), { autoAlpha: 1, scale: 1, duration: 0.45, ease: 'back.out(2)' }, t + lu);
+      .to($(li, '.t-num'), { opacity: 0, duration: 0.15 }, t + lu)
+      .to(
+        $(li, '.t-fait'),
+        { autoAlpha: 1, scale: 1, duration: 0.45, ease: 'back.out(2)' },
+        t + lu,
+      );
+    if (i > 0)
+      b.to(
+        roue,
+        { yPercent: (-100 * i) / etapes.length, duration: 0.5, ease: EASE.camera },
+        t - 0.1,
+      );
   });
   b.to(pied, { autoAlpha: 1, y: 0, duration: 0.5, ease: EASE.entree }, temps(pied));
   return tl.add(b, o);
 }
 
-/** Pecker's phone: the thread grows line by line, the quiz gets tapped, head office is told. */
+/** Pecker's WhatsApp chat: typing, replies typed then sent, the poll voted, head office notified. */
 function telephone(ecr: HTMLElement, o: number) {
   const tl = gsap.timeline();
   const b = gsap.timeline();
   const lignes = $$(ecr, '.p-ligne:not(.p-frappe)');
-  const bulles = lignes.map((l) => l.firstElementChild as HTMLElement);
+  const bulles = lignes.map((l) => $(l, '.p-msg'));
+  const st = $(ecr, '.p-st');
+  const ecrit = $(ecr, '.p-ecrit');
+  const indice = $(ecr, '.p-indice');
+  const repos = $(ecr, '.p-repos');
+  const envoyer = $(ecr, '.p-envoyer');
   const suivi = $(ecr, '.p-suivi');
 
   tl.set(lignes, { height: 0 }, 0)
-    .set(bulles, { autoAlpha: 0, scale: 0.9, y: 8 }, 0)
-    .set($$(ecr, '.p-teinte'), { opacity: 0 }, 0)
-    .set($$(ecr, '.p-quiz svg'), { autoAlpha: 0, scale: 0.4 }, 0)
-    .set($$(ecr, '.p-doigt'), { autoAlpha: 0, scale: 1.5, xPercent: 70, yPercent: 90 }, 0)
-    .set(suivi, { autoAlpha: 0, x: 48, scale: 0.96 }, 0)
-    .set($(suivi, '.p-coche svg'), { scale: 0.4, opacity: 0 }, 0);
+    .set(bulles, { autoAlpha: 0, scale: 0.92, y: 6 }, 0)
+    .set(st, { opacity: 1 }, 0)
+    .set(ecrit, { opacity: 0 }, 0)
+    .set($$(ecr, '.bonne .p-coche'), { autoAlpha: 0, scale: 0.4 }, 0)
+    .set($$(ecr, '.bonne .p-jauge span'), { scaleX: 0 }, 0)
+    .set($$(ecr, '.bonne .p-nb'), { opacity: 0 }, 0)
+    .set($$(ecr, '.p-doigt'), { autoAlpha: 0, scale: 1.5, xPercent: 120, yPercent: 140 }, 0)
+    .set($$(ecr, '.p-brouillon'), { opacity: 0, clipPath: 'inset(0 100% 0 0)' }, 0)
+    .set(indice, { opacity: 1 }, 0)
+    .set(repos, { opacity: 1 }, 0)
+    .set(envoyer, { opacity: 0, scale: 0.6 }, 0)
+    .set(suivi, { autoAlpha: 0, x: 48, y: 0, scale: 0.96 }, 0);
 
-  // Typing indicator: opens, its dots bounce, closes right before the message.
+  // Typing indicator: the header says "typing…", a bubble of dots opens, closes before the message.
   $$(ecr, '.p-frappe').forEach((f) => {
     const t = temps(f);
     const message = temps(f.nextElementSibling as HTMLElement);
-    b.to(f, { height: 'auto', duration: 0.35, ease: EASE.doux }, t)
+    b.to(st, { opacity: 0, duration: 0.2 }, t)
+      .to(ecrit, { opacity: 1, duration: 0.2 }, t + 0.1)
+      .to(f, { height: 'auto', duration: 0.35, ease: EASE.doux }, t)
+      .fromTo(
+        $(f, '.p-msg'),
+        { autoAlpha: 0, scale: 0.9 },
+        { autoAlpha: 1, scale: 1, duration: 0.3, ease: EASE.doux, immediateRender: false },
+        t + 0.05,
+      )
       .to(
-        $$(f, 'span'),
+        $$(f, '.p-msg span'),
         {
           yPercent: -45,
-          opacity: 0.4,
+          opacity: 0.45,
           duration: 0.3,
           ease: 'sine.inOut',
           yoyo: true,
@@ -174,10 +231,27 @@ function telephone(ecr: HTMLElement, o: number) {
         },
         t,
       )
-      .to(f, { height: 0, duration: 0.25, ease: EASE.sortie }, message - 0.25);
+      .to(f, { height: 0, duration: 0.25, ease: EASE.sortie }, message - 0.25)
+      .to(ecrit, { opacity: 0, duration: 0.2 }, message)
+      .to(st, { opacity: 1, duration: 0.2 }, message + 0.1);
   });
 
-  // Each message or quiz: its line grows (pushing the thread up), the bubble pops in from its tail.
+  // A reply is typed in the input bar (the send button replaces the mic), then sent.
+  $$(ecr, '.p-brouillon').forEach((d) => {
+    const t = temps(d);
+    const envoi = temps(d, 'envoi');
+    b.to(indice, { opacity: 0, duration: 0.1 }, t)
+      .to(repos, { opacity: 0, duration: 0.15 }, t)
+      .to(envoyer, { opacity: 1, scale: 1, duration: 0.3, ease: 'back.out(2)' }, t)
+      .to(d, { opacity: 1, duration: 0.01 }, t)
+      .to(d, { clipPath: 'inset(0 0% 0 0)', duration: envoi - t - 0.2, ease: 'steps(14)' }, t)
+      .to(envoyer, { scale: 0.85, duration: 0.1, yoyo: true, repeat: 1 }, envoi - 0.15)
+      .to(d, { opacity: 0, duration: 0.1 }, envoi)
+      .to(envoyer, { opacity: 0, scale: 0.6, duration: 0.2 }, envoi + 0.05)
+      .to([indice, repos], { opacity: 1, duration: 0.2 }, envoi + 0.1);
+  });
+
+  // Each message or poll: its line grows (pushing the thread up), the bubble pops from its tail.
   lignes.forEach((l, i) => {
     const t = temps(l);
     b.to(l, { height: 'auto', duration: 0.5, ease: EASE.entree }, t).to(
@@ -186,37 +260,28 @@ function telephone(ecr: HTMLElement, o: number) {
       t + 0.05,
     );
     if (!l.dataset.c) return;
-    // The quiz: a fingertip comes in, presses the right option, it turns orange and gets its check.
+    // The poll: a fingertip comes in, taps the right option, its radio fills, its bar runs to 100 %.
     const c = temps(l, 'c');
     const bonne = $(l, 'li.bonne');
     const doigt = $(bonne, '.p-doigt');
     b.to(
       doigt,
-      { autoAlpha: 1, scale: 1, xPercent: 0, yPercent: 0, duration: 0.55, ease: 'power3.out' },
-      c - 0.65,
+      { autoAlpha: 1, scale: 1, xPercent: 0, yPercent: 0, duration: 0.6, ease: 'power3.out' },
+      c - 0.7,
     )
       .to(
         doigt,
         { scale: 0.8, duration: 0.12, ease: 'power1.inOut', yoyo: true, repeat: 1 },
         c - 0.1,
       )
-      .to(
-        bonne,
-        { scale: 0.97, duration: 0.12, ease: 'power1.inOut', yoyo: true, repeat: 1 },
-        c - 0.1,
-      )
-      .to($(bonne, '.p-teinte'), { opacity: 1, duration: 0.25, ease: EASE.doux }, c)
-      .to($(bonne, 'svg'), { autoAlpha: 1, scale: 1, duration: 0.4, ease: 'back.out(2)' }, c + 0.15)
+      .to($(bonne, '.p-coche'), { autoAlpha: 1, scale: 1, duration: 0.4, ease: 'back.out(2)' }, c)
+      .to($(bonne, '.p-jauge span'), { scaleX: 1, duration: 0.7, ease: EASE.entree }, c + 0.1)
+      .to($(bonne, '.p-nb'), { opacity: 1, duration: 0.3 }, c + 0.3)
       .to(doigt, { autoAlpha: 0, scale: 1.2, duration: 0.3, ease: EASE.sortie }, c + 0.35);
   });
 
-  // Head office's training tracker slides out from behind the phone, then checks.
-  const t = temps(suivi);
-  b.to(suivi, { autoAlpha: 1, x: 0, scale: 1, duration: 0.9, ease: EASE.entree }, t).to(
-    $(suivi, '.p-coche svg'),
-    { scale: 1, opacity: 1, duration: 0.45, ease: 'back.out(2)' },
-    t + 0.4,
-  );
+  // Head office's notification slides out from behind the phone.
+  b.to(suivi, { autoAlpha: 1, x: 0, scale: 1, duration: 0.9, ease: EASE.entree }, temps(suivi));
   return tl.add(b, o);
 }
 
@@ -296,7 +361,8 @@ export function piloter(lieu: HTMLElement): Pilote {
       s.to(agent, { '--saut': -1, duration: 0.14, ease: 'power2.out' }, T.camera - 0.35)
         .to(agent, { '--saut': 1, duration: 0.2, ease: 'power2.out' }, '>')
         .to(agent, { '--saut': 0, duration: 0.45, ease: 'power2.inOut' }, '>');
-      // 3. Its device enters from its side (left of the device on desktop, above on phones).
+      // 3. Its device enters from its side (left of the device on desktop, above on phones), tilted
+      //    in 3D like a keynote product shot, settles flat, and a glare sweeps its glass once.
       s.fromTo(
         e,
         { autoAlpha: 0, x: mobile ? 0 : -56, y: mobile ? -24 : 0, scale: 0.96 },
@@ -310,7 +376,34 @@ export function piloter(lieu: HTMLElement): Pilote {
           immediateRender: false,
         },
         appareil,
-      );
+      )
+        .fromTo(
+          ecr,
+          {
+            rotationY: mobile ? 0 : 26,
+            rotationX: mobile ? 22 : 9,
+            rotationZ: mobile ? 0 : -2,
+            transformPerspective: 1600,
+            transformOrigin: '50% 60%',
+          },
+          {
+            rotationY: 0,
+            rotationX: 0,
+            rotationZ: 0,
+            duration: 1.3,
+            ease: EASE.entree,
+            immediateRender: false,
+          },
+          appareil,
+        )
+        .fromTo(
+          $(ecr, '.reflet'),
+          { opacity: 0, xPercent: -70 },
+          { xPercent: 70, duration: 1.5, ease: 'power2.inOut', immediateRender: false },
+          appareil + 0.2,
+        )
+        .to($(ecr, '.reflet'), { opacity: 1, duration: 0.5, ease: 'power1.out' }, appareil + 0.2)
+        .to($(ecr, '.reflet'), { opacity: 0, duration: 0.6, ease: 'power1.in' }, appareil + 1.1);
       // 4. The screen plays; meanwhile the camera keeps a slow push-in so the scene never freezes.
       s.add(
         ecr.classList.contains('tablette') ? tablette(ecr, contenu) : telephone(ecr, contenu),

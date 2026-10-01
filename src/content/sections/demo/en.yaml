@@ -56,6 +56,7 @@ lieux:
         titre: A question out loud, the procedure read step by step.
         ecran:
           appareil: tablette
+          heure: "15:02"
           entete: Owl · Kitchen tablet
           ecoute: Listening
           lit: Reading the sheet
@@ -66,6 +67,7 @@ lieux:
             - Enter your manager code on the screen
             - Count the cash float, €150
             - Confirm the opening, the receipt prints
+          compteur: Step {n} of {total}
           pied: Read out loud, step by step
       - cle: pecker
         nom: Pecker
@@ -73,8 +75,12 @@ lieux:
         titre: Five minutes of training during the break, and head office knows who passed.
         ecran:
           appareil: telephone
+          heure: "15:02"
           contact: Pecker
           statut: Training
+          ecrit: typing…
+          jour: Today
+          saisie: Message
           fil:
             - de: agent
               texte: Hi Inès! Today's module, “Opening the restaurant”, 5 min. Shall we?
@@ -82,6 +88,7 @@ lieux:
               texte: Let's go
             - quiz:
                 question: Before opening the till, you need to…
+                aide: Select one answer.
                 options:
                   - Switch on the fryer
                   - Count the cash float
@@ -90,6 +97,8 @@ lieux:
             - de: agent
               texte: Well done, module passed! Next one tomorrow during the break.
           suivi:
+            app: Hatch OS
+            quand: now
             titre: Head office · training tracker
             texte: Inès passed “Opening the restaurant”
 

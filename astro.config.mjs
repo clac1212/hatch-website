@@ -56,6 +56,10 @@ export default defineConfig({
 
   vite: {
     plugins: [tailwindcss()],
+    // GSAP is only reached through a dynamic import (the demo section loads it when it comes near).
+    // Pre-bundle it at dev start, or Vite discovers it late, re-optimises, and the page's request for
+    // the old bundle fails with "504 Outdated Optimize Dep".
+    optimizeDeps: { include: ['gsap'] },
   },
 
   // Web Analytics is injected by the Vercel adapter at deploy time (Preview + Production only).

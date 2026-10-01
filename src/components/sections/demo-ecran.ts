@@ -35,8 +35,17 @@ export function chronoTelephone(e: EcranTelephone) {
   /** Delay before the right option gets tapped, then before the next beat. */
   const reflexion = 2.2;
   let t = 0.5;
-  /** `choix` = when the right option is tapped (quiz); `frappe` = typing indicator (agent message). */
-  type Beat = { item: EcranTelephone['fil'][number]; t: number; choix?: number; frappe?: number };
+  /**
+   * `choix` = when the right option is tapped (quiz); `frappe` = typing indicator (agent message);
+   * `brouillon` = the team member types the reply in the input bar before sending it.
+   */
+  type Beat = {
+    item: EcranTelephone['fil'][number];
+    t: number;
+    choix?: number;
+    frappe?: number;
+    brouillon?: number;
+  };
   const fil = e.fil.map((item): Beat => {
     if ('quiz' in item) {
       const beat = { item, t, choix: t + reflexion };
@@ -48,8 +57,10 @@ export function chronoTelephone(e: EcranTelephone) {
       t += frappe + lecture(item.texte);
       return beat;
     }
-    const beat = { item, t };
-    t += lecture(item.texte);
+    // Typed at ~50 ms per character, then sent.
+    const saisie = 0.5 + item.texte.length * 0.05;
+    const beat = { item, t: t + saisie, brouillon: t };
+    t += saisie + lecture(item.texte);
     return beat;
   });
   return { fil, frappe, suivi: t, duree: t + 3.2 };

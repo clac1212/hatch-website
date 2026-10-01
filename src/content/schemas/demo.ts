@@ -16,8 +16,12 @@ const carte = z.union([
  * Animated device mock-up (pilot, kitchen, 01/10): the demo plays on a screen instead of a card.
  * Beats are derived from the copy in src/components/sections/demo-ecran.ts.
  */
+/** Clock in the device's status bar, e.g. "15:02". */
+const heure = z.string().regex(/^\d{1,2}:\d{2}$/);
+
 const ecranTablette = z.strictObject({
   appareil: z.literal('tablette'),
+  heure,
   /** Top bar of the tablet app. */
   entete: texte,
   /** Status in the top bar: listening (question), then reading (procedure). */
@@ -29,13 +33,22 @@ const ecranTablette = z.strictObject({
   fiche: texte,
   source: texte,
   etapes: z.array(texte).min(2).max(4),
+  /** Step counter, with `{n}` (current step) and `{total}`. */
+  compteur: texte.refine((c) => c.includes('{n}') && c.includes('{total}'), {
+    message: '`compteur` needs {n} and {total}',
+  }),
   /** Closing line once every step has been read. */
   pied: texte,
 });
 const ecranTelephone = z.strictObject({
   appareil: z.literal('telephone'),
+  heure,
   contact: texte,
   statut: texte,
+  /** Header status while the agent types, date chip above the thread, input placeholder. */
+  ecrit: texte,
+  jour: texte,
+  saisie: texte,
   /** Conversation, in order: messages and one multiple-choice question. */
   fil: z
     .array(
@@ -45,6 +58,8 @@ const ecranTelephone = z.strictObject({
           quiz: z
             .strictObject({
               question: texte,
+              /** Hint under the question, as in a WhatsApp poll. */
+              aide: texte,
               options: z.array(texte).min(2).max(4),
               /** Index of the right option. */
               bonne: z.number().int().min(0),
@@ -56,8 +71,8 @@ const ecranTelephone = z.strictObject({
       ]),
     )
     .min(2),
-  /** Card next to the phone, what head office sees at the end. */
-  suivi: z.strictObject({ titre: texte, texte: texte }),
+  /** Notification next to the phone, what head office sees at the end. */
+  suivi: z.strictObject({ app: texte, quand: texte, titre: texte, texte: texte }),
 });
 
 /**
