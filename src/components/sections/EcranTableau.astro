@@ -1,0 +1,746 @@
+---
+/**
+ * Head-office dashboard on an iPad (Lark, Jay, Finch; César 01/10): the agent posts a line, then
+ * the UI it generates resolves out of a skeleton, block by block — key figures counting up, an
+ * alert with its button, a manual sheet edited like a document then published, a score, an
+ * action plan written out as a document. The markup renders the FINAL state (no JS, reduced motion); the GSAP
+ * timeline (demo-motion.ts `tableau`) replays it on the beats from demo-ecran.ts.
+ */
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import type { EcranTableau } from '../../content/schemas/demo';
+import Ipad from '../ui/Ipad.astro';
+import { chronoTableau } from './demo-ecran';
+
+interface Props {
+  ecran: EcranTableau;
+  avatar: ImageMetadata;
+}
+const { ecran, avatar } = Astro.props;
+const c = chronoTableau(ecran);
+const s = (t: number) => t.toFixed(2);
+const [appNom, appVue] = ecran.entete.split(' · ');
+const nombre = new Intl.NumberFormat(Astro.currentLocale ?? 'fr').format;
+
+const I = {
+  ok: 'M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2Z',
+  wifi: 'M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8 3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4 2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z',
+  alerte: 'M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z',
+};
+---
+
+<div
+  class="ecr tableau"
+  data-duree={s(c.duree)}
+  data-demande={s(c.demande)}
+  data-intro={s(c.intro)}
+  data-carte={s(c.carte)}
+  data-resolu={s(c.resolu)}
+>
+  <Ipad>
+    <div class="b-ecran">
+      <div class="b-statut" aria-hidden="true">
+        <span>{ecran.heure}</span>
+        <span class="icones">
+          <svg viewBox="0 0 24 24">
+            <path d={I.wifi}></path>
+          </svg>
+          <svg class="batterie" viewBox="0 0 28 13">
+            <rect x="0.5" y="0.5" width="23" height="12" rx="3.5"></rect>
+            <rect class="plein" x="2" y="2" width="18" height="9" rx="2"></rect>
+            <rect class="borne" x="25" y="4.5" width="2" height="4" rx="1"></rect>
+          </svg>
+        </span>
+      </div>
+      <header class="b-barre">
+        <Image src={avatar} alt="" width={40} height={40} densities={[1, 2]} class="b-av" />
+        <span class="b-app">
+          <b>{appNom}</b>
+          <span>{appVue}</span>
+        </span>
+        <span class="b-pastille">
+          <span class="b-point" aria-hidden="true"></span>
+          {ecran.statut}
+        </span>
+      </header>
+      <div class="b-fil">
+        {
+          ecran.demande && (
+            <p class="b-demande">
+              <b>{ecran.demande.qui}</b>
+              {ecran.demande.texte}
+            </p>
+          )
+        }
+        <p class="b-intro">
+          <Image src={avatar} alt="" width={28} height={28} densities={[1, 2]} class="b-av-s" />
+          <span>{ecran.intro}</span>
+        </p>
+        <div class="b-carte">
+          <div class="b-squelette" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="b-contenu">
+            <header class="b-tete">
+              <p class="b-titre">{ecran.titre}</p>
+              <p class="b-source">{ecran.source}</p>
+            </header>
+            {
+              ecran.blocs.map((b, i) => (
+                <section
+                  class:list={['b-bloc', `b-${b.type}`]}
+                  data-type={b.type}
+                  data-t={s(c.blocs[i].t)}
+                  data-d={s(c.blocs[i].d)}
+                >
+                  {b.type === 'chiffres' &&
+                    b.items.map((it) => (
+                      <div class="b-tuile">
+                        <span class="b-valeur" data-valeur={it.valeur}>
+                          {nombre(it.valeur)}
+                        </span>
+                        <span class="b-libelle">{it.libelle}</span>
+                      </div>
+                    ))}
+                  {b.type === 'alerte' && (
+                    <>
+                      <span class="b-alerte-icone" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                          <path d={I.alerte} />
+                        </svg>
+                      </span>
+                      <p class="b-alerte-txt">{b.texte}</p>
+                      <span class="b-bouton">
+                        <span class="b-bouton-txt">{b.bouton}</span>
+                        <svg class="b-bouton-ok" viewBox="0 0 24 24" aria-hidden="true">
+                          <path d={I.ok} />
+                        </svg>
+                      </span>
+                    </>
+                  )}
+                  {b.type === 'edition' && (
+                    <>
+                      <p class="b-meta">
+                        <span class="b-badge" aria-hidden="true">
+                          <span class="b-roue">
+                            <span>{b.version.avant}</span>
+                            <span>{b.version.apres}</span>
+                          </span>
+                        </span>
+                        <span class="b-etat">
+                          <span class="b-en-cours">{b.etat.enCours}</span>
+                          <span class="b-publiee">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                              <path d={I.ok} />
+                            </svg>
+                            {b.etat.publiee}
+                          </span>
+                        </span>
+                      </p>
+                      <ol class="b-doc">
+                        {b.lignes.map((ligne, j) => (
+                          <li class:list={{ 'b-modifiee': j === b.modifiee }}>
+                            <span class="b-num">{j + 1}.</span>
+                            {j === b.modifiee ? (
+                              <span class="b-edite">
+                                <span class="b-teinte" aria-hidden="true" />
+                                <span class="b-avant-txt" aria-hidden="true">
+                                  {ligne}
+                                </span>
+                                <span class="b-apres-txt">{b.apres}</span>
+                                <span class="b-curseur" aria-hidden="true" />
+                              </span>
+                            ) : (
+                              <span>{ligne}</span>
+                            )}
+                          </li>
+                        ))}
+                      </ol>
+                      <p class="b-note">
+                        <span class="b-note-txt">{b.note}</span>
+                        <span class="b-curseur" aria-hidden="true" />
+                      </p>
+                    </>
+                  )}
+                  {b.type === 'score' && (
+                    <>
+                      <p class="b-compteur">
+                        <span class="b-valeur" data-valeur={b.valeur}>
+                          {nombre(b.valeur)}
+                        </span>
+                        <span class="b-sur">/ {nombre(b.sur)}</span>
+                        <span class="b-libelle">{b.libelle}</span>
+                      </p>
+                      <span class="b-jauge" aria-hidden="true">
+                        <span style={`--p:${b.valeur / b.sur}`} data-p={b.valeur / b.sur} />
+                      </span>
+                    </>
+                  )}
+                  {b.type === 'plan' && (
+                    <>
+                      <p class="b-reflexion" aria-hidden="true">
+                        <span class="b-points">
+                          <span />
+                          <span />
+                          <span />
+                        </span>
+                        {b.reflexion}
+                      </p>
+                      <div class="b-plan-doc">
+                        <p class="b-plan-titre">{b.titre}</p>
+                        <ol>
+                          {b.actions.map((a, j) => (
+                            <li>
+                              <span class="b-num">{j + 1}</span>
+                              <span class="b-plan-corps">
+                                <span class="b-ecrit">
+                                  <span class="b-action-txt">{a.action}</span>
+                                  <span class="b-curseur" aria-hidden="true" />
+                                </span>
+                                <span class="b-ecart-txt">
+                                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d={I.alerte} />
+                                  </svg>
+                                  {a.ecart}
+                                </span>
+                              </span>
+                              <span class="b-echeance">{a.echeance}</span>
+                            </li>
+                          ))}
+                        </ol>
+                      </div>
+                    </>
+                  )}
+                </section>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </Ipad>
+</div>
+
+<style>
+  .tableau {
+    width: 100%;
+  }
+  /* The screen fills the frame's screen box; everything inside is sized in cqw of its width. */
+  .b-ecran {
+    position: absolute;
+    inset: 0;
+    container-type: inline-size;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-cream);
+    font: 500 2.1cqw/1.35 var(--font-sans);
+    color: var(--color-ink);
+  }
+  .icones {
+    display: flex;
+    align-items: center;
+    gap: 0.8cqw;
+  }
+  .icones svg {
+    width: 2.1cqw;
+    fill: currentColor;
+  }
+  .icones .batterie {
+    width: 3cqw;
+  }
+  .batterie rect {
+    fill: none;
+    stroke: currentColor;
+    opacity: 0.45;
+  }
+  .batterie .plein,
+  .batterie .borne {
+    fill: currentColor;
+    stroke: none;
+    opacity: 1;
+  }
+  .batterie .borne {
+    opacity: 0.45;
+  }
+  .b-statut {
+    display: flex;
+    justify-content: space-between;
+    padding: 1.3cqw 2.6cqw 0;
+    font: 600 1.6cqw/1 var(--font-sans);
+  }
+  .b-barre {
+    display: flex;
+    align-items: center;
+    gap: 1.4cqw;
+    padding: 1.1cqw 2.6cqw 1.3cqw;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .b-barre :global(.b-av) {
+    width: 4.4cqw;
+    height: 4.4cqw;
+    border-radius: 1.2cqw;
+    background: var(--color-surface);
+    box-shadow: 0 0 0 1px var(--color-line);
+  }
+  .b-app {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+  }
+  .b-app b {
+    font: 700 2.6cqw/1.1 var(--font-display);
+    letter-spacing: -0.01em;
+  }
+  .b-app span {
+    font-size: 1.65cqw;
+    color: var(--color-soft);
+  }
+  .b-pastille {
+    display: flex;
+    align-items: center;
+    gap: 0.9cqw;
+    margin-left: auto;
+    padding: 0.8cqw 1.6cqw 0.8cqw 1.2cqw;
+    border-radius: 999px;
+    background: var(--color-surface);
+    box-shadow:
+      0 0 0 1px var(--color-line),
+      var(--shadow-1);
+    font: 600 1.65cqw/1 var(--font-sans);
+  }
+  .b-point {
+    width: 1cqw;
+    height: 1cqw;
+    border-radius: 999px;
+    background: var(--color-orange);
+    box-shadow: 0 0 0 0.35cqw var(--color-orange-tint);
+  }
+  .b-fil {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 1.4cqw;
+    min-height: 0;
+    padding: 1.8cqw 2.6cqw 2.4cqw;
+  }
+  /* A request from head office, as a sent message (right). */
+  .b-demande {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3cqw;
+    align-self: flex-end;
+    max-width: 72%;
+    padding: 1cqw 1.6cqw;
+    border-radius: 2cqw;
+    border-bottom-right-radius: 0.6cqw;
+    background: var(--color-night);
+    font-size: 1.85cqw;
+    color: var(--color-white);
+    transform-origin: 100% 100%;
+  }
+  .b-demande b {
+    font: 400 1.3cqw/1.3 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--color-white) 70%, transparent);
+  }
+  /* The agent's line, as a message. */
+  .b-intro {
+    display: flex;
+    align-items: flex-end;
+    align-self: flex-start;
+    gap: 1cqw;
+    max-width: 80%;
+    transform-origin: 0 100%;
+  }
+  .b-intro :global(.b-av-s) {
+    flex: none;
+    width: 3.4cqw;
+    height: 3.4cqw;
+    border-radius: 999px;
+    background: var(--color-surface);
+  }
+  .b-intro span {
+    padding: 1cqw 1.6cqw;
+    border-radius: 2cqw;
+    border-bottom-left-radius: 0.6cqw;
+    background: var(--color-surface);
+    box-shadow:
+      0 0 0 1px var(--color-line),
+      var(--shadow-1);
+    font-size: 1.9cqw;
+  }
+  /* The generated card: a skeleton first, then the blocks resolve in place. */
+  /* Sized by its blocks (not stretched): the card ends where the answer ends. */
+  .b-carte {
+    position: relative;
+    min-height: 0;
+    padding: 1.8cqw 2cqw 2cqw;
+    border-radius: 2.2cqw;
+    background: var(--color-surface);
+    box-shadow:
+      0 0 0 1px var(--color-line),
+      var(--shadow-1);
+  }
+  .b-squelette {
+    position: absolute;
+    inset: 1.8cqw 2cqw 2cqw;
+    display: flex;
+    flex-direction: column;
+    gap: 1.4cqw;
+    opacity: 0;
+  }
+  .b-squelette span {
+    flex: 1;
+    border-radius: 1cqw;
+    background: var(--color-cream-2);
+  }
+  .b-squelette span:first-child {
+    flex: none;
+    width: 45%;
+    height: 3.4cqw;
+  }
+  .b-contenu {
+    display: flex;
+    flex-direction: column;
+    gap: 1.7cqw;
+  }
+  .b-tete {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1.6cqw;
+  }
+  .b-titre {
+    font: 700 3.2cqw/1.1 var(--font-display);
+    letter-spacing: -0.015em;
+  }
+  .b-source {
+    flex: none;
+    padding: 0.3cqw 0.9cqw;
+    border-radius: 999px;
+    background: var(--color-sand);
+    font: 400 1.35cqw/1.4 var(--font-mono);
+    letter-spacing: 0.04em;
+    color: var(--color-soft);
+  }
+  .b-libelle {
+    font-size: 1.6cqw;
+    color: var(--color-soft);
+  }
+  .b-valeur {
+    font: 700 4.6cqw/1 var(--font-display);
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Key figures. */
+  .b-chiffres {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.2cqw;
+  }
+  .b-tuile {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8cqw;
+    padding: 1.6cqw 1.8cqw;
+    border-radius: 1.6cqw;
+    background: var(--color-surface-2);
+    box-shadow: inset 0 0 0 1px var(--color-line);
+  }
+
+  /* Alert with its action. */
+  .b-alerte {
+    display: flex;
+    align-items: center;
+    gap: 1.4cqw;
+    padding: 1.4cqw 1.6cqw;
+    border-radius: 1.6cqw;
+    background: var(--color-orange-tint);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-orange) 45%, transparent);
+  }
+  .b-alerte-icone {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 3.4cqw;
+    height: 3.4cqw;
+    border-radius: 999px;
+    background: var(--color-orange);
+  }
+  .b-alerte-icone svg {
+    width: 1.9cqw;
+    fill: var(--color-ink);
+  }
+  .b-alerte-txt {
+    flex: 1;
+    font-size: 1.9cqw;
+    font-weight: 600;
+  }
+  .b-bouton {
+    display: grid;
+    place-items: center;
+    flex: none;
+    padding: 1cqw 2cqw;
+    border-radius: 999px;
+    background: var(--color-ink);
+    font: 600 1.7cqw/1 var(--font-sans);
+    color: var(--color-white);
+  }
+  .b-bouton > * {
+    grid-area: 1 / 1;
+  }
+  .b-bouton-txt {
+    opacity: 0;
+  }
+  .b-bouton-ok {
+    width: 2.2cqw;
+    fill: var(--color-white);
+  }
+
+  /* A manual sheet edited like a document (no boxes: a page). The changed line gets a tracked-
+     change tint; its old text is deleted and the new one typed after a caret; a note on the change
+     is typed under the steps; then the badge rolls to the new version and the sheet is published. */
+  .b-meta {
+    display: flex;
+    align-items: center;
+    gap: 1cqw;
+    margin-top: -0.6cqw;
+  }
+  .b-badge {
+    height: 1.4em;
+    overflow: hidden;
+    padding: 0 1cqw;
+    border-radius: 999px;
+    background: var(--color-orange);
+    font: 400 1.5cqw/1.4 var(--font-mono);
+  }
+  .b-roue {
+    display: flex;
+    flex-direction: column;
+    transform: translateY(-50%);
+  }
+  .b-etat {
+    display: grid;
+    font: 600 1.5cqw/1.4 var(--font-sans);
+    color: var(--color-soft);
+  }
+  .b-etat > * {
+    grid-area: 1 / 1;
+    display: flex;
+    align-items: center;
+    gap: 0.5cqw;
+  }
+  .b-en-cours {
+    opacity: 0;
+  }
+  .b-publiee {
+    color: var(--color-success-txt);
+  }
+  .b-publiee svg {
+    width: 1.8cqw;
+    fill: currentColor;
+  }
+  .b-doc {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1cqw;
+    margin-top: 1.6cqw;
+    padding-top: 1.6cqw;
+    border-top: 1px solid var(--color-line);
+    font-size: 2cqw;
+    line-height: 1.4;
+  }
+  .b-doc li {
+    display: flex;
+    gap: 1.2cqw;
+  }
+  .b-num {
+    flex: none;
+    min-width: 2.4cqw;
+    font-weight: 600;
+    color: var(--color-soft);
+  }
+  .b-edite {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 0 0.6cqw;
+    margin: 0 -0.6cqw;
+    white-space: nowrap;
+  }
+  .b-edite > * {
+    position: relative;
+  }
+  /* Tracked-change tint behind the edited line. */
+  .b-edite > .b-teinte {
+    position: absolute;
+    inset: 0;
+    border-radius: 0.6cqw;
+    background: var(--color-orange-tint);
+    box-shadow: inset 0 -0.25cqw 0 var(--color-orange);
+  }
+  .b-avant-txt,
+  .b-apres-txt,
+  .b-note-txt,
+  .b-action-txt {
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    vertical-align: bottom;
+  }
+  .b-avant-txt {
+    width: 0;
+  }
+  .b-curseur {
+    display: inline-block;
+    width: 0.22cqw;
+    height: 1.15em;
+    margin-left: 0.15cqw;
+    vertical-align: middle;
+    background: var(--color-ink);
+    opacity: 0;
+  }
+  .b-note {
+    display: flex;
+    align-items: center;
+    margin-top: 1.4cqw;
+    font-size: 1.7cqw;
+    font-style: italic;
+    color: var(--color-soft);
+  }
+
+  /* Score with its gauge. */
+  .b-compteur {
+    display: flex;
+    align-items: baseline;
+    gap: 1cqw;
+  }
+  .b-score {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1cqw;
+    padding: 1.6cqw 1.8cqw;
+    border-radius: 1.6cqw;
+    background: var(--color-surface-2);
+    box-shadow: inset 0 0 0 1px var(--color-line);
+  }
+  .b-sur {
+    font: 600 2cqw/1 var(--font-sans);
+    color: var(--color-soft);
+  }
+  .b-score .b-libelle {
+    margin-left: auto;
+  }
+  .b-jauge {
+    height: 0.8cqw;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--color-cream-2);
+  }
+  .b-jauge span {
+    display: block;
+    height: 100%;
+    background: var(--color-orange);
+    transform-origin: left;
+    transform: scaleX(var(--p));
+  }
+
+  /* The agent thinks (dots), then writes the plan: each action is typed, its gap and its due
+     date follow. The thinking line is gone in the final state. */
+  .b-plan {
+    display: flex;
+    flex-direction: column;
+  }
+  .b-reflexion {
+    display: flex;
+    align-items: center;
+    gap: 1cqw;
+    height: 0;
+    overflow: hidden;
+    opacity: 0;
+    font-size: 1.7cqw;
+    font-style: italic;
+    color: var(--color-soft);
+  }
+  .b-points {
+    display: flex;
+    gap: 0.5cqw;
+  }
+  .b-points span {
+    width: 0.9cqw;
+    height: 0.9cqw;
+    border-radius: 999px;
+    background: var(--color-orange);
+  }
+  /* The plan is a document: a page with its title, the actions written one by one. */
+  .b-plan-doc {
+    padding: 1.8cqw 2.2cqw 2cqw;
+    border-radius: 0.8cqw;
+    background: var(--color-surface);
+    box-shadow:
+      0 0 0 1px var(--color-line),
+      0 0.3cqw 0 var(--color-cream-2),
+      0 0.6cqw 0 var(--color-line);
+  }
+  .b-plan-titre {
+    padding-bottom: 1cqw;
+    border-bottom: 1px solid var(--color-line);
+    font: 700 2.4cqw/1.15 var(--font-display);
+    letter-spacing: -0.01em;
+  }
+  .b-plan-doc ol {
+    display: flex;
+    flex-direction: column;
+    gap: 1.3cqw;
+    margin-top: 1.3cqw;
+  }
+  .b-plan-doc li {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.2cqw;
+  }
+  .b-plan-doc .b-num {
+    font-size: 1.9cqw;
+    line-height: 1.35;
+  }
+  .b-ecrit {
+    display: flex;
+    align-items: center;
+  }
+  .b-plan-corps {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.4cqw;
+    min-width: 0;
+  }
+  .b-action-txt {
+    font-size: 1.9cqw;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+  .b-ecart-txt {
+    display: flex;
+    align-items: center;
+    gap: 0.6cqw;
+    font-size: 1.5cqw;
+    color: var(--color-soft);
+  }
+  .b-ecart-txt svg {
+    width: 1.6cqw;
+    fill: var(--color-orange-txt);
+  }
+  .b-echeance {
+    flex: none;
+    margin-top: 0.3cqw;
+    font: 400 1.35cqw/1.4 var(--font-mono);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-orange-txt);
+  }
+</style>

@@ -1,54 +1,119 @@
-# Démo diorama : trois lieux au scroll ; dans chaque lieu, le visiteur ouvre la démo d'un agent.
+# Démo diorama : trois lieux au scroll ; dans chaque lieu, les démos des agents se jouent sur des appareils.
 titre: Vos agents au travail
-consigne: Choisissez un agent
-pause: Mettre la démo en pause
-lecture: Relancer la démo
 
 lieux:
   - surtitre: Au siège
-    titre: Quatre agents travaillent avec votre équipe.
-    retour: Retour au siège
     agents:
       - cle: peep
         nom: Peep
         role: répond aux questions du terrain
         titre: Le terrain écrit, Peep répond.
-        carte:
-          qui: Crousty One Lille
-          texte: Où est la fiche allergènes du nouveau burger ?
-          reponse:
-            qui: Peep
-            texte: Fiche « Allergènes carte été » v3, la voici.
+        ecran:
+          appareil: telephone
+          heure: "11:48"
+          contact: Peep
+          statut: Assistant du réseau
+          ecrit: écrit…
+          jour: Aujourd'hui
+          saisie: Message
+          fil:
+            - de: equipe
+              texte: Où est la fiche allergènes du nouveau burger ?
+            - de: agent
+              texte: La voici, c'est la version à jour.
+            - document:
+                titre: Allergènes · carte été v3
+                meta: PDF · 2 pages
+            - de: equipe
+              texte: Merci, je l'affiche en cuisine
+          suivi:
+            app: Hatch OS
+            quand: maintenant
+            titre: Siège · questions du terrain
+            texte: Peep a répondu à BunBun Lille
       - cle: lark
         nom: Lark
         role: prépare votre point du matin
         titre: L'état du réseau, chaque matin.
-        carte:
-          lignes:
-            - agent: Lark
-              texte: 312 réponses de Peep cette semaine
-            - agent: Lark
-              texte: relancer Lyon Part-Dieu, audit en retard de 3 jours
+        ecran:
+          appareil: tableau
+          heure: "8:00"
+          entete: Lark · Point du matin
+          statut: Lundi 8 h
+          intro: Bonjour Claire, voici l'état du réseau ce matin.
+          titre: Réseau BunBun · semaine 40
+          source: Données Hatch · 7 derniers jours
+          blocs:
+            - type: chiffres
+              items:
+                - valeur: 312
+                  libelle: réponses de Peep
+                - valeur: 28
+                  libelle: sites actifs
+                - valeur: 1
+                  libelle: audit en retard
+            - type: alerte
+              texte: BunBun Lyon Part-Dieu · audit en retard de 3 jours
+              bouton: Relancer
       - cle: jay
         nom: Jay
         role: tient le manuel à jour
-        titre: Le manuel à jour, et diffusé.
-        carte:
-          lignes:
-            - agent: Jay
-              texte: « Nettoyage friteuse » v4 diffusée à 30 sites
+        titre: Le manuel toujours à jour.
+        ecran:
+          appareil: tableau
+          heure: "10:15"
+          entete: Jay · Manuel
+          statut: Mise à jour
+          demande:
+            qui: Claire · siège
+            texte: "Jay, mets à jour la fiche friteuse : à Lille l'huile est saturée en fin de semaine, on passe à tous les trois jours."
+          intro: Je m'en occupe, je mets la fiche à jour.
+          titre: Nettoyage friteuse
+          source: Manuel BunBun · fiche Hygiène
+          blocs:
+            - type: edition
+              version:
+                avant: v3
+                apres: v4
+              etat:
+                enCours: Modification en cours
+                publiee: Publiée
+              lignes:
+                - Couper la friteuse, laisser refroidir 30 min
+                - Vidanger l'huile une fois par semaine
+                - Nettoyer la cuve au dégraissant
+              modifiee: 1
+              apres: Vidanger l'huile tous les trois jours
+              note: "Pourquoi : huile saturée en fin de semaine, retour de BunBun Lille"
       - cle: finch
         nom: Finch
         role: transforme les audits en actions
         titre: Des audits qui deviennent des plans d'action.
-        carte:
-          lignes:
-            - agent: Finch
-              texte: audit Lille 92 / 100, 2 écarts transformés en actions
+        ecran:
+          appareil: tableau
+          heure: "17:30"
+          entete: Finch · Audits
+          statut: Audit terminé
+          intro: Audit de BunBun Lille terminé, deux écarts à traiter.
+          titre: Audit qualité · BunBun Lille
+          source: Grille d'audit BunBun 2026
+          blocs:
+            - type: score
+              valeur: 92
+              sur: 100
+              libelle: Score global
+            - type: plan
+              reflexion: Je rédige le plan d'action…
+              titre: Plan d'action · BunBun Lille
+              actions:
+                - ecart: Températures du frigo non relevées
+                  action: Relever les températures du frigo matin et soir
+                  echeance: Dès demain
+                - ecart: Étiquette DLC manquante
+                  action: Étiqueter chaque bac à l'ouverture
+                  echeance: Avant vendredi
 
   - surtitre: En cuisine
-    titre: Les équipes demandent, les agents répondent.
-    retour: Retour à la cuisine
     agents:
       - cle: owl
         nom: Owl
@@ -56,15 +121,30 @@ lieux:
         titre: Une question à voix haute, la procédure lue étape par étape.
         ecran:
           appareil: tablette
+          heure: "15:02"
           entete: Owl · Tablette cuisine
           ecoute: Je vous écoute
-          question: Owl, comment on ouvre la caisse ?
+          prepare: Je prépare la fiche
+          lit: Je lis la fiche
+          question: Owl, comment on ouvre la caisse ?
           fiche: Ouverture de caisse
           source: Manuel BunBun · fiche Caisse v4
           etapes:
-            - Saisis ton code manager sur l'écran
-            - Compte le fond de caisse, 150 €
-            - Valide l'ouverture, le ticket sort
+            - visuel: code
+              texte: Saisis ton code manager sur l'écran
+              libelle: Code manager
+            - visuel: caisse
+              texte: Compte le fond de caisse, 150 €
+              libelle: Fond de caisse
+              billets: [50, 50, 20, 20, 10]
+            - visuel: ticket
+              texte: Valide l'ouverture, le ticket sort
+              bouton: Valider l'ouverture
+              lignes:
+                - BunBun · Caisse 1
+                - Ouverture 15:02
+                - Fond 150,00 €
+          compteur: Étape {n} sur {total}
           pied: Lu à voix haute, étape par étape
       - cle: pecker
         nom: Pecker
@@ -72,47 +152,84 @@ lieux:
         titre: Cinq minutes de formation pendant la pause, et le siège sait qui a validé.
         ecran:
           appareil: telephone
+          heure: "15:02"
           contact: Pecker
           statut: Formation
+          ecrit: écrit…
+          jour: Aujourd'hui
+          saisie: Message
           fil:
             - de: agent
-              texte: Salut Inès ! Ton module du jour, « Ouverture du restaurant », 5 min. On y va ?
+              texte: Salut Inès ! Ton module du jour, « Ouverture du restaurant », 5 min. On y va ?
             - de: equipe
               texte: C'est parti
             - quiz:
                 question: Avant d'ouvrir la caisse, tu dois…
+                aide: Choisis une réponse.
                 options:
                   - Allumer la friteuse
                   - Compter le fond de caisse
                   - Lancer la musique
                 bonne: 1
             - de: agent
-              texte: Bravo, module validé ! Prochain module demain à la pause.
+              texte: Bravo, module validé ! Prochain module demain à la pause.
           suivi:
+            app: Hatch OS
+            quand: maintenant
             titre: Siège · suivi des formations
-            texte: Inès a validé « Ouverture du restaurant »
+            texte: Inès a validé « Ouverture du restaurant »
 
   - surtitre: Sur le chantier
-    titre: Du premier contact au jour J.
-    retour: Retour au chantier
     agents:
       - cle: sparrow-candidats
         nom: Sparrow · Candidats
         role: qualifie vos candidats franchisés
         titre: Chaque candidat qualifié, sans attendre.
-        carte:
-          qui: Julien · candidat à Rennes
-          texte: Bonjour, la franchise m'intéresse. Comment on démarre ?
-          reponse:
-            qui: Sparrow
-            texte: Avec plaisir ! Ville visée, apport, date souhaitée ? Je prépare votre dossier.
+        ecran:
+          appareil: telephone
+          heure: "21:12"
+          contact: Sparrow
+          statut: Recrutement BunBun
+          ecrit: écrit…
+          jour: Aujourd'hui
+          saisie: Message
+          fil:
+            - de: equipe
+              texte: Bonjour, la franchise m'intéresse. Comment on démarre ?
+            - de: agent
+              texte: Avec plaisir ! Quelle ville visez-vous, et pour quand ?
+            - de: equipe
+              texte: Rennes, au printemps
+            - de: agent
+              texte: Parfait, je prépare votre dossier. Un appel avec l'équipe développement jeudi ?
+          suivi:
+            app: Hatch OS
+            quand: maintenant
+            titre: CRM · nouveau candidat
+            texte: Julien · futur BunBun Rennes · printemps 2027, dossier prêt
       - cle: sparrow-ouverture
         nom: Sparrow · Ouverture
         role: suit chaque ouverture jusqu'au jour J
         titre: Chaque ouverture suivie jusqu'au jour J.
-        carte:
-          qui: Sparrow
-          texte: Le carrelage est posé ? Il reste la formation de l'équipe à planifier.
-          reponse:
-            qui: Karim · franchisé
-            texte: Oui, terminé hier. On cale ça jeudi ?
+        ecran:
+          appareil: telephone
+          heure: "9:05"
+          contact: Sparrow
+          statut: Ouverture BunBun Angers
+          ecrit: écrit…
+          jour: Aujourd'hui
+          saisie: Message
+          fil:
+            - de: agent
+              texte: Bonjour Sophie, le carrelage est posé ?
+            - de: equipe
+              texte: Oui, terminé hier
+            - de: agent
+              texte: Super. Il reste la formation de l'équipe, on la cale jeudi ?
+            - de: equipe
+              texte: Jeudi c'est parfait
+          suivi:
+            app: Hatch OS
+            quand: maintenant
+            titre: BunBun Angers · ouverture 80 %
+            texte: Formation de l'équipe planifiée jeudi

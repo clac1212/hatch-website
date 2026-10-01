@@ -1,18 +1,16 @@
 ---
 /**
- * 04 — Diorama demo (César, 01/10). Three places on scroll (head office, kitchen, build site); inside a
- * place, the visitor opens an agent's demo on demand: markers on the agents and the menu card both
- * open it, the camera zooms on the agent and its card replaces the menu. Back, Escape, a click on the
- * scene or leaving the place closes it.
- * Pilot (01/10): a place whose demos all carry an `ecran` (the kitchen) plays them instead, one after
- * the other, as animated device mock-ups (DemoEcran.astro) with tabs, progress bars and a pause button.
+ * 04 — Diorama demo (César, 01/10). Three places on scroll (head office, kitchen, build site), one
+ * layout and one logic for all three: the scene is the setting, each agent's demo plays on a device
+ * mock-up (DemoEcran.astro), one after the other. Where (place, 0n / 03) top left, what (agent, one
+ * sentence) bottom left, the device on the right, a chapters bar at the bottom.
+ * The motion (camera, focus, screens) is one GSAP timeline per place, demo-motion.ts, loaded when
+ * the section comes near the viewport; time plays it and the scroll pushes it (mode `mixte`).
  *
  * Scroll rules (research: NN/g on scroll-jacking, Apple product pages):
- * - the scroll position picks the place DIRECTLY (no queue): a fast scroll lands on a clean state,
- *   CSS transitions then play at their own pace;
- * - the wheel is never captured; soft snap points (`proximity`) help stop on each place.
- * Without JS, the three places stack, each with its menu. Videos will later replace the still scenes:
- * one calm loop per place, one short clip per agent demo.
+ * - the scroll position picks the place DIRECTLY (no queue): a fast scroll lands on a clean state;
+ * - the wheel is never captured, and no snap point pulls the page (it would rewind the demo).
+ * Without JS, the three places stack, each with its first demo in its final state.
  */
 import { Image, Picture } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
@@ -36,7 +34,6 @@ import avOwl from '../../assets/hero/agents/owl.webp';
 import avPecker from '../../assets/hero/agents/pecker.webp';
 import avSparrow from '../../assets/demo/avatars/sparrow.png';
 import DemoEcran from './DemoEcran.astro';
-import { chronoTablette, chronoTelephone } from './demo-ecran';
 
 interface Props {
   locale: Locale;
@@ -54,34 +51,34 @@ type Cam = [fx: number, fy: number, z: number];
 const centre = (v: number, z: number, o: number) => Math.min(Math.max(v, o / z), 1 - (1 - o) / z);
 const camStyle = ([fx, fy, z]: Cam, [ox, oy] = [0.5, 0.5]) =>
   `--cx:${centre(fx, z, ox)};--cy:${centre(fy, z, oy)};--z:${z}`;
-/** Focus position of autoplay places on desktop, mirrored in the CSS (.d2-lieu.auto --ox/--oy). */
-const VISEE_AUTO: [number, number] = [0.3, 0.45];
+/** Where the focus sits in the viewport on desktop (wide shot and agents), mirrored in the CSS (--ox/--oy). */
+const VISEE: [number, number] = [0.27, 0.4];
 
 /**
  * Places, in YAML order: background, wide shot, cut-out agents (fractions of the image, from the v4
- * prototype geometry). `cles` = the demos that highlight this cut-out (Sparrow carries two).
+ * prototype geometry). `cles` = the demos this cut-out belongs to (Sparrow carries two).
  */
 const LIEUX: {
   fond: ImageMetadata;
   vue: Cam;
-  decoupes: { img: ImageMetadata; cles: Cle[]; x: number; y: number; w: number; d: number }[];
+  decoupes: { img: ImageMetadata; cles: Cle[]; x: number; y: number; w: number }[];
 }[] = [
   {
     fond: siegeFond,
     vue: [0.45, 0.52, 1.08],
     decoupes: [
-      { img: imgLark, cles: ['lark'], x: 0.1523, y: 0.3743, w: 0.1286, d: 0 },
-      { img: imgFinch, cles: ['finch'], x: 0.2747, y: 0.4577, w: 0.1188, d: 0.8 },
-      { img: imgJay, cles: ['jay'], x: 0.4873, y: 0.3789, w: 0.1352, d: 1.6 },
-      { img: imgPeep, cles: ['peep'], x: 0.609, y: 0.5645, w: 0.1112, d: 2.4 },
+      { img: imgLark, cles: ['lark'], x: 0.1523, y: 0.3743, w: 0.1286 },
+      { img: imgFinch, cles: ['finch'], x: 0.2747, y: 0.4577, w: 0.1188 },
+      { img: imgJay, cles: ['jay'], x: 0.4873, y: 0.3789, w: 0.1352 },
+      { img: imgPeep, cles: ['peep'], x: 0.609, y: 0.5645, w: 0.1112 },
     ],
   },
   {
     fond: cuisineFond,
     vue: [0.42, 0.55, 1.12],
     decoupes: [
-      { img: imgOwl, cles: ['owl'], x: 0.141, y: 0.3874, w: 0.1399, d: 0 },
-      { img: imgPecker, cles: ['pecker'], x: 0.5487, y: 0.556, w: 0.1126, d: 1.2 },
+      { img: imgOwl, cles: ['owl'], x: 0.141, y: 0.3874, w: 0.1399 },
+      { img: imgPecker, cles: ['pecker'], x: 0.5487, y: 0.556, w: 0.1126 },
     ],
   },
   {
@@ -94,64 +91,24 @@ const LIEUX: {
         x: 0.4684,
         y: 0.416,
         w: 0.1148,
-        d: 0,
       },
     ],
   },
 ];
 
-/**
- * Per demo: marker point over the scene (fractions of the image), side its label opens to, camera.
- * Sparrow's two demos sit left (on Sparrow: candidates) and right (on the franchisee: openings).
- */
-const DEMOS: Record<
-  Cle,
-  { repere: [number, number]; cote: 'g' | 'd'; cam: Cam; avatar: ImageMetadata }
-> = {
-  lark: { repere: [0.216, 0.39], cote: 'd', cam: [0.215, 0.47, 1.6], avatar: avLark },
-  finch: { repere: [0.334, 0.47], cote: 'd', cam: [0.335, 0.55, 1.6], avatar: avFinch },
-  jay: { repere: [0.555, 0.39], cote: 'd', cam: [0.55, 0.49, 1.6], avatar: avJay },
-  peep: { repere: [0.665, 0.575], cote: 'd', cam: [0.665, 0.64, 1.6], avatar: avPeep },
-  owl: { repere: [0.211, 0.4], cote: 'd', cam: [0.25, 0.47, 1.5], avatar: avOwl },
-  pecker: { repere: [0.605, 0.57], cote: 'd', cam: [0.62, 0.66, 1.5], avatar: avPecker },
-  'sparrow-candidats': {
-    repere: [0.526, 0.43],
-    cote: 'g',
-    cam: [0.5, 0.45, 1.6],
-    avatar: avSparrow,
-  },
-  'sparrow-ouverture': {
-    repere: [0.625, 0.455],
-    cote: 'd',
-    cam: [0.62, 0.58, 1.6],
-    avatar: avSparrow,
-  },
+/** Per demo: the camera on its agent, and the agent's avatar (legend, chapters, screens). */
+const DEMOS: Record<Cle, { cam: Cam; avatar: ImageMetadata }> = {
+  lark: { cam: [0.215, 0.47, 1.6], avatar: avLark },
+  finch: { cam: [0.335, 0.55, 1.6], avatar: avFinch },
+  jay: { cam: [0.55, 0.49, 1.6], avatar: avJay },
+  peep: { cam: [0.665, 0.64, 1.6], avatar: avPeep },
+  owl: { cam: [0.25, 0.47, 1.5], avatar: avOwl },
+  pecker: { cam: [0.62, 0.66, 1.5], avatar: avPecker },
+  'sparrow-candidats': { cam: [0.5, 0.45, 1.6], avatar: avSparrow },
+  'sparrow-ouverture': { cam: [0.62, 0.58, 1.6], avatar: avSparrow },
 };
-const AVATARS: Record<string, ImageMetadata> = {
-  peep: avPeep,
-  lark: avLark,
-  jay: avJay,
-  finch: avFinch,
-  owl: avOwl,
-  pecker: avPecker,
-  sparrow: avSparrow,
-};
-/** Avatar of a message sender, when it is an agent ("Owl · sur la tablette" → owl). */
-const avatar = (qui: string) => AVATARS[qui.split(/[ ·]/)[0].toLowerCase()];
-/** "Sparrow · Candidats" → "Sparrow", for the kicker. */
-const prenom = (nom: string) => nom.split(' · ')[0];
 
-const lieux = data.lieux.map((l, i) => {
-  const auto = l.agents.every((a) => a.ecran);
-  if (!auto && l.agents.some((a) => a.ecran))
-    throw new Error(
-      `Demo "${l.surtitre}": a place is either autoplay (all screens) or on demand (all cards)`,
-    );
-  return { ...l, ...LIEUX[i], auto };
-});
-/** Length of an animated demo, in seconds (tab progress bar). */
-const duree = (e: NonNullable<(typeof data.lieux)[number]['agents'][number]['ecran']>) =>
-  (e.appareil === 'tablette' ? chronoTablette(e) : chronoTelephone(e)).duree;
+const lieux = data.lieux.map((l, i) => ({ ...l, ...LIEUX[i] }));
 for (const l of lieux) {
   const ici = l.decoupes.flatMap((d) => d.cles);
   const ailleurs = l.agents.filter((a) => !ici.includes(a.cle));
@@ -166,9 +123,9 @@ for (const l of lieux) {
   <div class="d2-scene-fixe">
     {
       lieux.map((l, i) => (
-        <div class:list={['d2-lieu', { on: i === 0, auto: l.auto }]} data-vue={camStyle(l.vue)}>
+        <div class:list={['d2-lieu', { on: i === 0 }]} data-vue={camStyle(l.vue, VISEE)}>
           <div class="d2-plateau">
-            <div class="d2-calque" style={camStyle(l.vue)}>
+            <div class="d2-calque" style={camStyle(l.vue, VISEE)}>
               <Picture
                 src={l.fond}
                 formats={['avif', 'webp']}
@@ -187,206 +144,82 @@ for (const l of lieux) {
                   loading="lazy"
                   class="d2-agent"
                   data-cles={a.cles.join(' ')}
-                  style={`left:${a.x * 100}%;top:${a.y * 100}%;width:${a.w * 100}%;animation-delay:${-a.d}s`}
+                  style={`left:${a.x * 100}%;top:${a.y * 100}%;width:${a.w * 100}%`}
                 />
               ))}
-              {!l.auto &&
-                l.agents.map((d) => {
-                  const g = DEMOS[d.cle];
-                  return (
-                    <button
-                      type="button"
-                      class:list={['d2-repere', g.cote === 'g' && 'gauche']}
-                      style={`left:${g.repere[0] * 100}%;top:${g.repere[1] * 100}%`}
-                      data-ouvrir={d.cle}
-                      aria-controls={`d2-${d.cle}`}
-                      aria-expanded="false"
-                    >
-                      <span class="d2-point" aria-hidden="true" />
-                      <span>{d.nom}</span>
-                    </button>
-                  );
-                })}
+              <div class="d2-voile" aria-hidden="true" />
             </div>
           </div>
 
-          {l.auto ? (
-            <div class="d2-ui d2-auto">
-              <div class="d2-panneau">
-                <p class="d2-surtitre">{l.surtitre}</p>
-                <div class="d2-titres">
-                  {l.agents.map((d, j) => (
-                    <h3 class:list={['d2-titre', { on: j === 0 }]}>{d.titre}</h3>
-                  ))}
-                </div>
-                <div class="d2-onglets">
-                  {l.agents.map((d, j) => (
-                    <button
-                      type="button"
-                      class:list={{ on: j === 0 }}
-                      data-onglet={j}
-                      aria-pressed={j === 0 ? 'true' : 'false'}
-                    >
-                      <Image
-                        src={DEMOS[d.cle].avatar}
-                        alt=""
-                        width={28}
-                        height={28}
-                        densities={[1, 2]}
-                        class="d2-av"
-                      />
-                      <span>
-                        <b>{d.nom}</b> {d.role}
-                      </span>
-                      <span class="d2-barre" aria-hidden="true">
-                        <span style={`--duree:${d.ecran ? duree(d.ecran) : 0}s`} />
-                      </span>
-                    </button>
-                  ))}
-                  <button
-                    type="button"
-                    class="d2-pause"
-                    aria-label={data.pause}
-                    data-pause={data.pause}
-                    data-lecture={data.lecture}
-                  >
-                    <svg viewBox="0 0 24 24" class="i-pause" aria-hidden="true">
-                      <path d="M7 5h4v14H7zM13 5h4v14h-4z" />
-                    </svg>
-                    <svg viewBox="0 0 24 24" class="i-lecture" aria-hidden="true">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              <div class="d2-appareils">
-                {l.agents.map(
-                  (d, j) =>
-                    d.ecran && (
-                      <div
-                        class:list={['d2-ecran', d.ecran.appareil, { on: j === 0 }]}
-                        data-cam={camStyle(DEMOS[d.cle].cam, VISEE_AUTO)}
-                      >
-                        <DemoEcran ecran={d.ecran} avatar={DEMOS[d.cle].avatar} />
-                      </div>
-                    ),
-                )}
-              </div>
-            </div>
-          ) : (
-            <>
-              <div class="d2-ui d2-vue">
-                <div class="d2-panneau">
-                  <p class="d2-surtitre">{l.surtitre}</p>
-                  <h3 class="d2-titre">{l.titre}</h3>
-                </div>
-                <div class="d2-carte">
-                  <p class="d2-consigne">{data.consigne}</p>
-                  <ul class="d2-menu">
-                    {l.agents.map((d) => (
-                      <li>
-                        <button
-                          type="button"
-                          data-ouvrir={d.cle}
-                          aria-controls={`d2-${d.cle}`}
-                          aria-expanded="false"
-                        >
-                          <Image
-                            src={DEMOS[d.cle].avatar}
-                            alt=""
-                            width={28}
-                            height={28}
-                            densities={[1, 2]}
-                            class="d2-av"
-                          />
-                          <span>
-                            <b>{d.nom}</b> {d.role}
-                          </span>
-                          <svg viewBox="0 0 24 24" class="d2-fleche" aria-hidden="true">
-                            <path d="M4 11v2h16v-2zm12 2v2h2v-2zm-2 2v2h2v-2zm-2 2v2h2v-2zm4-6V9h2v2zm-2 4V7h2v8zm-2 2V5h2v12z" />
-                          </svg>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-
-              {l.agents.map((d) => (
-                <div
-                  class="d2-ui d2-demo"
-                  id={`d2-${d.cle}`}
-                  data-cle={d.cle}
-                  data-cam={camStyle(DEMOS[d.cle].cam)}
-                  role="region"
-                  aria-label={d.nom}
-                >
-                  <div class="d2-panneau">
-                    <button type="button" class="d2-retour" data-fermer>
-                      <span aria-hidden="true">←</span> {l.retour}
-                    </button>
-                    <p class="d2-surtitre">
-                      {l.surtitre} · {prenom(d.nom)}
-                    </p>
-                    <h3 class="d2-titre">{d.titre}</h3>
-                  </div>
-                  <div class="d2-carte">
-                    {/* On-demand places only hold card demos (checked above); the type keeps `carte` optional. */}
-                    {d.carte &&
-                      ('lignes' in d.carte ? (
-                        <ul class="d2-lignes">
-                          {d.carte.lignes.map((ligne) => (
-                            <li>
-                              {avatar(ligne.agent) && (
-                                <Image
-                                  src={avatar(ligne.agent)}
-                                  alt=""
-                                  width={28}
-                                  height={28}
-                                  densities={[1, 2]}
-                                  class="d2-av"
-                                />
-                              )}
-                              <span>
-                                <b>{ligne.agent}</b> {ligne.texte}
-                              </span>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <div class="d2-fil">
-                          {[d.carte, d.carte.reponse].map((m, j) => (
-                            <div class:list={['d2-msg', { 'd2-rep': j === 1 }]}>
-                              {avatar(m.qui) && (
-                                <Image
-                                  src={avatar(m.qui)}
-                                  alt=""
-                                  width={28}
-                                  height={28}
-                                  densities={[1, 2]}
-                                  class="d2-av"
-                                />
-                              )}
-                              <span>
-                                <b>{m.qui}</b>
-                                {m.texte}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      ))}
-                  </div>
+          <div class="d2-ui">
+            {/* Where: the place, and where it sits in the section. Stays put for the whole place. */}
+            <p class="d2-ou">
+              <span>{l.surtitre}</span>
+              <span class="d2-num" aria-hidden="true">
+                {String(i + 1).padStart(2, '0')} / {String(lieux.length).padStart(2, '0')}
+              </span>
+            </p>
+            {/* What: the agent on stage and what its demo shows. Fixed height, cross-fades. */}
+            <div class="d2-legende">
+              {l.agents.map((d, j) => (
+                <div class:list={['d2-leg', { on: j === 0 }]} data-titre={j}>
+                  <p class="d2-qui">
+                    <Image
+                      src={DEMOS[d.cle].avatar}
+                      alt=""
+                      width={28}
+                      height={28}
+                      densities={[1, 2]}
+                      class="d2-av"
+                    />
+                    <span>
+                      <b>{d.nom}</b> {d.role}
+                    </span>
+                  </p>
+                  <h3 class="d2-titre">{d.titre}</h3>
                 </div>
               ))}
-            </>
-          )}
+            </div>
+            {/* Chapters: one segment per demo, filled by the timeline, like a video player. */}
+            <div class="d2-chapitres">
+              {l.agents.map((d, j) => (
+                <button
+                  type="button"
+                  class:list={{ on: j === 0 }}
+                  data-onglet={j}
+                  aria-pressed={j === 0 ? 'true' : 'false'}
+                >
+                  <span class="d2-barre" aria-hidden="true">
+                    <span />
+                  </span>
+                  <span class="d2-chap">
+                    <Image
+                      src={DEMOS[d.cle].avatar}
+                      alt=""
+                      width={20}
+                      height={20}
+                      densities={[1, 2]}
+                      class="d2-av"
+                    />
+                    {d.nom}
+                  </span>
+                </button>
+              ))}
+            </div>
+            <div class="d2-appareils">
+              {l.agents.map((d, j) => (
+                <div
+                  class:list={['d2-ecran', d.ecran.appareil, { on: j === 0 }]}
+                  data-cam={camStyle(DEMOS[d.cle].cam, VISEE)}
+                >
+                  <DemoEcran ecran={d.ecran} avatar={DEMOS[d.cle].avatar} />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       ))
     }
-
-    <ol class="d2-points" aria-hidden="true">
-      {lieux.map((_, i) => <li class:list={{ on: i === 0 }} />)}
-    </ol>
   </div>
 </section>
 
@@ -406,7 +239,9 @@ for (const l of lieux) {
     top: calc((var(--i) + 0.5) * var(--pas));
     scroll-snap-align: start;
   }
-  :global(html:has(.d2.js)) {
+  /* Snap points only when time alone plays the demos (?auto=1). With the scroll in play, a snap
+     scrolls the page back up after the wheel stops, which rewound the demo (César 01/10). */
+  :global(html:has(.d2.js:not(.long))) {
     scroll-snap-type: y proximity;
   }
   .d2-scene-fixe {
@@ -464,96 +299,13 @@ for (const l of lieux) {
     height: 100%;
     object-fit: cover;
   }
+  /* The cut-out agents stay still: their soft-edged patches show as soon as they move. */
   .d2-calque :global(.d2-agent) {
     position: absolute;
     height: auto;
-    transform-origin: 50% 100%;
-    animation: d2-respire 4s ease-in-out infinite;
-    transition:
-      translate 0.5s var(--ease-hatch),
-      filter 0.5s var(--ease-hatch);
-  }
-  .d2-lieu:not([data-ouvert]) .d2-calque :global(.d2-agent.survol) {
-    translate: 0 -3%;
-    filter: drop-shadow(0 0 0.2vw rgb(255 255 255 / 0.85));
-  }
-  @keyframes d2-respire {
-    50% {
-      transform: scaleY(1.025);
-    }
   }
 
-  /* Markers: a pulsing dot on the agent, its name beside. Counter-scaled so the zoom keeps them crisp. */
-  .d2-repere {
-    position: absolute;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    padding: 5px 12px 5px 5px;
-    border-radius: 999px;
-    background: rgb(255 255 255 / 0.9);
-    box-shadow: var(--shadow-2);
-    font: 600 13px/1 var(--font-sans);
-    color: var(--color-ink);
-    white-space: nowrap;
-    cursor: pointer;
-    translate: -14px -50%;
-    transform-origin: 14px 50%;
-    scale: calc(1 / var(--z));
-    transition:
-      opacity 0.4s var(--ease-hatch),
-      background-color 0.3s,
-      visibility 0s;
-  }
-  .d2-repere.gauche {
-    flex-direction: row-reverse;
-    padding: 5px 5px 5px 12px;
-    translate: calc(-100% + 14px) -50%;
-    transform-origin: calc(100% - 14px) 50%;
-  }
-  .d2-repere:hover,
-  .d2-repere:focus-visible {
-    background: var(--color-orange-tint);
-  }
-  .d2-repere:focus-visible {
-    outline: 2px solid var(--color-orange-txt);
-    outline-offset: 2px;
-  }
-  .d2-point {
-    position: relative;
-    width: 18px;
-    height: 18px;
-    border-radius: 999px;
-    background: var(--color-orange);
-    box-shadow: inset 0 0 0 4px var(--color-white);
-  }
-  .d2-point::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    border: 2px solid var(--color-orange);
-    animation: d2-pulse 2.2s var(--ease-hatch) infinite;
-  }
-  @keyframes d2-pulse {
-    from {
-      scale: 1;
-      opacity: 0.8;
-    }
-    to {
-      scale: 2.4;
-      opacity: 0;
-    }
-  }
-  .d2-lieu[data-ouvert] .d2-repere {
-    opacity: 0;
-    visibility: hidden;
-    transition:
-      opacity 0.3s,
-      visibility 0s 0.3s;
-  }
-
-  /* Overlays: the wide shot (panel + menu) or one agent demo (panel + card). */
+  /* Overlay of a place: where, what, the device, the chapters. */
   .d2-ui {
     position: absolute;
     inset: 0;
@@ -569,157 +321,22 @@ for (const l of lieux) {
       opacity 0.45s var(--ease-hatch),
       translate 0.7s var(--ease-hatch);
   }
-  .d2-lieu.on:not([data-ouvert]) > .d2-vue,
-  .d2-lieu.on > .d2-demo.on,
-  .d2-lieu.on > .d2-auto {
+  .d2-lieu.on > .d2-ui {
     visibility: visible;
     transition-delay: 0s;
   }
-  .d2-lieu.on:not([data-ouvert]) > .d2-vue > *,
-  .d2-lieu.on > .d2-demo.on > *,
-  .d2-lieu.on > .d2-auto > * {
+  .d2-lieu.on > .d2-ui > * {
     opacity: 1;
     translate: 0 0;
     transition-delay: 0.35s;
   }
-  .d2-lieu.on:not([data-ouvert]) > .d2-vue > .d2-carte,
-  .d2-lieu.on > .d2-demo.on > .d2-carte {
-    transition-delay: 0.55s;
-  }
 
-  .d2-panneau {
-    position: absolute;
-    left: clamp(16px, 4vw, 64px);
-    bottom: clamp(56px, 9vh, 96px);
-    max-width: min(560px, calc(100vw - 32px));
-    padding: 22px 26px 24px;
-    border-radius: 22px;
-    background: linear-gradient(-120deg, rgb(255 255 255 / 0.78), rgb(255 255 255 / 0.58));
-    backdrop-filter: blur(16px) saturate(1.2);
-    -webkit-backdrop-filter: blur(16px) saturate(1.2);
-    box-shadow:
-      0 18px 44px color-mix(in srgb, var(--color-navy) 22%, transparent),
-      inset 0 1px 0 var(--color-white);
-  }
-  .d2-retour {
-    display: inline-flex;
-    gap: 6px;
-    margin-bottom: 12px;
-    padding: 6px 12px;
-    border-radius: 999px;
-    background: var(--color-ink);
-    font: 600 13px/1.2 var(--font-sans);
-    color: var(--color-white);
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  .d2-retour:hover {
-    background: var(--color-orange-txt);
-  }
-  .d2-retour:focus-visible {
-    outline: 2px solid var(--color-orange-txt);
-    outline-offset: 2px;
-  }
-  .d2-surtitre,
-  .d2-consigne {
-    font: 400 12px/1.2 var(--font-mono);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--color-orange-txt);
-  }
   .d2-titre {
     margin-top: 8px;
     font: 700 clamp(24px, 2.4vw, 34px) / 1.12 var(--font-display);
     letter-spacing: -0.02em;
     color: var(--color-ink);
     text-wrap: balance;
-  }
-  .d2-carte {
-    position: absolute;
-    right: clamp(16px, 6vw, 120px);
-    top: clamp(96px, 18vh, 200px);
-    width: min(380px, calc(100vw - 32px));
-    padding: 14px;
-    border-radius: 18px;
-    background: rgb(255 255 255 / 0.92);
-    box-shadow: 0 16px 40px color-mix(in srgb, var(--color-navy) 22%, transparent);
-    font: 500 14px/1.4 var(--font-sans);
-    color: var(--color-ink);
-  }
-  .d2-consigne {
-    padding: 2px 4px 10px;
-  }
-  .d2-menu {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-  .d2-menu button {
-    display: flex;
-    width: 100%;
-    gap: 10px;
-    align-items: center;
-    padding: 8px;
-    border-radius: 12px;
-    text-align: left;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  .d2-menu button > span {
-    flex: 1;
-  }
-  .d2-menu button:hover,
-  .d2-menu button:focus-visible,
-  .d2-menu button.survol {
-    background: var(--color-cream-2);
-  }
-  .d2-menu button:focus-visible {
-    outline: 2px solid var(--color-orange-txt);
-  }
-  .d2-fleche {
-    flex: none;
-    width: 16px;
-    height: 16px;
-    fill: var(--color-soft);
-    transition:
-      fill 0.3s,
-      translate 0.35s var(--ease-hatch);
-  }
-  .d2-menu button:hover .d2-fleche,
-  .d2-menu button.survol .d2-fleche {
-    fill: var(--color-orange-txt);
-    translate: 3px 0;
-  }
-  .d2-lignes {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .d2-lignes li,
-  .d2-msg {
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
-  }
-  .d2-fil {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .d2-msg > span {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    padding: 9px 12px;
-    border-radius: 14px;
-    background: var(--color-cream-2);
-  }
-  .d2-msg b {
-    font-size: 12px;
-    color: var(--color-soft);
-  }
-  .d2-rep > span {
-    background: var(--color-orange-tint);
   }
   .d2 :global(.d2-av) {
     flex: none;
@@ -729,146 +346,156 @@ for (const l of lieux) {
     background: var(--color-white);
     object-fit: cover;
   }
-  .d2-points {
-    position: absolute;
-    right: clamp(16px, 3vw, 40px);
-    top: 50%;
-    translate: 0 -50%;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .d2-points li {
-    width: 8px;
-    height: 8px;
-    border-radius: 999px;
-    background: rgb(255 255 255 / 0.55);
-    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-ink) 25%, transparent);
-    transition:
-      background-color 0.4s,
-      scale 0.4s var(--ease-hatch);
-  }
-  .d2-points li.on {
-    background: var(--color-orange);
-    scale: 1.35;
-  }
 
-  /* Autoplay place: the agent sits left of centre, its device on the right. */
-  .d2-lieu.auto .d2-plateau {
-    --ox: 0.3;
-    --oy: 0.45;
+  /* The agent sits left of centre, its device on the right (VISEE in the frontmatter). */
+  .d2-plateau {
+    --ox: 0.27;
+    --oy: 0.4;
   }
-  .d2-titres {
+  /* Focus: the whole scene dims, agents included, so the device is the subject. */
+  .d2-voile {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: color-mix(in srgb, var(--color-night) 40%, transparent);
+    opacity: 0;
+    pointer-events: none;
+  }
+  /* One layout for every place (César 01/10): where (top left), what (bottom left), the proof
+     (the device, right), and the chapters bar (bottom), always at the same spot. */
+  .d2-ou {
+    position: absolute;
+    left: clamp(16px, 4vw, 64px);
+    top: clamp(88px, 12vh, 112px);
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.86);
+    box-shadow: var(--shadow-1);
+    font: 400 12px/1.2 var(--font-mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-orange-txt);
+  }
+  .d2-num {
+    color: var(--color-soft);
+  }
+  .d2-legende {
+    position: absolute;
+    left: clamp(16px, 4vw, 64px);
+    bottom: calc(clamp(24px, 4vh, 40px) + 76px);
     display: grid;
+    width: min(440px, calc(100vw - 32px));
   }
-  /* Titles and devices swap out then in (a cross-fade would overlap two texts). */
-  .d2-titres > .d2-titre {
+  /* One caption per demo in the same cell: out, then in (a cross-fade would overlap two texts). */
+  .d2-leg {
     grid-area: 1 / 1;
+    align-self: end;
+    padding: 18px 22px 20px;
+    border-radius: var(--radius-glass);
+    background: rgb(255 255 255 / 0.9);
+    box-shadow: var(--shadow-2);
     opacity: 0;
     visibility: hidden;
+    translate: 0 8px;
     transition:
-      opacity 0.3s var(--ease-hatch),
+      opacity 0.3s var(--ease-sortie),
+      translate 0.3s var(--ease-sortie),
       visibility 0s 0.3s;
   }
-  .d2-titres > .d2-titre.on {
+  .d2-leg.on {
     opacity: 1;
     visibility: visible;
+    translate: 0 0;
     transition:
-      opacity 0.4s var(--ease-hatch) 0.3s,
+      opacity 0.5s var(--ease-doux) 0.3s,
+      translate 0.7s var(--ease-entree) 0.3s,
       visibility 0s;
   }
-  .d2-onglets {
+  .d2-qui {
     display: flex;
-    gap: 8px;
-    margin-top: 16px;
+    gap: 10px;
+    align-items: center;
+    font: 500 14px/1.3 var(--font-sans);
+    color: var(--color-soft);
   }
-  .d2-onglets [data-onglet] {
+  .d2-qui b {
+    color: var(--color-ink);
+  }
+  .d2-leg .d2-titre {
+    margin-top: 10px;
+    font-size: clamp(22px, 1.9vw, 28px);
+  }
+  .d2-chapitres {
+    position: absolute;
+    left: clamp(16px, 4vw, 64px);
+    right: clamp(16px, 4vw, 64px);
+    bottom: clamp(24px, 4vh, 40px);
+    display: flex;
+    gap: 6px;
+    align-items: stretch;
+    padding: 6px;
+    border-radius: 16px;
+    background: rgb(255 255 255 / 0.86);
+    box-shadow: var(--shadow-2);
+  }
+  .d2-chapitres [data-onglet] {
     position: relative;
     display: flex;
     flex: 1;
+    flex-direction: column;
     gap: 8px;
-    align-items: center;
-    padding: 9px 10px 13px;
-    overflow: hidden;
-    border-radius: 12px;
-    background: rgb(255 255 255 / 0.55);
-    font: 500 13px/1.3 var(--font-sans);
+    padding: 10px 12px 9px;
+    border-radius: 11px;
+    font: 500 13px/1.2 var(--font-sans);
     color: var(--color-soft);
     text-align: left;
     cursor: pointer;
     transition: background-color 0.3s;
   }
-  .d2-onglets [data-onglet] b {
+  .d2-chapitres [data-onglet]:hover {
+    background: var(--color-cream);
+  }
+  .d2-chapitres [data-onglet].on {
     color: var(--color-ink);
   }
-  .d2-onglets [data-onglet]:hover {
-    background: var(--color-white);
-  }
-  .d2-onglets [data-onglet].on {
-    background: var(--color-white);
-    color: var(--color-ink);
-  }
-  .d2-onglets button:focus-visible {
+  .d2-chapitres button:focus-visible {
     outline: 2px solid var(--color-orange-txt);
     outline-offset: 2px;
   }
+  .d2-chap {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-weight: 600;
+  }
+  .d2-chap :global(.d2-av) {
+    width: 20px;
+    height: 20px;
+  }
   .d2-barre {
-    position: absolute;
-    left: 10px;
-    right: 10px;
-    bottom: 6px;
-    height: 3px;
+    display: block;
+    height: 4px;
+    overflow: hidden;
     border-radius: 999px;
     background: var(--color-line);
   }
+  /* Filled by the timeline, in step with its demo. */
   .d2-barre > span {
     display: block;
     height: 100%;
-    border-radius: inherit;
     background: var(--color-orange);
     transform-origin: left;
-    scale: 0 1;
-  }
-  [data-onglet].on .d2-barre > span {
-    scale: 1 1;
-  }
-  [data-onglet].joue .d2-barre > span {
-    animation: d2-progres var(--duree) linear both;
-  }
-  @keyframes d2-progres {
-    from {
-      scale: 0 1;
-    }
-  }
-  .d2-lieu.pause [data-onglet] .d2-barre > span {
-    animation-play-state: paused;
-  }
-  .d2-pause {
-    display: grid;
-    place-items: center;
-    flex: none;
-    width: 40px;
-    border-radius: 12px;
-    background: var(--color-ink);
-    cursor: pointer;
-  }
-  .d2-pause svg {
-    width: 16px;
-    fill: var(--color-white);
-  }
-  .d2-pause .i-lecture,
-  .d2-lieu.pause .d2-pause .i-pause {
-    display: none;
-  }
-  .d2-lieu.pause .d2-pause .i-lecture {
-    display: block;
+    transform: scaleX(0);
   }
   /* Centred with the grid, not with translate: the overlay's entrance animates translate. */
   .d2-appareils {
     position: absolute;
-    right: clamp(16px, 6vw, 120px);
-    top: 0;
-    bottom: 0;
+    right: clamp(16px, 5vw, 96px);
+    top: clamp(72px, 9vh, 96px);
+    bottom: calc(clamp(24px, 4vh, 40px) + 76px);
     display: grid;
     place-items: center;
     align-content: center;
@@ -877,65 +504,50 @@ for (const l of lieux) {
   .d2-appareils > * {
     pointer-events: auto;
   }
+  /* Devices: shown by the timeline (inline styles). Without JS, the first one stays. */
   .d2-ecran {
     grid-area: 1 / 1;
-    opacity: 0;
     visibility: hidden;
-    transition:
-      opacity 0.3s var(--ease-hatch),
-      visibility 0s 0.3s;
   }
-  .d2-ecran.on {
-    opacity: 1;
+  .d2:not(.js) .d2-ecran.on {
     visibility: visible;
-    transition:
-      opacity 0.45s var(--ease-hatch) 0.3s,
-      visibility 0s;
   }
-  .d2-ecran.tablette {
-    width: min(560px, 40vw);
+  .d2-ecran:is(.tablette, .tableau) {
+    width: min(700px, 47vw, 108svh);
   }
   .d2-ecran.telephone {
-    width: min(290px, 22vw, 62svh);
+    width: min(330px, 24vw, 37svh);
   }
 
   @media (max-width: 47.99rem) {
-    .d2-lieu.auto .d2-plateau {
+    .d2-plateau {
       --ox: 0.5;
       --oy: 0.25;
     }
     .d2-appareils {
       left: 16px;
       right: 16px;
-      top: 80px;
+      top: 116px;
       bottom: auto;
     }
-    .d2-ecran.tablette {
+    .d2-ecran:is(.tablette, .tableau) {
       width: 100%;
     }
     .d2-ecran.telephone {
       width: min(230px, 52vw, 50svh);
     }
-    .d2-onglets [data-onglet] span:not(.d2-barre) {
-      font-size: 12px;
+    .d2-legende {
+      bottom: calc(clamp(24px, 4vh, 40px) + 64px);
     }
-    .d2-plateau {
-      --oy: 0.27;
+    .d2-leg {
+      padding: 14px 16px 16px;
     }
-    .d2-carte {
-      left: 16px;
-      right: 16px;
-      width: auto;
-      top: auto;
-      bottom: calc(clamp(56px, 9vh, 96px) + 150px);
-    }
-    .d2-panneau {
-      right: 16px;
-      padding: 18px 20px;
+    .d2-ou {
+      top: 76px;
     }
   }
 
-  /* Without JS: the three places stack, each with its wide shot and its menu. */
+  /* Without JS: the three places stack, each with its first demo in its final state. */
   .d2:not(.js) {
     height: auto;
   }
@@ -949,13 +561,13 @@ for (const l of lieux) {
     opacity: 1;
     visibility: visible;
   }
-  .d2:not(.js) :is(.d2-vue, .d2-auto),
-  .d2:not(.js) :is(.d2-vue, .d2-auto) > * {
+  .d2:not(.js) .d2-ui,
+  .d2:not(.js) .d2-ui > * {
     visibility: visible;
     opacity: 1;
     translate: none;
   }
-  .d2:not(.js) :is(.d2-repere, .d2-points, .d2-fleche, .d2-pause) {
+  .d2:not(.js) .d2-barre {
     display: none;
   }
 
@@ -970,112 +582,79 @@ for (const l of lieux) {
 </style>
 
 <script>
+  import type { Mode, Pilote } from './demo-motion';
   /**
-   * The scroll position picks the place directly: place = floor(progress × n). No queue, so a fast
-   * scroll never leaves a step pending. Inside a place, agent demos open on demand.
+   * The scroll position picks the place directly (no queue, so a fast scroll never leaves a step
+   * pending); inside a place, its timeline (demo-motion.ts) plays the demos.
    */
   const sec = document.querySelector<HTMLElement>('.d2')!;
   const lieux = [...sec.querySelectorAll<HTMLElement>('.d2-lieu')];
-  const points = [...sec.querySelectorAll<HTMLElement>('.d2-points li')];
-  const n = lieux.length;
   sec.classList.add('js');
 
   let k = 0;
-  let source: HTMLElement | null = null;
-  const fige = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (fige) sec.querySelectorAll('.ecr').forEach((e) => e.classList.add('fige'));
 
-  const calque = (lieu: HTMLElement) => lieu.querySelector<HTMLElement>('.d2-calque')!;
-  const demos = (lieu: HTMLElement) => [...lieu.querySelectorAll<HTMLElement>('.d2-demo')];
-
-  function survol(lieu: HTMLElement, cle: string | null) {
-    lieu.querySelectorAll<HTMLElement>('.d2-agent').forEach((a) => {
-      a.classList.toggle('survol', !!cle && a.dataset.cles!.split(' ').includes(cle));
-    });
-    lieu.querySelectorAll<HTMLElement>('.d2-menu [data-ouvrir]').forEach((b) => {
-      b.classList.toggle('survol', b.dataset.ouvrir === cle);
-    });
+  /**
+   * demo-motion.ts `Mode`: `mixte` by default, `?scroll=1` (scroll only) and `?auto=1` (time only)
+   * to compare. With the scroll in play, a place gets several steps of scroll instead of one, so
+   * scrolling through it covers its whole timeline.
+   */
+  const params = new URLSearchParams(location.search);
+  const mode: Mode = params.has('scroll') ? 'scroll' : params.has('auto') ? 'auto' : 'mixte';
+  const POIDS = { auto: 1, scroll: 5, mixte: 3 }[mode];
+  const poids = lieux.map(() => POIDS);
+  const debuts = poids.map((_, i) => poids.slice(0, i).reduce((a, b) => a + b, 0));
+  const total = poids.reduce((a, b) => a + b, 0);
+  if (POIDS > 1) {
+    sec.classList.add('long');
+    sec.style.setProperty('--n', String(total));
+  }
+  if (mode === 'scroll') sec.classList.add('scrub');
+  /** Where the scroll is: the place, and the position inside it (0–1). */
+  function ici() {
+    const r = sec.getBoundingClientRect();
+    const u = Math.min(Math.max(-r.top / (r.height - innerHeight), 0), 0.9999) * total;
+    const i = debuts.findLastIndex((d) => u >= d);
+    return { i, q: (u - debuts[i]) / poids[i] };
   }
 
-  function marquer(lieu: HTMLElement, cle: string | null) {
-    lieu.querySelectorAll<HTMLElement>('[data-ouvrir]').forEach((b) => {
-      b.setAttribute('aria-expanded', String(b.dataset.ouvrir === cle));
-    });
-  }
+  /** The places' timelines: GSAP and the choreography load when the section comes near. */
+  const pilotes = new Map<HTMLElement, Pilote>();
+  new IntersectionObserver(
+    async (entrees, io) => {
+      if (!entrees.some((e) => e.isIntersecting)) return;
+      io.disconnect();
+      const { piloter } = await import('./demo-motion');
+      lieux.forEach((l) => pilotes.set(l, piloter(l, mode)));
+      maj();
+    },
+    { rootMargin: '100% 0px' },
+  ).observe(sec);
 
-  function ouvrir(lieu: HTMLElement, cle: string, depuis: HTMLElement) {
-    const demo = demos(lieu).find((d) => d.dataset.cle === cle)!;
-    demos(lieu).forEach((d) => d.classList.toggle('on', d === demo));
-    lieu.dataset.ouvert = cle;
-    calque(lieu).setAttribute('style', demo.dataset.cam!);
-    survol(lieu, cle);
-    marquer(lieu, cle);
-    source = depuis;
-    requestAnimationFrame(() =>
-      demo.querySelector<HTMLElement>('[data-fermer]')!.focus({ preventScroll: true }),
-    );
-  }
-
-  function fermer(lieu: HTMLElement, rendreFocus: boolean) {
-    if (!lieu.dataset.ouvert) return;
-    delete lieu.dataset.ouvert;
-    demos(lieu).forEach((d) => d.classList.remove('on'));
-    calque(lieu).setAttribute('style', lieu.dataset.vue!);
-    survol(lieu, null);
-    marquer(lieu, null);
-    if (rendreFocus && source?.isConnected) {
-      // The marker that opened the demo fades back in; the menu line is always focusable.
-      const cible = source.classList.contains('d2-repere')
-        ? lieu.querySelector<HTMLElement>(`.d2-menu [data-ouvrir="${source.dataset.ouvrir}"]`)
-        : source;
-      cible?.focus({ preventScroll: true });
-    }
-    source = null;
-  }
-
-  /** Autoplay places: demo i plays on its device; its tab's progress bar ends it (see animationend). */
-  function jouer(lieu: HTMLElement, i: number) {
-    const ecrans = [...lieu.querySelectorAll<HTMLElement>('.d2-ecran')];
-    const onglets = [...lieu.querySelectorAll<HTMLElement>('[data-onglet]')];
-    lieu
-      .querySelectorAll('.d2-titres > .d2-titre')
-      .forEach((t, j) => t.classList.toggle('on', j === i));
-    onglets.forEach((o, j) => {
-      o.classList.toggle('on', j === i);
-      o.classList.remove('joue');
-      o.setAttribute('aria-pressed', String(j === i));
-    });
-    ecrans.forEach((e, j) => {
-      e.classList.toggle('on', j === i);
-      e.querySelector('.ecr')!.classList.remove('joue');
-    });
-    calque(lieu).setAttribute('style', ecrans[i].dataset.cam!);
-    if (fige) return;
-    const ecr = ecrans[i].querySelector<HTMLElement>('.ecr')!;
-    void ecr.offsetWidth; // restart the CSS animations from 0
-    ecr.classList.add('joue');
-    onglets[i].classList.add('joue');
-  }
-  function arreter(lieu: HTMLElement) {
-    lieu.querySelectorAll('.joue').forEach((e) => e.classList.remove('joue'));
-  }
-  function pause(lieu: HTMLElement, oui: boolean) {
-    lieu.classList.toggle('pause', oui);
-    const b = lieu.querySelector<HTMLElement>('.d2-pause')!;
-    b.setAttribute('aria-label', oui ? b.dataset.lecture! : b.dataset.pause!);
-  }
-
+  /**
+   * A place plays only while the section is pinned (César 01/10: the head office's first demo had
+   * played out of sight, while the section was still scrolling in from below). Above it, the first
+   * place waits on its wide shot; past it, the last one freezes where it is.
+   */
+  let enJeu = false;
   function maj() {
     const r = sec.getBoundingClientRect();
-    const p = Math.min(Math.max(-r.top / (r.height - innerHeight), 0), 0.9999);
-    const suivant = Math.floor(p * n);
-    if (suivant === k) return;
-    fermer(lieux[k], false);
-    if (lieux[k].classList.contains('auto')) arreter(lieux[k]);
-    k = suivant;
-    lieux.forEach((l, i) => l.classList.toggle('on', i === k));
-    if (lieux[k].classList.contains('auto')) jouer(lieux[k], 0);
-    points.forEach((el, i) => el.classList.toggle('on', i === k));
+    const epingle = r.top <= 1 && r.bottom >= innerHeight - 1;
+    const { i: suivant, q } = ici();
+    if (suivant !== k) {
+      if (enJeu) pilotes.get(lieux[k])?.arreter();
+      enJeu = false;
+      k = suivant;
+      lieux.forEach((l, i) => l.classList.toggle('on', i === k));
+    }
+    const pilote = pilotes.get(lieux[k]);
+    if (!pilote) return;
+    if (!epingle) {
+      if (enJeu) pilote.arreter(r.top > 1);
+      enJeu = false;
+    } else if (!enJeu) {
+      pilote.entrer(q);
+      enJeu = true;
+    } else pilote.suivre(q);
   }
 
   sec.addEventListener('click', (ev) => {
@@ -1083,43 +662,19 @@ for (const l of lieux) {
     const lieu = t.closest<HTMLElement>('.d2-lieu');
     if (!lieu) return;
     const onglet = t.closest<HTMLElement>('[data-onglet]');
-    if (onglet) {
-      pause(lieu, false);
-      return jouer(lieu, Number(onglet.dataset.onglet));
+    const pilote = pilotes.get(lieu);
+    if (onglet && mode === 'scroll' && pilote) {
+      // Scroll mode: a tab scrolls to where its demo starts.
+      const i = lieux.indexOf(lieu);
+      const u = debuts[i] + poids[i] * pilote.position(Number(onglet.dataset.onglet));
+      const r = sec.getBoundingClientRect();
+      const top = scrollY + r.top + (u / total) * (r.height - innerHeight);
+      return scrollTo({
+        top,
+        behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+      });
     }
-    if (t.closest('.d2-pause')) return pause(lieu, !lieu.classList.contains('pause'));
-    const b = t.closest<HTMLElement>('[data-ouvrir]');
-    if (b) return ouvrir(lieu, b.dataset.ouvrir!, b);
-    if (t.closest('[data-fermer]')) return fermer(lieu, true);
-    // A click on the scene itself (not on a card) goes back to the wide shot.
-    if (t.closest('.d2-plateau')) fermer(lieu, false);
-  });
-  for (const [on, off] of [
-    ['pointerover', 'pointerout'],
-    ['focusin', 'focusout'],
-  ]) {
-    sec.addEventListener(on, (ev) => {
-      const b = (ev.target as HTMLElement).closest<HTMLElement>('[data-ouvrir]');
-      const lieu = b?.closest<HTMLElement>('.d2-lieu');
-      if (b && lieu && !lieu.dataset.ouvert) survol(lieu, b.dataset.ouvrir!);
-    });
-    sec.addEventListener(off, (ev) => {
-      const b = (ev.target as HTMLElement).closest<HTMLElement>('[data-ouvrir]');
-      const lieu = b?.closest<HTMLElement>('.d2-lieu');
-      if (b && lieu && !lieu.dataset.ouvert) survol(lieu, null);
-    });
-  }
-  // A demo's progress bar is full: next demo of the place, in a loop.
-  sec.addEventListener('animationend', (ev) => {
-    const barre = (ev.target as HTMLElement).closest('.d2-barre');
-    const onglet = barre?.closest<HTMLElement>('[data-onglet]');
-    if (!onglet?.classList.contains('joue')) return;
-    const lieu = onglet.closest<HTMLElement>('.d2-lieu')!;
-    const n = lieu.querySelectorAll('[data-onglet]').length;
-    jouer(lieu, (Number(onglet.dataset.onglet) + 1) % n);
-  });
-  addEventListener('keydown', (ev) => {
-    if (ev.key === 'Escape' && lieux[k].dataset.ouvert) fermer(lieux[k], true);
+    if (onglet) pilote?.jouer(Number(onglet.dataset.onglet));
   });
 
   let raf = 0;
@@ -1128,5 +683,4 @@ for (const l of lieux) {
   });
   addEventListener('resize', maj);
   maj();
-  if (lieux[k].classList.contains('auto')) jouer(lieux[k], 0);
 </script>

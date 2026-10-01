@@ -157,7 +157,9 @@ function animer(section: HTMLElement) {
       obs.disconnect();
       viser();
     },
-    { threshold: 0.5 },
+    // Once the pinned stage fills the screen (the section has reached the top), not while it is
+    // still scrolling in: at half visible the 7 notifications used to drop before being seen.
+    { threshold: 0.95 },
   ).observe(collant);
   rendre(0);
 }

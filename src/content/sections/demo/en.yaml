@@ -1,54 +1,119 @@
 # Diorama demo: three places on scroll; in each place, the visitor opens an agent's demo.
 titre: Your agents at work
-consigne: Pick an agent
-pause: Pause the demo
-lecture: Play the demo
 
 lieux:
   - surtitre: At head office
-    titre: Four agents work alongside your team.
-    retour: Back to head office
     agents:
       - cle: peep
         nom: Peep
         role: answers questions from the field
-        titre: The field writes, Peep answers.
-        carte:
-          qui: Crousty One Lille
-          texte: Where's the allergen sheet for the new burger?
-          reponse:
-            qui: Peep
-            texte: '“Summer menu allergens” v3, here it is.'
+        titre: The field asks, Peep answers.
+        ecran:
+          appareil: telephone
+          heure: "11:48"
+          contact: Peep
+          statut: Network assistant
+          ecrit: typing…
+          jour: Today
+          saisie: Message
+          fil:
+            - de: equipe
+              texte: Where's the allergen sheet for the new burger?
+            - de: agent
+              texte: Here it is, the latest version.
+            - document:
+                titre: Allergens · summer menu v3
+                meta: PDF · 2 pages
+            - de: equipe
+              texte: Thanks, I'll put it up in the kitchen
+          suivi:
+            app: Hatch OS
+            quand: now
+            titre: Head office · field questions
+            texte: Peep answered BunBun Lille
       - cle: lark
         nom: Lark
         role: prepares your morning briefing
-        titre: The state of the network, every morning.
-        carte:
-          lignes:
-            - agent: Lark
-              texte: 312 answers from Peep this week
-            - agent: Lark
-              texte: follow up with Lyon Part-Dieu, audit 3 days late
+        titre: The state of your network, every morning.
+        ecran:
+          appareil: tableau
+          heure: "8:00"
+          entete: Lark · Morning briefing
+          statut: Monday 8 am
+          intro: Good morning Claire, here's the state of the network this morning.
+          titre: BunBun network · week 40
+          source: Hatch data · last 7 days
+          blocs:
+            - type: chiffres
+              items:
+                - valeur: 312
+                  libelle: answers from Peep
+                - valeur: 28
+                  libelle: active sites
+                - valeur: 1
+                  libelle: overdue audit
+            - type: alerte
+              texte: BunBun Lyon Part-Dieu · audit 3 days overdue
+              bouton: Follow up
       - cle: jay
         nom: Jay
         role: keeps the manual up to date
-        titre: The manual, up to date and shared.
-        carte:
-          lignes:
-            - agent: Jay
-              texte: '“Fryer cleaning” v4 shared with 30 sites'
+        titre: The manual always up to date.
+        ecran:
+          appareil: tableau
+          heure: "10:15"
+          entete: Jay · Manual
+          statut: Updated
+          demande:
+            qui: Claire · head office
+            texte: "Jay, please update the fryer sheet: in Lille the oil is saturated by the end of the week, let's switch to every three days."
+          intro: On it, updating the sheet.
+          titre: Fryer cleaning
+          source: BunBun manual · Hygiene sheet
+          blocs:
+            - type: edition
+              version:
+                avant: v3
+                apres: v4
+              etat:
+                enCours: Editing
+                publiee: Published
+              lignes:
+                - Switch off the fryer, let it cool for 30 min
+                - Drain the oil once a week
+                - Clean the tank with degreaser
+              modifiee: 1
+              apres: Drain the oil every three days
+              note: "Why: oil saturated by the end of the week, feedback from BunBun Lille"
       - cle: finch
         nom: Finch
         role: turns audits into actions
-        titre: Audits that turn into action plans.
-        carte:
-          lignes:
-            - agent: Finch
-              texte: Lille audit 92 / 100, 2 gaps turned into actions
+        titre: Audits that become action plans.
+        ecran:
+          appareil: tableau
+          heure: "17:30"
+          entete: Finch · Audits
+          statut: Audit done
+          intro: BunBun Lille audit done, two gaps to fix.
+          titre: Quality audit · BunBun Lille
+          source: BunBun audit grid 2026
+          blocs:
+            - type: score
+              valeur: 92
+              sur: 100
+              libelle: Overall score
+            - type: plan
+              reflexion: Writing the action plan…
+              titre: Action plan · BunBun Lille
+              actions:
+                - ecart: Fridge temperatures not logged
+                  action: Log fridge temperatures morning and evening
+                  echeance: From tomorrow
+                - ecart: Missing use-by label
+                  action: Label every tub at opening
+                  echeance: By Friday
 
   - surtitre: In the kitchen
-    titre: Teams ask, agents answer.
-    retour: Back to the kitchen
     agents:
       - cle: owl
         nom: Owl
@@ -56,15 +121,30 @@ lieux:
         titre: A question out loud, the procedure read step by step.
         ecran:
           appareil: tablette
+          heure: "15:02"
           entete: Owl · Kitchen tablet
           ecoute: Listening
+          prepare: Preparing the sheet
+          lit: Reading the sheet
           question: Owl, how do we open the till?
           fiche: Opening the till
           source: BunBun manual · Till sheet v4
           etapes:
-            - Enter your manager code on the screen
-            - Count the cash float, €150
-            - Confirm the opening, the receipt prints
+            - visuel: code
+              texte: Enter your manager code on the screen
+              libelle: Manager code
+            - visuel: caisse
+              texte: Count the cash float, €150
+              libelle: Cash float
+              billets: [50, 50, 20, 20, 10]
+            - visuel: ticket
+              texte: Confirm the opening, the receipt prints
+              bouton: Confirm opening
+              lignes:
+                - BunBun · Till 1
+                - Opened 15:02
+                - Float €150.00
+          compteur: Step {n} of {total}
           pied: Read out loud, step by step
       - cle: pecker
         nom: Pecker
@@ -72,8 +152,12 @@ lieux:
         titre: Five minutes of training during the break, and head office knows who passed.
         ecran:
           appareil: telephone
+          heure: "15:02"
           contact: Pecker
           statut: Training
+          ecrit: typing…
+          jour: Today
+          saisie: Message
           fil:
             - de: agent
               texte: Hi Inès! Today's module, “Opening the restaurant”, 5 min. Shall we?
@@ -81,6 +165,7 @@ lieux:
               texte: Let's go
             - quiz:
                 question: Before opening the till, you need to…
+                aide: Select one answer.
                 options:
                   - Switch on the fryer
                   - Count the cash float
@@ -89,30 +174,62 @@ lieux:
             - de: agent
               texte: Well done, module passed! Next one tomorrow during the break.
           suivi:
+            app: Hatch OS
+            quand: now
             titre: Head office · training tracker
             texte: Inès passed “Opening the restaurant”
 
   - surtitre: On the build site
-    titre: From first contact to opening day.
-    retour: Back to the build site
     agents:
       - cle: sparrow-candidats
         nom: Sparrow · Candidates
         role: qualifies your franchise candidates
-        titre: Every candidate qualified, right away.
-        carte:
-          qui: Julien · candidate in Rennes
-          texte: Hi, I'm interested in the franchise. How do we start?
-          reponse:
-            qui: Sparrow
-            texte: Glad to hear it! Target city, budget, ideal timing? I'll prepare your file.
+        titre: Every candidate qualified, without waiting.
+        ecran:
+          appareil: telephone
+          heure: "21:12"
+          contact: Sparrow
+          statut: BunBun recruitment
+          ecrit: typing…
+          jour: Today
+          saisie: Message
+          fil:
+            - de: equipe
+              texte: Hello, I'm interested in the franchise. How do we start?
+            - de: agent
+              texte: Glad to hear it! Which city are you aiming for, and when?
+            - de: equipe
+              texte: Rennes, next spring
+            - de: agent
+              texte: Perfect, I'm preparing your file. A call with the development team on Thursday?
+          suivi:
+            app: Hatch OS
+            quand: now
+            titre: CRM · new candidate
+            texte: Julien · future BunBun Rennes · spring 2027, file ready
       - cle: sparrow-ouverture
         nom: Sparrow · Opening
-        role: follows every opening through to day one
-        titre: Every opening followed through to day one.
-        carte:
-          qui: Sparrow
-          texte: Are the tiles done? The team training still needs a date.
-          reponse:
-            qui: Karim · franchisee
-            texte: Yes, finished yesterday. Thursday?
+        role: follows every opening until day one
+        titre: Every opening followed until day one.
+        ecran:
+          appareil: telephone
+          heure: "9:05"
+          contact: Sparrow
+          statut: BunBun Angers opening
+          ecrit: typing…
+          jour: Today
+          saisie: Message
+          fil:
+            - de: agent
+              texte: Hi Sophie, are the tiles laid?
+            - de: equipe
+              texte: Yes, finished yesterday
+            - de: agent
+              texte: Great. The team training is left, shall we set it for Thursday?
+            - de: equipe
+              texte: Thursday works
+          suivi:
+            app: Hatch OS
+            quand: now
+            titre: BunBun Angers · opening 80%
+            texte: Team training scheduled for Thursday
