@@ -65,7 +65,7 @@ const steps = events.map((e, i) => {
   return { ...e, x, y, anchor: SHOPS[i].anchor, avatar: avatars[e.agent] };
 });
 /** Seconds per event (wave, card running, card done, exit). */
-const STEP = 3.3;
+const STEP = 5.6;
 
 const tick =
   'M10 18H8v-2h2v2Zm-2-2H6v-2h2v2Zm4-2v2h-2v-2h2Zm-6 0H4v-2h2v2Zm8 0h-2v-2h2v2Zm2-2h-2v-2h2v2Zm2-2h-2V8h2v2Zm2-2h-2V6h2v2Z';
@@ -180,7 +180,8 @@ const tick =
 <script>
   /**
    * Hero loop: one shop at a time. Wave on the shop (0 → 1.4 s), then its card appears above it at
-   * 1 s ("running"), switches to "done" at 2.1 s, leaves at 2.85 s; next shop at STEP (3.3 s). Paused off screen.
+   * 1 s ("running"), switches to "done" at 3.2 s, leaves at 5 s; next shop at STEP (5.6 s). Each state stays
+   * ~2 s so its line can be read (César, 01/10: 1.1 s / 0.75 s was too fast). Paused off screen.
    * `?t=<s>` freezes the loop at an instant (captures); reduced motion shows a still frame.
    */
   const hero = document.querySelector<HTMLElement>('.hero')!;
@@ -191,8 +192,8 @@ const tick =
   const pings = [...hero.querySelectorAll<HTMLElement>('.h-ping')];
   const CYCLE = STEP * piles.length;
   const ENTREE = 1.0;
-  const BASCULE = 2.1;
-  const SORTIE = 2.85;
+  const BASCULE = 3.2;
+  const SORTIE = 5.0;
 
   /** p = wave progress (0 → 1; ≥ 1 = idle). The second ring follows 0.3 behind the first. */
   const clamp = (x: number) => Math.min(1, Math.max(0, x));
