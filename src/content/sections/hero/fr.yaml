@@ -15,7 +15,7 @@ tasks:
       running: "Question de l'équipe de Dijon"
       done: 'Fiche allergènes envoyée'
     - agent: lark
-      running: 'Stuttgart en retard sur le CA'
+      running: 'Strasbourg en retard sur le CA'
       done: 'Relance programmée demain 9 h'
     - agent: sparrow
       running: 'Ouverture Marseille · J-18'

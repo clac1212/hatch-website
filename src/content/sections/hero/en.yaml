@@ -14,7 +14,7 @@ tasks:
       running: 'Question from the Dijon team'
       done: 'Allergen sheet sent'
     - agent: lark
-      running: 'Stuttgart behind on revenue'
+      running: 'Strasbourg behind on revenue'
       done: 'Follow-up scheduled tomorrow 9 am'
     - agent: sparrow
       running: 'Marseille opening · D-18'
