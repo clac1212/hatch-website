@@ -139,9 +139,6 @@ export const schema = z.strictObject({
   titre: texte,
   /** Menu card heading, inviting to pick an agent. */
   consigne: texte,
-  /** Autoplay control of the animated screens. */
-  pause: texte,
-  lecture: texte,
   lieux: z.array(lieu).length(3),
 });
 

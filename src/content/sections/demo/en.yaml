@@ -1,8 +1,6 @@
 # Diorama demo: three places on scroll; in each place, the visitor opens an agent's demo.
 titre: Your agents at work
 consigne: Pick an agent
-pause: Pause the demo
-lecture: Play the demo
 
 lieux:
   - surtitre: At head office

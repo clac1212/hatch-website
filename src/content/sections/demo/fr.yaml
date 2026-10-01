@@ -1,8 +1,6 @@
 # Démo diorama : trois lieux au scroll ; dans chaque lieu, le visiteur ouvre la démo d'un agent.
 titre: Vos agents au travail
 consigne: Choisissez un agent
-pause: Mettre la démo en pause
-lecture: Relancer la démo
 
 lieux:
   - surtitre: Au siège

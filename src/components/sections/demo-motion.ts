@@ -6,7 +6,7 @@ import { gsap } from 'gsap';
  * Apple, Stripe): one focal motion at a time — the camera travels to the agent, the scene dims,
  * the agent's device enters from its side, then the screen plays its beats
  * (DemoEcran.astro `data-t`). Exits are shorter than entrances. The timeline also drives the tabs'
- * progress bars, so pause, tab clicks and the loop stay in sync.
+ * progress bars, so tab clicks, scroll and the loop stay in sync.
  * Reduced motion: no timeline; a tab shows its demo's final state, the camera cuts.
  */
 
@@ -440,8 +440,6 @@ export interface Pilote {
   jouer(i: number): void;
   /** The place is left. */
   arreter(): void;
-  /** Toggle the visitor's pause; returns the new state. */
-  basculer(): boolean;
   /** Scroll mode: progress (0–1) where demo i starts, to scroll a tab click there. */
   position(i: number): number;
 }
@@ -463,7 +461,6 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
   let tl: gsap.core.Timeline | null = null;
   let debuts: number[] = [];
   let actif = false;
-  let enPause = false;
   let courant = -1;
   /** Last scroll position inside the place (0–1): scroll mode reapplies it, mixte diffs it. */
   let q = 0;
@@ -576,7 +573,15 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
         { '--z': cam['--z'] * DERIVE, duration: duree, ease: 'sine.inOut' },
         c,
       );
-      // 4. Exit, shorter than the entrance.
+      // 4. Exit, shorter than the entrance. A card beside the device (head office's notification)
+      //    leaves first, on its own path, so the two read as separate things, not one block.
+      const aCote = ecr.querySelector<HTMLElement>('.p-suivi');
+      if (aCote)
+        s.to(
+          aCote,
+          { autoAlpha: 0, x: -28, y: -10, duration: 0.35, ease: EASE.sortie },
+          c + duree - 0.25,
+        );
       s.to(
         e,
         {
@@ -586,7 +591,7 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
           duration: T.sortie,
           ease: EASE.sortie,
         },
-        c + duree,
+        c + duree + (aCote ? 0.12 : 0),
       );
 
       const debut = i === 0 ? ARRIVEE.plan : m.duration() - 0.1;
@@ -646,7 +651,7 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
       tl = reduit ? null : construire(!!mobile);
       if (!tl) montrer(scroll ? indice(q) : 0);
       else if (scroll) tl.progress(q);
-      else if (actif) tl.play(depart(q)).paused(enPause);
+      else if (actif) tl.play(depart(q));
       return () => {
         tl = null;
       };
@@ -654,7 +659,7 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
   );
 
   document.addEventListener('visibilitychange', () => {
-    if (tl && actif && !enPause && !scroll && cible === null) tl.paused(document.hidden);
+    if (tl && actif && !scroll && cible === null) tl.paused(document.hidden);
   });
 
   /** Mixte: move the playhead by `dt` seconds, eased, then let it play on from there. */
@@ -670,7 +675,7 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
       overwrite: true,
       onComplete() {
         cible = null;
-        if (actif && !enPause) tl?.play();
+        if (actif) tl?.play();
       },
     });
   }
@@ -681,7 +686,6 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
       q = p;
       if (!tl) return montrer(scroll ? indice(p) : 0);
       if (scroll) return void tl.progress(p);
-      enPause = false;
       tl.play(depart(p));
     },
     suivre(p) {
@@ -696,7 +700,6 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
     jouer(i) {
       if (scroll) return;
       if (!tl) return montrer(i);
-      enPause = false;
       cible = null;
       gsap.killTweensOf(tl);
       tl.play(i === 0 ? 0 : `d${i}`);
@@ -707,11 +710,6 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
       if (!tl) return scroll ? undefined : montrer(0);
       gsap.killTweensOf(tl);
       if (!scroll) tl.pause(0);
-    },
-    basculer() {
-      enPause = !enPause;
-      if (tl && cible === null) tl.paused(enPause);
-      return enPause;
     },
     position(i) {
       if (!tl) return (i + 0.5) / ecrans.length;
