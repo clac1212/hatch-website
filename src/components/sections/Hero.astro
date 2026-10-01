@@ -334,7 +334,7 @@ const tick =
     height: 100%;
     transform-origin: 50% 100%;
     animation: h-respire 3.9s ease-in-out var(--d) infinite;
-    transition: scale 0.5s var(--ease-hatch);
+    transition: scale 0.6s var(--ease-entree);
   }
   @keyframes h-respire {
     0%,
@@ -363,8 +363,8 @@ const tick =
     transform: translate(-30%, 6px) scale(0.8);
     transform-origin: 20% 100%;
     transition:
-      opacity 0.35s var(--ease-hatch),
-      transform 0.5s cubic-bezier(0.34, 1.4, 0.64, 1);
+      opacity 0.35s var(--ease-doux),
+      transform 0.5s var(--ease-pop);
   }
   .h-bulle i {
     width: 6px;
@@ -510,9 +510,9 @@ const tick =
     filter: blur(6px);
     transform: translateY(14px) scale(0.94);
     transition:
-      opacity 0.45s var(--ease-hatch),
-      filter 0.45s var(--ease-hatch),
-      transform 0.7s cubic-bezier(0.34, 1.4, 0.64, 1);
+      opacity 0.45s var(--ease-doux),
+      filter 0.45s var(--ease-doux),
+      transform 0.7s var(--ease-entree);
   }
   @media (min-width: 40rem) {
     .h-tache {
@@ -528,7 +528,8 @@ const tick =
     opacity: 0;
     filter: blur(4px);
     transform: translateY(-10px) scale(0.98);
-    transition-duration: 0.45s;
+    transition-duration: 0.3s;
+    transition-timing-function: var(--ease-sortie);
   }
   .h-avatar {
     flex: none;
