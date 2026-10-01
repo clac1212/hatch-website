@@ -14,7 +14,7 @@ export const schema = z.strictObject({
     events: z
       .array(
         z.strictObject({
-          agent: z.enum(['peep', 'lark', 'jay', 'finch', 'owl', 'pecker']),
+          agent: z.enum(['peep', 'lark', 'jay', 'finch', 'owl', 'pecker', 'sparrow']),
           running: z.string().min(1),
           done: z.string().min(1),
         }),

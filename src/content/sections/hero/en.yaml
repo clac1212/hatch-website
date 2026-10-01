@@ -12,23 +12,26 @@ tasks:
   # The shops are picked in Hero.astro (same order).
   events:
     - agent: peep
-      running: "Question from the Dijon team"
-      done: "Allergen sheet sent"
+      running: 'Question from the Dijon team'
+      done: 'Allergen sheet sent'
     - agent: pecker
-      running: "New hire in Geneva"
-      done: "Onboarding course sent"
+      running: 'New hire in Geneva'
+      done: 'Onboarding course sent'
     - agent: finch
-      running: "Hygiene audit in Nice"
-      done: "3 gaps turned into actions"
+      running: 'Hygiene audit in Nice'
+      done: '3 gaps turned into actions'
     - agent: jay
-      running: "Metz asks for the opening checklist"
-      done: "Checklist shared with the team"
+      running: 'Metz asks for the opening checklist'
+      done: 'Checklist shared with the team'
+    - agent: sparrow
+      running: 'Marseille opening · D-18'
+      done: 'Team training booked for Thursday'
     - agent: peep
-      running: "Question in Spanish · Barcelona"
-      done: "Reply sent in Spanish"
+      running: 'Question in Spanish · Barcelona'
+      done: 'Reply sent in Spanish'
     - agent: owl
       running: "Zurich: the oven won't heat up"
-      done: "Troubleshooting read out in the kitchen"
+      done: 'Troubleshooting read out in the kitchen'
     - agent: lark
-      running: "Stuttgart behind on revenue"
-      done: "Follow-up scheduled tomorrow 9 am"
+      running: 'Stuttgart behind on revenue'
+      done: 'Follow-up scheduled tomorrow 9 am'

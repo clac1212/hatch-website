@@ -1,0 +1,21 @@
+{
+  "_doc": "Box of each bird sprite in the hero frame (1440 x 804), written by hero-v4-relief/oiseaux.py with the map. Do not edit by hand.",
+  "lark": {
+    "left": 1045.99,
+    "top": 87.65,
+    "width": 73.78,
+    "height": 69.59
+  },
+  "peep": {
+    "left": 929.04,
+    "top": 289.1,
+    "width": 60.7,
+    "height": 87.65
+  },
+  "sparrow": {
+    "left": 876.45,
+    "top": 518.28,
+    "width": 74.04,
+    "height": 70.64
+  }
+}

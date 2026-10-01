@@ -14,22 +14,25 @@ tasks:
   events:
     - agent: peep
       running: "Question de l'équipe de Dijon"
-      done: "Fiche allergènes envoyée"
+      done: 'Fiche allergènes envoyée'
     - agent: pecker
-      running: "Nouvelle recrue à Genève"
+      running: 'Nouvelle recrue à Genève'
       done: "Parcours d'intégration envoyé"
     - agent: finch
-      running: "Audit hygiène à Nice"
-      done: "3 écarts transformés en actions"
+      running: 'Audit hygiène à Nice'
+      done: '3 écarts transformés en actions'
     - agent: jay
       running: "Metz demande la procédure d'ouverture"
       done: "Procédure partagée à l'équipe"
+    - agent: sparrow
+      running: 'Ouverture Marseille · J-18'
+      done: "Formation de l'équipe calée jeudi"
     - agent: peep
-      running: "Question en espagnol · Barcelone"
-      done: "Réponse envoyée en espagnol"
+      running: 'Question en espagnol · Barcelone'
+      done: 'Réponse envoyée en espagnol'
     - agent: owl
-      running: "Zurich : le four ne chauffe plus"
-      done: "Procédure de dépannage lue en cuisine"
+      running: 'Zurich : le four ne chauffe plus'
+      done: 'Procédure de dépannage lue en cuisine'
     - agent: lark
-      running: "Stuttgart en retard sur le CA"
-      done: "Relance programmée demain 9 h"
+      running: 'Stuttgart en retard sur le CA'
+      done: 'Relance programmée demain 9 h'
