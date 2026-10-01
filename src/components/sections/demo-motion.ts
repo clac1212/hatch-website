@@ -447,7 +447,7 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
   const voile = $(lieu, '.d2-voile');
   const ecrans = $$(lieu, '.d2-ecran');
   const onglets = $$(lieu, '[data-onglet]');
-  const titres = $$(lieu, '.d2-titres > .d2-titre');
+  const titres = $$(lieu, '[data-titre]');
   const barres = onglets.map((o) => $(o, '.d2-barre > span'));
   const vue = lireCam(lieu.dataset.vue!);
   const cams = ecrans.map((e) => lireCam(e.dataset.cam!));

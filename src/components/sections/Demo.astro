@@ -56,7 +56,7 @@ const centre = (v: number, z: number, o: number) => Math.min(Math.max(v, o / z),
 const camStyle = ([fx, fy, z]: Cam, [ox, oy] = [0.5, 0.5]) =>
   `--cx:${centre(fx, z, ox)};--cy:${centre(fy, z, oy)};--z:${z}`;
 /** Focus position of autoplay places on desktop (wide shot and agents), mirrored in the CSS (.d2-lieu.auto --ox/--oy). */
-const VISEE_AUTO: [number, number] = [0.3, 0.45];
+const VISEE_AUTO: [number, number] = [0.27, 0.4];
 
 /**
  * Places, in YAML order: background, wide shot, cut-out agents (fractions of the image, from the v4
@@ -214,21 +214,18 @@ for (const l of lieux) {
 
           {l.auto ? (
             <div class="d2-ui d2-auto">
-              <div class="d2-panneau">
-                <p class="d2-surtitre">{l.surtitre}</p>
-                <div class="d2-titres">
-                  {l.agents.map((d, j) => (
-                    <h3 class:list={['d2-titre', { on: j === 0 }]}>{d.titre}</h3>
-                  ))}
-                </div>
-                <div class="d2-onglets">
-                  {l.agents.map((d, j) => (
-                    <button
-                      type="button"
-                      class:list={{ on: j === 0 }}
-                      data-onglet={j}
-                      aria-pressed={j === 0 ? 'true' : 'false'}
-                    >
+              {/* Where: the place, and where it sits in the section. Stays put for the whole place. */}
+              <p class="d2-ou">
+                <span>{l.surtitre}</span>
+                <span class="d2-num" aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')} / {String(lieux.length).padStart(2, '0')}
+                </span>
+              </p>
+              {/* What: the agent on stage and what its demo shows. Fixed height, cross-fades. */}
+              <div class="d2-legende">
+                {l.agents.map((d, j) => (
+                  <div class:list={['d2-leg', { on: j === 0 }]} data-titre={j}>
+                    <p class="d2-qui">
                       <Image
                         src={DEMOS[d.cle].avatar}
                         alt=""
@@ -240,26 +237,50 @@ for (const l of lieux) {
                       <span>
                         <b>{d.nom}</b> {d.role}
                       </span>
-                      <span class="d2-barre" aria-hidden="true">
-                        <span />
-                      </span>
-                    </button>
-                  ))}
+                    </p>
+                    <h3 class="d2-titre">{d.titre}</h3>
+                  </div>
+                ))}
+              </div>
+              {/* Chapters: one segment per demo, filled by the timeline, like a video player. */}
+              <div class="d2-chapitres">
+                <button
+                  type="button"
+                  class="d2-pause"
+                  aria-label={data.pause}
+                  data-pause={data.pause}
+                  data-lecture={data.lecture}
+                >
+                  <svg viewBox="0 0 24 24" class="i-pause" aria-hidden="true">
+                    <path d="M7 5h4v14H7zM13 5h4v14h-4z" />
+                  </svg>
+                  <svg viewBox="0 0 24 24" class="i-lecture" aria-hidden="true">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </button>
+                {l.agents.map((d, j) => (
                   <button
                     type="button"
-                    class="d2-pause"
-                    aria-label={data.pause}
-                    data-pause={data.pause}
-                    data-lecture={data.lecture}
+                    class:list={{ on: j === 0 }}
+                    data-onglet={j}
+                    aria-pressed={j === 0 ? 'true' : 'false'}
                   >
-                    <svg viewBox="0 0 24 24" class="i-pause" aria-hidden="true">
-                      <path d="M7 5h4v14H7zM13 5h4v14h-4z" />
-                    </svg>
-                    <svg viewBox="0 0 24 24" class="i-lecture" aria-hidden="true">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
+                    <span class="d2-barre" aria-hidden="true">
+                      <span />
+                    </span>
+                    <span class="d2-chap">
+                      <Image
+                        src={DEMOS[d.cle].avatar}
+                        alt=""
+                        width={20}
+                        height={20}
+                        densities={[1, 2]}
+                        class="d2-av"
+                      />
+                      {d.nom}
+                    </span>
                   </button>
-                </div>
+                ))}
               </div>
               <div class="d2-appareils">
                 {l.agents.map(
@@ -763,8 +784,8 @@ for (const l of lieux) {
   /* Autoplay place: the agent sits left of centre, its device on the right. The timeline drives
      the camera, so no CSS transition smooths it a second time. */
   .d2-lieu.auto .d2-plateau {
-    --ox: 0.3;
-    --oy: 0.45;
+    --ox: 0.27;
+    --oy: 0.4;
   }
   .d2-lieu.auto .d2-calque {
     transition: none;
@@ -782,66 +803,124 @@ for (const l of lieux) {
     opacity: 0;
     pointer-events: none;
   }
-  .d2-titres {
-    display: grid;
+  /* Autoplay place, one layout for every place (César 01/10): where (top left), what (bottom
+     left), the proof (the device, right), and the chapters bar (bottom), always at the same spot. */
+  .d2-ou {
+    position: absolute;
+    left: clamp(16px, 4vw, 64px);
+    top: clamp(88px, 12vh, 112px);
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.86);
+    box-shadow: var(--shadow-1);
+    font: 400 12px/1.2 var(--font-mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-orange-txt);
   }
-  /* Titles and devices swap out then in (a cross-fade would overlap two texts). */
-  .d2-titres > .d2-titre {
+  .d2-num {
+    color: var(--color-soft);
+  }
+  .d2-legende {
+    position: absolute;
+    left: clamp(16px, 4vw, 64px);
+    bottom: calc(clamp(24px, 4vh, 40px) + 76px);
+    display: grid;
+    width: min(440px, calc(100vw - 32px));
+  }
+  /* One caption per demo in the same cell: out, then in (a cross-fade would overlap two texts). */
+  .d2-leg {
     grid-area: 1 / 1;
+    align-self: end;
+    padding: 18px 22px 20px;
+    border-radius: var(--radius-glass);
+    background: rgb(255 255 255 / 0.9);
+    box-shadow: var(--shadow-2);
     opacity: 0;
     visibility: hidden;
+    translate: 0 8px;
     transition:
-      opacity 0.3s var(--ease-hatch),
+      opacity 0.3s var(--ease-sortie),
+      translate 0.3s var(--ease-sortie),
       visibility 0s 0.3s;
   }
-  .d2-titres > .d2-titre.on {
+  .d2-leg.on {
     opacity: 1;
     visibility: visible;
+    translate: 0 0;
     transition:
-      opacity 0.4s var(--ease-hatch) 0.3s,
+      opacity 0.5s var(--ease-doux) 0.3s,
+      translate 0.7s var(--ease-entree) 0.3s,
       visibility 0s;
   }
-  .d2-onglets {
+  .d2-qui {
     display: flex;
-    gap: 8px;
-    margin-top: 16px;
+    gap: 10px;
+    align-items: center;
+    font: 500 14px/1.3 var(--font-sans);
+    color: var(--color-soft);
   }
-  .d2-onglets [data-onglet] {
+  .d2-qui b {
+    color: var(--color-ink);
+  }
+  .d2-leg .d2-titre {
+    margin-top: 10px;
+    font-size: clamp(22px, 1.9vw, 28px);
+  }
+  .d2-chapitres {
+    position: absolute;
+    left: clamp(16px, 4vw, 64px);
+    right: clamp(16px, 4vw, 64px);
+    bottom: clamp(24px, 4vh, 40px);
+    display: flex;
+    gap: 6px;
+    align-items: stretch;
+    padding: 6px;
+    border-radius: 16px;
+    background: rgb(255 255 255 / 0.86);
+    box-shadow: var(--shadow-2);
+  }
+  .d2-chapitres [data-onglet] {
     position: relative;
     display: flex;
     flex: 1;
+    flex-direction: column;
     gap: 8px;
-    align-items: center;
-    padding: 9px 10px 13px;
-    overflow: hidden;
-    border-radius: 12px;
-    background: rgb(255 255 255 / 0.55);
-    font: 500 13px/1.3 var(--font-sans);
+    padding: 10px 12px 9px;
+    border-radius: 11px;
+    font: 500 13px/1.2 var(--font-sans);
     color: var(--color-soft);
     text-align: left;
     cursor: pointer;
     transition: background-color 0.3s;
   }
-  .d2-onglets [data-onglet] b {
+  .d2-chapitres [data-onglet]:hover {
+    background: var(--color-cream);
+  }
+  .d2-chapitres [data-onglet].on {
     color: var(--color-ink);
   }
-  .d2-onglets [data-onglet]:hover {
-    background: var(--color-white);
-  }
-  .d2-onglets [data-onglet].on {
-    background: var(--color-white);
-    color: var(--color-ink);
-  }
-  .d2-onglets button:focus-visible {
+  .d2-chapitres button:focus-visible {
     outline: 2px solid var(--color-orange-txt);
     outline-offset: 2px;
   }
+  .d2-chap {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-weight: 600;
+  }
+  .d2-chap :global(.d2-av) {
+    width: 20px;
+    height: 20px;
+  }
   .d2-barre {
-    position: absolute;
-    left: 10px;
-    right: 10px;
-    bottom: 6px;
-    height: 3px;
+    display: block;
+    height: 4px;
+    overflow: hidden;
     border-radius: 999px;
     background: var(--color-line);
   }
@@ -849,7 +928,6 @@ for (const l of lieux) {
   .d2-barre > span {
     display: block;
     height: 100%;
-    border-radius: inherit;
     background: var(--color-orange);
     transform-origin: left;
     transform: scaleX(0);
@@ -858,8 +936,8 @@ for (const l of lieux) {
     display: grid;
     place-items: center;
     flex: none;
-    width: 40px;
-    border-radius: 12px;
+    width: 52px;
+    border-radius: 11px;
     background: var(--color-ink);
     cursor: pointer;
   }
@@ -877,9 +955,9 @@ for (const l of lieux) {
   /* Centred with the grid, not with translate: the overlay's entrance animates translate. */
   .d2-appareils {
     position: absolute;
-    right: clamp(16px, 6vw, 120px);
-    top: 0;
-    bottom: 0;
+    right: clamp(16px, 5vw, 96px);
+    top: clamp(72px, 9vh, 96px);
+    bottom: calc(clamp(24px, 4vh, 40px) + 76px);
     display: grid;
     place-items: center;
     align-content: center;
@@ -911,7 +989,7 @@ for (const l of lieux) {
     .d2-appareils {
       left: 16px;
       right: 16px;
-      top: 80px;
+      top: 116px;
       bottom: auto;
     }
     .d2-ecran.tablette {
@@ -920,8 +998,14 @@ for (const l of lieux) {
     .d2-ecran.telephone {
       width: min(230px, 52vw, 50svh);
     }
-    .d2-onglets [data-onglet] span:not(.d2-barre) {
-      font-size: 12px;
+    .d2-legende {
+      bottom: calc(clamp(24px, 4vh, 40px) + 64px);
+    }
+    .d2-leg {
+      padding: 14px 16px 16px;
+    }
+    .d2-ou {
+      top: 76px;
     }
     .d2-plateau {
       --oy: 0.27;
