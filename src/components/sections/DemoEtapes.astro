@@ -1,0 +1,581 @@
+---
+/**
+ * 04 — Diorama demo, v2 (César, 01/10). Replaces the 11-step pinned demo: it was ~20 screens long and
+ * a fast scroll left the section before its queued steps had played.
+ *
+ * Rules (research: NN/g on scroll-jacking, Apple product pages):
+ * - the scroll position picks the step DIRECTLY (no queue): a fast scroll lands on a clean state,
+ *   transitions then play at their own pace (CSS, ~0.9 s);
+ * - the wheel is never captured; soft snap points (`proximity`) help stop on each step;
+ * - one thing on screen per step: a camera move, a kicker + short title, one card.
+ *
+ * Two step lists are rendered for comparison (`?demo=lieu` default, `?demo=agent`), with a temporary
+ * switch; the losing one will be removed. Videos will later replace the still scenes (same steps).
+ */
+import { Image, Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { section } from '../../content/section';
+import type { Locale } from '../../i18n/ui';
+import siegeFond from '../../assets/demo/siege/fond.jpg';
+import imgLark from '../../assets/demo/siege/lark.png';
+import imgFinch from '../../assets/demo/siege/finch.png';
+import imgJay from '../../assets/demo/siege/jay.png';
+import imgPeep from '../../assets/demo/siege/peep.png';
+import cuisineFond from '../../assets/demo/cuisine/fond.jpg';
+import imgOwl from '../../assets/demo/cuisine/owl.png';
+import imgPecker from '../../assets/demo/cuisine/pecker.png';
+import chantierFond from '../../assets/demo/chantier/fond.jpg';
+import imgSparrow from '../../assets/demo/chantier/sparrow.png';
+import avPeep from '../../assets/hero/agents/peep.webp';
+import avLark from '../../assets/hero/agents/lark.webp';
+import avJay from '../../assets/hero/agents/jay.webp';
+import avFinch from '../../assets/hero/agents/finch.webp';
+import avOwl from '../../assets/hero/agents/owl.webp';
+import avPecker from '../../assets/hero/agents/pecker.webp';
+import avSparrow from '../../assets/demo/avatars/sparrow.png';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const data = await section('demoEtapes', locale);
+
+type SceneKey = 'siege' | 'cuisine' | 'chantier';
+/** Cut-out agents over each background (fractions of the image), from the v4 prototype geometry. */
+const SCENES: Record<
+  SceneKey,
+  {
+    fond: ImageMetadata;
+    agents: { img: ImageMetadata; x: number; y: number; w: number; h: number; d: number }[];
+  }
+> = {
+  siege: {
+    fond: siegeFond,
+    agents: [
+      { img: imgLark, x: 0.1523, y: 0.3743, w: 0.1286, h: 0.2116, d: 0 },
+      { img: imgFinch, x: 0.2747, y: 0.4577, w: 0.1188, h: 0.1908, d: 0.8 },
+      { img: imgJay, x: 0.4873, y: 0.3789, w: 0.1352, h: 0.2324, d: 1.6 },
+      { img: imgPeep, x: 0.609, y: 0.5645, w: 0.1112, h: 0.1849, d: 2.4 },
+    ],
+  },
+  cuisine: {
+    fond: cuisineFond,
+    agents: [
+      { img: imgOwl, x: 0.141, y: 0.3874, w: 0.1399, h: 0.2155, d: 0 },
+      { img: imgPecker, x: 0.5487, y: 0.556, w: 0.1126, h: 0.2129, d: 1.2 },
+    ],
+  },
+  chantier: {
+    fond: chantierFond,
+    agents: [{ img: imgSparrow, x: 0.4684, y: 0.416, w: 0.1148, h: 0.2396, d: 0 }],
+  },
+};
+const AVATARS: Record<string, ImageMetadata> = {
+  peep: avPeep,
+  lark: avLark,
+  jay: avJay,
+  finch: avFinch,
+  owl: avOwl,
+  pecker: avPecker,
+  sparrow: avSparrow,
+};
+const avatar = (qui: string) => AVATARS[qui.split(/[ ·]/)[0].toLowerCase()];
+
+/** Camera per step: scene, focus point (fractions of the image), zoom. Same order as the YAML lists. */
+type Cam = { scene: SceneKey; f: [number, number]; z: number };
+const CAMERAS: Record<'lieu' | 'agent', Cam[]> = {
+  lieu: [
+    { scene: 'siege', f: [0.45, 0.52], z: 1.08 },
+    { scene: 'cuisine', f: [0.42, 0.55], z: 1.12 },
+    { scene: 'chantier', f: [0.53, 0.53], z: 1.2 },
+  ],
+  agent: [
+    { scene: 'siege', f: [0.665, 0.64], z: 1.6 },
+    { scene: 'siege', f: [0.215, 0.47], z: 1.6 },
+    { scene: 'siege', f: [0.55, 0.49], z: 1.6 },
+    { scene: 'siege', f: [0.335, 0.55], z: 1.6 },
+    { scene: 'cuisine', f: [0.25, 0.47], z: 1.5 },
+    { scene: 'cuisine', f: [0.62, 0.66], z: 1.5 },
+    { scene: 'chantier', f: [0.525, 0.53], z: 1.45 },
+  ],
+};
+/** Keep the image edges outside the frame: the focus centre is clamped by the zoom. */
+const centre = (v: number, z: number) => Math.min(Math.max(v, 0.5 / z), 1 - 0.5 / z);
+
+const modes = (['lieu', 'agent'] as const).map((mode) => {
+  const etapes = data[mode].map((e, i) => ({ ...e, cam: CAMERAS[mode][i] }));
+  const scenes = [...new Set(etapes.map((e) => e.cam.scene))];
+  return { mode, etapes, scenes };
+});
+/** Server-rendered state = step 0, so the section reads without JS. */
+const camStyle = (c: Cam) => `--cx:${centre(c.f[0], c.z)};--cy:${centre(c.f[1], c.z)};--z:${c.z}`;
+const premiere = (etapes: { cam: Cam }[], key: SceneKey) =>
+  etapes.find((e) => e.cam.scene === key)!.cam;
+---
+
+<div class="d2-modes" data-d2-modes>
+  {
+    modes.map(({ mode, etapes, scenes }) => (
+      <section
+        class="d2"
+        data-mode={mode}
+        data-n={etapes.length}
+        aria-labelledby={`d2-titre-${mode}`}
+        hidden={mode !== 'lieu'}
+        style={`--n:${etapes.length}`}
+      >
+        <h2 id={`d2-titre-${mode}`} class="sr-only">
+          {data.titre}
+        </h2>
+        {etapes.map((_, i) => (
+          <div class="d2-ancre" style={`--i:${i}`} aria-hidden="true" />
+        ))}
+        <div class="d2-scene-fixe">
+          <div class="d2-plateau" aria-hidden="true">
+            {scenes.map((key) => (
+              <div
+                class:list={['d2-calque', { on: key === etapes[0].cam.scene }]}
+                data-scene={key}
+                style={camStyle(premiere(etapes, key))}
+              >
+                <Picture
+                  src={SCENES[key].fond}
+                  formats={['avif', 'webp']}
+                  widths={[960, 1440, 2048]}
+                  sizes="max(100vw, 178vh)"
+                  alt=""
+                  loading="lazy"
+                  class="d2-fond"
+                />
+                {SCENES[key].agents.map((a) => (
+                  <Image
+                    src={a.img}
+                    alt=""
+                    widths={[200, 400]}
+                    sizes="12vw"
+                    loading="lazy"
+                    class="d2-agent"
+                    style={`left:${a.x * 100}%;top:${a.y * 100}%;width:${a.w * 100}%;animation-delay:${-a.d}s`}
+                  />
+                ))}
+              </div>
+            ))}
+          </div>
+
+          {etapes.map((e, i) => (
+            <div
+              class:list={['d2-etape', { on: i === 0 }]}
+              data-scene={e.cam.scene}
+              style={camStyle(e.cam)}
+            >
+              <div class="d2-panneau">
+                <p class="d2-surtitre">{e.surtitre}</p>
+                <h3 class="d2-titre">{e.titre}</h3>
+              </div>
+              <div class="d2-carte">
+                {'lignes' in e.carte ? (
+                  <ul class="d2-lignes">
+                    {e.carte.lignes.map((l) => (
+                      <li>
+                        {avatar(l.agent) && (
+                          <Image
+                            src={avatar(l.agent)}
+                            alt=""
+                            width={28}
+                            height={28}
+                            densities={[1, 2]}
+                            class="d2-av"
+                          />
+                        )}
+                        <span>
+                          <b>{l.agent}</b> {l.texte}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div class="d2-fil">
+                    <div class="d2-msg">
+                      {avatar(e.carte.qui) && (
+                        <Image
+                          src={avatar(e.carte.qui)}
+                          alt=""
+                          width={28}
+                          height={28}
+                          densities={[1, 2]}
+                          class="d2-av"
+                        />
+                      )}
+                      <span>
+                        <b>{e.carte.qui}</b>
+                        {e.carte.texte}
+                      </span>
+                    </div>
+                    <div class="d2-msg d2-rep">
+                      {avatar(e.carte.reponse.qui) && (
+                        <Image
+                          src={avatar(e.carte.reponse.qui)}
+                          alt=""
+                          width={28}
+                          height={28}
+                          densities={[1, 2]}
+                          class="d2-av"
+                        />
+                      )}
+                      <span>
+                        <b>{e.carte.reponse.qui}</b>
+                        {e.carte.reponse.texte}
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+
+          <ol class="d2-points" aria-hidden="true">
+            {etapes.map((_, i) => (
+              <li class:list={{ on: i === 0 }} />
+            ))}
+          </ol>
+        </div>
+      </section>
+    ))
+  }
+
+  <!-- Temporary comparison switch (removed once a step list is chosen). -->
+  <div class="d2-choix" role="group" aria-label="Comparer les deux découpages">
+    <button type="button" data-choix="lieu" aria-pressed="true">Par lieu · 3 étapes</button>
+    <button type="button" data-choix="agent" aria-pressed="false">Par agent · 7 étapes</button>
+  </div>
+</div>
+
+<style>
+  .d2 {
+    --pas: 75svh;
+    position: relative;
+    height: calc(var(--n) * var(--pas) + 100svh);
+    background: var(--color-scene);
+  }
+  .d2-ancre {
+    position: absolute;
+    left: 0;
+    width: 1px;
+    height: 1px;
+    top: calc(var(--i) * var(--pas));
+    scroll-snap-align: start;
+  }
+  :global(html:has(.d2:not([hidden]))) {
+    scroll-snap-type: y proximity;
+  }
+  .d2-scene-fixe {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    overflow: hidden;
+  }
+
+  /* The scene: an image box covering the viewport; the camera moves it so the focus sits centred. */
+  .d2-plateau {
+    position: absolute;
+    inset: 0;
+    container-type: size;
+  }
+  .d2-calque {
+    --w: max(100cqw, calc(100cqh * 2400 / 1340));
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: var(--w);
+    aspect-ratio: 2400 / 1340;
+    translate: -50% -50%;
+    transform-origin: calc(var(--cx, 0.5) * 100%) calc(var(--cy, 0.5) * 100%);
+    transform: translate(calc((0.5 - var(--cx, 0.5)) * 100%), calc((0.5 - var(--cy, 0.5)) * 100%))
+      scale(var(--z, 1));
+    opacity: 0;
+    transition:
+      transform 1s cubic-bezier(0.32, 0.72, 0, 1),
+      transform-origin 1s cubic-bezier(0.32, 0.72, 0, 1),
+      opacity 0.6s var(--ease-hatch);
+  }
+  .d2-calque.on {
+    opacity: 1;
+  }
+  .d2-calque :global(.d2-fond) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .d2-calque :global(.d2-agent) {
+    position: absolute;
+    height: auto;
+    animation: d2-respire 4s ease-in-out infinite;
+    transform-origin: 50% 100%;
+  }
+  @keyframes d2-respire {
+    50% {
+      transform: scaleY(1.025);
+    }
+  }
+
+  /* Step overlays: one panel + one card, cross-faded. */
+  .d2-etape > * {
+    opacity: 0;
+    translate: 0 14px;
+    transition:
+      opacity 0.5s var(--ease-hatch),
+      translate 0.7s var(--ease-hatch);
+    pointer-events: none;
+  }
+  .d2-etape.on > * {
+    opacity: 1;
+    translate: 0 0;
+    transition-delay: 0.35s;
+  }
+  .d2-etape.on > .d2-carte {
+    transition-delay: 0.6s;
+  }
+  .d2-panneau {
+    position: absolute;
+    left: clamp(16px, 4vw, 64px);
+    bottom: clamp(56px, 9vh, 96px);
+    max-width: min(560px, calc(100vw - 32px));
+    padding: 22px 26px 24px;
+    border-radius: 22px;
+    background: linear-gradient(-120deg, rgb(255 255 255 / 0.78), rgb(255 255 255 / 0.58));
+    backdrop-filter: blur(16px) saturate(1.2);
+    -webkit-backdrop-filter: blur(16px) saturate(1.2);
+    box-shadow:
+      0 18px 44px color-mix(in srgb, var(--color-navy) 22%, transparent),
+      inset 0 1px 0 var(--color-white);
+  }
+  .d2-surtitre {
+    font: 400 12px/1.2 var(--font-mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-orange-txt);
+  }
+  .d2-titre {
+    margin-top: 8px;
+    font: 700 clamp(24px, 2.4vw, 34px) / 1.12 var(--font-display);
+    letter-spacing: -0.02em;
+    color: var(--color-ink);
+    text-wrap: balance;
+  }
+  .d2-carte {
+    position: absolute;
+    right: clamp(16px, 6vw, 120px);
+    top: clamp(96px, 18vh, 200px);
+    width: min(380px, calc(100vw - 32px));
+    padding: 14px;
+    border-radius: 18px;
+    background: rgb(255 255 255 / 0.92);
+    box-shadow: 0 16px 40px color-mix(in srgb, var(--color-navy) 22%, transparent);
+    font: 500 14px/1.4 var(--font-sans);
+    color: var(--color-ink);
+  }
+  .d2-lignes {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .d2-lignes li,
+  .d2-msg {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .d2-fil {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .d2-msg > span {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 9px 12px;
+    border-radius: 14px;
+    background: var(--color-cream-2);
+  }
+  .d2-msg b {
+    font-size: 12px;
+    color: var(--color-soft);
+  }
+  .d2-rep > span {
+    background: var(--color-orange-tint);
+  }
+  .d2 :global(.d2-av) {
+    flex: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    background: var(--color-white);
+    object-fit: cover;
+  }
+  .d2-points {
+    position: absolute;
+    right: clamp(16px, 3vw, 40px);
+    top: 50%;
+    translate: 0 -50%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .d2-points li {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.55);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-ink) 25%, transparent);
+    transition:
+      background-color 0.4s,
+      scale 0.4s var(--ease-hatch);
+  }
+  .d2-points li.on {
+    background: var(--color-orange);
+    scale: 1.35;
+  }
+
+  @media (max-width: 47.99rem) {
+    .d2-carte {
+      left: 16px;
+      right: 16px;
+      width: auto;
+      top: auto;
+      bottom: calc(clamp(56px, 9vh, 96px) + 150px);
+    }
+    .d2-panneau {
+      right: 16px;
+      padding: 18px 20px;
+    }
+  }
+
+  /* Temporary comparison switch. */
+  .d2-choix {
+    position: fixed;
+    left: 50%;
+    bottom: 64px; /* clear of the Astro dev toolbar */
+    z-index: 55;
+    translate: -50% 0;
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    border-radius: 999px;
+    background: var(--color-ink);
+    box-shadow: var(--shadow-3);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .d2-choix.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .d2-choix button {
+    padding: 8px 14px;
+    border-radius: 999px;
+    font: 600 13px var(--font-sans);
+    color: var(--color-white);
+    cursor: pointer;
+  }
+  .d2-choix button[aria-pressed='true'] {
+    background: var(--color-orange);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .d2-calque,
+    .d2-etape > * {
+      transition: none !important;
+    }
+    .d2-calque :global(.d2-agent) {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  /**
+   * The scroll position picks the step directly: step = floor(progress × n). No queue, so a fast
+   * scroll can never leave a step "pending"; the CSS transitions then play at their own pace.
+   */
+  const racine = document.querySelector<HTMLElement>('[data-d2-modes]')!;
+  const sections = [...racine.querySelectorAll<HTMLElement>('.d2')];
+  const choix = racine.querySelector<HTMLElement>('.d2-choix')!;
+
+  type Etat = {
+    sec: HTMLElement;
+    n: number;
+    k: number;
+    calques: HTMLElement[];
+    etapes: HTMLElement[];
+    points: HTMLElement[];
+  };
+  const etats: Etat[] = sections.map((sec) => {
+    return {
+      sec,
+      n: Number(sec.dataset.n),
+      k: 0,
+      calques: [...sec.querySelectorAll<HTMLElement>('.d2-calque')],
+      etapes: [...sec.querySelectorAll<HTMLElement>('.d2-etape')],
+      points: [...sec.querySelectorAll<HTMLElement>('.d2-points li')],
+    };
+  });
+
+  function appliquer(e: Etat, k: number) {
+    if (k === e.k) return;
+    e.k = k;
+    const etape = e.etapes[k];
+    e.etapes.forEach((el, i) => el.classList.toggle('on', i === k));
+    e.points.forEach((el, i) => el.classList.toggle('on', i === k));
+    for (const c of e.calques) {
+      const actif = c.dataset.scene === etape.dataset.scene;
+      c.classList.toggle('on', actif);
+      if (actif)
+        for (const v of ['--cx', '--cy', '--z'])
+          c.style.setProperty(v, etape.style.getPropertyValue(v));
+    }
+  }
+
+  function maj() {
+    for (const e of etats) {
+      if (e.sec.hidden) continue;
+      const r = e.sec.getBoundingClientRect();
+      const course = r.height - innerHeight;
+      const p = Math.min(Math.max(-r.top / course, 0), 0.9999);
+      appliquer(e, Math.floor(p * e.n));
+      choix.classList.toggle('visible', r.top < innerHeight * 0.5 && r.bottom > innerHeight * 0.5);
+    }
+  }
+
+  function mode(m: string) {
+    for (const e of etats) {
+      e.sec.hidden = e.sec.dataset.mode !== m;
+      e.k = -1;
+    }
+    choix
+      .querySelectorAll('button')
+      .forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.choix === m)));
+    const u = new URL(location.href);
+    u.searchParams.set('demo', m);
+    history.replaceState(null, '', u);
+    maj();
+  }
+
+  choix.addEventListener('click', (ev) => {
+    const b = (ev.target as HTMLElement).closest<HTMLButtonElement>('button[data-choix]');
+    if (!b) return;
+    const haut = racine.getBoundingClientRect().top + scrollY;
+    mode(b.dataset.choix!);
+    scrollTo({ top: haut, behavior: 'instant' });
+  });
+
+  let raf = 0;
+  addEventListener('scroll', () => (raf ||= requestAnimationFrame(() => ((raf = 0), maj()))), {
+    passive: true,
+  });
+  addEventListener('resize', maj);
+  mode(new URLSearchParams(location.search).get('demo') === 'agent' ? 'agent' : 'lieu');
+</script>
