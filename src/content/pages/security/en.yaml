@@ -1,67 +1,71 @@
 seo:
   title: 'Security & privacy — Hatch OS'
-  description: 'Your data stays yours: no AI training, zero retention on the model side, hosting in Europe, granular access control and GDPR compliance.'
+  description: 'Your data stays yours: hosted in Europe, never used to train an AI, accessible only to whom you decide.'
 hero:
-  kicker: 'Security · Privacy · Access'
+  kicker: 'Security & privacy'
   title: 'Your data stays yours.'
-  lead: 'Hatch runs across your network without ever training on your data. You choose what you share with Hatch, and who can see what inside Hatch — down to the single document.'
-  badges:
-    - 'No AI training'
-    - 'Zero model retention'
+  lead: 'You decide what Hatch uses and who can access it. Your data stays hosted in Europe, and no AI trains on it.'
+  proofs:
     - 'Hosted in Europe'
+    - 'No AI training'
     - 'GDPR compliant'
-training:
-  kicker: '01 — The AI never trains on you'
-  title: 'No training, zero retention.'
-  cards:
-    - icon: shield-check
-      title: 'No training'
-      text: 'Your data is never used to train an AI model. Not by us, not by our providers.'
-    - icon: lock
-      title: 'Zero retention on the model side'
-      text: 'Your data stays with you. Our model providers keep nothing once it has been processed.'
-sharing:
-  kicker: '02 — You choose what you share'
-  title: 'Hatch only sees what you decide.'
-  text: 'You connect your sources and pick the scopes, documents and shared spaces. Everything else stays with you. Revocable at any time, without losing control.'
-  items:
-    - 'Sources: Drive, Notion, PDF, Word, Excel — your call'
-    - 'Scopes by brand, region, location'
-    - 'One-click removal, full access trail'
-  example:
-    title: 'Example — the Nobinobi network'
-    rows:
-      - source: 'HQ — the full manual'
-        status: 'Shared'
-        shared: true
-      - source: 'Lyon Part-Dieu — kitchen sheets'
-        status: 'Shared'
-        shared: true
-      - source: 'Recipes in testing — Q4'
-        status: 'Not shared'
-        shared: false
+  alts:
+    jay: 'Jay, the voxel bird, standing on two servers with a European flag'
+    owl: 'Owl in front of a safe closed with a padlock'
+    finch: 'Finch stamping a file as approved'
+guarantees:
+  - kicker: 'Hosting'
+    title: 'Hosted in Europe.'
+    points:
+      - 'Your data and its backups stay in Europe.'
+      - 'Encrypted in transit and at rest (TLS, AES-256).'
+      - 'Isolated per customer: nothing shared between networks.'
+  - kicker: 'Artificial intelligence'
+    title: 'No AI trains on your data.'
+    points:
+      - 'Your content is used to answer you, never to train a model.'
+      - 'Zero retention at our model providers.'
+      - 'The agents only rely on your documents.'
+  - kicker: 'Compliance'
+    title: 'GDPR and AI Act, without the jargon.'
+    points:
+      - 'Access, export and delete your data whenever you want.'
+      - 'No AI assesses, scores or ranks a person.'
+      - 'DPA and security documentation on request.'
 access:
-  kicker: '03 — Who sees what, at every level'
-  title: 'Granular access control.'
-  text: 'Every member of the network only sees what concerns them. The franchisor runs the show, each location sees its own scope.'
-  cards:
-    - icon: users
-      title: 'Role-based access'
-      text: 'Separate rights for franchisor, franchisees, managers and crew. HQ sees everything, a location only sees itself.'
-    - icon: file-text
-      title: 'Fine-grained permissions'
-      text: 'You decide who can open which documents within your teams. By folder, by sheet, by location.'
-    - icon: key
-      title: 'Enterprise SSO'
-      text: 'Sign in through your SAML SSO. Arrivals, departures and rights follow your directory.'
-foundation:
-  kicker: '04 — Foundation & compliance'
-  cards:
-    - title: 'Hosted in Europe'
-      text: 'AWS servers located in Europe. Data isolated per customer, never shared across networks.'
-    - title: 'GDPR compliant'
-      text: 'Shareable security policy, signable DPA. A dedicated security contact.'
+  kicker: 'Access control'
+  title: 'Everyone only sees their own scope.'
+  points:
+    - 'You choose what Hatch uses, source by source. The rest is never shared.'
+    - 'Head office sees everything, a site sees its site, a crew member what concerns them.'
+    - 'Your teams sign in with your SSO (SAML).'
+  screen:
+    app: 'Hatch · Access'
+    viewing: 'Seen by'
+    roles:
+      - 'Head office'
+      - 'BunBun Lille'
+      - 'Crew member'
+    states:
+      visible: 'Visible'
+      perimetre: 'Own scope'
+      masque: 'Hidden'
+      nonPartage: 'Not shared with Hatch'
+    rows:
+      - label: 'BunBun manual'
+        meta: 'All sheets'
+        access: [visible, visible, visible]
+      - label: 'Quality audits'
+        meta: 'All sites'
+        access: [visible, perimetre, masque]
+      - label: 'Rotas'
+        meta: 'Site teams'
+        access: [visible, perimetre, perimetre]
+      - label: 'Network figures'
+        meta: 'Revenue, footfall'
+        access: [visible, masque, masque]
+      - label: 'Recipes in testing'
+        meta: 'R&D folder'
 cta:
-  title: 'Need the full file for your IT team?'
-  label: 'Request the security policy and DPA'
-  href: 'mailto:cesar@gethatch.io?subject=Hatch%20OS%20security%20policy%20and%20DPA'
+  title: 'A question from your IT team?'
+  text: 'Security questionnaire, DPA, documentation: we answer with the details.'

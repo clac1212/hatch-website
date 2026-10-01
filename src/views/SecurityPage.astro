@@ -1,183 +1,438 @@
 ---
 import { getEntry } from 'astro:content';
+import { Picture } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Button from '../components/ui/Button.astro';
-import Check from '../components/pages/Check.astro';
-import Icon from '../components/pages/Icon.astro';
-import { routes, type Locale } from '../i18n/ui';
+import Ipad from '../components/ui/Ipad.astro';
+import jay from '../assets/securite/jay.png';
+import owl from '../assets/securite/owl.png';
+import finch from '../assets/securite/finch.png';
+import { routes, useTranslations, type Locale } from '../i18n/ui';
 
-/** Security page (pencil-new.pen → "Page Sécurité — Hatch"), shared by /securite and /en/security. */
+/**
+ * Security page (César 01/10), shared by /securite and /en/security. Same language as the home:
+ * the three guarantees held by voxel agents (Jay: hosting in Europe, Owl: no AI training, Finch:
+ * compliance), then access control shown as product, on an iPad — who sees what in the BunBun
+ * network, role by role — and the site's single call to action.
+ * The access screen cycles through the roles while in view (not under reduced motion); a click on a
+ * role takes over and stops the cycle. Without JS it shows the head office's view.
+ */
 interface Props {
   locale: Locale;
 }
 
 const { locale } = Astro.props;
+const t = useTranslations(locale);
 const entry = await getEntry('securityPage', locale);
 if (!entry) throw new Error(`Missing src/content/pages/security/${locale}.yaml`);
-const { seo, hero, training, sharing, access, foundation, cta } = entry.data;
-
-const wrap = 'mx-auto max-w-[1440px] px-6 md:px-12 xl:px-24';
-const kicker = 'font-mono text-[13px] tracking-[1px] uppercase md:text-[14px]';
-const h2 = 'font-display text-[30px] leading-[1.1] font-bold md:text-[38px] md:leading-[41px]';
-const lightCard =
-  'flex flex-col items-start gap-3 rounded-glass bg-surface p-6 outline outline-1 -outline-offset-1 outline-line md:p-7';
+const { seo, hero, guarantees, access, cta } = entry.data;
+const { screen } = access;
+const wrap = 'mx-auto w-full max-w-site px-6 md:px-12';
 ---
 
 <Base locale={locale} paths={routes.security} title={seo.title} description={seo.description}>
-  <header class:list={[wrap, 'flex flex-col items-start gap-5 pt-32 pb-10 md:pt-[140px] md:pb-14']}>
-    <p class="font-mono text-[14px] tracking-[1px] text-orange-txt uppercase md:text-[15px]">
-      {hero.kicker}
-    </p>
-    <h1
-      class="font-display text-[40px] leading-[1.05] font-bold tracking-[-1px] text-ink md:text-[56px] md:leading-[57px]"
-    >
-      {hero.title}
-    </h1>
-    <p class="text-[17px] leading-[27px] text-soft md:text-[19px] md:leading-[29px]">{hero.lead}</p>
-    <ul class="flex flex-wrap gap-3">
-      {
-        hero.badges.map((badge) => (
-          <li class="flex items-center gap-2 rounded-full bg-surface px-4 py-2.5 text-[13px] font-semibold text-ink outline outline-1 -outline-offset-1 outline-line">
-            <Check class="size-4 text-orange" />
-            {badge}
-          </li>
-        ))
-      }
-    </ul>
-  </header>
-
-  <section
-    aria-labelledby="secu-ia"
-    class:list={[wrap, 'flex flex-col gap-6 py-10 md:py-12']}
+  <header
+    class:list={[
+      wrap,
+      'grid items-center gap-12 pt-32 pb-16 md:grid-cols-[1.05fr_1fr] md:pt-40 md:pb-24',
+    ]}
     data-rv-groupe
   >
-    <p class:list={[kicker, 'text-orange-txt']} data-rv>{training.kicker}</p>
-    <h2 id="secu-ia" class:list={[h2, 'text-ink']} data-rv>{training.title}</h2>
-    <div class="grid items-start gap-5 md:grid-cols-2">
+    <div class="flex flex-col items-start gap-6">
+      <p class="font-mono text-kicker text-orange-txt uppercase" data-rv>{hero.kicker}</p>
+      <h1 class="font-mono text-h1 text-ink" data-rv>{hero.title}</h1>
+      <p class="max-w-[34rem] text-body text-soft" data-rv>{hero.lead}</p>
+      <ul class="preuves flex flex-wrap gap-x-6 gap-y-2" data-rv>
+        {hero.proofs.map((p) => <li>{p}</li>)}
+      </ul>
+      <div data-rv>
+        <Button href={routes.demo[locale]} size="lg">{t('cta.demo')}</Button>
+      </div>
+    </div>
+    <div class="trio" data-rv>
+      <Picture
+        src={jay}
+        alt={hero.alts.jay}
+        width={300}
+        densities={[1, 2]}
+        formats={['avif', 'webp']}
+        class="jay"
+      />
+      <Picture
+        src={owl}
+        alt={hero.alts.owl}
+        width={250}
+        densities={[1, 2]}
+        formats={['avif', 'webp']}
+        class="owl"
+      />
+      <Picture
+        src={finch}
+        alt={hero.alts.finch}
+        width={250}
+        densities={[1, 2]}
+        formats={['avif', 'webp']}
+        class="finch"
+      />
+    </div>
+  </header>
+
+  <section aria-label={hero.kicker} class:list={[wrap, 'pb-20 md:pb-28']} data-rv-groupe>
+    <div
+      class="grid gap-px overflow-hidden rounded-card bg-line outline outline-1 outline-line md:grid-cols-3"
+    >
       {
-        training.cards.map((c) => (
-          <article class={lightCard} data-rv>
-            <Icon name={c.icon} class="size-7 text-orange" />
-            <h3 class="text-[18px] font-bold text-ink">{c.title}</h3>
-            <p class="text-[15px] leading-[23px] text-soft">{c.text}</p>
+        guarantees.map((g, i) => (
+          <article class="flex flex-col gap-4 bg-surface p-7 md:p-9" data-rv>
+            <p class="font-mono text-kicker text-orange-txt uppercase">
+              {String(i + 1).padStart(2, '0')} · {g.kicker}
+            </p>
+            <h2 class="font-display text-card font-bold text-ink">{g.title}</h2>
+            <ul class="points flex flex-col">
+              {g.points.map((p) => (
+                <li>{p}</li>
+              ))}
+            </ul>
           </article>
         ))
       }
     </div>
   </section>
 
-  <section
-    aria-labelledby="secu-partage"
-    class:list={[wrap, 'grid gap-8 pt-6 pb-10 md:grid-cols-2 md:gap-6 md:pb-12']}
-    data-rv-groupe
-  >
-    <div class="flex flex-col items-start gap-4">
-      <p class:list={[kicker, 'text-orange-txt']} data-rv>{sharing.kicker}</p>
-      <h2
-        id="secu-partage"
-        class="font-display text-[28px] leading-[1.1] font-bold text-ink md:text-[34px] md:leading-[37px]"
-        data-rv
-      >
-        {sharing.title}
-      </h2>
-      <p class="text-[16px] leading-[25px] text-soft" data-rv>{sharing.text}</p>
-      <ul class="flex flex-col gap-3.5" data-rv>
-        {
-          sharing.items.map((item) => (
-            <li class="flex items-center gap-2.5 text-[14px] font-semibold text-ink">
-              <Check class="size-[18px] text-orange" />
-              {item}
-            </li>
-          ))
-        }
-      </ul>
-    </div>
-    <figure
-      class="flex flex-col gap-3 self-start rounded-glass bg-surface p-5 outline outline-1 -outline-offset-1 outline-line md:p-6"
-      data-rv
-    >
-      <figcaption class="font-mono text-[12px] tracking-[1px] text-orange-txt uppercase">
-        {sharing.example.title}
-      </figcaption>
-      <ul class="flex flex-col gap-3">
-        {
-          sharing.example.rows.map((row) => (
-            <li class="flex items-center justify-between gap-3 rounded-xl bg-cream p-3.5">
-              <span class="text-[14px] font-semibold text-ink">{row.source}</span>
-              <span
-                class:list={[
-                  'text-[13px] font-bold whitespace-nowrap',
-                  row.shared ? 'partage' : 'text-soft',
-                ]}
-              >
-                {row.status}
-              </span>
-            </li>
-          ))
-        }
-      </ul>
-    </figure>
-  </section>
-
-  <section aria-labelledby="secu-acces" class="bg-night text-cream" data-rv-groupe>
-    <div class:list={[wrap, 'flex flex-col gap-6 py-12 md:py-12']}>
-      <p class:list={[kicker, 'text-orange']} data-rv>{access.kicker}</p>
-      <h2 id="secu-acces" class:list={[h2, 'text-cream md:leading-[1.2]']} data-rv>
-        {access.title}
-      </h2>
-      <p class="text-[16px] leading-[25px] text-stone/80" data-rv>{access.text}</p>
-      <div class="grid items-start gap-5 md:grid-cols-3">
-        {
-          access.cards.map((c) => (
-            <article
-              class="flex flex-col items-start gap-3 rounded-glass bg-night-2 p-6 outline outline-1 -outline-offset-1 outline-line-night md:p-7"
-              data-rv
-            >
-              <Icon name={c.icon} class="size-7 text-orange" />
-              <h3 class="text-[18px] font-bold text-cream">{c.title}</h3>
-              <p class="text-[14.5px] leading-[22px] text-stone/80">{c.text}</p>
-            </article>
-          ))
-        }
+  <section aria-labelledby="secu-acces" class="bg-night py-20 text-white md:py-28">
+    <div class:list={[wrap, 'grid items-center gap-12 md:grid-cols-[0.9fr_1.1fr]']} data-rv-groupe>
+      <div class="flex flex-col items-start gap-6">
+        <p class="font-mono text-kicker text-orange uppercase" data-rv>{access.kicker}</p>
+        <h2 id="secu-acces" class="font-display text-section font-bold" data-rv>
+          {access.title}
+        </h2>
+        <ul class="points points-nuit flex flex-col" data-rv>
+          {access.points.map((p) => <li>{p}</li>)}
+        </ul>
+      </div>
+      <div data-rv>
+        <Ipad>
+          <div class="ac" data-acces data-role="0">
+            <header class="ac-barre">
+              <b>{screen.app}</b>
+              <span class="ac-vu">{screen.viewing}</span>
+              <div class="ac-roles" role="group" aria-label={screen.viewing}>
+                <span class="ac-curseur" aria-hidden="true"></span>
+                {
+                  screen.roles.map((r, i) => (
+                    <button type="button" data-r={i} aria-pressed={i === 0 ? 'true' : 'false'}>
+                      {r}
+                    </button>
+                  ))
+                }
+              </div>
+            </header>
+            <ul class="ac-lignes">
+              {
+                screen.rows.map((row, i) => (
+                  <li style={`--i:${i}`} class:list={{ 'non-partage': !row.access }}>
+                    <span class="ac-txt">
+                      <b>{row.label}</b>
+                      <span>{row.meta}</span>
+                    </span>
+                    {row.access ? (
+                      <span class="ac-etats">
+                        {row.access.map((etat, r) => (
+                          <span class:list={['ac-etat', etat]} data-r={r}>
+                            {screen.states[etat]}
+                          </span>
+                        ))}
+                      </span>
+                    ) : (
+                      <span class="ac-etats">
+                        <span class="ac-etat np">{screen.states.nonPartage}</span>
+                      </span>
+                    )}
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+        </Ipad>
       </div>
     </div>
   </section>
 
   <section
-    aria-labelledby="secu-socle"
-    class:list={[wrap, 'flex flex-col gap-5 py-10 md:py-12']}
+    aria-labelledby="secu-cta"
+    class:list={[
+      wrap,
+      'flex flex-col items-start gap-5 py-20 md:items-center md:py-24 md:text-center',
+    ]}
     data-rv-groupe
   >
-    <h2 id="secu-socle" class:list={[kicker, 'text-orange-txt']} data-rv>{foundation.kicker}</h2>
-    <div class="grid items-start gap-5 md:grid-cols-2">
-      {
-        foundation.cards.map((c) => (
-          <article class={lightCard.replace('gap-3', 'gap-2.5')} data-rv>
-            <h3 class="text-[17px] font-bold text-ink">{c.title}</h3>
-            <p class="text-[14.5px] leading-[22px] text-soft">{c.text}</p>
-          </article>
-        ))
-      }
+    <h2 id="secu-cta" class="font-display text-section font-bold text-ink" data-rv>{cta.title}</h2>
+    <p class="max-w-[36rem] text-body text-soft" data-rv>{cta.text}</p>
+    <div data-rv>
+      <Button href={routes.demo[locale]} size="lg">{t('cta.demo')}</Button>
     </div>
-  </section>
-
-  <section
-    aria-labelledby="secu-cta"
-    class:list={[wrap, 'flex flex-col items-center gap-4 pt-8 pb-18 text-center']}
-  >
-    <h2
-      id="secu-cta"
-      class="font-display text-[24px] leading-tight font-bold text-ink md:text-[28px]"
-    >
-      {cta.title}
-    </h2>
-    <Button href={cta.href} size="lg" class="max-w-full whitespace-normal">{cta.label}</Button>
   </section>
 </Base>
 
 <style>
-  /* "Shared" status: success green readable as text on cream (AA). */
-  .partage {
-    color: var(--color-success-txt);
+  /* Proofs under the lead: plain facts, a small orange square instead of an icon. */
+  .preuves li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font: 600 15px/1.3 var(--font-sans);
+    color: var(--color-ink);
+  }
+  .preuves li::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: var(--color-orange);
+  }
+
+  /* The three agents, staged as a small group: Jay behind, Owl and Finch in front. */
+  .trio {
+    position: relative;
+    aspect-ratio: 1.15;
+    width: 100%;
+    max-width: 560px;
+    justify-self: center;
+  }
+  .trio :global(img) {
+    position: absolute;
+    height: auto;
+    filter: drop-shadow(0 18px 22px color-mix(in srgb, var(--color-shadow) 22%, transparent));
+  }
+  .trio :global(.jay) {
+    left: 26%;
+    top: 0;
+    width: 52%;
+  }
+  .trio :global(.owl) {
+    left: 0;
+    bottom: 2%;
+    width: 44%;
+  }
+  .trio :global(.finch) {
+    right: 0;
+    bottom: 0;
+    width: 44%;
+  }
+
+  /* Points: short lines separated by rules, no icons. */
+  .points li {
+    padding: 12px 0;
+    border-top: 1px solid var(--color-line);
+    font: 400 16px/1.45 var(--font-sans);
+    color: var(--color-soft);
+  }
+  .points li:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+  .points-nuit li {
+    border-color: var(--color-line-night);
+    color: color-mix(in srgb, var(--color-white) 78%, transparent);
+  }
+
+  /* ---------- The access screen (iPad), sized in cqw of the screen ---------- */
+  .ac {
+    position: absolute;
+    inset: 0;
+    container-type: inline-size;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-cream);
+    font: 500 2.1cqw/1.35 var(--font-sans);
+    color: var(--color-ink);
+  }
+  .ac-barre {
+    display: flex;
+    align-items: center;
+    gap: 2cqw;
+    padding: 3cqw 3.4cqw 2.4cqw;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .ac-barre b {
+    font: 700 2.8cqw/1 var(--font-display);
+  }
+  .ac-vu {
+    margin-left: auto;
+    font: 400 1.5cqw/1 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-soft);
+  }
+  /* Segmented control: a cursor slides under the selected role. */
+  .ac-roles {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    padding: 0.5cqw;
+    border-radius: 999px;
+    background: var(--color-cream-2);
+    box-shadow: inset 0 0 0 1px var(--color-line);
+  }
+  .ac-curseur {
+    position: absolute;
+    top: 0.5cqw;
+    bottom: 0.5cqw;
+    left: 0.5cqw;
+    width: calc((100% - 1cqw) / 3);
+    border-radius: 999px;
+    background: var(--color-surface);
+    box-shadow: var(--shadow-1);
+    transition: translate 0.5s var(--ease-entree);
+  }
+  .ac[data-role='1'] .ac-curseur {
+    translate: 100% 0;
+  }
+  .ac[data-role='2'] .ac-curseur {
+    translate: 200% 0;
+  }
+  .ac-roles button {
+    position: relative;
+    padding: 1cqw 2cqw;
+    border-radius: 999px;
+    font: 600 1.7cqw/1 var(--font-sans);
+    color: var(--color-soft);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color 0.3s var(--ease-doux);
+  }
+  .ac-roles button[aria-pressed='true'] {
+    color: var(--color-ink);
+  }
+  .ac-roles button:focus-visible {
+    outline: 2px solid var(--color-orange-txt);
+    outline-offset: 1px;
+  }
+  .ac-lignes {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4cqw;
+    padding: 2.8cqw 3.4cqw;
+  }
+  .ac-lignes li {
+    display: flex;
+    align-items: center;
+    gap: 2cqw;
+    padding: 2cqw 2.4cqw;
+    border-radius: 1.6cqw;
+    background: var(--color-surface);
+    box-shadow: 0 0 0 1px var(--color-line);
+  }
+  .ac-txt {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.4cqw;
+    min-width: 0;
+  }
+  .ac-txt b {
+    font-size: 2.2cqw;
+  }
+  .ac-txt span {
+    font-size: 1.6cqw;
+    color: var(--color-soft);
+  }
+  /* One state per role in the same cell; the selected role's shows. */
+  .ac-etats {
+    display: grid;
+    justify-items: end;
+  }
+  .ac-etat {
+    grid-area: 1 / 1;
+    padding: 0.7cqw 1.5cqw;
+    border-radius: 999px;
+    font: 600 1.6cqw/1.2 var(--font-sans);
+    white-space: nowrap;
+    opacity: 0;
+    translate: 0 0.6cqw;
+    transition:
+      opacity 0.25s var(--ease-sortie),
+      translate 0.25s var(--ease-sortie);
+  }
+  .ac[data-role='0'] .ac-etat[data-r='0'],
+  .ac[data-role='1'] .ac-etat[data-r='1'],
+  .ac[data-role='2'] .ac-etat[data-r='2'],
+  .ac-etat.np {
+    opacity: 1;
+    translate: 0 0;
+    transition:
+      opacity 0.45s var(--ease-doux) calc(0.15s + var(--i) * 0.06s),
+      translate 0.6s var(--ease-entree) calc(0.15s + var(--i) * 0.06s);
+  }
+  .ac-etat.visible {
+    background: var(--color-orange-tint);
+    color: var(--color-orange-txt);
+  }
+  .ac-etat.perimetre {
+    background: var(--color-sand);
+    color: var(--color-ink);
+  }
+  .ac-etat.masque {
+    background: var(--color-cream-2);
+    color: var(--color-muted);
+  }
+  .ac-etat.np {
+    background: transparent;
+    box-shadow: inset 0 0 0 1px var(--color-stone);
+    color: var(--color-soft);
+  }
+  /* A source not shared with Hatch stays greyed for every role. */
+  .ac-lignes li.non-partage {
+    background: transparent;
+    box-shadow: 0 0 0 1px var(--color-line);
+  }
+  .ac-lignes li.non-partage .ac-txt b {
+    color: var(--color-soft);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ac-curseur,
+    .ac-etat {
+      transition: none !important;
+    }
   }
 </style>
+
+<script>
+  /**
+   * The access screen goes through the roles on its own while it is in view (reduced motion: never);
+   * clicking a role shows that view and hands control to the visitor (the cycle stops).
+   */
+  const ecran = document.querySelector<HTMLElement>('[data-acces]');
+  if (ecran) {
+    const boutons = [...ecran.querySelectorAll<HTMLButtonElement>('.ac-roles button')];
+    const montrer = (r: number) => {
+      ecran.dataset.role = String(r);
+      boutons.forEach((b, i) => b.setAttribute('aria-pressed', String(i === r)));
+    };
+    let minuterie: number | null = null;
+    const arreter = () => {
+      if (minuterie !== null) clearInterval(minuterie);
+      minuterie = null;
+    };
+    boutons.forEach((b, i) =>
+      b.addEventListener('click', () => {
+        arreter();
+        cycle = false;
+        montrer(i);
+      }),
+    );
+    let cycle = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+    new IntersectionObserver(
+      ([e]) => {
+        if (!cycle) return;
+        if (e.isIntersecting && minuterie === null)
+          minuterie = window.setInterval(
+            () => montrer((Number(ecran.dataset.role) + 1) % boutons.length),
+            2800,
+          );
+        else if (!e.isIntersecting) arreter();
+      },
+      { threshold: 0.5 },
+    ).observe(ecran);
+  }
+</script>

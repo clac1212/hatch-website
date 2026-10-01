@@ -22,48 +22,60 @@ export const demoPage = z.strictObject({
   agendaFallbackLink: z.string(),
 });
 
-const card = z.strictObject({ title: z.string(), text: z.string() });
-const iconCard = card.extend({
-  icon: z.enum(['shield-check', 'lock', 'users', 'file-text', 'key']),
-});
-
-/** /securite — mirrors the "Page Sécurité — Hatch" frame of pencil-new.pen. */
+/**
+ * /securite (César 01/10): three guarantees, each held by a voxel agent (hero), the access control
+ * shown on an iPad (who sees what in the BunBun network), one call to action.
+ * Every claim must be true of Hatch OS: hosting is in Europe.
+ */
+const accessState = z.enum(['visible', 'perimetre', 'masque']);
 export const securityPage = z.strictObject({
   seo,
   hero: z.strictObject({
     kicker: z.string(),
     title: z.string(),
     lead: z.string(),
-    badges: z.array(z.string()).length(4),
+    proofs: z.array(z.string()).length(3),
+    /** Alt texts of the three agents (Jay: servers and EU flag, Owl: safe, Finch: stamp). */
+    alts: z.strictObject({ jay: z.string(), owl: z.string(), finch: z.string() }),
   }),
-  training: z.strictObject({
-    kicker: z.string(),
-    title: z.string(),
-    cards: z.array(iconCard).length(2),
-  }),
-  sharing: z.strictObject({
-    kicker: z.string(),
-    title: z.string(),
-    text: z.string(),
-    items: z.array(z.string()).length(3),
-    example: z.strictObject({
-      title: z.string(),
-      rows: z.array(
-        z.strictObject({ source: z.string(), status: z.string(), shared: z.boolean() }),
-      ),
-    }),
-  }),
+  guarantees: z
+    .array(
+      z.strictObject({
+        kicker: z.string(),
+        title: z.string(),
+        points: z.array(z.string()).min(2).max(3),
+      }),
+    )
+    .length(3),
   access: z.strictObject({
     kicker: z.string(),
     title: z.string(),
-    text: z.string(),
-    cards: z.array(iconCard).length(3),
+    points: z.array(z.string()).length(3),
+    /** The iPad screen: one view per role, each row visible, limited to the role's scope, or hidden. */
+    screen: z.strictObject({
+      app: z.string(),
+      viewing: z.string(),
+      roles: z.array(z.string()).length(3),
+      states: z.strictObject({
+        visible: z.string(),
+        perimetre: z.string(),
+        masque: z.string(),
+        nonPartage: z.string(),
+      }),
+      rows: z
+        .array(
+          z.strictObject({
+            label: z.string(),
+            meta: z.string(),
+            /** One state per role; absent = the source is not shared with Hatch at all. */
+            access: z.array(accessState).length(3).optional(),
+          }),
+        )
+        .min(3)
+        .max(5),
+    }),
   }),
-  foundation: z.strictObject({
-    kicker: z.string(),
-    cards: z.array(card).length(2),
-  }),
-  cta: z.strictObject({ title: z.string(), label: z.string(), href: z.string() }),
+  cta: z.strictObject({ title: z.string(), text: z.string() }),
 });
 
 /**
