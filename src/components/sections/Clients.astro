@@ -172,24 +172,6 @@ const formats: ('avif' | 'webp')[] = ['avif', 'webp'];
         }
       </div>
     </div>
-    <button
-      type="button"
-      class="bande-pause absolute right-6 -bottom-8 size-7 cursor-pointer items-center justify-center rounded-full border border-stone text-soft transition-colors hover:border-ink hover:text-ink md:right-12 xl:right-24"
-      aria-label={data.band.pause}
-      data-pause={data.band.pause}
-      data-play={data.band.play}
-      hidden
-    >
-      <svg class="icone-pause size-3" viewBox="0 0 12 12" aria-hidden="true">
-        <rect x="2" y="1.5" width="2.6" height="9" rx="0.6" fill="currentColor"></rect>
-        <rect x="7.4" y="1.5" width="2.6" height="9" rx="0.6" fill="currentColor"></rect>
-      </svg>
-      <svg class="icone-play hidden size-3" viewBox="0 0 12 12" aria-hidden="true">
-        <path
-          d="M3 1.8v8.4a.6.6 0 0 0 .9.5l6.8-4.2a.6.6 0 0 0 0-1L3.9 1.3a.6.6 0 0 0-.9.5Z"
-          fill="currentColor"></path>
-      </svg>
-    </button>
   </div>
 </section>
 
@@ -225,9 +207,10 @@ const formats: ('avif' | 'webp')[] = ['avif', 'webp'];
       transform: translateX(-50%);
     }
   }
+  /* No pause button (César 01/10): the band stops while hovered or focused, and not at all under
+     reduced motion. */
   .bande:hover .bande-piste,
-  .bande:focus-within .bande-piste,
-  .bande.est-arrete .bande-piste {
+  .bande:focus-within .bande-piste {
     animation-play-state: paused;
   }
   .bande-liste {
@@ -298,17 +281,7 @@ const formats: ('avif' | 'webp')[] = ['avif', 'webp'];
     opacity: 1;
   }
 
-  .bande-pause:not([hidden]) {
-    display: flex;
-  }
-  .bande.est-arrete .icone-pause {
-    display: none;
-  }
-  .bande.est-arrete .icone-play {
-    display: block;
-  }
-
-  /* Reduced motion: no scrolling, a static band the visitor scrolls sideways; the clone and the pause button go. */
+  /* Reduced motion: no scrolling, a static band the visitor scrolls sideways; the clone goes. */
   @media (prefers-reduced-motion: reduce) {
     .bande {
       height: auto;
@@ -322,8 +295,7 @@ const formats: ('avif' | 'webp')[] = ['avif', 'webp'];
       margin-left: 0;
       padding-left: 24px;
     }
-    .bande-liste[aria-hidden='true'],
-    .bande-pause:not([hidden]) {
+    .bande-liste[aria-hidden='true'] {
       display: none;
     }
   }
@@ -337,15 +309,6 @@ const formats: ('avif' | 'webp')[] = ['avif', 'webp'];
 
   document.querySelectorAll<HTMLElement>('[data-clients]').forEach((section) => {
     const locale = section.dataset.locale as Locale;
-
-    // Pause / resume button (WCAG 2.2.2). Without JS the band still pauses on hover and focus.
-    const bande = section.querySelector<HTMLElement>('.bande')!;
-    const bouton = section.querySelector<HTMLButtonElement>('.bande-pause')!;
-    if (!reduit) bouton.hidden = false;
-    bouton.addEventListener('click', () => {
-      const arrete = bande.classList.toggle('est-arrete');
-      bouton.setAttribute('aria-label', (arrete ? bouton.dataset.play : bouton.dataset.pause)!);
-    });
 
     // Counters: the page renders the final value (no JS, reduced motion); here they restart from 0
     // and count up on first sight, 1.4 s, cubic ease-out — as in v4.

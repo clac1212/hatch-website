@@ -37,8 +37,6 @@ export const schema = z.strictObject({
   band: z.strictObject({
     /** Accessible name of the band (a list of client names for screen readers). */
     label: z.string(),
-    pause: z.string(),
-    play: z.string(),
   }),
   /** `name` is the logo's alt text, read once by screen readers. */
   clients: z.array(z.strictObject({ id: z.enum(clientIds), name: z.string() })).min(1),

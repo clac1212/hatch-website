@@ -6,8 +6,6 @@ figures:
   - { prefix: '< ', value: 10, suffix: ' s', label: per answer }
 band:
   label: Our client networks
-  pause: Pause scrolling
-  play: Resume scrolling
 clients:
   - { id: nobinobi, name: Nobinobi }
   - { id: pny, name: PNY }

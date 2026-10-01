@@ -6,8 +6,6 @@ figures:
   - { prefix: '< ', value: 10, suffix: ' s', label: par réponse }
 band:
   label: Nos réseaux clients
-  pause: Mettre en pause le défilement
-  play: Reprendre le défilement
 clients:
   - { id: nobinobi, name: Nobinobi }
   - { id: pny, name: PNY }
