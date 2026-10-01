@@ -53,9 +53,9 @@
   --color-gray-700: #555555;
   --color-gray-800: #333333;
   /* Device mock-ups (demo section): titanium and aluminium edges, black glass, WhatsApp chat. */
-  --color-metal: #4a4844;
-  --color-metal-light: #a8a49c;
-  --color-metal-dark: #1f1e1c;
+  --color-metal: #c8c6c1; /* silver edge */
+  --color-metal-light: #f2f1ee;
+  --color-metal-dark: #8f8c86;
   --color-glass: #050506;
   --color-whatsapp-wall: #efeae2; /* chat background */
   --color-whatsapp-tick: #53bdeb; /* read receipts */

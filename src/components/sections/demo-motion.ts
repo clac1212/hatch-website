@@ -40,41 +40,61 @@ const $ = (racine: Element, sel: string) => racine.querySelector<HTMLElement>(se
 const $$ = (racine: Element, sel: string) => [...racine.querySelectorAll<HTMLElement>(sel)];
 const temps = (el: HTMLElement, cle = 't') => Number(el.dataset[cle]);
 
-/** Owl's iPad app: listening (orb, waveform, transcript), then the sheet read step by step. */
+/**
+ * Owl's iPad app. The question is heard (voice bubble, waveform, words), then Owl answers twice at
+ * once: it generates the procedure as UI (skeleton, then the sheet resolves in place) and speaks it
+ * (audio pill); the step being spoken is highlighted, then checked.
+ */
 function tablette(ecr: HTMLElement, o: number) {
   const tl = gsap.timeline();
   /** `tl` resets the screen from the demo start; `b` holds the beats, from the content start `o`. */
   const b = gsap.timeline();
   const debut = temps(ecr, 'debut');
   const reponse = temps(ecr, 'reponse');
+  const prepare = temps(ecr, 'prepare');
+  const resolu = temps(ecr, 'resolu');
+  const voix = temps(ecr, 'voix');
+  const fin = temps(ecr, 'fin');
   const etape = temps(ecr, 'etape');
+  const bulle = $(ecr, '.t-bulle');
   const mots = $$(ecr, '.t-mot');
-  const barres = $$(ecr, '.t-onde span');
-  const anneaux = $$(ecr, '.t-anneau');
-  const fiche = $(ecr, '.t-fiche');
+  const onde = $$(ecr, '.t-onde span');
+  const pilule = $(ecr, '.t-voix');
+  const eq = $$(ecr, '.t-eq span');
+  const carte = $(ecr, '.t-carte');
+  const squelette = $(ecr, '.t-squelette');
+  const os = $$(ecr, '.t-squelette span');
+  const contenu = $(ecr, '.t-contenu');
+  const morceaux = [$(ecr, '.t-source'), $(ecr, '.t-titre'), ...$$(ecr, '.t-etapes li')];
   const etapes = $$(ecr, '.t-etapes li');
   const roue = $(ecr, '.t-roue');
-  const pied = $(ecr, '.t-pied');
+  const [ecoute, prepa, lit] = [$(ecr, '.t-ecoute'), $(ecr, '.t-prepare'), $(ecr, '.t-lit')];
 
   // Back to the start state (the markup is the final state), as soon as the demo starts.
-  tl.set(mots, { autoAlpha: 0, y: '0.35em', filter: 'blur(4px)' }, 0)
-    .set($(ecr, '.t-ecoute'), { opacity: 1 }, 0)
-    .set($(ecr, '.t-lit'), { opacity: 0 }, 0)
-    .set(barres, { scaleY: 0.12 }, 0)
-    .set(anneaux, { opacity: 0, scale: 1 }, 0)
-    .set($(ecr, '.t-coeur'), { scale: 1 }, 0)
-    .set(fiche, { autoAlpha: 0, x: 24 }, 0)
-    .set(etapes, { autoAlpha: 0, y: 12 }, 0)
-    .set($$(ecr, '.t-surligne, .t-eq'), { opacity: 0 }, 0)
+  tl.set(bulle, { autoAlpha: 0, y: 10, scale: 0.96 }, 0)
+    .set(mots, { autoAlpha: 0, y: '0.35em', filter: 'blur(4px)' }, 0)
+    .set(onde, { scaleY: 0.2 }, 0)
+    .set($(ecr, '.t-onde'), { opacity: 1 }, 0)
+    .set(ecoute, { opacity: 1 }, 0)
+    .set([prepa, lit], { opacity: 0 }, 0)
+    .set(pilule, { autoAlpha: 0, x: -12 }, 0)
+    .set(eq, { scaleY: 0.25 }, 0)
+    .set($(ecr, '.t-progression span'), { scaleX: 0, transformOrigin: 'left' }, 0)
+    .set(carte, { autoAlpha: 0, y: 14 }, 0)
+    .set(squelette, { opacity: 1 }, 0)
+    .set(os, { opacity: 1 }, 0)
+    .set(contenu, { opacity: 0 }, 0)
+    .set(morceaux, { autoAlpha: 0, y: 8, filter: 'blur(6px)' }, 0)
+    .set($$(ecr, '.t-surligne'), { opacity: 0 }, 0)
     .set($$(ecr, '.t-num'), { opacity: 1 }, 0)
     .set($$(ecr, '.t-fait'), { autoAlpha: 0, scale: 0.4 }, 0)
     .set($$(ecr, '.t-lu'), { scaleX: 0, opacity: 1 }, 0)
-    .set(roue, { yPercent: 0, y: 0 }, 0)
-    .set(pied, { autoAlpha: 0, y: 6 }, 0);
+    .set(roue, { yPercent: 0, y: 0 }, 0);
 
-  // Listening: the live dot blinks, rings leave the orb, the waveform follows the voice.
-  const ecoute = reponse - debut;
-  b.to(
+  // 1. Listening: the bubble opens, the live dot blinks, the waveform follows the voice, the
+  //    words land one by one.
+  const duree = reponse - debut;
+  b.to(bulle, { autoAlpha: 1, y: 0, scale: 1, duration: 0.6, ease: EASE.entree }, debut - 0.5).to(
     $(ecr, '.t-rec'),
     {
       opacity: 0.25,
@@ -84,82 +104,83 @@ function tablette(ecr: HTMLElement, o: number) {
       repeat: 2 * Math.ceil(reponse / 0.9) - 1,
     },
     0,
-  ).to(
-    $(ecr, '.t-coeur'),
-    {
-      scale: 1.06,
-      duration: 0.5,
-      ease: 'sine.inOut',
-      yoyo: true,
-      repeat: 2 * Math.ceil(ecoute) - 1,
-    },
-    debut - 0.3,
   );
-  anneaux.forEach((a, i) =>
-    b.fromTo(
-      a,
-      { opacity: 0.6, scale: 1 },
-      {
-        opacity: 0,
-        scale: 1.7,
-        duration: 1.5,
-        ease: 'power1.out',
-        repeat: Math.max(0, Math.floor((ecoute - 0.5 * i) / 1.5) - 1),
-        immediateRender: false,
-      },
-      debut - 0.3 + 0.5 * i,
-    ),
-  );
-  barres.forEach((barre, i) =>
+  onde.forEach((barre, i) =>
     b.to(
       barre,
       {
-        scaleY: () => gsap.utils.random(0.25, 1),
+        scaleY: () => gsap.utils.random(0.3, 1),
         duration: 0.16,
         ease: 'sine.inOut',
         yoyo: true,
-        repeat: Math.floor(ecoute / 0.16),
+        repeat: Math.floor(duree / 0.16),
         repeatRefresh: true,
       },
-      debut + i * 0.012,
+      debut + i * 0.02,
     ),
   );
-  b.to(barres, { scaleY: 0.12, duration: 0.35, ease: EASE.doux }, reponse);
+  b.to(onde, { scaleY: 0.2, duration: 0.3, ease: EASE.doux }, reponse).to(
+    $(ecr, '.t-onde'),
+    { opacity: 0.35, duration: 0.3 },
+    reponse,
+  );
   mots.forEach((m) =>
     b.to(m, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.45, ease: EASE.doux }, temps(m)),
   );
 
-  // Answer: status swaps, the sheet slides in, its steps cascade.
-  b.to($(ecr, '.t-ecoute'), { opacity: 0, duration: 0.2, ease: EASE.sortie }, reponse)
-    .to($(ecr, '.t-lit'), { opacity: 1, duration: 0.3, ease: EASE.doux }, reponse + 0.15)
-    .to(fiche, { autoAlpha: 1, x: 0, duration: 0.9, ease: EASE.entree }, reponse + 0.1)
+  // 2. Generating: status "preparing", the card opens on a pulsing skeleton...
+  b.to(ecoute, { opacity: 0, duration: 0.2 }, prepare)
+    .to(prepa, { opacity: 1, duration: 0.3 }, prepare + 0.1)
+    .to(carte, { autoAlpha: 1, y: 0, duration: 0.7, ease: EASE.entree }, prepare)
     .to(
-      etapes,
-      { autoAlpha: 1, y: 0, duration: 0.7, ease: EASE.entree, stagger: 0.08 },
-      reponse + 0.35,
+      os,
+      {
+        opacity: 0.45,
+        duration: 0.35,
+        ease: 'sine.inOut',
+        yoyo: true,
+        repeat: 2 * Math.ceil((resolu - prepare) / 0.7) - 1,
+        stagger: 0.08,
+      },
+      prepare,
+    );
+  // ...then the sheet resolves in place, piece by piece, out of a blur.
+  b.to(squelette, { opacity: 0, duration: 0.3, ease: EASE.sortie }, resolu)
+    .set(contenu, { opacity: 1 }, resolu)
+    .to(
+      morceaux,
+      { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.6, ease: EASE.entree, stagger: 0.09 },
+      resolu + 0.05,
     );
 
-  // Each step is read out: tinted, equaliser on, reading bar fills, the counter rolls, then a check.
+  // 3. Speaking, in parallel: status "reading", the audio pill plays to the end of the answer.
+  b.to(prepa, { opacity: 0, duration: 0.2 }, voix)
+    .to(lit, { opacity: 1, duration: 0.3 }, voix + 0.1)
+    .to(pilule, { autoAlpha: 1, x: 0, duration: 0.6, ease: EASE.entree }, voix - 0.2)
+    .to($(ecr, '.t-progression span'), { scaleX: 1, duration: fin - voix, ease: 'none' }, voix)
+    .to(eq, { scaleY: 0.25, duration: 0.3, ease: EASE.doux }, fin);
+  eq.forEach((barre, i) =>
+    b.to(
+      barre,
+      {
+        scaleY: () => gsap.utils.random(0.3, 1),
+        duration: 0.18,
+        ease: 'sine.inOut',
+        yoyo: true,
+        repeat: Math.floor((fin - voix) / 0.18) - 1,
+        repeatRefresh: true,
+      },
+      voix + i * 0.015,
+    ),
+  );
+
+  // 4. The step being spoken: tinted, its reading bar fills, the counter rolls, then a check.
   const lu = etape * 0.85;
   etapes.forEach((li, i) => {
     const t = temps(li);
     b.to($(li, '.t-surligne'), { opacity: 1, duration: 0.3, ease: EASE.doux }, t)
-      .to($(li, '.t-eq'), { opacity: 1, duration: 0.2 }, t)
-      .to(
-        $$(li, '.t-eq span'),
-        {
-          scaleY: () => gsap.utils.random(0.4, 1),
-          duration: 0.18,
-          ease: 'sine.inOut',
-          yoyo: true,
-          repeat: Math.floor(lu / 0.18),
-          repeatRefresh: true,
-          stagger: 0.06,
-        },
-        t,
-      )
       .to($(li, '.t-lu'), { scaleX: 1, duration: lu, ease: 'none' }, t)
-      .to($$(li, '.t-surligne, .t-eq'), { opacity: 0, duration: 0.3, ease: EASE.sortie }, t + lu)
+      .to($(li, '.t-surligne'), { opacity: 0, duration: 0.3, ease: EASE.sortie }, t + lu)
       .to($(li, '.t-lu'), { opacity: 0, duration: 0.3 }, t + lu)
       .to($(li, '.t-num'), { opacity: 0, duration: 0.15 }, t + lu)
       .to(
@@ -174,7 +195,6 @@ function tablette(ecr: HTMLElement, o: number) {
         t - 0.1,
       );
   });
-  b.to(pied, { autoAlpha: 1, y: 0, duration: 0.5, ease: EASE.entree }, temps(pied));
   return tl.add(b, o);
 }
 
@@ -187,7 +207,8 @@ function telephone(ecr: HTMLElement, o: number) {
   const st = $(ecr, '.p-st');
   const ecrit = $(ecr, '.p-ecrit');
   const indice = $(ecr, '.p-indice');
-  const repos = $(ecr, '.p-repos');
+  const photo = $(ecr, '.p-photo');
+  const micro = $(ecr, '.p-micro');
   const envoyer = $(ecr, '.p-envoyer');
   const suivi = $(ecr, '.p-suivi');
 
@@ -201,7 +222,8 @@ function telephone(ecr: HTMLElement, o: number) {
     .set($$(ecr, '.p-doigt'), { autoAlpha: 0, scale: 1.5, xPercent: 120, yPercent: 140 }, 0)
     .set($$(ecr, '.p-brouillon'), { opacity: 0, clipPath: 'inset(0 100% 0 0)' }, 0)
     .set(indice, { opacity: 1 }, 0)
-    .set(repos, { opacity: 1 }, 0)
+    .set(photo, { '--ouvert': 1 }, 0)
+    .set(micro, { opacity: 1, scale: 1 }, 0)
     .set(envoyer, { opacity: 0, scale: 0.6 }, 0)
     .set(suivi, { autoAlpha: 0, x: 48, y: 0, scale: 0.96 }, 0);
 
@@ -236,19 +258,23 @@ function telephone(ecr: HTMLElement, o: number) {
       .to(st, { opacity: 1, duration: 0.2 }, message + 0.1);
   });
 
-  // A reply is typed in the input bar (the send button replaces the mic), then sent.
+  // A reply is typed in the input bar (the camera folds away, the send button replaces the mic),
+  // then sent.
   $$(ecr, '.p-brouillon').forEach((d) => {
     const t = temps(d);
     const envoi = temps(d, 'envoi');
     b.to(indice, { opacity: 0, duration: 0.1 }, t)
-      .to(repos, { opacity: 0, duration: 0.15 }, t)
-      .to(envoyer, { opacity: 1, scale: 1, duration: 0.3, ease: 'back.out(2)' }, t)
+      .to(photo, { '--ouvert': 0, duration: 0.3, ease: EASE.doux }, t)
+      .to(micro, { opacity: 0, scale: 0.6, duration: 0.15 }, t)
+      .to(envoyer, { opacity: 1, scale: 1, duration: 0.3, ease: 'back.out(2)' }, t + 0.05)
       .to(d, { opacity: 1, duration: 0.01 }, t)
       .to(d, { clipPath: 'inset(0 0% 0 0)', duration: envoi - t - 0.2, ease: 'steps(14)' }, t)
       .to(envoyer, { scale: 0.85, duration: 0.1, yoyo: true, repeat: 1 }, envoi - 0.15)
       .to(d, { opacity: 0, duration: 0.1 }, envoi)
       .to(envoyer, { opacity: 0, scale: 0.6, duration: 0.2 }, envoi + 0.05)
-      .to([indice, repos], { opacity: 1, duration: 0.2 }, envoi + 0.1);
+      .to(indice, { opacity: 1, duration: 0.2 }, envoi + 0.1)
+      .to(micro, { opacity: 1, scale: 1, duration: 0.25, ease: EASE.doux }, envoi + 0.1)
+      .to(photo, { '--ouvert': 1, duration: 0.3, ease: EASE.doux }, envoi + 0.1);
   });
 
   // Each message or poll: its line grows (pushing the thread up), the bubble pops from its tail.
@@ -285,24 +311,32 @@ function telephone(ecr: HTMLElement, o: number) {
   return tl.add(b, o);
 }
 
+/**
+ * How an autoplay place reacts to time and scroll:
+ * - `auto`: the timeline plays on its own, in a loop; the scroll only picks the place;
+ * - `scroll` (`?scroll=1`): it never plays on its own, the scroll inside the place is the playhead;
+ * - `mixte` (default, César 01/10): it plays on its own, and scrolling inside the place pushes it
+ *   forward or back on top of that, so a fast scroll fast-forwards and scrolling up rewinds.
+ */
+export type Mode = 'auto' | 'scroll' | 'mixte';
+
 export interface Pilote {
-  /** Play demo i (and the following ones, in a loop). */
+  /** The place becomes active, the scroll being at q (0–1) inside it. */
+  entrer(q: number): void;
+  /** The scroll moved inside the active place, now at q (0–1). */
+  suivre(q: number): void;
+  /** A tab was clicked: play demo i (auto, mixte). */
   jouer(i: number): void;
-  /** Back to the wide shot, stopped (the place is left). */
+  /** The place is left. */
   arreter(): void;
   /** Toggle the visitor's pause; returns the new state. */
   basculer(): boolean;
-  /** Scroll mode: show the timeline at progress q (0–1), smoothed. */
-  scruter(q: number): void;
   /** Scroll mode: progress (0–1) where demo i starts, to scroll a tab click there. */
   position(i: number): number;
 }
 
-/**
- * `scroll` (test variant, `?scroll=1`): the timeline does not play on its own; the scroll position
- * inside the place drives it (`scruter`), so the visitor scrubs the demo like a video.
- */
-export function piloter(lieu: HTMLElement, { scroll = false } = {}): Pilote {
+export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
+  const scroll = mode === 'scroll';
   const calque = $(lieu, '.d2-calque');
   const voile = $(lieu, '.d2-voile');
   const ecrans = $$(lieu, '.d2-ecran');
@@ -318,8 +352,10 @@ export function piloter(lieu: HTMLElement, { scroll = false } = {}): Pilote {
   let actif = false;
   let enPause = false;
   let courant = -1;
-  /** Scroll mode: the last progress asked for, reapplied when the timeline is rebuilt. */
+  /** Last scroll position inside the place (0–1): scroll mode reapplies it, mixte diffs it. */
   let q = 0;
+  /** Mixte: where the scroll is pushing the playhead to (seconds), while it catches up. */
+  let cible: number | null = null;
 
   /** Tabs and titles follow the demo on screen (classes: their CSS transitions do the rest). */
   function marquer(i: number) {
@@ -467,7 +503,7 @@ export function piloter(lieu: HTMLElement, { scroll = false } = {}): Pilote {
     marquer(i);
   }
 
-  /** Reduced motion in scroll mode: the demos split the place's scroll evenly. */
+  /** Reduced motion: no playhead; in scroll mode the demos split the place's scroll evenly. */
   const indice = (p: number) => Math.min(ecrans.length - 1, Math.floor(p * ecrans.length));
 
   // gsap.matchMedia runs the handler only while one condition matches: `mobile` and `large` cover
@@ -485,7 +521,7 @@ export function piloter(lieu: HTMLElement, { scroll = false } = {}): Pilote {
       tl = reduit ? null : construire(!!mobile);
       if (!tl) montrer(scroll ? indice(q) : 0);
       else if (scroll) tl.progress(q);
-      else if (actif) tl.play(0).paused(enPause);
+      else if (actif) tl.play(mode === 'mixte' ? q * tl.duration() : 0).paused(enPause);
       return () => {
         tl = null;
       };
@@ -493,33 +529,65 @@ export function piloter(lieu: HTMLElement, { scroll = false } = {}): Pilote {
   );
 
   document.addEventListener('visibilitychange', () => {
-    if (tl && actif && !enPause && !scroll) tl.paused(document.hidden);
+    if (tl && actif && !enPause && !scroll && cible === null) tl.paused(document.hidden);
   });
 
+  /** Mixte: move the playhead by `dt` seconds, eased, then let it play on from there. */
+  function pousser(dt: number) {
+    if (!tl) return;
+    const d = tl.duration();
+    cible = Math.min(Math.max((cible ?? tl.time()) + dt, 0), d - 0.05);
+    tl.pause();
+    gsap.to(tl, {
+      time: cible,
+      duration: 0.5,
+      ease: 'power3.out',
+      overwrite: true,
+      onComplete() {
+        cible = null;
+        if (actif && !enPause) tl?.play();
+      },
+    });
+  }
+
   return {
-    jouer(i) {
+    entrer(p) {
       actif = true;
+      q = p;
+      if (!tl) return montrer(scroll ? indice(p) : 0);
+      if (scroll) return void tl.progress(p);
+      enPause = false;
+      // Mixte: coming in from below starts near the end, so scrolling back up rewinds it.
+      tl.play(mode === 'mixte' ? p * tl.duration() : 0);
+    },
+    suivre(p) {
+      const dq = p - q;
+      q = p;
+      if (!tl) return scroll ? montrer(indice(p)) : undefined;
+      if (scroll) {
+        // A short catch-up tween smooths the wheel's steps without lagging behind the scroll.
+        gsap.to(tl, { progress: p, duration: 0.6, ease: 'power3.out', overwrite: true });
+      } else if (mode === 'mixte' && dq) pousser(dq * tl.duration());
+    },
+    jouer(i) {
       if (scroll) return;
       if (!tl) return montrer(i);
       enPause = false;
+      cible = null;
+      gsap.killTweensOf(tl);
       tl.play(i === 0 ? 0 : `d${i}`);
     },
     arreter() {
       actif = false;
-      if (scroll) return;
-      if (tl) tl.pause(0);
-      else montrer(0);
+      cible = null;
+      if (!tl) return scroll ? undefined : montrer(0);
+      gsap.killTweensOf(tl);
+      if (!scroll) tl.pause(0);
     },
     basculer() {
       enPause = !enPause;
-      tl?.paused(enPause);
+      if (tl && cible === null) tl.paused(enPause);
       return enPause;
-    },
-    scruter(p) {
-      q = p;
-      if (!tl) return montrer(indice(p));
-      // A short catch-up tween smooths the wheel's steps without lagging behind the scroll.
-      gsap.to(tl, { progress: p, duration: 0.6, ease: 'power3.out', overwrite: true });
     },
     position(i) {
       if (!tl) return (i + 0.5) / ecrans.length;

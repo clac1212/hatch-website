@@ -24,8 +24,9 @@ const ecranTablette = z.strictObject({
   heure,
   /** Top bar of the tablet app. */
   entete: texte,
-  /** Status in the top bar: listening (question), then reading (procedure). */
+  /** Status in the top bar: listening (question), building the answer, reading it out loud. */
   ecoute: texte,
+  prepare: texte,
   lit: texte,
   /** Spoken question, shown word by word. */
   question: texte,
@@ -37,7 +38,7 @@ const ecranTablette = z.strictObject({
   compteur: texte.refine((c) => c.includes('{n}') && c.includes('{total}'), {
     message: '`compteur` needs {n} and {total}',
   }),
-  /** Closing line once every step has been read. */
+  /** Caption of the audio pill: the answer is also spoken out loud. */
   pied: texte,
 });
 const ecranTelephone = z.strictObject({

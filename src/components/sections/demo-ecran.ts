@@ -13,19 +13,26 @@ export function chronoTablette(e: EcranTablette) {
   const mots = e.question.split(' ');
   const debutMots = 0.9;
   const parMot = 0.24;
-  // Listening (waveform) until the last word, then the sheet arrives.
+  // Listening (waveform) until the last word.
   const reponse = debutMots + mots.length * parMot + 0.7;
+  // Then Owl builds the answer as UI (skeleton, then the sheet resolves) and starts speaking it.
+  const prepare = reponse + 0.2;
+  const resolu = prepare + 1.3;
+  const voix = resolu + 0.7;
   const parEtape = 2.2;
-  const etapes = e.etapes.map((_, i) => reponse + 1 + i * parEtape);
-  const pied = reponse + 1 + e.etapes.length * parEtape;
+  const etapes = e.etapes.map((_, i) => voix + 0.3 + i * parEtape);
+  const finVoix = voix + 0.3 + e.etapes.length * parEtape;
   return {
     mots: mots.map((m, i) => ({ m, t: debutMots + i * parMot })),
     debutMots,
     reponse,
+    prepare,
+    resolu,
+    voix,
     parEtape,
     etapes,
-    pied,
-    duree: pied + 2.2,
+    finVoix,
+    duree: finVoix + 2,
   };
 }
 

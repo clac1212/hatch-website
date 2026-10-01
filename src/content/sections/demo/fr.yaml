@@ -59,6 +59,7 @@ lieux:
           heure: "15:02"
           entete: Owl · Tablette cuisine
           ecoute: Je vous écoute
+          prepare: Je prépare la fiche
           lit: Je lis la fiche
           question: Owl, comment on ouvre la caisse ?
           fiche: Ouverture de caisse

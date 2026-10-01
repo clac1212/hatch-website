@@ -57,9 +57,14 @@ const I = {
       data-duree={s(tab.duree)}
       data-debut={s(tab.debutMots)}
       data-reponse={s(tab.reponse)}
+      data-prepare={s(tab.prepare)}
+      data-resolu={s(tab.resolu)}
+      data-voix={s(tab.voix)}
+      data-fin={s(tab.finVoix)}
       data-etape={s(tab.parEtape)}
     >
       <div class="ipad">
+        <span class="bouton haut" aria-hidden="true" />
         <div class="vitre">
           <span class="t-camera" aria-hidden="true" />
           <div class="t-ecran">
@@ -86,27 +91,19 @@ const I = {
                 <span class="t-rec" aria-hidden="true" />
                 <span class="t-statuts">
                   <span class="t-ecoute">{ecran.ecoute}</span>
+                  <span class="t-prepare">{ecran.prepare}</span>
                   <span class="t-lit">{ecran.lit}</span>
                 </span>
               </span>
             </header>
-            <div class="t-corps">
-              <section class="t-voix">
-                <div class="t-orbe" aria-hidden="true">
-                  <span class="t-anneau" />
-                  <span class="t-anneau" />
-                  <span class="t-anneau" />
-                  <span class="t-coeur">
-                    <svg viewBox="0 0 24 24">
-                      <path d={I.micro} />
-                    </svg>
-                  </span>
-                </div>
-                <div class="t-onde" aria-hidden="true">
-                  {Array.from({ length: BARRES }, () => (
-                    <span />
-                  ))}
-                </div>
+            <div class="t-fil">
+              {/* The question, heard: a voice bubble transcribed word by word. */}
+              <div class="t-bulle">
+                <span class="t-micro" aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <path d={I.micro} />
+                  </svg>
+                </span>
                 <p class="t-question">
                   {tab.mots.map(({ m, t }) => (
                     <>
@@ -116,52 +113,74 @@ const I = {
                     </>
                   ))}
                 </p>
-              </section>
-              <section class="t-fiche">
-                <p class="t-source">{ecran.source}</p>
-                <div class="t-titre">
-                  <p>{ecran.fiche}</p>
-                  <p class="t-compteur">
-                    {compteurAvant}
-                    <span class="t-fenetre">
-                      <span class="t-roue">
-                        {ecran.etapes.map((_, i) => (
-                          <span>{i + 1}</span>
-                        ))}
-                      </span>
-                    </span>
-                    {compteurApres}
-                  </p>
-                </div>
-                <ol class="t-etapes">
-                  {ecran.etapes.map((etape, i) => (
-                    <li data-t={s(tab.etapes[i])}>
-                      <span class="t-surligne" aria-hidden="true" />
-                      <span class="t-pastille" aria-hidden="true">
-                        <span class="t-num">{i + 1}</span>
-                        <span class="t-fait">
-                          <svg viewBox="0 0 24 24">
-                            <path d={I.ok} />
-                          </svg>
-                        </span>
-                      </span>
-                      <span class="t-txt">{etape}</span>
-                      <span class="t-eq" aria-hidden="true">
-                        <span />
-                        <span />
-                        <span />
-                      </span>
-                      <span class="t-lu" aria-hidden="true" />
-                    </li>
+                <span class="t-onde" aria-hidden="true">
+                  {Array.from({ length: 9 }, () => (
+                    <span />
                   ))}
-                </ol>
-                <p class="t-pied" data-t={s(tab.pied)}>
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d={I.hp} />
-                  </svg>
-                  {ecran.pied}
-                </p>
-              </section>
+                </span>
+              </div>
+              {/* The answer: Owl speaks it (audio pill) and shows it as UI it generates. */}
+              <div class="t-reponse">
+                <div class="t-voix">
+                  <span class="t-hp" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <path d={I.hp} />
+                    </svg>
+                  </span>
+                  <span class="t-eq" aria-hidden="true">
+                    {Array.from({ length: 14 }, () => (
+                      <span />
+                    ))}
+                  </span>
+                  <span class="t-legende">{ecran.pied}</span>
+                  <span class="t-progression" aria-hidden="true">
+                    <span />
+                  </span>
+                </div>
+                <div class="t-carte">
+                  <div class="t-squelette" aria-hidden="true">
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <div class="t-contenu">
+                    <p class="t-source">{ecran.source}</p>
+                    <div class="t-titre">
+                      <p>{ecran.fiche}</p>
+                      <p class="t-compteur">
+                        {compteurAvant}
+                        <span class="t-fenetre">
+                          <span class="t-roue">
+                            {ecran.etapes.map((_, i) => (
+                              <span>{i + 1}</span>
+                            ))}
+                          </span>
+                        </span>
+                        {compteurApres}
+                      </p>
+                    </div>
+                    <ol class="t-etapes">
+                      {ecran.etapes.map((etape, i) => (
+                        <li data-t={s(tab.etapes[i])}>
+                          <span class="t-surligne" aria-hidden="true" />
+                          <span class="t-pastille" aria-hidden="true">
+                            <span class="t-num">{i + 1}</span>
+                            <span class="t-fait">
+                              <svg viewBox="0 0 24 24">
+                                <path d={I.ok} />
+                              </svg>
+                            </span>
+                          </span>
+                          <span class="t-txt">{etape}</span>
+                          <span class="t-lu" aria-hidden="true" />
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -304,15 +323,15 @@ const I = {
                     ),
                 )}
               </span>
+              <span class="p-photo">
+                <svg viewBox="0 0 24 24">
+                  <path d={I.photo} />
+                </svg>
+              </span>
               <span class="p-actions">
-                <span class="p-repos">
-                  <svg viewBox="0 0 24 24">
-                    <path d={I.photo} />
-                  </svg>
-                  <svg viewBox="0 0 24 24">
-                    <path d={I.micro} />
-                  </svg>
-                </span>
+                <svg class="p-micro" viewBox="0 0 24 24">
+                  <path d={I.micro} />
+                </svg>
                 <span class="p-envoyer">
                   <svg viewBox="0 0 24 24">
                     <path d={I.envoi} />
@@ -342,30 +361,43 @@ const I = {
 
 <style>
   /* ================= Devices ================= */
-  /* Edge: brushed metal, a light rim on top and a dark rim below; black glass inside it. */
+  /* A silver edge (--bord), black glass inside it (--verre), the screen inside the glass. Every
+     radius derives from the outer one (--rayon), so the corners stay concentric. */
   .ipad,
   .iphone {
     position: relative;
     container-type: inline-size;
-    background: linear-gradient(
-      160deg,
-      var(--color-metal-light),
-      var(--color-metal) 18%,
-      var(--color-metal-dark) 55%,
-      var(--color-metal) 85%,
-      var(--color-metal-light)
-    );
+    border-radius: var(--rayon);
+    background: var(--color-metal);
     box-shadow:
-      inset 0 0 0 1px color-mix(in srgb, var(--color-white) 28%, transparent),
-      inset 0 -2px 3px color-mix(in srgb, var(--color-black) 45%, transparent),
-      0 2px 3px color-mix(in srgb, var(--color-shadow) 30%, transparent),
-      0 24px 40px -12px color-mix(in srgb, var(--color-shadow) 45%, transparent),
-      0 60px 90px -30px color-mix(in srgb, var(--color-shadow) 40%, transparent);
+      inset 0 0 0 0.15cqw var(--color-metal-dark),
+      inset 0 0.35cqw 0.25cqw var(--color-metal-light),
+      inset 0 -0.35cqw 0.35cqw var(--color-metal-dark),
+      0 1px 2px color-mix(in srgb, var(--color-shadow) 25%, transparent),
+      0 18px 36px -14px color-mix(in srgb, var(--color-shadow) 45%, transparent),
+      0 44px 80px -36px color-mix(in srgb, var(--color-shadow) 40%, transparent);
   }
   .vitre {
     position: absolute;
+    inset: var(--bord);
+    border-radius: calc(var(--rayon) - var(--bord));
     background: var(--color-glass);
-    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-white) 8%, transparent);
+    box-shadow: 0 0 0 0.12cqw var(--color-metal-dark);
+  }
+  /* The screen, inside the glass. */
+  .t-ecran,
+  .p-ecran {
+    position: absolute;
+    inset: var(--verre);
+    border-radius: calc(var(--rayon) - var(--bord) - var(--verre));
+  }
+  .bouton {
+    position: absolute;
+    border-radius: 0.6cqw;
+    background: var(--color-metal);
+    box-shadow:
+      inset 0 0 0 0.12cqw var(--color-metal-dark),
+      inset 0.2cqw 0 0.2cqw var(--color-metal-light);
   }
   /* A soft glare across the glass; the timeline sweeps it once when the device lands. */
   .reflet {
@@ -403,37 +435,38 @@ const I = {
     opacity: 0.45;
   }
 
-  /* ---------- iPad Pro 13", landscape ---------- */
+  /* ---------- iPad Pro 13", landscape (281.6 × 215.5 mm) ---------- */
   .tablette {
     width: 100%;
   }
   .ipad {
+    --rayon: 6.6cqw;
+    --bord: 0.55cqw;
+    --verre: 2.1cqw;
     aspect-ratio: 281.6 / 215.5;
-    border-radius: 6.2cqw;
   }
-  .ipad .vitre {
-    inset: 0.55cqw;
-    border-radius: 5.7cqw;
+  .ipad .haut {
+    top: -0.35cqw;
+    right: 14%;
+    width: 6%;
+    height: 0.5cqw;
   }
   .t-camera {
     position: absolute;
     left: 50%;
-    top: 1cqw;
-    width: 0.9cqw;
-    height: 0.9cqw;
-    margin-left: -0.45cqw;
+    top: calc(var(--verre) / 2 - 0.4cqw);
+    width: 0.8cqw;
+    height: 0.8cqw;
+    margin-left: -0.4cqw;
     border-radius: 999px;
     background: var(--color-night-2);
-    box-shadow: inset 0 0 0 0.2cqw var(--color-metal-dark);
+    box-shadow: inset 0 0 0 0.18cqw var(--color-line-night);
   }
   .t-ecran {
-    position: absolute;
-    inset: 2.9cqw;
     container-type: inline-size;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    border-radius: 3.4cqw;
     background: var(--color-cream);
     font: 500 2.2cqw/1.35 var(--font-sans);
     color: var(--color-ink);
@@ -441,7 +474,7 @@ const I = {
   .t-statut {
     display: flex;
     justify-content: space-between;
-    padding: 1.2cqw 2.6cqw 0;
+    padding: 1.3cqw 3cqw 0;
     font: 600 1.6cqw/1 var(--font-sans);
   }
   .t-statut .icones {
@@ -457,12 +490,13 @@ const I = {
     display: flex;
     align-items: center;
     gap: 1.4cqw;
-    padding: 1.4cqw 2.6cqw 1.6cqw;
+    padding: 1.4cqw 3cqw 1.6cqw;
+    border-bottom: 1px solid var(--color-line);
   }
   .t-barre :global(.t-av) {
-    width: 4.4cqw;
-    height: 4.4cqw;
-    border-radius: 1.2cqw;
+    width: 4.6cqw;
+    height: 4.6cqw;
+    border-radius: 1.3cqw;
     background: var(--color-surface);
     box-shadow: 0 0 0 1px var(--color-line);
   }
@@ -484,7 +518,7 @@ const I = {
     align-items: center;
     gap: 0.9cqw;
     margin-left: auto;
-    padding: 0.8cqw 1.6cqw 0.8cqw 1.2cqw;
+    padding: 0.85cqw 1.7cqw 0.85cqw 1.3cqw;
     border-radius: 999px;
     background: var(--color-surface);
     box-shadow:
@@ -499,98 +533,167 @@ const I = {
     background: var(--color-orange);
     box-shadow: 0 0 0 0.35cqw var(--color-orange-tint);
   }
-  /* The two statuses share one cell; the timeline swaps them. Final state: reading. */
+  /* The three statuses share one cell; the timeline swaps them. Final state: reading. */
   .t-statuts {
     display: grid;
+    justify-items: end;
   }
   .t-statuts > * {
     grid-area: 1 / 1;
   }
-  .t-ecoute {
+  .t-ecoute,
+  .t-prepare {
     opacity: 0;
-  }
-  .t-corps {
-    display: grid;
-    grid-template-columns: 34% 1fr;
-    gap: 1.6cqw;
-    flex: 1;
-    min-height: 0;
-    padding: 0 2.2cqw 2.2cqw;
   }
 
-  /* Voice card: a dark card where the question is heard and transcribed. */
-  .t-voix {
+  /* The conversation: the heard question on the right, Owl's answer below it. */
+  .t-fil {
     display: flex;
+    flex: 1;
     flex-direction: column;
+    gap: 1.8cqw;
+    min-height: 0;
+    padding: 2.2cqw 3cqw 2.6cqw;
+  }
+  .t-bulle {
+    display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 2.4cqw;
-    padding: 2.6cqw 2.4cqw;
-    border-radius: 2.4cqw;
+    align-self: flex-end;
+    gap: 1.3cqw;
+    max-width: 70%;
+    padding: 1.1cqw 1.8cqw 1.1cqw 1.1cqw;
+    border-radius: 3cqw;
+    border-bottom-right-radius: 0.8cqw;
     background: var(--color-night);
     color: var(--color-white);
-    text-align: center;
   }
-  .t-orbe {
-    position: relative;
+  .t-micro {
     display: grid;
     place-items: center;
-    width: 14cqw;
-    height: 14cqw;
-  }
-  .t-anneau {
-    position: absolute;
-    inset: 1.5cqw;
-    border-radius: 999px;
-    border: 0.25cqw solid var(--color-orange);
-    opacity: 0;
-  }
-  .t-coeur {
-    display: grid;
-    place-items: center;
-    width: 10cqw;
-    height: 10cqw;
+    flex: none;
+    width: 3.8cqw;
+    height: 3.8cqw;
     border-radius: 999px;
     background: var(--color-orange);
-    box-shadow: 0 0 0 1.1cqw color-mix(in srgb, var(--color-orange) 22%, transparent);
   }
-  .t-coeur svg {
-    width: 4.6cqw;
+  .t-micro svg {
+    width: 2.1cqw;
     fill: var(--color-ink);
   }
-  .t-onde {
-    display: flex;
-    align-items: center;
-    gap: 0.45cqw;
-    height: 4.4cqw;
-  }
-  .t-onde span {
-    width: 0.55cqw;
-    height: 100%;
-    border-radius: 999px;
-    background: color-mix(in srgb, var(--color-white) 75%, transparent);
-    transform: scaleY(0.12);
-  }
   .t-question {
-    font: 600 2.9cqw/1.3 var(--font-sans);
-    text-wrap: balance;
+    font: 600 2.3cqw/1.3 var(--font-sans);
   }
   .t-mot {
     display: inline-block;
   }
-
-  /* Procedure card. */
-  .t-fiche {
+  .t-onde {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 0.35cqw;
+    height: 2.6cqw;
+  }
+  .t-onde span {
+    width: 0.4cqw;
+    height: 100%;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-white) 75%, transparent);
+    transform: scaleY(0.2);
+  }
+  .t-reponse {
     display: flex;
     flex-direction: column;
-    min-width: 0;
-    padding: 2.2cqw 2.4cqw;
+    gap: 1.1cqw;
+    min-height: 0;
+  }
+  /* Audio pill: the answer is also spoken; its bar runs while Owl speaks. */
+  .t-voix {
+    position: relative;
+    display: flex;
+    align-items: center;
+    align-self: flex-start;
+    gap: 1.2cqw;
+    padding: 0.9cqw 1.8cqw 0.9cqw 0.9cqw;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--color-orange-tint);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-orange) 35%, transparent);
+    font: 600 1.7cqw/1 var(--font-sans);
+    color: var(--color-orange-txt);
+  }
+  .t-hp {
+    display: grid;
+    place-items: center;
+    width: 3.2cqw;
+    height: 3.2cqw;
+    border-radius: 999px;
+    background: var(--color-orange);
+  }
+  .t-hp svg {
+    width: 1.8cqw;
+    fill: var(--color-ink);
+  }
+  .t-eq {
+    display: flex;
+    align-items: center;
+    gap: 0.3cqw;
+    height: 2.4cqw;
+  }
+  .t-eq span {
+    width: 0.38cqw;
+    height: 100%;
+    border-radius: 999px;
+    background: var(--color-orange-txt);
+    transform: scaleY(0.25);
+  }
+  .t-progression {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 0.3cqw;
+  }
+  .t-progression span {
+    display: block;
+    height: 100%;
+    background: var(--color-orange);
+  }
+  /* The generated sheet: a skeleton first, then the content resolves in place. */
+  .t-carte {
+    position: relative;
+    padding: 2cqw 2.2cqw 2.2cqw;
     border-radius: 2.4cqw;
     background: var(--color-surface);
-    box-shadow: 0 0 0 1px var(--color-line);
+    box-shadow:
+      0 0 0 1px var(--color-line),
+      var(--shadow-1);
+  }
+  .t-squelette {
+    position: absolute;
+    inset: 2cqw 2.2cqw;
+    display: flex;
+    flex-direction: column;
+    gap: 1.4cqw;
+    opacity: 0;
+  }
+  .t-squelette span {
+    height: 2.4cqw;
+    border-radius: 0.8cqw;
+    background: var(--color-cream-2);
+  }
+  .t-squelette span:first-child {
+    width: 30%;
+    height: 1.8cqw;
+  }
+  .t-squelette span:nth-child(2) {
+    width: 55%;
+    height: 3.4cqw;
+  }
+  .t-squelette span:nth-child(n + 3) {
+    height: 4.6cqw;
   }
   .t-source {
-    align-self: flex-start;
+    display: inline-block;
     padding: 0.35cqw 1cqw;
     border-radius: 999px;
     background: var(--color-sand);
@@ -603,10 +706,10 @@ const I = {
     align-items: baseline;
     justify-content: space-between;
     gap: 1.6cqw;
-    margin-top: 1cqw;
+    margin-top: 0.9cqw;
   }
   .t-titre > p:first-child {
-    font: 700 3.9cqw/1.1 var(--font-display);
+    font: 700 3.6cqw/1.1 var(--font-display);
     letter-spacing: -0.015em;
   }
   .t-compteur {
@@ -631,15 +734,15 @@ const I = {
   .t-etapes {
     display: flex;
     flex-direction: column;
-    gap: 1.2cqw;
-    margin-top: 2.2cqw;
+    gap: 1cqw;
+    margin-top: 1.6cqw;
   }
   .t-etapes li {
     position: relative;
     display: flex;
     align-items: center;
-    gap: 1.6cqw;
-    padding: 1.8cqw 1.9cqw;
+    gap: 1.5cqw;
+    padding: 1.45cqw 1.8cqw;
     overflow: hidden;
     border-radius: 1.6cqw;
     background: var(--color-surface-2);
@@ -659,7 +762,7 @@ const I = {
     left: 0;
     right: 0;
     bottom: 0;
-    height: 0.45cqw;
+    height: 0.4cqw;
     background: var(--color-orange);
     transform: scaleX(0);
     transform-origin: left;
@@ -668,8 +771,8 @@ const I = {
     position: relative;
     display: grid;
     flex: none;
-    width: 3.8cqw;
-    height: 3.8cqw;
+    width: 3.6cqw;
+    height: 3.6cqw;
   }
   .t-pastille > * {
     grid-area: 1 / 1;
@@ -680,49 +783,20 @@ const I = {
   .t-num {
     background: var(--color-surface);
     box-shadow: inset 0 0 0 1px var(--color-stone);
-    font: 600 1.9cqw/1 var(--font-sans);
+    font: 600 1.8cqw/1 var(--font-sans);
     opacity: 0;
   }
   .t-fait {
     background: var(--color-ink);
   }
   .t-fait svg {
-    width: 2.4cqw;
+    width: 2.3cqw;
     fill: var(--color-white);
   }
   .t-txt {
     position: relative;
     flex: 1;
-    font-size: 2.35cqw;
-  }
-  /* "Speaking" equaliser, only while the step is read. */
-  .t-eq {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 0.3cqw;
-    height: 2.4cqw;
-    opacity: 0;
-  }
-  .t-eq span {
-    width: 0.5cqw;
-    height: 100%;
-    border-radius: 999px;
-    background: var(--color-orange-txt);
-    transform: scaleY(0.3);
-  }
-  .t-pied {
-    display: flex;
-    align-items: center;
-    gap: 0.8cqw;
-    margin-top: auto;
-    padding-top: 1.4cqw;
-    font-size: 1.75cqw;
-    color: var(--color-soft);
-  }
-  .t-pied svg {
-    width: 2.2cqw;
-    fill: currentColor;
+    font-size: 2.25cqw;
   }
 
   /* ---------- iPhone 17 Pro ---------- */
@@ -730,30 +804,21 @@ const I = {
     position: relative;
     width: 100%;
   }
+  /* 71.9 × 150 mm; bezel ~1.5 mm. */
   .iphone {
+    --rayon: 15.6cqw;
+    --bord: 1.25cqw;
+    --verre: 2.35cqw;
     aspect-ratio: 71.9 / 150;
-    border-radius: 15.5cqw;
   }
-  .iphone .vitre {
-    inset: 1.25cqw;
-    border-radius: 14.3cqw;
-  }
-  .bouton {
-    position: absolute;
+  .bouton:is(.action, .volume-haut, .volume-bas, .alimentation, .capture) {
     width: 1cqw;
-    border-radius: 0.6cqw;
-    background: linear-gradient(
-      90deg,
-      var(--color-metal-dark),
-      var(--color-metal-light) 60%,
-      var(--color-metal)
-    );
   }
   .bouton:is(.action, .volume-haut, .volume-bas) {
-    left: -0.8cqw;
+    left: -0.7cqw;
   }
   .bouton:is(.alimentation, .capture) {
-    right: -0.8cqw;
+    right: -0.7cqw;
   }
   .action {
     top: 17%;
@@ -779,13 +844,10 @@ const I = {
      so the thread reads at website size) so the WhatsApp UI keeps its real proportions. */
   .p-ecran {
     --pt: calc(100cqw / 370);
-    position: absolute;
-    inset: 3.6cqw;
     container-type: inline-size;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    border-radius: 11.6cqw;
     background: var(--color-whatsapp-wall);
     font: 400 calc(16 * var(--pt)) / 1.3 var(--font-sans);
     color: var(--color-ink);
@@ -1074,27 +1136,40 @@ const I = {
   .p-brouillon {
     opacity: 0;
   }
+  /* --ouvert (1 → 0, timeline) folds the camera's slot, gap included, so the field grows. */
+  .p-photo {
+    --ouvert: 1;
+    display: flex;
+    flex: none;
+    width: calc(24 * var(--pt) * var(--ouvert));
+    margin-right: calc((var(--ouvert) - 1) * 10 * var(--pt));
+    overflow: hidden;
+    opacity: var(--ouvert);
+  }
+  /* While a reply is typed, the camera folds away (the field grows) and the send button takes the
+     mic's place: both are centred in the same 32 pt cell. */
   .p-actions {
     display: grid;
+    place-items: center;
+    flex: none;
+    width: calc(32 * var(--pt));
+    height: calc(32 * var(--pt));
   }
   .p-actions > * {
     grid-area: 1 / 1;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: calc(14 * var(--pt));
   }
   .p-envoyer {
-    justify-self: end;
-    width: calc(32 * var(--pt));
-    height: calc(32 * var(--pt));
-    justify-content: center;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
     border-radius: 999px;
     background: var(--color-orange);
     opacity: 0;
   }
-  .p-envoyer svg {
+  .p-saisie .p-envoyer svg {
     width: calc(16 * var(--pt));
+    margin-left: calc(2 * var(--pt));
   }
   .p-accueil {
     position: absolute;
