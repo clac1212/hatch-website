@@ -628,18 +628,36 @@ for (const l of lieux) {
       io.disconnect();
       const { piloter } = await import('./demo-motion');
       lieux.forEach((l) => pilotes.set(l, piloter(l, mode)));
-      pilotes.get(lieux[k])!.entrer(ici().q);
+      maj();
     },
     { rootMargin: '100% 0px' },
   ).observe(sec);
 
+  /**
+   * A place plays only while the section is pinned (César 01/10: the head office's first demo had
+   * played out of sight, while the section was still scrolling in from below). Above it, the first
+   * place waits on its wide shot; past it, the last one freezes where it is.
+   */
+  let enJeu = false;
   function maj() {
+    const r = sec.getBoundingClientRect();
+    const epingle = r.top <= 1 && r.bottom >= innerHeight - 1;
     const { i: suivant, q } = ici();
-    if (suivant === k) return void pilotes.get(lieux[k])?.suivre(q);
-    pilotes.get(lieux[k])?.arreter();
-    k = suivant;
-    lieux.forEach((l, i) => l.classList.toggle('on', i === k));
-    pilotes.get(lieux[k])?.entrer(q);
+    if (suivant !== k) {
+      if (enJeu) pilotes.get(lieux[k])?.arreter();
+      enJeu = false;
+      k = suivant;
+      lieux.forEach((l, i) => l.classList.toggle('on', i === k));
+    }
+    const pilote = pilotes.get(lieux[k]);
+    if (!pilote) return;
+    if (!epingle) {
+      if (enJeu) pilote.arreter(r.top > 1);
+      enJeu = false;
+    } else if (!enJeu) {
+      pilote.entrer(q);
+      enJeu = true;
+    } else pilote.suivre(q);
   }
 
   sec.addEventListener('click', (ev) => {

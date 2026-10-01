@@ -576,8 +576,8 @@ export interface Pilote {
   suivre(q: number): void;
   /** A tab was clicked: play demo i (auto, mixte). */
   jouer(i: number): void;
-  /** The place is left. */
-  arreter(): void;
+  /** The place is left: back to its wide shot (`remettre`), or frozen where it is. */
+  arreter(remettre?: boolean): void;
   /** Scroll mode: progress (0–1) where demo i starts, to scroll a tab click there. */
   position(i: number): number;
 }
@@ -855,12 +855,14 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
       gsap.killTweensOf(tl);
       tl.play(i === 0 ? 0 : `d${i}`);
     },
-    arreter() {
+    arreter(remettre = true) {
       actif = false;
       cible = null;
       if (!tl) return scroll ? undefined : montrer(0);
       gsap.killTweensOf(tl);
-      if (!scroll) tl.pause(0);
+      if (scroll) return;
+      if (remettre) tl.pause(0);
+      else tl.pause();
     },
     position(i) {
       if (!tl) return (i + 0.5) / ecrans.length;
