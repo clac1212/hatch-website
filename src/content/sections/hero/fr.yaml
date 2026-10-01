@@ -5,19 +5,31 @@ title:
   - développer votre
   - réseau d'établissements
 lead: Vos sites vous écrivent tous en même temps. Vos agents répondent, vous préparez la prochaine ouverture.
-# Cartes de tâches animées sur la carte, dans l'ordre de la boucle (Peep à Lyon, Lark au siège, Sparrow à Marseille, puis Barcelone).
 tasks:
   status:
     running: En cours
     done: Terminé
-  lyon:
-    - Question de l'équipe de Lyon
-    - Fiche allergènes envoyée
-  headOffice:
-    - État du réseau ce matin
-    - 3 relances à faire
-  marseille:
-    - Ouverture Marseille · J-18
-    - Formation de l'équipe calée jeudi
-  barcelona:
-    - Réponse en espagnol · Barcelone
+  # Un événement par point de vente, dans l'ordre de la boucle : le point de vente émet son onde, puis la carte de l'agent apparaît au-dessus (« running »), passe à « done » et s'efface.
+  # Les points de vente sont choisis dans Hero.astro (même ordre).
+  events:
+    - agent: peep
+      running: "Question de l'équipe de Dijon"
+      done: "Fiche allergènes envoyée"
+    - agent: pecker
+      running: "Nouvelle recrue à Genève"
+      done: "Parcours d'intégration envoyé"
+    - agent: finch
+      running: "Audit hygiène à Nice"
+      done: "3 écarts transformés en actions"
+    - agent: jay
+      running: "Metz demande la procédure d'ouverture"
+      done: "Procédure partagée à l'équipe"
+    - agent: peep
+      running: "Question en espagnol · Barcelone"
+      done: "Réponse envoyée en espagnol"
+    - agent: owl
+      running: "Zurich : le four ne chauffe plus"
+      done: "Procédure de dépannage lue en cuisine"
+    - agent: lark
+      running: "Stuttgart en retard sur le CA"
+      done: "Relance programmée demain 9 h"

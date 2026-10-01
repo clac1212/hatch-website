@@ -6,20 +6,24 @@ import { routes, useTranslations, type Locale } from '../../i18n/ui';
 import carte from '../../assets/hero/carte-v3-2.jpg';
 import grain from '../../assets/hero/grain.png';
 import boutiques from './hero-boutiques.json';
-import peep from '../../assets/hero/peep.jpg';
-import lark from '../../assets/hero/lark.jpg';
-import sparrow from '../../assets/hero/sparrow.jpg';
+import peep from '../../assets/hero/agents/peep.webp';
+import lark from '../../assets/hero/agents/lark.webp';
+import jay from '../../assets/hero/agents/jay.webp';
+import finch from '../../assets/hero/agents/finch.webp';
+import owl from '../../assets/hero/agents/owl.webp';
+import pecker from '../../assets/hero/agents/pecker.webp';
 
 /**
- * Hero of the home (v4 node EnmYf, animation from prototypes/hero/hero-c1.html): full-screen voxel
- * map of the network, liquid-glass title card, and a living scene on top of the map: task cards
- * stacked above each agent + human duo (Peep → Lark → Sparrow → Barcelona, 17 s loop) and orange
- * ground waves on the shops. The image (hero v3) already carries its clouds, their shadows and the sea
- * reflections, so nothing else is animated on top of it.
+ * Hero of the home: full-screen voxel map of the network (hero v3), liquid-glass title card, and one
+ * living rule on top of the map (César, 01/10): a shop writes, its agent answers. Each event, in turn:
+ *   1. a real shop sends a ground wave;
+ *   2. the agent's card appears right above that shop, "running";
+ *   3. it switches to "done", then fades out, and the next shop takes over.
+ * No wave is ever sent without its card. The image already carries its clouds and sea reflections.
  *
- * Every scene coordinate below is in the prototype's frame: the image reduced to 1440 × 804. The
- * scene (`--sw` × `--sh`) is that frame covering the section, pinned right (we lose sea on the left,
- * never France), so pings and stacks stay on their cube whatever the crop.
+ * Coordinates are in the image's frame (1440 × 804) and expressed in % of it, so they stay on their
+ * shop whatever the screen: the shops' ground points are measured by the composition script
+ * (hero-boutiques.json), only the choice of shops and the card anchors are made here.
  */
 interface Props {
   locale: Locale;
@@ -28,80 +32,41 @@ interface Props {
 const { locale } = Astro.props;
 const data = await section('hero', locale);
 const t = useTranslations(locale);
-const { status } = data.tasks;
+const { status, events } = data.tasks;
 
 const W = 1440;
 const H = 804;
-const pos = ([x, y]: readonly [number, number]) =>
-  `left:${((x / W) * 100).toFixed(3)}%;top:${((y / H) * 100).toFixed(3)}%`;
+const pct = (v: number, of: number) => `${((v / of) * 100).toFixed(3)}%`;
+const avatars = { peep, lark, jay, finch, owl, pecker };
 
-type Anchor = 'left' | 'right' | 'center';
-const anchors: Record<Anchor, { dx: string; align: string }> = {
-  left: { dx: '0%', align: 'flex-start' },
-  right: { dx: '-100%', align: 'flex-end' },
-  center: { dx: '-50%', align: 'center' },
-};
-
-/** A card is "done" from the start, or "running" until `switchAt` seconds into its scene. */
-type Card = { text: string; done: true } | { text: string; done: false; switchAt?: number };
-
-const scenes: {
-  avatar: ImageMetadata;
-  start: number;
-  duration: number;
-  ping: [number, number];
-  stack: { at: [number, number]; anchor: Anchor };
-  cards: Card[];
-}[] = [
-  {
-    avatar: peep,
-    start: 0,
-    duration: 4.6,
-    ping: [1086, 446], // the Lyon restaurant
-    stack: { at: [1432, 318], anchor: 'right' }, // above the Lyon restaurant, flush right
-    cards: [
-      { text: data.tasks.lyon[0], done: false, switchAt: 2 },
-      { text: data.tasks.lyon[1], done: true },
-    ],
-  },
-  {
-    avatar: lark,
-    start: 4.6,
-    duration: 4.6,
-    ping: [905, 232], // the head office
-    stack: { at: [1126, 128], anchor: 'left' }, // right of Lark
-    cards: [
-      { text: data.tasks.headOffice[0], done: true },
-      { text: data.tasks.headOffice[1], done: false },
-    ],
-  },
-  {
-    avatar: sparrow,
-    start: 9.2,
-    duration: 4.6,
-    ping: [1188, 676], // the Marseille construction site
-    stack: { at: [930, 770], anchor: 'center' }, // below the Marseille duo
-    cards: [
-      { text: data.tasks.marseille[0], done: false },
-      { text: data.tasks.marseille[1], done: true },
-    ],
-  },
-  {
-    avatar: peep,
-    start: 13.8,
-    duration: 3.2,
-    ping: [666, 776], // the Barcelona shop
-    stack: { at: [670, 742], anchor: 'center' },
-    cards: [{ text: data.tasks.barcelona[0], done: true }],
-  },
+/**
+ * The shop of each event (index in hero-boutiques.json), in the order of `tasks.events`. Picked among
+ * the shops visible on every screen (right of the title card, below the nav). `anchor` keeps the card
+ * inside the frame near its right edge.
+ */
+const SHOPS: { shop: number; anchor: 'center' | 'right' }[] = [
+  { shop: 12, anchor: 'center' }, // Dijon
+  { shop: 16, anchor: 'center' }, // Geneva
+  { shop: 20, anchor: 'center' }, // Nice
+  { shop: 6, anchor: 'center' }, // Metz
+  { shop: 23, anchor: 'center' }, // Barcelona
+  { shop: 13, anchor: 'right' }, // Zurich
+  { shop: 7, anchor: 'center' }, // Stuttgart
 ];
+if (SHOPS.length !== events.length) {
+  throw new Error(
+    `Hero: ${events.length} events in the content, ${SHOPS.length} shops in Hero.astro`,
+  );
+}
+/** Shop height in the frame: the card sits just above the roof. */
+const ROOF = 30;
+const steps = events.map((e, i) => {
+  const [x, y] = boutiques.shops[SHOPS[i].shop] as [number, number];
+  return { ...e, x, y, anchor: SHOPS[i].anchor, avatar: avatars[e.agent] };
+});
+/** Seconds per event (wave, card running, card done, exit). */
+const STEP = 3.3;
 
-/** Shops that send a ground wave now and then between two task scenes ("your sites write to you"):
- * the footprint centre of every shop, measured on the composed image (see hero-boutiques.json). */
-const cubes = boutiques.shops as [number, number][];
-
-/** The second card of a stack slides in once the first one has been read. */
-const entries = [0.5, 2.4];
 const tick =
   'M10 18H8v-2h2v2Zm-2-2H6v-2h2v2Zm4-2v2h-2v-2h2Zm-6 0H4v-2h2v2Zm8 0h-2v-2h2v2Zm2-2h-2v-2h2v2Zm2-2h-2V8h2v2Zm2-2h-2V6h2v2Z';
 ---
@@ -124,16 +89,8 @@ const tick =
       class="absolute inset-0 size-full object-cover"
     />
     {
-      scenes.map((s) => (
-        <div class="h-ping grand" data-ping="scene" style={pos(s.ping)}>
-          <span />
-          <span />
-        </div>
-      ))
-    }
-    {
-      cubes.map(([x, y]) => (
-        <div class="h-ping" data-ping="cube" style={pos([x, y])}>
+      steps.map((e) => (
+        <div class="h-ping" style={`left:${pct(e.x, W)};top:${pct(e.y, H)}`}>
           <span />
           <span />
         </div>
@@ -148,50 +105,40 @@ const tick =
   <div
     class="relative z-1 mx-auto flex h-full max-w-[1440px] flex-col justify-end gap-2 px-4 pt-24 pb-4 sm:px-6 sm:pb-6 lg:static lg:justify-center lg:gap-0 lg:px-14 lg:pt-16 lg:pb-[149px]"
   >
-    <div class="h-piles" aria-hidden="true">
+    <div class="h-piles" aria-hidden="true" data-pas={STEP}>
       {
-        scenes.map((s) => (
+        steps.map((e) => (
           <div
             class="h-pile"
-            data-debut={s.start}
-            data-duree={s.duration}
-            style={`--x:${((s.stack.at[0] / W) * 100).toFixed(3)}%;--y:${((s.stack.at[1] / H) * 100).toFixed(3)}%;--dx:${anchors[s.stack.anchor].dx};--align:${anchors[s.stack.anchor].align}`}
+            style={`--x:${pct(e.x, W)};--y:${pct(e.y - ROOF, H)};--dx:${e.anchor === 'right' ? '-88%' : '-50%'}`}
           >
-            {s.cards.map((card, j) => (
-              <div
-                class="h-slot"
-                data-entree={entries[j]}
-                data-bascule={!card.done && card.switchAt !== undefined ? card.switchAt : undefined}
-              >
-                <div>
-                  <div class:list={['h-tache', card.done && 'fait']}>
-                    <Image
-                      src={s.avatar}
-                      width={28}
-                      height={28}
-                      densities={[1, 2]}
-                      format="webp"
-                      alt=""
-                      class="h-avatar"
-                    />
-                    <span class="h-corps">
-                      <span class="h-ligne">
-                        <span class="h-statut">
-                          <span class="h-point" />
-                          <svg class="h-coche" viewBox="0 0 24 24">
-                            <path d={tick} />
-                          </svg>
-                          <span class="lib-cours">{status.running}</span>
-                          <span class="lib-fait">{status.done}</span>
-                        </span>
-                        <span class="h-sep" />
-                        <span class="h-texte">{card.text}</span>
-                      </span>
-                    </span>
-                  </div>
+            <div class="h-slot">
+              <div>
+                <div class="h-tache">
+                  <Image
+                    src={e.avatar}
+                    width={28}
+                    height={28}
+                    densities={[1, 2]}
+                    format="webp"
+                    alt=""
+                    class="h-avatar"
+                  />
+                  <span class="h-statut">
+                    <span class="h-point" />
+                    <svg class="h-coche" viewBox="0 0 24 24">
+                      <path d={tick} />
+                    </svg>
+                    <span class="lib-cours">{status.running}</span>
+                    <span class="lib-fait">{status.done}</span>
+                  </span>
+                  <span class="h-texte">
+                    <span class="lib-cours">{e.running}</span>
+                    <span class="lib-fait">{e.done}</span>
+                  </span>
                 </div>
               </div>
-            ))}
+            </div>
           </div>
         ))
       }
@@ -232,25 +179,20 @@ const tick =
 
 <script>
   /**
-   * Hero loop (prototypes/hero/hero-c1.html): one duo at a time, its cube pings, then its task cards
-   * stack up ("running" → "done") and fade out. Paused off screen. `?t=<s>` freezes the loop at an
-   * instant (captures); reduced motion shows a still frame.
+   * Hero loop: one shop at a time. Wave on the shop (0 → 1.4 s), then its card appears above it at
+   * 1 s ("running"), switches to "done" at 2.1 s, leaves at 2.85 s; next shop at STEP (3.3 s). Paused off screen.
+   * `?t=<s>` freezes the loop at an instant (captures); reduced motion shows a still frame.
    */
   const hero = document.querySelector<HTMLElement>('.hero')!;
-  const CYCLE = 17;
-  const piles = [...hero.querySelectorAll<HTMLElement>('.h-pile')].map((pile) => ({
-    pile,
-    debut: Number(pile.dataset.debut),
-    duree: Number(pile.dataset.duree),
-    slots: [...pile.querySelectorAll<HTMLElement>('.h-slot')].map((slot) => ({
-      slot,
-      tache: slot.querySelector<HTMLElement>('.h-tache')!,
-      entree: Number(slot.dataset.entree),
-      bascule: slot.dataset.bascule === undefined ? null : Number(slot.dataset.bascule),
-    })),
-  }));
-  const pings = [...hero.querySelectorAll<HTMLElement>('[data-ping="scene"]')];
-  const cubes = [...hero.querySelectorAll<HTMLElement>('[data-ping="cube"]')];
+  const STEP = Number(hero.querySelector<HTMLElement>('.h-piles')!.dataset.pas);
+  const piles = [...hero.querySelectorAll<HTMLElement>('.h-pile')];
+  const taches = piles.map((p) => p.querySelector<HTMLElement>('.h-tache')!);
+  const slots = piles.map((p) => p.querySelector<HTMLElement>('.h-slot')!);
+  const pings = [...hero.querySelectorAll<HTMLElement>('.h-ping')];
+  const CYCLE = STEP * piles.length;
+  const ENTREE = 1.0;
+  const BASCULE = 2.1;
+  const SORTIE = 2.85;
 
   /** p = wave progress (0 → 1; ≥ 1 = idle). The second ring follows 0.3 behind the first. */
   const clamp = (x: number) => Math.min(1, Math.max(0, x));
@@ -263,25 +205,19 @@ const tick =
 
   function rendu(t: number) {
     const tc = t % CYCLE;
-    piles.forEach(({ pile, debut, duree, slots }, i) => {
-      const r = tc - debut;
-      const actif = r >= 0 && r < duree;
-      ping(pings[i], actif ? r / 1.6 : 1);
-      pile.classList.toggle('sort', actif && r >= duree - 0.5);
-      for (const { slot, tache, entree, bascule } of slots) {
-        slot.classList.toggle('on', actif && r >= entree);
-        if (bascule !== null) tache.classList.toggle('fait', r >= bascule);
-      }
+    piles.forEach((pile, i) => {
+      const r = tc - i * STEP;
+      const actif = r >= 0 && r < STEP;
+      ping(pings[i], actif ? r / 1.4 : 1);
+      slots[i].classList.toggle('on', actif && r >= ENTREE);
+      pile.classList.toggle('sort', actif && r >= SORTIE);
+      taches[i].classList.toggle('fait', actif && r >= BASCULE);
     });
-    // Ambient waves: every 2.3 s, one shop (5 steps apart) sends a soft ground wave.
-    const n = Math.floor(t / 2.3);
-    const q = (t % 2.3) / 1.6;
-    cubes.forEach((el, k) => ping(el, k === (n * 5) % cubes.length ? q : 1));
   }
 
   const fige = new URLSearchParams(location.search).get('t');
   if (fige !== null) rendu(Number.parseFloat(fige));
-  else if (matchMedia('(prefers-reduced-motion: reduce)').matches) rendu(1.2);
+  else if (matchMedia('(prefers-reduced-motion: reduce)').matches) rendu(2);
   else {
     let t = 0;
     let avant: number | null = null;
@@ -338,9 +274,6 @@ const tick =
     width: 3.2%;
     aspect-ratio: 1 / 0.56;
     transform: translate(-50%, -50%);
-  }
-  .h-ping.grand {
-    width: 6.4%;
   }
   .h-ping::before {
     content: '';
@@ -409,7 +342,6 @@ const tick =
       width: 420px;
       max-width: none;
       transform: translate(var(--dx), -100%);
-      align-items: var(--align);
     }
   }
   .h-slot {
@@ -461,17 +393,6 @@ const tick =
     flex: none;
     object-fit: cover;
   }
-  .h-corps {
-    display: flex;
-    min-width: 0;
-    flex-direction: column;
-  }
-  .h-ligne {
-    display: flex;
-    min-width: 0;
-    align-items: center;
-    gap: 8px;
-  }
   .h-texte {
     min-width: 0;
     overflow: hidden;
@@ -515,11 +436,6 @@ const tick =
   .h-tache.fait .h-coche {
     display: block;
   }
-  .h-sep {
-    flex: none;
-    width: 1px;
-    height: 12px;
-  }
 
   .h-tache {
     gap: 10px;
@@ -553,9 +469,6 @@ const tick =
   .fait .h-statut {
     color: var(--color-soft);
     background: color-mix(in srgb, var(--color-ink) 7%, transparent);
-  }
-  .h-sep {
-    display: none;
   }
 
   .h-pause .h-point {

@@ -4,19 +4,31 @@ title:
   - to run and grow your
   - network of locations
 lead: All your locations message you at once. Your agents answer, while you get the next opening ready.
-# Task cards animated on the map, in loop order (Peep in Lyon, Lark at head office, Sparrow in Marseille, then Barcelona).
 tasks:
   status:
     running: In progress
     done: Done
-  lyon:
-    - Question from the Lyon team
-    - Allergen sheet sent
-  headOffice:
-    - Network status this morning
-    - 3 follow-ups to send
-  marseille:
-    - Marseille opening · D-18
-    - Team training booked for Thursday
-  barcelona:
-    - Replied in Spanish · Barcelona
+  # One event per shop, in loop order: the shop sends its wave, then the agent's card appears above it ("running"), switches to "done" and fades out.
+  # The shops are picked in Hero.astro (same order).
+  events:
+    - agent: peep
+      running: "Question from the Dijon team"
+      done: "Allergen sheet sent"
+    - agent: pecker
+      running: "New hire in Geneva"
+      done: "Onboarding course sent"
+    - agent: finch
+      running: "Hygiene audit in Nice"
+      done: "3 gaps turned into actions"
+    - agent: jay
+      running: "Metz asks for the opening checklist"
+      done: "Checklist shared with the team"
+    - agent: peep
+      running: "Question in Spanish · Barcelona"
+      done: "Reply sent in Spanish"
+    - agent: owl
+      running: "Zurich: the oven won't heat up"
+      done: "Troubleshooting read out in the kitchen"
+    - agent: lark
+      running: "Stuttgart behind on revenue"
+      done: "Follow-up scheduled tomorrow 9 am"
