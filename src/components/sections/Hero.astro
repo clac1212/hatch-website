@@ -189,9 +189,10 @@ const tick =
       >
         {data.title.join(' ')}
       </h1>
-      <!-- Lighter and grey under the title, for hierarchy (César, 01/10). -->
+      <!-- Lighter and grey under the title, for hierarchy (César, 01/10). On the liquid glass the plain
+           `soft` grey fell to 4.3:1 on its darkest spots: a quarter of ink brings it back above AA. -->
       <p
-        class="lead text-base leading-6 font-normal text-soft sm:text-[17px] lg:text-lg lg:leading-[27px]"
+        class="lead text-base leading-6 font-normal text-[color-mix(in_srgb,var(--color-soft)_75%,var(--color-ink))] sm:text-[17px] lg:text-lg lg:leading-[27px]"
       >
         {data.lead}
       </p>
@@ -575,19 +576,18 @@ const tick =
   /* Liquid-glass title card; the gradient rim is a masked layer so it follows the radius. */
   .carte-hero {
     isolation: isolate;
-    /* More opaque than the v4 mockup (César, 01/10): the map's colours no longer show through the text. */
     background-image: linear-gradient(
       -123deg,
-      color-mix(in srgb, var(--color-white) 82%, transparent) 14.6%,
-      color-mix(in srgb, var(--color-white) 64%, transparent) 53.5%,
-      color-mix(in srgb, var(--color-white) 58%, transparent) 85.4%
+      color-mix(in srgb, var(--color-white) 55%, transparent) 14.6%,
+      color-mix(in srgb, var(--color-white) 20%, transparent) 53.5%,
+      color-mix(in srgb, var(--color-peach-2) 5%, transparent) 85.4%
     );
     box-shadow:
       0 30px 70px color-mix(in srgb, var(--color-navy) 22%, transparent),
       inset 0 2px 1px color-mix(in srgb, var(--color-white) 70%, transparent),
       inset 0 -12px 30px color-mix(in srgb, var(--color-white) 20%, transparent);
-    backdrop-filter: blur(24px) saturate(1.05);
-    -webkit-backdrop-filter: blur(24px) saturate(1.05);
+    backdrop-filter: blur(18px) saturate(1.15);
+    -webkit-backdrop-filter: blur(18px) saturate(1.15);
   }
   .carte-hero::before {
     content: '';
