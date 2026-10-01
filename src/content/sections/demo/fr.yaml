@@ -1,6 +1,8 @@
 # Démo diorama : trois lieux au scroll ; dans chaque lieu, le visiteur ouvre la démo d'un agent.
 titre: Vos agents au travail
 consigne: Choisissez un agent
+pause: Mettre la démo en pause
+lecture: Relancer la démo
 
 lieux:
   - surtitre: Au siège
@@ -51,21 +53,44 @@ lieux:
       - cle: owl
         nom: Owl
         role: répond à voix haute
-        titre: Une question à voix haute, une réponse dans la minute.
-        carte:
-          qui: Équipe · à voix haute
-          texte: « Owl, comment on ouvre la caisse ? »
-          reponse:
-            qui: Owl · sur la tablette
-            texte: Fiche « Caisse », étapes 1 à 3, lue à voix haute.
+        titre: Une question à voix haute, la procédure lue étape par étape.
+        ecran:
+          appareil: tablette
+          entete: Owl · Tablette cuisine
+          ecoute: Je vous écoute
+          question: Owl, comment on ouvre la caisse ?
+          fiche: Ouverture de caisse
+          source: Manuel BunBun · fiche Caisse v4
+          etapes:
+            - Saisis ton code manager sur l'écran
+            - Compte le fond de caisse, 150 €
+            - Valide l'ouverture, le ticket sort
+          pied: Lu à voix haute, étape par étape
       - cle: pecker
         nom: Pecker
         role: forme l'équipe pendant la pause
-        titre: La formation se fait pendant la pause.
-        carte:
-          lignes:
-            - agent: Pecker
-              texte: module « Ouverture », 5 min, validé par Inès
+        titre: Cinq minutes de formation pendant la pause, et le siège sait qui a validé.
+        ecran:
+          appareil: telephone
+          contact: Pecker
+          statut: Formation
+          fil:
+            - de: agent
+              texte: Salut Inès ! Ton module du jour, « Ouverture du restaurant », 5 min. On y va ?
+            - de: equipe
+              texte: C'est parti
+            - quiz:
+                question: Avant d'ouvrir la caisse, tu dois…
+                options:
+                  - Allumer la friteuse
+                  - Compter le fond de caisse
+                  - Lancer la musique
+                bonne: 1
+            - de: agent
+              texte: Bravo, module validé ! Prochain module demain à la pause.
+          suivi:
+            titre: Siège · suivi des formations
+            texte: Inès a validé « Ouverture du restaurant »
 
   - surtitre: Sur le chantier
     titre: Du premier contact au jour J.

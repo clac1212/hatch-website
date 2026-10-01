@@ -1,6 +1,8 @@
 # Diorama demo: three places on scroll; in each place, the visitor opens an agent's demo.
 titre: Your agents at work
 consigne: Pick an agent
+pause: Pause the demo
+lecture: Play the demo
 
 lieux:
   - surtitre: At head office
@@ -51,21 +53,44 @@ lieux:
       - cle: owl
         nom: Owl
         role: answers out loud
-        titre: A question out loud, an answer within a minute.
-        carte:
-          qui: Team · out loud
-          texte: '“Owl, how do we open the till?”'
-          reponse:
-            qui: Owl · on the tablet
-            texte: '“Till” sheet, steps 1 to 3, read out loud.'
+        titre: A question out loud, the procedure read step by step.
+        ecran:
+          appareil: tablette
+          entete: Owl · Kitchen tablet
+          ecoute: Listening
+          question: Owl, how do we open the till?
+          fiche: Opening the till
+          source: BunBun manual · Till sheet v4
+          etapes:
+            - Enter your manager code on the screen
+            - Count the cash float, €150
+            - Confirm the opening, the receipt prints
+          pied: Read out loud, step by step
       - cle: pecker
         nom: Pecker
         role: trains the team during the break
-        titre: Training happens during the break.
-        carte:
-          lignes:
-            - agent: Pecker
-              texte: '“Opening” module, 5 min, completed by Inès'
+        titre: Five minutes of training during the break, and head office knows who passed.
+        ecran:
+          appareil: telephone
+          contact: Pecker
+          statut: Training
+          fil:
+            - de: agent
+              texte: Hi Inès! Today's module, “Opening the restaurant”, 5 min. Shall we?
+            - de: equipe
+              texte: Let's go
+            - quiz:
+                question: Before opening the till, you need to…
+                options:
+                  - Switch on the fryer
+                  - Count the cash float
+                  - Start the music
+                bonne: 1
+            - de: agent
+              texte: Well done, module passed! Next one tomorrow during the break.
+          suivi:
+            titre: Head office · training tracker
+            texte: Inès passed “Opening the restaurant”
 
   - surtitre: On the build site
     titre: From first contact to opening day.

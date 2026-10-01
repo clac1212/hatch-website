@@ -4,6 +4,8 @@
  * place, the visitor opens an agent's demo on demand: markers on the agents and the menu card both
  * open it, the camera zooms on the agent and its card replaces the menu. Back, Escape, a click on the
  * scene or leaving the place closes it.
+ * Pilot (01/10): a place whose demos all carry an `ecran` (the kitchen) plays them instead, one after
+ * the other, as animated device mock-ups (DemoEcran.astro) with tabs, progress bars and a pause button.
  *
  * Scroll rules (research: NN/g on scroll-jacking, Apple product pages):
  * - the scroll position picks the place DIRECTLY (no queue): a fast scroll lands on a clean state,
@@ -33,6 +35,8 @@ import avFinch from '../../assets/hero/agents/finch.webp';
 import avOwl from '../../assets/hero/agents/owl.webp';
 import avPecker from '../../assets/hero/agents/pecker.webp';
 import avSparrow from '../../assets/demo/avatars/sparrow.png';
+import DemoEcran from './DemoEcran.astro';
+import { chronoTablette, chronoTelephone } from './demo-ecran';
 
 interface Props {
   locale: Locale;
@@ -43,9 +47,15 @@ type Cle = (typeof data.lieux)[number]['agents'][number]['cle'];
 
 /** Camera: focus point (fractions of the image) and zoom. */
 type Cam = [fx: number, fy: number, z: number];
-/** Keep the image edges outside the frame: the focus centre is clamped by the zoom. */
-const centre = (v: number, z: number) => Math.min(Math.max(v, 0.5 / z), 1 - 0.5 / z);
-const camStyle = ([fx, fy, z]: Cam) => `--cx:${centre(fx, z)};--cy:${centre(fy, z)};--z:${z}`;
+/**
+ * Keep the image edges outside the frame: the focus is clamped by the zoom and by where it sits in
+ * the viewport (`o`, 0.5 = centred; autoplay places put the agent left of centre, see --ox/--oy).
+ */
+const centre = (v: number, z: number, o: number) => Math.min(Math.max(v, o / z), 1 - (1 - o) / z);
+const camStyle = ([fx, fy, z]: Cam, [ox, oy] = [0.5, 0.5]) =>
+  `--cx:${centre(fx, z, ox)};--cy:${centre(fy, z, oy)};--z:${z}`;
+/** Focus position of autoplay places on desktop, mirrored in the CSS (.d2-lieu.auto --ox/--oy). */
+const VISEE_AUTO: [number, number] = [0.3, 0.45];
 
 /**
  * Places, in YAML order: background, wide shot, cut-out agents (fractions of the image, from the v4
@@ -131,7 +141,17 @@ const avatar = (qui: string) => AVATARS[qui.split(/[ ·]/)[0].toLowerCase()];
 /** "Sparrow · Candidats" → "Sparrow", for the kicker. */
 const prenom = (nom: string) => nom.split(' · ')[0];
 
-const lieux = data.lieux.map((l, i) => ({ ...l, ...LIEUX[i] }));
+const lieux = data.lieux.map((l, i) => {
+  const auto = l.agents.every((a) => a.ecran);
+  if (!auto && l.agents.some((a) => a.ecran))
+    throw new Error(
+      `Demo "${l.surtitre}": a place is either autoplay (all screens) or on demand (all cards)`,
+    );
+  return { ...l, ...LIEUX[i], auto };
+});
+/** Length of an animated demo, in seconds (tab progress bar). */
+const duree = (e: NonNullable<(typeof data.lieux)[number]['agents'][number]['ecran']>) =>
+  (e.appareil === 'tablette' ? chronoTablette(e) : chronoTelephone(e)).duree;
 for (const l of lieux) {
   const ici = l.decoupes.flatMap((d) => d.cles);
   const ailleurs = l.agents.filter((a) => !ici.includes(a.cle));
@@ -146,7 +166,7 @@ for (const l of lieux) {
   <div class="d2-scene-fixe">
     {
       lieux.map((l, i) => (
-        <div class:list={['d2-lieu', { on: i === 0 }]} data-vue={camStyle(l.vue)}>
+        <div class:list={['d2-lieu', { on: i === 0, auto: l.auto }]} data-vue={camStyle(l.vue)}>
           <div class="d2-plateau">
             <div class="d2-calque" style={camStyle(l.vue)}>
               <Picture
@@ -170,40 +190,42 @@ for (const l of lieux) {
                   style={`left:${a.x * 100}%;top:${a.y * 100}%;width:${a.w * 100}%;animation-delay:${-a.d}s`}
                 />
               ))}
-              {l.agents.map((d) => {
-                const g = DEMOS[d.cle];
-                return (
-                  <button
-                    type="button"
-                    class:list={['d2-repere', g.cote === 'g' && 'gauche']}
-                    style={`left:${g.repere[0] * 100}%;top:${g.repere[1] * 100}%`}
-                    data-ouvrir={d.cle}
-                    aria-controls={`d2-${d.cle}`}
-                    aria-expanded="false"
-                  >
-                    <span class="d2-point" aria-hidden="true" />
-                    <span>{d.nom}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div class="d2-ui d2-vue">
-            <div class="d2-panneau">
-              <p class="d2-surtitre">{l.surtitre}</p>
-              <h3 class="d2-titre">{l.titre}</h3>
-            </div>
-            <div class="d2-carte">
-              <p class="d2-consigne">{data.consigne}</p>
-              <ul class="d2-menu">
-                {l.agents.map((d) => (
-                  <li>
+              {!l.auto &&
+                l.agents.map((d) => {
+                  const g = DEMOS[d.cle];
+                  return (
                     <button
                       type="button"
+                      class:list={['d2-repere', g.cote === 'g' && 'gauche']}
+                      style={`left:${g.repere[0] * 100}%;top:${g.repere[1] * 100}%`}
                       data-ouvrir={d.cle}
                       aria-controls={`d2-${d.cle}`}
                       aria-expanded="false"
+                    >
+                      <span class="d2-point" aria-hidden="true" />
+                      <span>{d.nom}</span>
+                    </button>
+                  );
+                })}
+            </div>
+          </div>
+
+          {l.auto ? (
+            <div class="d2-ui d2-auto">
+              <div class="d2-panneau">
+                <p class="d2-surtitre">{l.surtitre}</p>
+                <div class="d2-titres">
+                  {l.agents.map((d, j) => (
+                    <h3 class:list={['d2-titre', { on: j === 0 }]}>{d.titre}</h3>
+                  ))}
+                </div>
+                <div class="d2-onglets">
+                  {l.agents.map((d, j) => (
+                    <button
+                      type="button"
+                      class:list={{ on: j === 0 }}
+                      data-onglet={j}
+                      aria-pressed={j === 0 ? 'true' : 'false'}
                     >
                       <Image
                         src={DEMOS[d.cle].avatar}
@@ -216,80 +238,148 @@ for (const l of lieux) {
                       <span>
                         <b>{d.nom}</b> {d.role}
                       </span>
-                      <svg viewBox="0 0 24 24" class="d2-fleche" aria-hidden="true">
-                        <path d="M4 11v2h16v-2zm12 2v2h2v-2zm-2 2v2h2v-2zm-2 2v2h2v-2zm4-6V9h2v2zm-2 4V7h2v8zm-2 2V5h2v12z" />
-                      </svg>
+                      <span class="d2-barre" aria-hidden="true">
+                        <span style={`--duree:${d.ecran ? duree(d.ecran) : 0}s`} />
+                      </span>
                     </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          {l.agents.map((d) => (
-            <div
-              class="d2-ui d2-demo"
-              id={`d2-${d.cle}`}
-              data-cle={d.cle}
-              data-cam={camStyle(DEMOS[d.cle].cam)}
-              role="region"
-              aria-label={d.nom}
-            >
-              <div class="d2-panneau">
-                <button type="button" class="d2-retour" data-fermer>
-                  <span aria-hidden="true">←</span> {l.retour}
-                </button>
-                <p class="d2-surtitre">
-                  {l.surtitre} · {prenom(d.nom)}
-                </p>
-                <h3 class="d2-titre">{d.titre}</h3>
+                  ))}
+                  <button
+                    type="button"
+                    class="d2-pause"
+                    aria-label={data.pause}
+                    data-pause={data.pause}
+                    data-lecture={data.lecture}
+                  >
+                    <svg viewBox="0 0 24 24" class="i-pause" aria-hidden="true">
+                      <path d="M7 5h4v14H7zM13 5h4v14h-4z" />
+                    </svg>
+                    <svg viewBox="0 0 24 24" class="i-lecture" aria-hidden="true">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </button>
+                </div>
               </div>
-              <div class="d2-carte">
-                {'lignes' in d.carte ? (
-                  <ul class="d2-lignes">
-                    {d.carte.lignes.map((ligne) => (
-                      <li>
-                        {avatar(ligne.agent) && (
-                          <Image
-                            src={avatar(ligne.agent)}
-                            alt=""
-                            width={28}
-                            height={28}
-                            densities={[1, 2]}
-                            class="d2-av"
-                          />
-                        )}
-                        <span>
-                          <b>{ligne.agent}</b> {ligne.texte}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <div class="d2-fil">
-                    {[d.carte, d.carte.reponse].map((m, j) => (
-                      <div class:list={['d2-msg', { 'd2-rep': j === 1 }]}>
-                        {avatar(m.qui) && (
-                          <Image
-                            src={avatar(m.qui)}
-                            alt=""
-                            width={28}
-                            height={28}
-                            densities={[1, 2]}
-                            class="d2-av"
-                          />
-                        )}
-                        <span>
-                          <b>{m.qui}</b>
-                          {m.texte}
-                        </span>
+              <div class="d2-appareils">
+                {l.agents.map(
+                  (d, j) =>
+                    d.ecran && (
+                      <div
+                        class:list={['d2-ecran', d.ecran.appareil, { on: j === 0 }]}
+                        data-cam={camStyle(DEMOS[d.cle].cam, VISEE_AUTO)}
+                      >
+                        <DemoEcran ecran={d.ecran} avatar={DEMOS[d.cle].avatar} />
                       </div>
-                    ))}
-                  </div>
+                    ),
                 )}
               </div>
             </div>
-          ))}
+          ) : (
+            <>
+              <div class="d2-ui d2-vue">
+                <div class="d2-panneau">
+                  <p class="d2-surtitre">{l.surtitre}</p>
+                  <h3 class="d2-titre">{l.titre}</h3>
+                </div>
+                <div class="d2-carte">
+                  <p class="d2-consigne">{data.consigne}</p>
+                  <ul class="d2-menu">
+                    {l.agents.map((d) => (
+                      <li>
+                        <button
+                          type="button"
+                          data-ouvrir={d.cle}
+                          aria-controls={`d2-${d.cle}`}
+                          aria-expanded="false"
+                        >
+                          <Image
+                            src={DEMOS[d.cle].avatar}
+                            alt=""
+                            width={28}
+                            height={28}
+                            densities={[1, 2]}
+                            class="d2-av"
+                          />
+                          <span>
+                            <b>{d.nom}</b> {d.role}
+                          </span>
+                          <svg viewBox="0 0 24 24" class="d2-fleche" aria-hidden="true">
+                            <path d="M4 11v2h16v-2zm12 2v2h2v-2zm-2 2v2h2v-2zm-2 2v2h2v-2zm4-6V9h2v2zm-2 4V7h2v8zm-2 2V5h2v12z" />
+                          </svg>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              {l.agents.map((d) => (
+                <div
+                  class="d2-ui d2-demo"
+                  id={`d2-${d.cle}`}
+                  data-cle={d.cle}
+                  data-cam={camStyle(DEMOS[d.cle].cam)}
+                  role="region"
+                  aria-label={d.nom}
+                >
+                  <div class="d2-panneau">
+                    <button type="button" class="d2-retour" data-fermer>
+                      <span aria-hidden="true">←</span> {l.retour}
+                    </button>
+                    <p class="d2-surtitre">
+                      {l.surtitre} · {prenom(d.nom)}
+                    </p>
+                    <h3 class="d2-titre">{d.titre}</h3>
+                  </div>
+                  <div class="d2-carte">
+                    {/* On-demand places only hold card demos (checked above); the type keeps `carte` optional. */}
+                    {d.carte &&
+                      ('lignes' in d.carte ? (
+                        <ul class="d2-lignes">
+                          {d.carte.lignes.map((ligne) => (
+                            <li>
+                              {avatar(ligne.agent) && (
+                                <Image
+                                  src={avatar(ligne.agent)}
+                                  alt=""
+                                  width={28}
+                                  height={28}
+                                  densities={[1, 2]}
+                                  class="d2-av"
+                                />
+                              )}
+                              <span>
+                                <b>{ligne.agent}</b> {ligne.texte}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <div class="d2-fil">
+                          {[d.carte, d.carte.reponse].map((m, j) => (
+                            <div class:list={['d2-msg', { 'd2-rep': j === 1 }]}>
+                              {avatar(m.qui) && (
+                                <Image
+                                  src={avatar(m.qui)}
+                                  alt=""
+                                  width={28}
+                                  height={28}
+                                  densities={[1, 2]}
+                                  class="d2-av"
+                                />
+                              )}
+                              <span>
+                                <b>{m.qui}</b>
+                                {m.texte}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
         </div>
       ))
     }
@@ -345,6 +435,8 @@ for (const l of lieux) {
 
   /* The scene: an image box covering the viewport; the camera moves it so the focus sits centred. */
   .d2-plateau {
+    /* --ox/--oy = where the focus sits in the viewport. */
+    --ox: 0.5;
     --oy: 0.5;
     position: absolute;
     inset: 0;
@@ -357,7 +449,7 @@ for (const l of lieux) {
     width: max(100cqw, calc(100cqh * 2400 / 1340));
     aspect-ratio: 2400 / 1340;
     /* --oy = where the focus sits vertically: centred, or high on phones where the cards fill the bottom. */
-    translate: -50% calc(-50% + (var(--oy) - 0.5) * 100cqh);
+    translate: calc(-50% + (var(--ox) - 0.5) * 100cqw) calc(-50% + (var(--oy) - 0.5) * 100cqh);
     transform-origin: calc(var(--cx) * 100%) calc(var(--cy) * 100%);
     transform: translate(calc((0.5 - var(--cx)) * 100%), calc((0.5 - var(--cy)) * 100%))
       scale(var(--z));
@@ -478,12 +570,14 @@ for (const l of lieux) {
       translate 0.7s var(--ease-hatch);
   }
   .d2-lieu.on:not([data-ouvert]) > .d2-vue,
-  .d2-lieu.on > .d2-demo.on {
+  .d2-lieu.on > .d2-demo.on,
+  .d2-lieu.on > .d2-auto {
     visibility: visible;
     transition-delay: 0s;
   }
   .d2-lieu.on:not([data-ouvert]) > .d2-vue > *,
-  .d2-lieu.on > .d2-demo.on > * {
+  .d2-lieu.on > .d2-demo.on > *,
+  .d2-lieu.on > .d2-auto > * {
     opacity: 1;
     translate: 0 0;
     transition-delay: 0.35s;
@@ -659,7 +753,172 @@ for (const l of lieux) {
     scale: 1.35;
   }
 
+  /* Autoplay place: the agent sits left of centre, its device on the right. */
+  .d2-lieu.auto .d2-plateau {
+    --ox: 0.3;
+    --oy: 0.45;
+  }
+  .d2-titres {
+    display: grid;
+  }
+  /* Titles and devices swap out then in (a cross-fade would overlap two texts). */
+  .d2-titres > .d2-titre {
+    grid-area: 1 / 1;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.3s var(--ease-hatch),
+      visibility 0s 0.3s;
+  }
+  .d2-titres > .d2-titre.on {
+    opacity: 1;
+    visibility: visible;
+    transition:
+      opacity 0.4s var(--ease-hatch) 0.3s,
+      visibility 0s;
+  }
+  .d2-onglets {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .d2-onglets [data-onglet] {
+    position: relative;
+    display: flex;
+    flex: 1;
+    gap: 8px;
+    align-items: center;
+    padding: 9px 10px 13px;
+    overflow: hidden;
+    border-radius: 12px;
+    background: rgb(255 255 255 / 0.55);
+    font: 500 13px/1.3 var(--font-sans);
+    color: var(--color-soft);
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  .d2-onglets [data-onglet] b {
+    color: var(--color-ink);
+  }
+  .d2-onglets [data-onglet]:hover {
+    background: var(--color-white);
+  }
+  .d2-onglets [data-onglet].on {
+    background: var(--color-white);
+    color: var(--color-ink);
+  }
+  .d2-onglets button:focus-visible {
+    outline: 2px solid var(--color-orange-txt);
+    outline-offset: 2px;
+  }
+  .d2-barre {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 6px;
+    height: 3px;
+    border-radius: 999px;
+    background: var(--color-line);
+  }
+  .d2-barre > span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--color-orange);
+    transform-origin: left;
+    scale: 0 1;
+  }
+  [data-onglet].on .d2-barre > span {
+    scale: 1 1;
+  }
+  [data-onglet].joue .d2-barre > span {
+    animation: d2-progres var(--duree) linear both;
+  }
+  @keyframes d2-progres {
+    from {
+      scale: 0 1;
+    }
+  }
+  .d2-lieu.pause [data-onglet] .d2-barre > span {
+    animation-play-state: paused;
+  }
+  .d2-pause {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 40px;
+    border-radius: 12px;
+    background: var(--color-ink);
+    cursor: pointer;
+  }
+  .d2-pause svg {
+    width: 16px;
+    fill: var(--color-white);
+  }
+  .d2-pause .i-lecture,
+  .d2-lieu.pause .d2-pause .i-pause {
+    display: none;
+  }
+  .d2-lieu.pause .d2-pause .i-lecture {
+    display: block;
+  }
+  /* Centred with the grid, not with translate: the overlay's entrance animates translate. */
+  .d2-appareils {
+    position: absolute;
+    right: clamp(16px, 6vw, 120px);
+    top: 0;
+    bottom: 0;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    pointer-events: none;
+  }
+  .d2-appareils > * {
+    pointer-events: auto;
+  }
+  .d2-ecran {
+    grid-area: 1 / 1;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.3s var(--ease-hatch),
+      visibility 0s 0.3s;
+  }
+  .d2-ecran.on {
+    opacity: 1;
+    visibility: visible;
+    transition:
+      opacity 0.45s var(--ease-hatch) 0.3s,
+      visibility 0s;
+  }
+  .d2-ecran.tablette {
+    width: min(560px, 40vw);
+  }
+  .d2-ecran.telephone {
+    width: min(290px, 22vw, 62svh);
+  }
+
   @media (max-width: 47.99rem) {
+    .d2-lieu.auto .d2-plateau {
+      --ox: 0.5;
+      --oy: 0.25;
+    }
+    .d2-appareils {
+      left: 16px;
+      right: 16px;
+      top: 80px;
+      bottom: auto;
+    }
+    .d2-ecran.tablette {
+      width: 100%;
+    }
+    .d2-ecran.telephone {
+      width: min(230px, 52vw, 50svh);
+    }
+    .d2-onglets [data-onglet] span:not(.d2-barre) {
+      font-size: 12px;
+    }
     .d2-plateau {
       --oy: 0.27;
     }
@@ -690,13 +949,13 @@ for (const l of lieux) {
     opacity: 1;
     visibility: visible;
   }
-  .d2:not(.js) .d2-vue,
-  .d2:not(.js) .d2-vue > * {
+  .d2:not(.js) :is(.d2-vue, .d2-auto),
+  .d2:not(.js) :is(.d2-vue, .d2-auto) > * {
     visibility: visible;
     opacity: 1;
     translate: none;
   }
-  .d2:not(.js) :is(.d2-repere, .d2-points, .d2-fleche) {
+  .d2:not(.js) :is(.d2-repere, .d2-points, .d2-fleche, .d2-pause) {
     display: none;
   }
 
@@ -723,6 +982,8 @@ for (const l of lieux) {
 
   let k = 0;
   let source: HTMLElement | null = null;
+  const fige = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (fige) sec.querySelectorAll('.ecr').forEach((e) => e.classList.add('fige'));
 
   const calque = (lieu: HTMLElement) => lieu.querySelector<HTMLElement>('.d2-calque')!;
   const demos = (lieu: HTMLElement) => [...lieu.querySelectorAll<HTMLElement>('.d2-demo')];
@@ -772,14 +1033,48 @@ for (const l of lieux) {
     source = null;
   }
 
+  /** Autoplay places: demo i plays on its device; its tab's progress bar ends it (see animationend). */
+  function jouer(lieu: HTMLElement, i: number) {
+    const ecrans = [...lieu.querySelectorAll<HTMLElement>('.d2-ecran')];
+    const onglets = [...lieu.querySelectorAll<HTMLElement>('[data-onglet]')];
+    lieu
+      .querySelectorAll('.d2-titres > .d2-titre')
+      .forEach((t, j) => t.classList.toggle('on', j === i));
+    onglets.forEach((o, j) => {
+      o.classList.toggle('on', j === i);
+      o.classList.remove('joue');
+      o.setAttribute('aria-pressed', String(j === i));
+    });
+    ecrans.forEach((e, j) => {
+      e.classList.toggle('on', j === i);
+      e.querySelector('.ecr')!.classList.remove('joue');
+    });
+    calque(lieu).setAttribute('style', ecrans[i].dataset.cam!);
+    if (fige) return;
+    const ecr = ecrans[i].querySelector<HTMLElement>('.ecr')!;
+    void ecr.offsetWidth; // restart the CSS animations from 0
+    ecr.classList.add('joue');
+    onglets[i].classList.add('joue');
+  }
+  function arreter(lieu: HTMLElement) {
+    lieu.querySelectorAll('.joue').forEach((e) => e.classList.remove('joue'));
+  }
+  function pause(lieu: HTMLElement, oui: boolean) {
+    lieu.classList.toggle('pause', oui);
+    const b = lieu.querySelector<HTMLElement>('.d2-pause')!;
+    b.setAttribute('aria-label', oui ? b.dataset.lecture! : b.dataset.pause!);
+  }
+
   function maj() {
     const r = sec.getBoundingClientRect();
     const p = Math.min(Math.max(-r.top / (r.height - innerHeight), 0), 0.9999);
     const suivant = Math.floor(p * n);
     if (suivant === k) return;
     fermer(lieux[k], false);
+    if (lieux[k].classList.contains('auto')) arreter(lieux[k]);
     k = suivant;
     lieux.forEach((l, i) => l.classList.toggle('on', i === k));
+    if (lieux[k].classList.contains('auto')) jouer(lieux[k], 0);
     points.forEach((el, i) => el.classList.toggle('on', i === k));
   }
 
@@ -787,6 +1082,12 @@ for (const l of lieux) {
     const t = ev.target as HTMLElement;
     const lieu = t.closest<HTMLElement>('.d2-lieu');
     if (!lieu) return;
+    const onglet = t.closest<HTMLElement>('[data-onglet]');
+    if (onglet) {
+      pause(lieu, false);
+      return jouer(lieu, Number(onglet.dataset.onglet));
+    }
+    if (t.closest('.d2-pause')) return pause(lieu, !lieu.classList.contains('pause'));
     const b = t.closest<HTMLElement>('[data-ouvrir]');
     if (b) return ouvrir(lieu, b.dataset.ouvrir!, b);
     if (t.closest('[data-fermer]')) return fermer(lieu, true);
@@ -808,6 +1109,15 @@ for (const l of lieux) {
       if (b && lieu && !lieu.dataset.ouvert) survol(lieu, null);
     });
   }
+  // A demo's progress bar is full: next demo of the place, in a loop.
+  sec.addEventListener('animationend', (ev) => {
+    const barre = (ev.target as HTMLElement).closest('.d2-barre');
+    const onglet = barre?.closest<HTMLElement>('[data-onglet]');
+    if (!onglet?.classList.contains('joue')) return;
+    const lieu = onglet.closest<HTMLElement>('.d2-lieu')!;
+    const n = lieu.querySelectorAll('[data-onglet]').length;
+    jouer(lieu, (Number(onglet.dataset.onglet) + 1) % n);
+  });
   addEventListener('keydown', (ev) => {
     if (ev.key === 'Escape' && lieux[k].dataset.ouvert) fermer(lieux[k], true);
   });
@@ -818,4 +1128,5 @@ for (const l of lieux) {
   });
   addEventListener('resize', maj);
   maj();
+  if (lieux[k].classList.contains('auto')) jouer(lieux[k], 0);
 </script>
