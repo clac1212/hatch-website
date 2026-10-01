@@ -5,6 +5,7 @@ import { section } from '../../content/section';
 import { routes, useTranslations, type Locale } from '../../i18n/ui';
 import carte from '../../assets/hero/carte-reseau.jpg';
 import grain from '../../assets/hero/grain.png';
+import boutiques from './hero-boutiques.json';
 import peep from '../../assets/hero/peep.jpg';
 import lark from '../../assets/hero/lark.jpg';
 import sparrow from '../../assets/hero/sparrow.jpg';
@@ -95,23 +96,9 @@ const scenes: {
   },
 ];
 
-/** Shops that send a ground wave now and then between two task scenes ("your sites write to you"): cube centres. */
-const cubes: [number, number][] = [
-  [691, 180],
-  [590, 263],
-  [745, 383],
-  [663, 532],
-  [1198, 185],
-  [1313, 221],
-  [1384, 330],
-  [1293, 368],
-  [1398, 497],
-  [723, 28],
-  [1047, 40],
-  [1232, 40],
-  [484, 676],
-  [666, 762],
-];
+/** Shops that send a ground wave now and then between two task scenes ("your sites write to you"):
+ * the footprint centre of every shop, measured on the composed image (see hero-boutiques.json). */
+const cubes = boutiques.shops as [number, number][];
 
 /** The second card of a stack slides in once the first one has been read. */
 const entries = [0.5, 2.4];
@@ -146,7 +133,7 @@ const tick =
     }
     {
       cubes.map(([x, y]) => (
-        <div class="h-ping" data-ping="cube" style={pos([x, y + 12])}>
+        <div class="h-ping" data-ping="cube" style={pos([x, y])}>
           <span />
           <span />
         </div>
