@@ -30,7 +30,7 @@ lieux:
             app: Hatch OS
             quand: now
             titre: Head office · field questions
-            texte: Peep answered Crousty One Lille
+            texte: Peep answered BunBun Lille
       - cle: lark
         nom: Lark
         role: prepares your morning briefing
@@ -53,7 +53,7 @@ lieux:
                 - valeur: 1
                   libelle: overdue audit
             - type: alerte
-              texte: Lyon Part-Dieu · audit 3 days overdue
+              texte: BunBun Lyon Part-Dieu · audit 3 days overdue
               bouton: Follow up
       - cle: jay
         nom: Jay
@@ -64,7 +64,7 @@ lieux:
           heure: "10:15"
           entete: Jay · Manual
           statut: Updated
-          intro: I updated the sheet after feedback from Lille.
+          intro: I updated the sheet after feedback from BunBun Lille.
           titre: Fryer cleaning
           source: BunBun manual · Hygiene sheet
           blocs:
@@ -90,8 +90,8 @@ lieux:
           heure: "17:30"
           entete: Finch · Audits
           statut: Audit done
-          intro: Lille audit done, two gaps to fix.
-          titre: Quality audit · Lille
+          intro: BunBun Lille audit done, two gaps to fix.
+          titre: Quality audit · BunBun Lille
           source: BunBun audit grid 2026
           blocs:
             - type: score
@@ -100,7 +100,7 @@ lieux:
               libelle: Overall score
             - type: plan
               reflexion: Writing the action plan…
-              titre: Action plan · Lille
+              titre: Action plan · BunBun Lille
               actions:
                 - ecart: Fridge temperatures not logged
                   action: Log fridge temperatures morning and evening
@@ -202,7 +202,7 @@ lieux:
             app: Hatch OS
             quand: now
             titre: CRM · new candidate
-            texte: Julien · Rennes · spring 2027, file ready
+            texte: Julien · future BunBun Rennes · spring 2027, file ready
       - cle: sparrow-ouverture
         nom: Sparrow · Opening
         role: follows every opening until day one
@@ -211,13 +211,13 @@ lieux:
           appareil: telephone
           heure: "9:05"
           contact: Sparrow
-          statut: Rennes opening
+          statut: BunBun Angers opening
           ecrit: typing…
           jour: Today
           saisie: Message
           fil:
             - de: agent
-              texte: Hi Karim, are the tiles laid?
+              texte: Hi Sophie, are the tiles laid?
             - de: equipe
               texte: Yes, finished yesterday
             - de: agent
@@ -227,5 +227,5 @@ lieux:
           suivi:
             app: Hatch OS
             quand: now
-            titre: Rennes opening · 80%
+            titre: BunBun Angers · opening 80%
             texte: Team training scheduled for Thursday

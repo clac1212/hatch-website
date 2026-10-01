@@ -30,7 +30,7 @@ lieux:
             app: Hatch OS
             quand: maintenant
             titre: Siège · questions du terrain
-            texte: Peep a répondu à Crousty One Lille
+            texte: Peep a répondu à BunBun Lille
       - cle: lark
         nom: Lark
         role: prépare votre point du matin
@@ -53,7 +53,7 @@ lieux:
                 - valeur: 1
                   libelle: audit en retard
             - type: alerte
-              texte: Lyon Part-Dieu · audit en retard de 3 jours
+              texte: BunBun Lyon Part-Dieu · audit en retard de 3 jours
               bouton: Relancer
       - cle: jay
         nom: Jay
@@ -64,7 +64,7 @@ lieux:
           heure: "10:15"
           entete: Jay · Manuel
           statut: Mise à jour
-          intro: J'ai mis à jour la fiche après le retour de Lille.
+          intro: J'ai mis à jour la fiche après le retour de BunBun Lille.
           titre: Nettoyage friteuse
           source: Manuel BunBun · fiche Hygiène
           blocs:
@@ -90,8 +90,8 @@ lieux:
           heure: "17:30"
           entete: Finch · Audits
           statut: Audit terminé
-          intro: Audit de Lille terminé, deux écarts à traiter.
-          titre: Audit qualité · Lille
+          intro: Audit de BunBun Lille terminé, deux écarts à traiter.
+          titre: Audit qualité · BunBun Lille
           source: Grille d'audit BunBun 2026
           blocs:
             - type: score
@@ -100,7 +100,7 @@ lieux:
               libelle: Score global
             - type: plan
               reflexion: Je rédige le plan d'action…
-              titre: Plan d'action · Lille
+              titre: Plan d'action · BunBun Lille
               actions:
                 - ecart: Températures du frigo non relevées
                   action: Relever les températures du frigo matin et soir
@@ -202,7 +202,7 @@ lieux:
             app: Hatch OS
             quand: maintenant
             titre: CRM · nouveau candidat
-            texte: Julien · Rennes · printemps 2027, dossier prêt
+            texte: Julien · futur BunBun Rennes · printemps 2027, dossier prêt
       - cle: sparrow-ouverture
         nom: Sparrow · Ouverture
         role: suit chaque ouverture jusqu'au jour J
@@ -211,13 +211,13 @@ lieux:
           appareil: telephone
           heure: "9:05"
           contact: Sparrow
-          statut: Ouverture Rennes
+          statut: Ouverture BunBun Angers
           ecrit: écrit…
           jour: Aujourd'hui
           saisie: Message
           fil:
             - de: agent
-              texte: Bonjour Karim, le carrelage est posé ?
+              texte: Bonjour Sophie, le carrelage est posé ?
             - de: equipe
               texte: Oui, terminé hier
             - de: agent
@@ -227,5 +227,5 @@ lieux:
           suivi:
             app: Hatch OS
             quand: maintenant
-            titre: Ouverture Rennes · 80 %
+            titre: BunBun Angers · ouverture 80 %
             texte: Formation de l'équipe planifiée jeudi
