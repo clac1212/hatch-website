@@ -335,12 +335,21 @@ function tableau(ecr: HTMLElement, o: number) {
   const tl = gsap.timeline();
   const b = gsap.timeline();
   const intro = $(ecr, '.b-intro');
+  const demande = ecr.querySelector<HTMLElement>('.b-demande');
   const carte = $(ecr, '.b-carte');
   const squelette = $(ecr, '.b-squelette');
   const os = $$(ecr, '.b-squelette span');
   const tete = $(ecr, '.b-tete');
   const blocs = $$(ecr, '.b-bloc');
 
+  if (demande) {
+    tl.set(demande, { autoAlpha: 0, scale: 0.92, y: 8 }, 0);
+    b.to(
+      demande,
+      { autoAlpha: 1, scale: 1, y: 0, duration: 0.5, ease: 'back.out(1.2)' },
+      temps(ecr, 'demande'),
+    );
+  }
   tl.set(intro, { autoAlpha: 0, scale: 0.92, y: 8 }, 0)
     .set(carte, { autoAlpha: 0, y: 14 }, 0)
     .set(squelette, { opacity: 1 }, 0)

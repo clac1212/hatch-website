@@ -64,7 +64,10 @@ lieux:
           heure: "10:15"
           entete: Jay · Manual
           statut: Updated
-          intro: Updating the sheet after feedback from BunBun Lille.
+          demande:
+            qui: Claire · head office
+            texte: "Jay, please update the fryer sheet: in Lille the oil is saturated by the end of the week, let's switch to every three days."
+          intro: On it, updating the sheet.
           titre: Fryer cleaning
           source: BunBun manual · Hygiene sheet
           blocs:

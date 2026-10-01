@@ -95,7 +95,9 @@ const DUREE_BLOC: Record<EcranTableau['blocs'][number]['type'], number> = {
   plan: 0,
 };
 export function chronoTableau(e: EcranTableau) {
-  const intro = 0.4;
+  // A request first, if any (read before the agent answers), then the agent's line.
+  const demande = 0.4;
+  const intro = e.demande ? demande + 0.8 + lecture(e.demande.texte) * 0.7 : 0.4;
   const carte = intro + 0.9 + lecture(e.intro) * 0.6;
   const resolu = carte + 1.1;
   let t = resolu + 0.5;
@@ -106,5 +108,5 @@ export function chronoTableau(e: EcranTableau) {
     t += d;
     return beat;
   });
-  return { intro, carte, resolu, blocs, duree: t + 1.8 };
+  return { demande, intro, carte, resolu, blocs, duree: t + 1.8 };
 }

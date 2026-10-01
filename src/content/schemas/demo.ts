@@ -108,6 +108,8 @@ const ecranTableau = z.strictObject({
   /** "Lark · Point du matin": app name, then the view. */
   entete: texte,
   statut: texte,
+  /** Optional request someone at head office sends the agent first (who, what). */
+  demande: z.strictObject({ qui: texte, texte }).optional(),
   /** The agent's line above the generated card. */
   intro: texte,
   titre: texte,

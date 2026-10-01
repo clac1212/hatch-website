@@ -64,7 +64,10 @@ lieux:
           heure: "10:15"
           entete: Jay · Manuel
           statut: Mise à jour
-          intro: Je mets à jour la fiche après le retour de BunBun Lille.
+          demande:
+            qui: Claire · siège
+            texte: "Jay, mets à jour la fiche friteuse : à Lille l'huile est saturée en fin de semaine, on passe à tous les trois jours."
+          intro: Je m'en occupe, je mets la fiche à jour.
           titre: Nettoyage friteuse
           source: Manuel BunBun · fiche Hygiène
           blocs:
