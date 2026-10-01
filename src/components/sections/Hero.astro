@@ -23,10 +23,9 @@ import oiseauxPos from './hero-oiseaux.json';
  *   3. it switches to "done", then fades out, and the next shop takes over.
  * No wave is ever sent without its card. The image already carries its clouds and sea reflections.
  * The loop starts with the three agents drawn on the map (Peep, Lark, Sparrow), then one agent off the
- * map, and restarts (César, 01/10: otherwise one gets lost). For a bird on the map the exchange is shown:
- * a message dot travels along an arc from the shop to the bird, a "typing" bubble shows above the bird
- * while the card says "running", then the reply travels back and the card turns "done". The birds
- * themselves stay still (César did not like them growing).
+ * map, and restarts (César, 01/10: otherwise one gets lost). While the card of a bird drawn on the map
+ * says "running", a "typing" bubble shows above that bird: subtle on purpose (César tried growing birds
+ * and message arcs, both too heavy). The birds themselves stay still.
  *
  * Coordinates are in the image's frame (1440 × 804) and expressed in % of it, so they stay on their
  * shop whatever the screen: the shops' ground points are measured by the composition script
@@ -45,7 +44,7 @@ const W = 1440;
 const H = 804;
 const pct = (v: number, of: number) => `${((v / of) * 100).toFixed(3)}%`;
 const avatars = { peep, lark, jay, finch, owl, pecker, sparrow };
-/** Birds drawn on the map and their box in the frame (hero-oiseaux.json, written with the image). */
+/** Birds drawn on the map and their box in the frame (hero-oiseaux.json): anchors of the bubbles. */
 const OISEAUX = { lark: oiseauxPos.lark, peep: oiseauxPos.peep, sparrow: oiseauxPos.sparrow };
 type Oiseau = keyof typeof OISEAUX;
 const surCarte = (agent: string): agent is Oiseau => agent in OISEAUX;
@@ -58,13 +57,12 @@ const surCarte = (agent: string): agent is Oiseau => agent in OISEAUX;
 type Ancre = 'center' | 'right';
 const SHOPS: (
   | { shop: number; anchor: Ancre }
-  | { x: number; y: number; roof: number; anchor: Ancre; creux?: number }
+  | { x: number; y: number; roof: number; anchor: Ancre }
 )[] = [
   { shop: 12, anchor: 'center' }, // Dijon (Peep)
   { shop: 8, anchor: 'center' }, // Stuttgart (Lark)
   // Marseille opening (Sparrow): the construction site of the map (decor, not a shop), card above its crane
-  // creux: its arc dips deeper, under the feet of the worker standing between Sparrow and the site
-  { x: 1190, y: 650, roof: 140, anchor: 'center', creux: 0.4 },
+  { x: 1190, y: 650, roof: 140, anchor: 'center' },
   { shop: 13, anchor: 'right' }, // Zurich (Owl, off the map)
 ];
 if (SHOPS.length !== events.length) {
@@ -78,27 +76,10 @@ const steps = events.map((e, i) => {
   const at = SHOPS[i];
   const [x, y] = 'shop' in at ? (boutiques.shops[at.shop] as [number, number]) : [at.x, at.y];
   const roof = 'shop' in at ? ROOF : at.roof;
-  const creux = ('creux' in at && at.creux) || 0.25;
-  return { ...e, x, y, roof, creux, anchor: at.anchor, avatar: avatars[e.agent] };
+  return { ...e, x, y, roof, anchor: at.anchor, avatar: avatars[e.agent] };
 });
-/**
- * Message arcs, shop -> bird, in the frame: from the foot of the shop to the bird's chest, bulging
- * DOWNWARD by `creux` × their distance (a quadratic curve), so the card above the shop never hides it.
- */
-const arcs = steps.map((e, i) => {
-  if (!surCarte(e.agent)) return null;
-  const b = OISEAUX[e.agent];
-  const [x0, y0] = [e.x, e.y];
-  const [x1, y1] = [b.left + b.width / 2, b.top + b.height * 0.5];
-  const d = Math.hypot(x1 - x0, y1 - y0);
-  const [cx, cy] = [(x0 + x1) / 2, Math.max(y0, y1) + d * e.creux];
-  return {
-    i,
-    d: `M${x0} ${y0} Q${cx.toFixed(1)} ${cy.toFixed(1)} ${x1.toFixed(1)} ${y1.toFixed(1)}`,
-  };
-});
-/** Seconds per event (wave, message, card running, reply, card done, exit). */
-const STEP = 6.4;
+/** Seconds per event (wave, card running, card done, exit). */
+const STEP = 5.6;
 
 const tick =
   'M10 18H8v-2h2v2Zm-2-2H6v-2h2v2Zm4-2v2h-2v-2h2Zm-6 0H4v-2h2v2Zm8 0h-2v-2h2v2Zm2-2h-2v-2h2v2Zm2-2h-2V8h2v2Zm2-2h-2V6h2v2Z';
@@ -129,20 +110,6 @@ const tick =
         </div>
       ))
     }
-    <svg class="h-arcs" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none">
-      {
-        arcs.map(
-          (a) =>
-            a && (
-              <g class="h-arc" data-i={a.i}>
-                <path class="h-trace" d={a.d} pathLength="1" />
-                <circle class="h-msg" r="4.5" />
-                <circle class="h-rep" r="4.5" />
-              </g>
-            ),
-        )
-      }
-    </svg>
     {
       (Object.keys(OISEAUX) as Oiseau[]).map((agent) => {
         const b = OISEAUX[agent];
@@ -245,11 +212,10 @@ const tick =
 
 <script>
   /**
-   * Hero loop: one shop at a time. Wave on the shop (0 → 1.4 s); its card appears above it at 1 s
-   * ("running"), switches to "done" at 4.2 s, leaves at 5.8 s; next shop at STEP (6.4 s). Each state
-   * stays ~2-3 s so its line can be read (César, 01/10). For a bird on the map, a message travels the
-   * arc shop → bird (0.35 → 1.15 s), the bird "types" until 3.4 s, the reply travels back (3.4 → 4.2 s)
-   * and lands as the card turns "done". Paused off screen.
+   * Hero loop: one shop at a time. Wave on the shop (0 → 1.4 s), then its card appears above it at
+   * 1 s ("running"), switches to "done" at 3.2 s, leaves at 5 s; next shop at STEP (5.6 s). Each state
+   * stays ~2 s so its line can be read (César, 01/10). A bird of the map "types" while its card runs.
+   * Paused off screen.
    * `?t=<s>` freezes the loop at an instant (captures); reduced motion shows a still frame.
    */
   const hero = document.querySelector<HTMLElement>('.hero')!;
@@ -259,39 +225,10 @@ const tick =
   const slots = piles.map((p) => p.querySelector<HTMLElement>('.h-slot')!);
   const pings = [...hero.querySelectorAll<HTMLElement>('.h-ping')];
   const oiseaux = [...hero.querySelectorAll<HTMLElement>('.h-oiseau')];
-  /** Arc of each event, if its agent is on the map (index = event). */
-  const arcs = piles.map((_, i) => {
-    const g = hero.querySelector<SVGGElement>(`.h-arc[data-i="${i}"]`);
-    if (!g) return null;
-    const trace = g.querySelector<SVGPathElement>('.h-trace')!;
-    return {
-      g,
-      trace,
-      long: trace.getTotalLength(),
-      msg: g.querySelector<SVGCircleElement>('.h-msg')!,
-      rep: g.querySelector<SVGCircleElement>('.h-rep')!,
-    };
-  });
   const CYCLE = STEP * piles.length;
   const ENTREE = 1.0;
-  const BASCULE = 4.2;
-  const SORTIE = 5.8;
-  const ALLER = [0.35, 1.15];
-  const RETOUR = [3.4, 4.2];
-  /** power3.inOut, the camera curve of the shared motion tokens (--ease-camera): a message travels. */
-  const voyage = (x: number) => (x < 0.5 ? 4 * x ** 3 : 1 - (-2 * x + 2) ** 3 / 2);
-  function place(
-    c: SVGCircleElement,
-    a: NonNullable<(typeof arcs)[number]>,
-    p: number,
-    visible: boolean,
-  ) {
-    const pt = a.trace.getPointAtLength(a.long * p);
-    c.setAttribute('cx', pt.x.toFixed(1));
-    c.setAttribute('cy', pt.y.toFixed(1));
-    c.style.opacity = visible ? '1' : '0';
-  }
-
+  const BASCULE = 3.2;
+  const SORTIE = 5.0;
   /** p = wave progress (0 → 1; ≥ 1 = idle). The second ring follows 0.3 behind the first. */
   const clamp = (x: number) => Math.min(1, Math.max(0, x));
   function ping(el: HTMLElement, p: number) {
@@ -303,21 +240,11 @@ const tick =
 
   function rendu(t: number) {
     const tc = t % CYCLE;
-    // the bird whose message has arrived "types" until its reply leaves
+    // the bird whose card is "running" types its answer
     const actifs = new Set<string>();
     piles.forEach((pile, i) => {
       const r = tc - i * STEP;
-      if (r >= ALLER[1] && r < RETOUR[0]) actifs.add(pile.dataset.agent!);
-      const a = arcs[i];
-      if (!a) return;
-      const actif = r >= 0 && r < STEP;
-      const aller = clamp((r - ALLER[0]) / (ALLER[1] - ALLER[0]));
-      const retour = clamp((r - RETOUR[0]) / (RETOUR[1] - RETOUR[0]));
-      // the trail draws itself behind the message, stays during the exchange, fades after the reply
-      a.trace.style.strokeDashoffset = String(1 - voyage(aller));
-      a.trace.style.opacity = String(actif && r >= ALLER[0] ? 1 - clamp((r - RETOUR[1]) / 0.6) : 0);
-      place(a.msg, a, voyage(aller), actif && r >= ALLER[0] && r < ALLER[1]);
-      place(a.rep, a, 1 - voyage(retour), actif && r >= RETOUR[0] && r < RETOUR[1]);
+      if (r >= ENTREE && r < BASCULE) actifs.add(pile.dataset.agent!);
     });
     oiseaux.forEach((o) => o.classList.toggle('parle', actifs.has(o.dataset.agent!)));
     piles.forEach((pile, i) => {
@@ -386,40 +313,6 @@ const tick =
   .h-oiseau {
     position: absolute;
   }
-  /* Message arcs (frame coordinates, stretched with the map). The trail draws itself behind the
-     message dot; the reply dot is white, ringed with orange. JS drives positions and opacities. */
-  .h-arcs {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-  }
-  .h-trace {
-    fill: none;
-    stroke: var(--color-white);
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-dasharray: 1;
-    stroke-dashoffset: 1;
-    opacity: 0;
-    filter: drop-shadow(0 1px 2px color-mix(in srgb, var(--color-navy) 45%, transparent));
-  }
-  .h-msg,
-  .h-rep {
-    opacity: 0;
-    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--color-orange) 70%, transparent));
-  }
-  .h-msg {
-    fill: var(--color-orange);
-    stroke: var(--color-white);
-    stroke-width: 1.5;
-  }
-  .h-rep {
-    fill: var(--color-white);
-    stroke: var(--color-orange);
-    stroke-width: 2;
-  }
   /* "Typing" bubble above the head while the bird's event is running. */
   .h-bulle {
     position: absolute;
@@ -428,12 +321,13 @@ const tick =
     display: flex;
     gap: 4px;
     padding: 7px 10px;
-    border-radius: 999px 999px 999px 4px;
+    border-radius: 999px 999px 4px 999px;
     background: var(--color-white);
     box-shadow: var(--shadow-2);
     opacity: 0;
-    transform: translate(-30%, 6px) scale(0.8);
-    transform-origin: 20% 100%;
+    /* opens to the left of the head: the task cards always sit to the right of the birds */
+    transform: translate(-80%, 6px) scale(0.8);
+    transform-origin: 80% 100%;
     transition:
       opacity 0.35s var(--ease-doux),
       transform 0.5s var(--ease-pop);
@@ -446,7 +340,7 @@ const tick =
   }
   .parle .h-bulle {
     opacity: 1;
-    transform: translate(-30%, 0) scale(1);
+    transform: translate(-80%, 0) scale(1);
   }
   .parle .h-bulle i {
     animation: h-tape 0.9s ease-in-out infinite;
