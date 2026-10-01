@@ -27,6 +27,11 @@ const EASE = {
 };
 /** Seconds: camera travel, device entrance start, content start, device exit. */
 const T = { camera: 1.1, appareil: 0.85, contenu: 1.25, sortie: 0.4 };
+/**
+ * Arriving in a place (César 01/10: "too fast"): the wide shot of the diorama holds first, with a
+ * slow push-in, then the camera glides in to the first agent, slower than between two agents.
+ */
+const ARRIVEE = { plan: 2.2, voyage: 2, ease: 'power2.inOut' };
 /** Slow push-in while a demo plays: the zoom grows by 4 %. */
 const DERIVE = 1.04;
 
@@ -441,6 +446,9 @@ export interface Pilote {
   position(i: number): number;
 }
 
+/** Mixte: share of the scroll that moves the playhead (the rest is left to time). */
+const POUSSEE = 0.7;
+
 export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
   const scroll = mode === 'scroll';
   const calque = $(lieu, '.d2-calque');
@@ -492,19 +500,31 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
       .set(calque, vue, 0)
       .set(voile, { opacity: 0 }, 0)
       .set(barres, { scaleX: 0 }, 0)
-      .to(voile, { opacity: 1, duration: 0.9, ease: 'power1.inOut' }, 0.15);
+      .to(calque, { '--z': vue['--z'] * DERIVE, duration: ARRIVEE.plan, ease: 'sine.inOut' }, 0)
+      .to(voile, { opacity: 1, duration: 1.4, ease: 'power1.inOut' }, ARRIVEE.plan + 0.2);
     debuts = [];
     ecrans.forEach((e, i) => {
       const ecr = $(e, '.ecr');
       const duree = Number(ecr.dataset.duree);
       const s = gsap.timeline();
       const cam = cams[i];
+      /** The first travel (from the wide shot) is longer: the rest of the segment shifts with it. */
+      const voyage = i === 0 ? ARRIVEE.voyage : T.camera;
+      const a = appareil + voyage - T.camera;
+      const c = contenu + voyage - T.camera;
       // 1. The camera travels to the agent, under the dimmed layer: the scene is only the setting,
       //    the device is the subject (César 01/10: the cut-out agent must not move or stand out).
       s.fromTo(
         calque,
-        i === 0 ? vue : { ...cams[i - 1], '--z': cams[i - 1]['--z'] * DERIVE },
-        { ...cam, duration: T.camera, ease: EASE.camera, immediateRender: false },
+        i === 0
+          ? { ...vue, '--z': vue['--z'] * DERIVE }
+          : { ...cams[i - 1], '--z': cams[i - 1]['--z'] * DERIVE },
+        {
+          ...cam,
+          duration: voyage,
+          ease: i === 0 ? ARRIVEE.ease : EASE.camera,
+          immediateRender: false,
+        },
         0,
       );
       // 2. Its device enters from its side (left of the device on desktop, above on phones), tilted
@@ -521,7 +541,7 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
           ease: EASE.entree,
           immediateRender: false,
         },
-        appareil,
+        a,
       )
         .fromTo(
           ecr,
@@ -540,21 +560,22 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
             ease: EASE.entree,
             immediateRender: false,
           },
-          appareil,
+          a,
         )
         .fromTo(
           $(ecr, '.reflet'),
           { opacity: 0, xPercent: -70 },
           { xPercent: 70, duration: 1.5, ease: 'power2.inOut', immediateRender: false },
-          appareil + 0.2,
+          a + 0.2,
         )
-        .to($(ecr, '.reflet'), { opacity: 1, duration: 0.5, ease: 'power1.out' }, appareil + 0.2)
-        .to($(ecr, '.reflet'), { opacity: 0, duration: 0.6, ease: 'power1.in' }, appareil + 1.1);
+        .to($(ecr, '.reflet'), { opacity: 1, duration: 0.5, ease: 'power1.out' }, a + 0.2)
+        .to($(ecr, '.reflet'), { opacity: 0, duration: 0.6, ease: 'power1.in' }, a + 1.1);
       // 3. The screen plays; meanwhile the camera keeps a slow push-in so the scene never freezes.
-      s.add(
-        ecr.classList.contains('tablette') ? tablette(ecr, contenu) : telephone(ecr, contenu),
-        0,
-      ).to(calque, { '--z': cam['--z'] * DERIVE, duration: duree, ease: 'sine.inOut' }, contenu);
+      s.add(ecr.classList.contains('tablette') ? tablette(ecr, c) : telephone(ecr, c), 0).to(
+        calque,
+        { '--z': cam['--z'] * DERIVE, duration: duree, ease: 'sine.inOut' },
+        c,
+      );
       // 4. Exit, shorter than the entrance.
       s.to(
         e,
@@ -565,10 +586,10 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
           duration: T.sortie,
           ease: EASE.sortie,
         },
-        contenu + duree,
+        c + duree,
       );
 
-      const debut = i === 0 ? 0 : m.duration() - 0.1;
+      const debut = i === 0 ? ARRIVEE.plan : m.duration() - 0.1;
       debuts.push(debut);
       m.addLabel(`d${i}`, debut)
         .add(s, debut)
@@ -588,8 +609,6 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
       { ...vue, duration: 1.3, ease: EASE.camera, immediateRender: false },
       fin,
     ).to(voile, { opacity: 0, duration: 0.8, ease: 'power1.inOut' }, fin + 0.2);
-    // Autoplay: a breath on the wide shot before the loop starts again.
-    if (!scroll) m.to({}, { duration: 1.4 });
     return m;
   }
 
@@ -602,6 +621,12 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
     gsap.set(barres[i], { scaleX: 1 });
     marquer(i);
   }
+
+  /**
+   * Where the playhead starts when the place becomes active: from the top (wide shot) when coming
+   * in from above; mixte, coming in from below, starts near the end so scrolling up rewinds it.
+   */
+  const depart = (p: number) => (mode === 'mixte' && p > 0.5 ? p * (tl?.duration() ?? 0) : 0);
 
   /** Reduced motion: no playhead; in scroll mode the demos split the place's scroll evenly. */
   const indice = (p: number) => Math.min(ecrans.length - 1, Math.floor(p * ecrans.length));
@@ -621,7 +646,7 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
       tl = reduit ? null : construire(!!mobile);
       if (!tl) montrer(scroll ? indice(q) : 0);
       else if (scroll) tl.progress(q);
-      else if (actif) tl.play(mode === 'mixte' ? q * tl.duration() : 0).paused(enPause);
+      else if (actif) tl.play(depart(q)).paused(enPause);
       return () => {
         tl = null;
       };
@@ -657,8 +682,7 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
       if (!tl) return montrer(scroll ? indice(p) : 0);
       if (scroll) return void tl.progress(p);
       enPause = false;
-      // Mixte: coming in from below starts near the end, so scrolling back up rewinds it.
-      tl.play(mode === 'mixte' ? p * tl.duration() : 0);
+      tl.play(depart(p));
     },
     suivre(p) {
       const dq = p - q;
@@ -667,7 +691,7 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
       if (scroll) {
         // A short catch-up tween smooths the wheel's steps without lagging behind the scroll.
         gsap.to(tl, { progress: p, duration: 0.6, ease: 'power3.out', overwrite: true });
-      } else if (mode === 'mixte' && dq) pousser(dq * tl.duration());
+      } else if (mode === 'mixte' && dq) pousser(dq * tl.duration() * POUSSEE);
     },
     jouer(i) {
       if (scroll) return;
