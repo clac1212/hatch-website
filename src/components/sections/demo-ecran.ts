@@ -6,8 +6,11 @@ import type { EcranTableau, EcranTablette, EcranTelephone } from '../../content/
  * GSAP timeline (demo-motion.ts) places each gesture on its beat. `duree` = content length.
  */
 
-/** Reading time of a line: a short beat to find it, then ~26 characters per second (César 01/10: faster). */
-const lecture = (texte: string) => 0.8 + texte.length / 26;
+/**
+ * Pause after a line before the next one. César 01/10: the thread must flow, one message right
+ * after another, no waiting; the visitor rereads the thread, it stays on screen.
+ */
+const lecture = (texte: string) => 0.35 + texte.length / 45;
 
 export function chronoTablette(e: EcranTablette) {
   const mots = e.question.split(' ');
@@ -39,9 +42,9 @@ export function chronoTablette(e: EcranTablette) {
 
 export function chronoTelephone(e: EcranTelephone) {
   /** Typing indicator shown before each agent message. */
-  const frappe = 0.7;
+  const frappe = 0.5;
   /** Delay before the right option gets tapped, then before the next beat. */
-  const reflexion = 1.5;
+  const reflexion = 1.1;
   let t = 0.3;
   /**
    * `choix` = when the right option is tapped (quiz); `frappe` = typing indicator (agent message);
@@ -57,13 +60,13 @@ export function chronoTelephone(e: EcranTelephone) {
   const fil = e.fil.map((item): Beat => {
     if ('document' in item) {
       // The agent's attachment lands right after its message.
-      const beat = { item, t: t - 0.4 };
-      t += 1.4;
+      const beat = { item, t: t - 0.2 };
+      t += 0.9;
       return beat;
     }
     if ('quiz' in item) {
       const beat = { item, t, choix: t + reflexion };
-      t += reflexion + 1.1;
+      t += reflexion + 0.8;
       return beat;
     }
     if (item.de === 'agent') {
@@ -71,13 +74,13 @@ export function chronoTelephone(e: EcranTelephone) {
       t += frappe + lecture(item.texte);
       return beat;
     }
-    // Typed at ~35 ms per character, then sent.
-    const saisie = 0.3 + item.texte.length * 0.035;
+    // Typed at ~25 ms per character, then sent.
+    const saisie = 0.2 + item.texte.length * 0.025;
     const beat = { item, t: t + saisie, brouillon: t };
     t += saisie + lecture(item.texte);
     return beat;
   });
-  return { fil, frappe, suivi: t, duree: t + 2.6 };
+  return { fil, frappe, suivi: t, duree: t + 2.4 };
 }
 
 /**
@@ -87,10 +90,10 @@ export function chronoTelephone(e: EcranTelephone) {
 const DUREE_BLOC: Record<EcranTableau['blocs'][number]['type'], number> = {
   chiffres: 2.6,
   alerte: 2.2,
-  version: 3.2,
+  edition: 4.6,
   diffusion: 3,
-  score: 2.4,
-  ecarts: 0,
+  score: 2.2,
+  plan: 0,
 };
 export function chronoTableau(e: EcranTableau) {
   const intro = 0.4;
@@ -98,7 +101,8 @@ export function chronoTableau(e: EcranTableau) {
   const resolu = carte + 1.1;
   let t = resolu + 0.5;
   const blocs = e.blocs.map((b) => {
-    const d = b.type === 'ecarts' ? 0.6 + b.items.length * 2.3 : DUREE_BLOC[b.type];
+    // The plan: ~1.8 s of thinking, then each action typed.
+    const d = b.type === 'plan' ? 2.2 + b.actions.length * 1.7 : DUREE_BLOC[b.type];
     const beat = { t, d };
     t += d;
     return beat;

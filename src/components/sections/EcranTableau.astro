@@ -2,8 +2,8 @@
 /**
  * Head-office dashboard on an iPad (Lark, Jay, Finch; César 01/10): the agent posts a line, then
  * the UI it generates resolves out of a skeleton, block by block — key figures counting up, an
- * alert with its button, a procedure line before/after, a broadcast to N sites, a score, gaps
- * turned into actions. The markup renders the FINAL state (no JS, reduced motion); the GSAP
+ * alert with its button, a manual sheet edited in place, a broadcast to N sites, a score, an
+ * action plan written out. The markup renders the FINAL state (no JS, reduced motion); the GSAP
  * timeline (demo-motion.ts `tableau`) replays it on the beats from demo-ecran.ts.
  */
 import { Image } from 'astro:assets';
@@ -26,7 +26,6 @@ const I = {
   ok: 'M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2Z',
   wifi: 'M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8 3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4 2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z',
   alerte: 'M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z',
-  fleche: 'M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z',
 };
 ---
 
@@ -113,20 +112,38 @@ const I = {
                       </span>
                     </>
                   )}
-                  {b.type === 'version' && (
+                  {b.type === 'edition' && (
                     <>
-                      <p class="b-ligne b-avant">
-                        <span class="b-v">{b.avant.version}</span>
-                        <span class="b-texte">
-                          {b.avant.texte}
-                          <span class="b-rature" aria-hidden="true" />
+                      <p class="b-doc-tete">
+                        <span class="b-badge" aria-hidden="true">
+                          <span class="b-roue">
+                            <span>{b.version.avant}</span>
+                            <span>{b.version.apres}</span>
+                          </span>
                         </span>
                       </p>
-                      <p class="b-ligne b-apres">
-                        <span class="b-surligne" aria-hidden="true" />
-                        <span class="b-v">{b.apres.version}</span>
-                        <span class="b-texte">{b.apres.texte}</span>
-                      </p>
+                      <ol class="b-doc">
+                        {b.lignes.map((ligne, j) =>
+                          j === b.modifiee ? (
+                            <li class="b-modifiee">
+                              <span class="b-suivi" aria-hidden="true" />
+                              <span class="b-num">{j + 1}</span>
+                              <span class="b-edite">
+                                <span class="b-avant-txt" aria-hidden="true">
+                                  {ligne}
+                                </span>
+                                <span class="b-apres-txt">{b.apres}</span>
+                                <span class="b-curseur" aria-hidden="true" />
+                              </span>
+                            </li>
+                          ) : (
+                            <li>
+                              <span class="b-num">{j + 1}</span>
+                              <span>{ligne}</span>
+                            </li>
+                          ),
+                        )}
+                      </ol>
                     </>
                   )}
                   {b.type === 'diffusion' && (
@@ -158,23 +175,36 @@ const I = {
                       </span>
                     </>
                   )}
-                  {b.type === 'ecarts' && (
+                  {b.type === 'plan' && (
                     <>
-                      <p class="b-libelle b-plan">{b.libelle}</p>
-                      {b.items.map((it) => (
-                        <div class="b-ecart">
-                          <span class="b-pb">
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                              <path d={I.alerte} />
-                            </svg>
-                            {it.ecart}
-                          </span>
-                          <svg class="b-fleche" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d={I.fleche} />
-                          </svg>
-                          <span class="b-action">{it.action}</span>
-                        </div>
-                      ))}
+                      <p class="b-reflexion" aria-hidden="true">
+                        <span class="b-points">
+                          <span />
+                          <span />
+                          <span />
+                        </span>
+                        {b.reflexion}
+                      </p>
+                      <div class="b-plan-doc">
+                        <p class="b-plan-titre">{b.titre}</p>
+                        <ol>
+                          {b.actions.map((a, j) => (
+                            <li>
+                              <span class="b-num">{j + 1}</span>
+                              <span class="b-plan-corps">
+                                <span class="b-action-txt">{a.action}</span>
+                                <span class="b-ecart-txt">
+                                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d={I.alerte} />
+                                  </svg>
+                                  {a.ecart}
+                                </span>
+                              </span>
+                              <span class="b-echeance">{a.echeance}</span>
+                            </li>
+                          ))}
+                        </ol>
+                      </div>
                     </>
                   )}
                 </section>
@@ -444,57 +474,84 @@ const I = {
     fill: var(--color-white);
   }
 
-  /* A procedure line, before (struck out) and after (highlighted). */
-  .b-version {
+  /* A manual sheet edited in place: the changed line is tinted (tracked change), its old text is
+     deleted and the new one typed after a caret; the version badge rolls to the new version. */
+  .b-doc-tete {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: -1cqw;
+  }
+  .b-badge {
+    height: 1.4em;
+    overflow: hidden;
+    padding: 0 1cqw;
+    border-radius: 999px;
+    background: var(--color-orange);
+    font: 400 1.5cqw/1.4 var(--font-mono);
+  }
+  .b-roue {
     display: flex;
     flex-direction: column;
-    gap: 1cqw;
+    transform: translateY(-50%);
   }
-  .b-ligne {
+  .b-doc {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8cqw;
+    margin-top: 1cqw;
+  }
+  .b-doc li {
     position: relative;
     display: flex;
     align-items: center;
-    gap: 1.4cqw;
-    padding: 1.4cqw 1.6cqw;
-    overflow: hidden;
-    border-radius: 1.4cqw;
+    gap: 1.3cqw;
+    padding: 1.2cqw 1.5cqw;
+    border-radius: 1.3cqw;
     background: var(--color-surface-2);
     box-shadow: inset 0 0 0 1px var(--color-line);
-    font-size: 2cqw;
+    font-size: 1.9cqw;
   }
-  .b-avant .b-texte {
-    color: var(--color-soft);
-  }
-  .b-texte {
+  .b-doc li > * {
     position: relative;
   }
-  .b-rature {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 55%;
-    height: 0.25cqw;
-    background: var(--color-soft);
-    transform-origin: left;
-  }
-  .b-surligne {
+  .b-doc li > .b-suivi {
     position: absolute;
     inset: 0;
+    border-radius: inherit;
     background: var(--color-orange-tint);
     box-shadow: inset 0 0 0 1px var(--color-orange);
-    border-radius: inherit;
-    transform-origin: left;
   }
-  .b-v {
-    position: relative;
+  .b-num {
+    display: grid;
+    place-items: center;
     flex: none;
-    padding: 0.3cqw 0.9cqw;
+    width: 2.9cqw;
+    height: 2.9cqw;
     border-radius: 999px;
-    background: var(--color-sand);
-    font: 400 1.4cqw/1.3 var(--font-mono);
+    background: var(--color-surface);
+    box-shadow: inset 0 0 0 1px var(--color-stone);
+    font: 600 1.5cqw/1 var(--font-sans);
   }
-  .b-apres .b-v {
-    background: var(--color-orange);
+  .b-edite {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+  }
+  .b-avant-txt,
+  .b-apres-txt {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: bottom;
+  }
+  .b-avant-txt {
+    width: 0;
+  }
+  .b-curseur {
+    width: 0.25cqw;
+    height: 1.2em;
+    margin-left: 0.15cqw;
+    background: var(--color-ink);
+    opacity: 0;
   }
 
   /* Broadcast: the count runs while a dot per site lights up. */
@@ -550,50 +607,84 @@ const I = {
     transform: scaleX(var(--p));
   }
 
-  /* Gaps found, each turned into an action. */
-  .b-ecarts {
+  /* The agent thinks (dots), then writes the plan: each action is typed, its gap and its due
+     date follow. The thinking line is gone in the final state. */
+  .b-plan {
     display: flex;
     flex-direction: column;
-    gap: 1cqw;
   }
-  .b-plan {
-    font: 400 1.35cqw/1.2 var(--font-mono);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-  .b-ecart {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    gap: 1.2cqw;
-  }
-  .b-pb,
-  .b-action {
+  .b-reflexion {
     display: flex;
     align-items: center;
-    gap: 0.9cqw;
-    min-height: 100%;
-    padding: 1.2cqw 1.4cqw;
-    border-radius: 1.4cqw;
-    font-size: 1.75cqw;
-    line-height: 1.3;
+    gap: 1cqw;
+    height: 0;
+    overflow: hidden;
+    opacity: 0;
+    font-size: 1.7cqw;
+    font-style: italic;
+    color: var(--color-soft);
   }
-  .b-pb {
+  .b-points {
+    display: flex;
+    gap: 0.5cqw;
+  }
+  .b-points span {
+    width: 0.9cqw;
+    height: 0.9cqw;
+    border-radius: 999px;
+    background: var(--color-orange);
+  }
+  .b-plan-doc {
+    padding: 1.6cqw 1.8cqw;
+    border-radius: 1.6cqw;
     background: var(--color-surface-2);
     box-shadow: inset 0 0 0 1px var(--color-line);
   }
-  .b-pb svg {
-    flex: none;
-    width: 2cqw;
-    fill: var(--color-orange-txt);
+  .b-plan-titre {
+    font: 400 1.4cqw/1.2 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-orange-txt);
   }
-  .b-action {
-    background: var(--color-orange-tint);
-    box-shadow: inset 0 0 0 1px var(--color-orange);
+  .b-plan-doc ol {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2cqw;
+    margin-top: 1.2cqw;
+  }
+  .b-plan-doc li {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.3cqw;
+  }
+  .b-plan-corps {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.4cqw;
+    min-width: 0;
+  }
+  .b-action-txt {
+    font-size: 1.9cqw;
     font-weight: 600;
   }
-  .b-fleche {
-    width: 2.4cqw;
-    fill: var(--color-soft);
+  .b-ecart-txt {
+    display: flex;
+    align-items: center;
+    gap: 0.6cqw;
+    font-size: 1.5cqw;
+    color: var(--color-soft);
+  }
+  .b-ecart-txt svg {
+    width: 1.6cqw;
+    fill: var(--color-orange-txt);
+  }
+  .b-echeance {
+    flex: none;
+    padding: 0.5cqw 1cqw;
+    border-radius: 999px;
+    background: var(--color-orange-tint);
+    box-shadow: inset 0 0 0 1px var(--color-orange);
+    font: 600 1.45cqw/1.2 var(--font-sans);
   }
 </style>

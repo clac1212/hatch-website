@@ -68,13 +68,16 @@ lieux:
           titre: Nettoyage friteuse
           source: Manuel BunBun · fiche Hygiène
           blocs:
-            - type: version
-              avant:
-                version: v3
-                texte: Vidanger l'huile une fois par semaine
-              apres:
-                version: v4
-                texte: Vidanger l'huile tous les trois jours
+            - type: edition
+              version:
+                avant: v3
+                apres: v4
+              lignes:
+                - Couper la friteuse, laisser refroidir 30 min
+                - Vidanger l'huile une fois par semaine
+                - Nettoyer la cuve au dégraissant
+              modifiee: 1
+              apres: Vidanger l'huile tous les trois jours
             - type: diffusion
               total: 30
               libelle: sites ont reçu la v4
@@ -95,13 +98,16 @@ lieux:
               valeur: 92
               sur: 100
               libelle: Score global
-            - type: ecarts
-              libelle: Plan d'action
-              items:
+            - type: plan
+              reflexion: Je rédige le plan d'action…
+              titre: Plan d'action · Lille
+              actions:
                 - ecart: Températures du frigo non relevées
-                  action: Relevé matin et soir, rappel à l'équipe
+                  action: Relever les températures du frigo matin et soir
+                  echeance: Dès demain
                 - ecart: Étiquette DLC manquante
-                  action: Étiquettes en place avant vendredi
+                  action: Étiqueter chaque bac à l'ouverture
+                  echeance: Avant vendredi
 
   - surtitre: En cuisine
     agents:

@@ -119,12 +119,21 @@ const ecranTableau = z.strictObject({
         z.strictObject({ type: z.literal('chiffres'), items: z.array(chiffre).min(2).max(3) }),
         /** Something to act on, with its button. */
         z.strictObject({ type: z.literal('alerte'), texte, bouton: texte }),
-        /** A procedure line, before and after the update. */
-        z.strictObject({
-          type: z.literal('version'),
-          avant: z.strictObject({ version: texte, texte }),
-          apres: z.strictObject({ version: texte, texte }),
-        }),
+        /**
+         * A manual sheet edited in place: line `modifiee` is deleted and retyped as `apres`, the
+         * version badge goes from `avant` to `apres`.
+         */
+        z
+          .strictObject({
+            type: z.literal('edition'),
+            version: z.strictObject({ avant: texte, apres: texte }),
+            lignes: z.array(texte).min(2).max(4),
+            modifiee: z.number().int().min(0),
+            apres: texte,
+          })
+          .refine((e) => e.modifiee < e.lignes.length, {
+            message: '`modifiee` is past the last line',
+          }),
         /** Sent to N sites: dots light up as the count runs. */
         z.strictObject({
           type: z.literal('diffusion'),
@@ -138,12 +147,13 @@ const ecranTableau = z.strictObject({
           sur: z.number().int().min(1),
           libelle: texte,
         }),
-        /** Gaps found, each turned into an action. */
+        /** The agent thinks, then writes an action plan, one action per gap found. */
         z.strictObject({
-          type: z.literal('ecarts'),
-          libelle: texte,
-          items: z
-            .array(z.strictObject({ ecart: texte, action: texte }))
+          type: z.literal('plan'),
+          reflexion: texte,
+          titre: texte,
+          actions: z
+            .array(z.strictObject({ ecart: texte, action: texte, echeance: texte }))
             .min(1)
             .max(3),
         }),

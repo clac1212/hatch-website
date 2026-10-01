@@ -9,7 +9,7 @@
  *
  * Scroll rules (research: NN/g on scroll-jacking, Apple product pages):
  * - the scroll position picks the place DIRECTLY (no queue): a fast scroll lands on a clean state;
- * - the wheel is never captured; soft snap points (`proximity`) help stop on each place's wide shot.
+ * - the wheel is never captured, and no snap point pulls the page (it would rewind the demo).
  * Without JS, the three places stack, each with its first demo in its final state.
  */
 import { Image, Picture } from 'astro:assets';
@@ -239,7 +239,9 @@ for (const l of lieux) {
     top: calc((var(--i) + 0.5) * var(--pas));
     scroll-snap-align: start;
   }
-  :global(html:has(.d2.js)) {
+  /* Snap points only when time alone plays the demos (?auto=1). With the scroll in play, a snap
+     scrolls the page back up after the wheel stops, which rewound the demo (César 01/10). */
+  :global(html:has(.d2.js:not(.long))) {
     scroll-snap-type: y proximity;
   }
   .d2-scene-fixe {
@@ -605,11 +607,6 @@ for (const l of lieux) {
   if (POIDS > 1) {
     sec.classList.add('long');
     sec.style.setProperty('--n', String(total));
-    // Soft snap points on each place's opening wide shot (the page helps you stop there, it never
-    // holds the wheel).
-    sec.querySelectorAll<HTMLElement>('.d2-ancre').forEach((a, i) => {
-      a.style.top = `calc(${debuts[i] + 0.12} * var(--pas))`;
-    });
   }
   if (mode === 'scroll') sec.classList.add('scrub');
   /** Where the scroll is: the place, and the position inside it (0–1). */

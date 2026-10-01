@@ -189,7 +189,7 @@ function tablette(ecr: HTMLElement, o: number) {
         duration: 0.18,
         ease: 'sine.inOut',
         yoyo: true,
-        repeat: Math.floor((fin - voix) / 0.18) - 1,
+        repeat: Math.max(0, Math.floor((fin - voix) / 0.18) - 1),
         repeatRefresh: true,
       },
       voix + i * 0.015,
@@ -403,16 +403,33 @@ function tableau(ecr: HTMLElement, o: number) {
           { autoAlpha: 1, scale: 1, duration: 0.4, ease: 'back.out(2)' },
           t + 1.5,
         );
-    } else if (type === 'version') {
-      const avant = $(bloc, '.b-avant');
-      const apres = $(bloc, '.b-apres');
-      tl.set([avant, apres], { autoAlpha: 0, x: -10 }, 0)
-        .set($(bloc, '.b-rature'), { scaleX: 0 }, 0)
-        .set($(bloc, '.b-surligne'), { scaleX: 0 }, 0);
-      b.to(avant, { autoAlpha: 1, x: 0, duration: 0.5, ease: EASE.entree }, t + 0.1)
-        .to($(bloc, '.b-rature'), { scaleX: 1, duration: 0.5, ease: EASE.doux }, t + 0.9)
-        .to(apres, { autoAlpha: 1, x: 0, duration: 0.5, ease: EASE.entree }, t + 1.4)
-        .to($(bloc, '.b-surligne'), { scaleX: 1, duration: 0.7, ease: EASE.doux }, t + 1.7);
+    } else if (type === 'edition') {
+      // The sheet is there; a caret lands on the changed line, deletes its old text, types the
+      // new one; the line is marked as changed and the version badge rolls over.
+      const lignes = $$(bloc, '.b-doc li');
+      const modifiee = $(bloc, '.b-modifiee');
+      const [avantTxt, apresTxt, curseur] = [
+        $(modifiee, '.b-avant-txt'),
+        $(modifiee, '.b-apres-txt'),
+        $(modifiee, '.b-curseur'),
+      ];
+      tl.set(lignes, { autoAlpha: 0, y: 6 }, 0)
+        .set($(modifiee, '.b-suivi'), { opacity: 0 }, 0)
+        .set(avantTxt, { width: 'auto' }, 0)
+        .set(apresTxt, { width: 0 }, 0)
+        .set(curseur, { opacity: 0 }, 0)
+        .set($(bloc, '.b-roue'), { yPercent: 0, y: 0 }, 0);
+      b.to(lignes, { autoAlpha: 1, y: 0, duration: 0.5, ease: EASE.entree, stagger: 0.08 }, t + 0.1)
+        .to($(modifiee, '.b-suivi'), { opacity: 1, duration: 0.3, ease: EASE.doux }, t + 0.8)
+        .to(
+          curseur,
+          { opacity: 1, duration: 0.25, ease: 'steps(1)', yoyo: true, repeat: 10 },
+          t + 0.8,
+        )
+        .to(avantTxt, { width: 0, duration: 0.8, ease: 'steps(18)' }, t + 1.2)
+        .to(apresTxt, { width: 'auto', duration: 1.3, ease: 'steps(26)' }, t + 2.1)
+        .to(curseur, { opacity: 0, duration: 0.2 }, t + 3.6)
+        .to($(bloc, '.b-roue'), { yPercent: -50, duration: 0.5, ease: EASE.camera }, t + 3.6);
     } else if (type === 'diffusion') {
       const sites = $$(bloc, '.b-sites span');
       tl.set(sites, { opacity: 0.18, scale: 0.6 }, 0);
@@ -427,20 +444,47 @@ function tableau(ecr: HTMLElement, o: number) {
       compter($(bloc, '.b-valeur'), t + 0.2, 1.4, b);
       const p = Number($(bloc, '.b-jauge span').dataset.p);
       b.to($(bloc, '.b-jauge span'), { scaleX: p, duration: 1.4, ease: 'power2.out' }, t + 0.2);
-    } else if (type === 'ecarts') {
-      $$(bloc, '.b-ecart').forEach((ecart, j) => {
-        const at = t + 0.5 + j * 2.3;
-        const [pb, fleche, action] = [
-          $(ecart, '.b-pb'),
-          $(ecart, '.b-fleche'),
-          $(ecart, '.b-action'),
-        ];
-        tl.set(pb, { autoAlpha: 0, x: -10 }, 0)
-          .set(fleche, { autoAlpha: 0, x: -6 }, 0)
-          .set(action, { autoAlpha: 0, x: -14, scale: 0.96 }, 0);
-        b.to(pb, { autoAlpha: 1, x: 0, duration: 0.5, ease: EASE.entree }, at)
-          .to(fleche, { autoAlpha: 1, x: 0, duration: 0.4, ease: EASE.doux }, at + 0.8)
-          .to(action, { autoAlpha: 1, x: 0, scale: 1, duration: 0.6, ease: EASE.entree }, at + 1.1);
+    } else if (type === 'plan') {
+      // The agent thinks (dots), then writes the plan: each action typed, its gap and due date.
+      const reflexion = $(bloc, '.b-reflexion');
+      const doc = $(bloc, '.b-plan-doc');
+      const items = $$(bloc, '.b-plan-doc li');
+      tl.set(reflexion, { height: 0, opacity: 0 }, 0)
+        .set(doc, { autoAlpha: 0, y: 10 }, 0)
+        .set(items, { autoAlpha: 0 }, 0)
+        .set($$(bloc, '.b-action-txt'), { clipPath: 'inset(0 100% 0 0)' }, 0)
+        .set($$(bloc, '.b-ecart-txt'), { opacity: 0 }, 0)
+        .set($$(bloc, '.b-echeance'), { autoAlpha: 0, scale: 0.6 }, 0);
+      b.to(reflexion, { height: 'auto', opacity: 1, duration: 0.35, ease: EASE.doux }, t + 0.2)
+        .to(
+          $$(bloc, '.b-points span'),
+          {
+            yPercent: -50,
+            opacity: 0.4,
+            duration: 0.3,
+            ease: 'sine.inOut',
+            yoyo: true,
+            repeat: 3,
+            stagger: 0.12,
+          },
+          t + 0.3,
+        )
+        .to(reflexion, { height: 0, opacity: 0, duration: 0.3, ease: EASE.sortie }, t + 1.7)
+        .to(doc, { autoAlpha: 1, y: 0, duration: 0.6, ease: EASE.entree }, t + 1.8);
+      items.forEach((li, j) => {
+        const at = t + 2.2 + j * 1.7;
+        b.set(li, { autoAlpha: 1 }, at)
+          .to(
+            $(li, '.b-action-txt'),
+            { clipPath: 'inset(0 0% 0 0)', duration: 0.9, ease: 'steps(22)' },
+            at,
+          )
+          .to($(li, '.b-ecart-txt'), { opacity: 1, duration: 0.4, ease: EASE.doux }, at + 0.8)
+          .to(
+            $(li, '.b-echeance'),
+            { autoAlpha: 1, scale: 1, duration: 0.4, ease: 'back.out(2)' },
+            at + 1,
+          );
       });
     }
   });
@@ -497,7 +541,9 @@ function telephone(ecr: HTMLElement, o: number) {
           duration: 0.3,
           ease: 'sine.inOut',
           yoyo: true,
-          repeat: 2 * Math.floor((message - t) / 0.6) - 1,
+          // At least one bounce: below 0.6 s this gave -1, an infinite repeat that made the whole
+          // place's timeline endless (César 01/10, tabs and scroll stopped working).
+          repeat: Math.max(1, 2 * Math.floor((message - t) / 0.6)) - 1,
           stagger: 0.12,
         },
         t,

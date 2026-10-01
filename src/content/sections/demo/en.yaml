@@ -68,13 +68,16 @@ lieux:
           titre: Fryer cleaning
           source: BunBun manual · Hygiene sheet
           blocs:
-            - type: version
-              avant:
-                version: v3
-                texte: Drain the oil once a week
-              apres:
-                version: v4
-                texte: Drain the oil every three days
+            - type: edition
+              version:
+                avant: v3
+                apres: v4
+              lignes:
+                - Switch off the fryer, let it cool for 30 min
+                - Drain the oil once a week
+                - Clean the tank with degreaser
+              modifiee: 1
+              apres: Drain the oil every three days
             - type: diffusion
               total: 30
               libelle: sites received v4
@@ -95,13 +98,16 @@ lieux:
               valeur: 92
               sur: 100
               libelle: Overall score
-            - type: ecarts
-              libelle: Action plan
-              items:
+            - type: plan
+              reflexion: Writing the action plan…
+              titre: Action plan · Lille
+              actions:
                 - ecart: Fridge temperatures not logged
-                  action: Log morning and evening, reminder to the team
+                  action: Log fridge temperatures morning and evening
+                  echeance: From tomorrow
                 - ecart: Missing use-by label
-                  action: Labels in place by Friday
+                  action: Label every tub at opening
+                  echeance: By Friday
 
   - surtitre: In the kitchen
     agents:
