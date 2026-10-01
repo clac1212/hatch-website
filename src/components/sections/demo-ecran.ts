@@ -1,4 +1,4 @@
-import type { EcranTablette, EcranTelephone } from '../../content/schemas/demo';
+import type { EcranTableau, EcranTablette, EcranTelephone } from '../../content/schemas/demo';
 
 /**
  * Beats of the animated screens (seconds from the start of a demo's content), derived from the copy
@@ -55,6 +55,12 @@ export function chronoTelephone(e: EcranTelephone) {
     brouillon?: number;
   };
   const fil = e.fil.map((item): Beat => {
+    if ('document' in item) {
+      // The agent's attachment lands right after its message.
+      const beat = { item, t: t - 0.4 };
+      t += 1.4;
+      return beat;
+    }
     if ('quiz' in item) {
       const beat = { item, t, choix: t + reflexion };
       t += reflexion + 1.1;
@@ -72,4 +78,30 @@ export function chronoTelephone(e: EcranTelephone) {
     return beat;
   });
   return { fil, frappe, suivi: t, duree: t + 2.6 };
+}
+
+/**
+ * Head-office dashboard (EcranTableau): the agent's line, the card resolving out of a skeleton,
+ * then each block plays its gesture in turn, for a length that suits it.
+ */
+const DUREE_BLOC: Record<EcranTableau['blocs'][number]['type'], number> = {
+  chiffres: 2.6,
+  alerte: 2.2,
+  version: 3.2,
+  diffusion: 3,
+  score: 2.4,
+  ecarts: 0,
+};
+export function chronoTableau(e: EcranTableau) {
+  const intro = 0.4;
+  const carte = intro + 0.9 + lecture(e.intro) * 0.6;
+  const resolu = carte + 1.1;
+  let t = resolu + 0.5;
+  const blocs = e.blocs.map((b) => {
+    const d = b.type === 'ecarts' ? 0.6 + b.items.length * 2.3 : DUREE_BLOC[b.type];
+    const beat = { t, d };
+    t += d;
+    return beat;
+  });
+  return { intro, carte, resolu, blocs, duree: t + 1.8 };
 }

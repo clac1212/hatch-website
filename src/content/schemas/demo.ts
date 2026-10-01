@@ -2,19 +2,10 @@ import { z } from 'astro/zod';
 
 const texte = z.string().min(1);
 
-/** One card: a two-message exchange, or a list of short lines signed by an agent. */
-const carte = z.union([
-  z.strictObject({
-    qui: texte,
-    texte: texte,
-    reponse: z.strictObject({ qui: texte, texte: texte }),
-  }),
-  z.strictObject({ lignes: z.array(z.strictObject({ agent: texte, texte: texte })).min(1) }),
-]);
-
 /**
- * Animated device mock-up (pilot, kitchen, 01/10): the demo plays on a screen instead of a card.
- * Beats are derived from the copy in src/components/sections/demo-ecran.ts.
+ * Each agent demo plays on a device mock-up (DemoEcran.astro): Owl's voice app on an iPad
+ * (`tablette`), a WhatsApp chat on an iPhone (`telephone`), or a head-office dashboard on an iPad
+ * (`tableau`). Beats are derived from the copy in src/components/sections/demo-ecran.ts.
  */
 /** Clock in the device's status bar, e.g. "15:02". */
 const heure = z.string().regex(/^\d{1,2}:\d{2}$/);
@@ -74,11 +65,15 @@ const ecranTelephone = z.strictObject({
   ecrit: texte,
   jour: texte,
   saisie: texte,
-  /** Conversation, in order: messages and one multiple-choice question. */
+  /**
+   * Conversation, in order: messages, a document the agent sends, a multiple-choice question.
+   * `equipe` is the phone's owner (right), `agent` the agent (left).
+   */
   fil: z
     .array(
       z.union([
         z.strictObject({ de: z.enum(['agent', 'equipe']), texte: texte }),
+        z.strictObject({ document: z.strictObject({ titre: texte, meta: texte }) }),
         z.strictObject({
           quiz: z
             .strictObject({
@@ -100,47 +95,98 @@ const ecranTelephone = z.strictObject({
   suivi: z.strictObject({ app: texte, quand: texte, titre: texte, texte: texte }),
 });
 
+/** A number that counts up on screen, with what it counts. */
+const chiffre = z.strictObject({ valeur: z.number().int().min(0), libelle: texte });
+
 /**
- * An agent demo inside a place, opened on demand. `cle` ties it to its marker and camera in
+ * Head-office dashboard on an iPad: the agent posts a line, then the UI it generates resolves,
+ * block by block. Each block type has its own visual and gesture (demo-motion.ts).
+ */
+const ecranTableau = z.strictObject({
+  appareil: z.literal('tableau'),
+  heure,
+  /** "Lark · Point du matin": app name, then the view. */
+  entete: texte,
+  statut: texte,
+  /** The agent's line above the generated card. */
+  intro: texte,
+  titre: texte,
+  source: texte,
+  blocs: z
+    .array(
+      z.discriminatedUnion('type', [
+        /** Key figures counting up. */
+        z.strictObject({ type: z.literal('chiffres'), items: z.array(chiffre).min(2).max(3) }),
+        /** Something to act on, with its button. */
+        z.strictObject({ type: z.literal('alerte'), texte, bouton: texte }),
+        /** A procedure line, before and after the update. */
+        z.strictObject({
+          type: z.literal('version'),
+          avant: z.strictObject({ version: texte, texte }),
+          apres: z.strictObject({ version: texte, texte }),
+        }),
+        /** Sent to N sites: dots light up as the count runs. */
+        z.strictObject({
+          type: z.literal('diffusion'),
+          total: z.number().int().min(1).max(60),
+          libelle: texte,
+        }),
+        /** A score out of a maximum, with its gauge. */
+        z.strictObject({
+          type: z.literal('score'),
+          valeur: z.number().int().min(0),
+          sur: z.number().int().min(1),
+          libelle: texte,
+        }),
+        /** Gaps found, each turned into an action. */
+        z.strictObject({
+          type: z.literal('ecarts'),
+          libelle: texte,
+          items: z
+            .array(z.strictObject({ ecart: texte, action: texte }))
+            .min(1)
+            .max(3),
+        }),
+      ]),
+    )
+    .min(1)
+    .max(3),
+});
+
+/**
+ * An agent demo inside a place. `cle` ties it to its cut-out and camera in Demo.astro; Sparrow
+ * has two (candidates, openings). `cle` ties it to its marker and camera in
  * Demo.astro; Sparrow has two (candidates, openings).
  */
-const demoAgent = z
-  .strictObject({
-    cle: z.enum([
-      'peep',
-      'lark',
-      'jay',
-      'finch',
-      'owl',
-      'pecker',
-      'sparrow-candidats',
-      'sparrow-ouverture',
-    ]),
-    /** Marker and menu label. */
-    nom: texte,
-    /** What the agent does here, in a few words (menu line). */
-    role: texte,
-    titre: texte,
-    /** Exactly one: a still card (demo opened on demand) or an animated screen (place in autoplay). */
-    carte: carte.optional(),
-    ecran: z.discriminatedUnion('appareil', [ecranTablette, ecranTelephone]).optional(),
-  })
-  .refine((a) => !a.carte !== !a.ecran, { message: 'An agent demo has either `carte` or `ecran`' });
+const demoAgent = z.strictObject({
+  cle: z.enum([
+    'peep',
+    'lark',
+    'jay',
+    'finch',
+    'owl',
+    'pecker',
+    'sparrow-candidats',
+    'sparrow-ouverture',
+  ]),
+  nom: texte,
+  /** What the agent does here, in a few words. */
+  role: texte,
+  /** What its demo shows, one sentence. */
+  titre: texte,
+  ecran: z.discriminatedUnion('appareil', [ecranTablette, ecranTelephone, ecranTableau]),
+});
 
 const lieu = z.strictObject({
   surtitre: texte,
-  titre: texte,
-  /** Back button label, from an agent demo to the wide shot. */
-  retour: texte,
   agents: z.array(demoAgent).min(1),
 });
 
 export const schema = z.strictObject({
   titre: texte,
-  /** Menu card heading, inviting to pick an agent. */
-  consigne: texte,
   lieux: z.array(lieu).length(3),
 });
 
 export type EcranTablette = z.infer<typeof ecranTablette>;
 export type EcranTelephone = z.infer<typeof ecranTelephone>;
+export type EcranTableau = z.infer<typeof ecranTableau>;

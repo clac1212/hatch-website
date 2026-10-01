@@ -309,7 +309,145 @@ function ticket(v: HTMLElement, t: number, tl: gsap.core.Timeline, b: gsap.core.
     );
 }
 
-/** Pecker's WhatsApp chat: typing, replies typed then sent, the poll voted, head office notified. */
+/** Plain numbers in the page's language (dashboard figures count up). */
+const nombre = new Intl.NumberFormat(document.documentElement.lang || 'fr').format;
+
+/** A figure counts from 0 to its `data-valeur`, between `t` and `t + d`. */
+function compter(el: HTMLElement, t: number, d: number, b: gsap.core.Timeline) {
+  const cible = Number(el.dataset.valeur);
+  const n = { v: 0 };
+  const ecrire = () => (el.textContent = nombre(Math.round(n.v)));
+  // Back to zero just before it shows, then up to its value.
+  b.fromTo(
+    n,
+    { v: 0 },
+    { v: 0, duration: 0.01, onUpdate: ecrire, immediateRender: false },
+    t - 0.4,
+  );
+  b.to(n, { v: cible, duration: d, ease: 'power2.out', onUpdate: ecrire }, t);
+}
+
+/**
+ * Head-office dashboard (EcranTableau.astro): the agent's line pops in, the card opens on a
+ * skeleton and resolves, then each block plays its gesture on its beat.
+ */
+function tableau(ecr: HTMLElement, o: number) {
+  const tl = gsap.timeline();
+  const b = gsap.timeline();
+  const intro = $(ecr, '.b-intro');
+  const carte = $(ecr, '.b-carte');
+  const squelette = $(ecr, '.b-squelette');
+  const os = $$(ecr, '.b-squelette span');
+  const tete = $(ecr, '.b-tete');
+  const blocs = $$(ecr, '.b-bloc');
+
+  tl.set(intro, { autoAlpha: 0, scale: 0.92, y: 8 }, 0)
+    .set(carte, { autoAlpha: 0, y: 14 }, 0)
+    .set(squelette, { opacity: 1 }, 0)
+    .set(os, { opacity: 1 }, 0)
+    .set([tete, ...blocs], { autoAlpha: 0, y: 8, filter: 'blur(6px)' }, 0);
+
+  const tIntro = temps(ecr, 'intro');
+  const tCarte = temps(ecr, 'carte');
+  const tResolu = temps(ecr, 'resolu');
+  b.to(intro, { autoAlpha: 1, scale: 1, y: 0, duration: 0.5, ease: 'back.out(1.2)' }, tIntro)
+    .to(carte, { autoAlpha: 1, y: 0, duration: 0.7, ease: EASE.entree }, tCarte)
+    .to(
+      os,
+      {
+        opacity: 0.45,
+        duration: 0.35,
+        ease: 'sine.inOut',
+        yoyo: true,
+        repeat: 2 * Math.ceil((tResolu - tCarte) / 0.7) - 1,
+        stagger: 0.07,
+      },
+      tCarte,
+    )
+    .to(squelette, { opacity: 0, duration: 0.3, ease: EASE.sortie }, tResolu)
+    .to(
+      tete,
+      { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.6, ease: EASE.entree },
+      tResolu + 0.05,
+    );
+
+  blocs.forEach((bloc) => {
+    const t = temps(bloc);
+    b.to(bloc, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.6, ease: EASE.entree }, t);
+    const type = bloc.dataset.type;
+    if (type === 'chiffres') {
+      const tuiles = $$(bloc, '.b-tuile');
+      tl.set(tuiles, { autoAlpha: 0, y: 10 }, 0);
+      tuiles.forEach((tuile, j) => {
+        b.to(tuile, { autoAlpha: 1, y: 0, duration: 0.5, ease: EASE.entree }, t + 0.1 + j * 0.15);
+        compter($(tuile, '.b-valeur'), t + 0.2 + j * 0.15, 1.3, b);
+      });
+    } else if (type === 'alerte') {
+      const bouton = $(bloc, '.b-bouton');
+      tl.set($(bloc, '.b-bouton-txt'), { opacity: 1 }, 0)
+        .set($(bloc, '.b-bouton-ok'), { autoAlpha: 0, scale: 0.4 }, 0)
+        .set($(bloc, '.b-alerte-icone'), { scale: 1 }, 0);
+      b.to(
+        $(bloc, '.b-alerte-icone'),
+        { scale: 1.15, duration: 0.25, ease: 'sine.inOut', yoyo: true, repeat: 3 },
+        t + 0.3,
+      )
+        .to(
+          bouton,
+          { scale: 0.92, duration: 0.12, ease: 'power1.inOut', yoyo: true, repeat: 1 },
+          t + 1.3,
+        )
+        .to($(bloc, '.b-bouton-txt'), { opacity: 0, duration: 0.15 }, t + 1.45)
+        .to(
+          $(bloc, '.b-bouton-ok'),
+          { autoAlpha: 1, scale: 1, duration: 0.4, ease: 'back.out(2)' },
+          t + 1.5,
+        );
+    } else if (type === 'version') {
+      const avant = $(bloc, '.b-avant');
+      const apres = $(bloc, '.b-apres');
+      tl.set([avant, apres], { autoAlpha: 0, x: -10 }, 0)
+        .set($(bloc, '.b-rature'), { scaleX: 0 }, 0)
+        .set($(bloc, '.b-surligne'), { scaleX: 0 }, 0);
+      b.to(avant, { autoAlpha: 1, x: 0, duration: 0.5, ease: EASE.entree }, t + 0.1)
+        .to($(bloc, '.b-rature'), { scaleX: 1, duration: 0.5, ease: EASE.doux }, t + 0.9)
+        .to(apres, { autoAlpha: 1, x: 0, duration: 0.5, ease: EASE.entree }, t + 1.4)
+        .to($(bloc, '.b-surligne'), { scaleX: 1, duration: 0.7, ease: EASE.doux }, t + 1.7);
+    } else if (type === 'diffusion') {
+      const sites = $$(bloc, '.b-sites span');
+      tl.set(sites, { opacity: 0.18, scale: 0.6 }, 0);
+      compter($(bloc, '.b-valeur'), t + 0.3, 1.8, b);
+      b.to(
+        sites,
+        { opacity: 1, scale: 1, duration: 0.25, ease: 'back.out(2)', stagger: 1.8 / sites.length },
+        t + 0.3,
+      );
+    } else if (type === 'score') {
+      tl.set($(bloc, '.b-jauge span'), { scaleX: 0 }, 0);
+      compter($(bloc, '.b-valeur'), t + 0.2, 1.4, b);
+      const p = Number($(bloc, '.b-jauge span').dataset.p);
+      b.to($(bloc, '.b-jauge span'), { scaleX: p, duration: 1.4, ease: 'power2.out' }, t + 0.2);
+    } else if (type === 'ecarts') {
+      $$(bloc, '.b-ecart').forEach((ecart, j) => {
+        const at = t + 0.5 + j * 2.3;
+        const [pb, fleche, action] = [
+          $(ecart, '.b-pb'),
+          $(ecart, '.b-fleche'),
+          $(ecart, '.b-action'),
+        ];
+        tl.set(pb, { autoAlpha: 0, x: -10 }, 0)
+          .set(fleche, { autoAlpha: 0, x: -6 }, 0)
+          .set(action, { autoAlpha: 0, x: -14, scale: 0.96 }, 0);
+        b.to(pb, { autoAlpha: 1, x: 0, duration: 0.5, ease: EASE.entree }, at)
+          .to(fleche, { autoAlpha: 1, x: 0, duration: 0.4, ease: EASE.doux }, at + 0.8)
+          .to(action, { autoAlpha: 1, x: 0, scale: 1, duration: 0.6, ease: EASE.entree }, at + 1.1);
+      });
+    }
+  });
+  return tl.add(b, o);
+}
+
+/** A WhatsApp chat (Peep, Pecker, Sparrow): typing, replies typed then sent, the poll voted, head office notified. */
 function telephone(ecr: HTMLElement, o: number) {
   const tl = gsap.timeline();
   const b = gsap.timeline();
@@ -568,11 +706,14 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
         .to($(ecr, '.reflet'), { opacity: 1, duration: 0.5, ease: 'power1.out' }, a + 0.2)
         .to($(ecr, '.reflet'), { opacity: 0, duration: 0.6, ease: 'power1.in' }, a + 1.1);
       // 3. The screen plays; meanwhile the camera keeps a slow push-in so the scene never freezes.
-      s.add(ecr.classList.contains('tablette') ? tablette(ecr, c) : telephone(ecr, c), 0).to(
-        calque,
-        { '--z': cam['--z'] * DERIVE, duration: duree, ease: 'sine.inOut' },
-        c,
-      );
+      s.add(
+        ecr.classList.contains('tablette')
+          ? tablette(ecr, c)
+          : ecr.classList.contains('tableau')
+            ? tableau(ecr, c)
+            : telephone(ecr, c),
+        0,
+      ).to(calque, { '--z': cam['--z'] * DERIVE, duration: duree, ease: 'sine.inOut' }, c);
       // 4. Exit, shorter than the entrance. A card beside the device (head office's notification)
       //    leaves first, on its own path, so the two read as separate things, not one block.
       const aCote = ecr.querySelector<HTMLElement>('.p-suivi');

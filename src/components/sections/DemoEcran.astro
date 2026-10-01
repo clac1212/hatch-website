@@ -1,22 +1,24 @@
 ---
 /**
- * Device mock-up of an agent demo (kitchen, César 01/10): an iPad running Owl's kitchen app, or an
- * iPhone 17 Pro in a WhatsApp chat with Pecker. Frames come from ui/Ipad and ui/Iphone (traced SVG);
- * the screens are real HTML. Owl answers with generated UI: a small app that shows each step (a
- * keypad typed on, notes counted, a receipt printed) while it speaks the answer.
+ * Device mock-up of an agent demo (César 01/10): an iPad running Owl's kitchen app, an iPhone 17 Pro
+ * in a WhatsApp chat (Peep, Pecker, Sparrow), or a head-office dashboard (EcranTableau.astro).
+ * Frames come from ui/Ipad and ui/Iphone (traced SVG); the screens are real HTML. Owl answers with
+ * generated UI: a small app that shows each step (a keypad typed on, notes counted, a receipt
+ * printed) while it speaks the answer.
  * The markup renders the FINAL state, which is what shows without JS and under reduced motion. The
  * GSAP timeline (demo-motion.ts) hides and reveals each element on its beat (`data-t`, from
  * demo-ecran.ts); nothing here animates on its own.
  */
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
-import type { EcranTablette, EcranTelephone } from '../../content/schemas/demo';
+import type { EcranTableau, EcranTablette, EcranTelephone } from '../../content/schemas/demo';
 import { chronoTablette, chronoTelephone } from './demo-ecran';
 import Ipad from '../ui/Ipad.astro';
 import Iphone from '../ui/Iphone.astro';
+import EcranTableau from './EcranTableau.astro';
 
 interface Props {
-  ecran: EcranTablette | EcranTelephone;
+  ecran: EcranTablette | EcranTelephone | EcranTableau;
   avatar: ImageMetadata;
 }
 const { ecran, avatar } = Astro.props;
@@ -58,8 +60,11 @@ const I = {
     'M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4zM9 2 7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z',
   envoi: 'M2.01 21 23 12 2.01 3 2 10l15 2-15 2z',
   liste: 'M3 5h2v2H3zm4 0h14v2H7zM3 11h2v2H3zm4 0h14v2H7zm-4 6h2v2H3zm4 0h14v2H7z',
+  doc: 'M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z',
 };
 ---
+
+{ecran.appareil === 'tableau' && <EcranTableau ecran={ecran} avatar={avatar} />}
 
 {
   ecran.appareil === 'tablette' && tab && (
@@ -320,7 +325,24 @@ const I = {
           <div class="p-fil">
             <p class="p-jour">{ecran.jour}</p>
             {tel.fil.map((b) =>
-              'quiz' in b.item ? (
+              'document' in b.item ? (
+                <div class="p-ligne agent" data-t={s(b.t)}>
+                  <div class="p-msg p-doc">
+                    <span class="p-doc-fichier">
+                      <span class="p-doc-icone" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                          <path d={I.doc} />
+                        </svg>
+                      </span>
+                      <span class="p-doc-txt">
+                        <b>{b.item.document.titre}</b>
+                        <span>{b.item.document.meta}</span>
+                      </span>
+                    </span>
+                    <span class="p-meta">{ecran.heure}</span>
+                  </div>
+                </div>
+              ) : 'quiz' in b.item ? (
                 <div class="p-ligne agent" data-t={s(b.t)} data-c={s(b.choix ?? b.t)}>
                   <div class="p-msg p-sondage">
                     <p class="p-question">{b.item.quiz.question}</p>
@@ -393,7 +415,7 @@ const I = {
               {tel.fil.map(
                 (b) =>
                   b.brouillon !== undefined &&
-                  !('quiz' in b.item) && (
+                  'texte' in b.item && (
                     <span class="p-brouillon" data-t={s(b.brouillon)} data-envoi={s(b.t)}>
                       {b.item.texte}
                     </span>
@@ -1216,6 +1238,45 @@ const I = {
     height: calc(8 * var(--pt));
     border-radius: 999px;
     background: var(--color-gray-400);
+  }
+  /* A document the agent sends: a file card inside its bubble. */
+  .p-doc {
+    width: 78%;
+  }
+  .p-doc-fichier {
+    display: flex;
+    align-items: center;
+    gap: calc(10 * var(--pt));
+    padding: calc(10 * var(--pt));
+    border-radius: calc(10 * var(--pt));
+    background: var(--color-cream-2);
+  }
+  .p-doc-icone {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: calc(36 * var(--pt));
+    height: calc(44 * var(--pt));
+    border-radius: calc(6 * var(--pt));
+    background: var(--color-orange);
+  }
+  .p-doc-icone svg {
+    width: calc(22 * var(--pt));
+    fill: var(--color-ink);
+  }
+  .p-doc-txt {
+    display: flex;
+    flex-direction: column;
+    gap: calc(2 * var(--pt));
+    min-width: 0;
+    line-height: 1.25;
+  }
+  .p-doc-txt b {
+    font-weight: 600;
+  }
+  .p-doc-txt span {
+    font-size: calc(13 * var(--pt));
+    color: var(--color-muted);
   }
   /* The quiz as a WhatsApp poll. Final state: the right option voted. */
   .p-sondage {
