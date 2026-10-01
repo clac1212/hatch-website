@@ -10,13 +10,19 @@ import { gsap } from 'gsap';
  * Reduced motion: no timeline; a tab shows its demo's final state, the camera cuts.
  */
 
+/**
+ * Shared with the CSS motion tokens in global.css (`--ease-*`, same curves as cubic-beziers, used
+ * by the hero). GSAP keeps its native eases: reading the tokens would need CustomEase, for no
+ * visible difference. Small pops (checks, chips) use `back.out` ≈ `--ease-pop`.
+ */
 const EASE = {
-  /** Camera travel: slow out, slow in. */
+  /** Camera travel: slow out, slow in. `--ease-camera` */
   camera: 'power3.inOut',
-  /** Something arrives: fast then settles (expo-like, no bounce). */
+  /** Something arrives: fast then settles, no bounce. `--ease-entree` */
   entree: 'expo.out',
-  /** Something leaves: accelerates out, shorter. */
+  /** Something leaves: accelerates out, shorter. `--ease-sortie` */
   sortie: 'power2.in',
+  /** Fades and small state changes. `--ease-doux` */
   doux: 'power2.out',
 };
 /** Seconds: camera travel, device entrance start, content start, device exit. */
