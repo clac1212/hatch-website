@@ -65,9 +65,20 @@ lieux:
           fiche: Ouverture de caisse
           source: Manuel BunBun · fiche Caisse v4
           etapes:
-            - Saisis ton code manager sur l'écran
-            - Compte le fond de caisse, 150 €
-            - Valide l'ouverture, le ticket sort
+            - visuel: code
+              texte: Saisis ton code manager sur l'écran
+              libelle: Code manager
+            - visuel: caisse
+              texte: Compte le fond de caisse, 150 €
+              libelle: Fond de caisse
+              billets: [50, 50, 20, 20, 10]
+            - visuel: ticket
+              texte: Valide l'ouverture, le ticket sort
+              bouton: Valider l'ouverture
+              lignes:
+                - BunBun · Caisse 1
+                - Ouverture 15:02
+                - Fond 150,00 €
           compteur: Étape {n} sur {total}
           pied: Lu à voix haute, étape par étape
       - cle: pecker

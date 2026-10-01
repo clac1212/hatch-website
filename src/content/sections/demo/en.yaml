@@ -65,9 +65,20 @@ lieux:
           fiche: Opening the till
           source: BunBun manual · Till sheet v4
           etapes:
-            - Enter your manager code on the screen
-            - Count the cash float, €150
-            - Confirm the opening, the receipt prints
+            - visuel: code
+              texte: Enter your manager code on the screen
+              libelle: Manager code
+            - visuel: caisse
+              texte: Count the cash float, €150
+              libelle: Cash float
+              billets: [50, 50, 20, 20, 10]
+            - visuel: ticket
+              texte: Confirm the opening, the receipt prints
+              bouton: Confirm opening
+              lignes:
+                - BunBun · Till 1
+                - Opened 15:02
+                - Float €150.00
           compteur: Step {n} of {total}
           pied: Read out loud, step by step
       - cle: pecker

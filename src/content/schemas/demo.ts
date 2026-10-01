@@ -33,7 +33,31 @@ const ecranTablette = z.strictObject({
   /** Procedure sheet the agent answers with, and where it comes from. */
   fiche: texte,
   source: texte,
-  etapes: z.array(texte).min(2).max(4),
+  /**
+   * The procedure, as the UI Owl generates to explain it: each step carries a small visual (a
+   * keypad being typed on, a cash count, a receipt printing) chosen by `visuel`.
+   */
+  etapes: z
+    .array(
+      z.discriminatedUnion('visuel', [
+        z.strictObject({ visuel: z.literal('code'), texte, libelle: texte }),
+        z.strictObject({
+          visuel: z.literal('caisse'),
+          texte,
+          libelle: texte,
+          /** Banknotes counted, in euros; the total is their sum. */
+          billets: z.array(z.number().int().positive()).min(1).max(6),
+        }),
+        z.strictObject({
+          visuel: z.literal('ticket'),
+          texte,
+          bouton: texte,
+          lignes: z.array(texte).min(1).max(4),
+        }),
+      ]),
+    )
+    .min(2)
+    .max(4),
   /** Step counter, with `{n}` (current step) and `{total}`. */
   compteur: texte.refine((c) => c.includes('{n}') && c.includes('{total}'), {
     message: '`compteur` needs {n} and {total}',

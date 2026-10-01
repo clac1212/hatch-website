@@ -6,8 +6,8 @@ import type { EcranTablette, EcranTelephone } from '../../content/schemas/demo';
  * GSAP timeline (demo-motion.ts) places each gesture on its beat. `duree` = content length.
  */
 
-/** Reading time of a line: ~1 s to find it, then ~250 ms per word (≈ 22 characters per second). */
-const lecture = (texte: string) => 1.2 + texte.length / 22;
+/** Reading time of a line: a short beat to find it, then ~26 characters per second (César 01/10: faster). */
+const lecture = (texte: string) => 0.8 + texte.length / 26;
 
 export function chronoTablette(e: EcranTablette) {
   const mots = e.question.split(' ');
@@ -19,7 +19,8 @@ export function chronoTablette(e: EcranTablette) {
   const prepare = reponse + 0.2;
   const resolu = prepare + 1.3;
   const voix = resolu + 0.7;
-  const parEtape = 2.2;
+  /** Each step's visual plays its gesture (keys typed, notes counted, receipt printed). */
+  const parEtape = 2.9;
   const etapes = e.etapes.map((_, i) => voix + 0.3 + i * parEtape);
   const finVoix = voix + 0.3 + e.etapes.length * parEtape;
   return {
@@ -38,10 +39,10 @@ export function chronoTablette(e: EcranTablette) {
 
 export function chronoTelephone(e: EcranTelephone) {
   /** Typing indicator shown before each agent message. */
-  const frappe = 1;
+  const frappe = 0.7;
   /** Delay before the right option gets tapped, then before the next beat. */
-  const reflexion = 2.2;
-  let t = 0.5;
+  const reflexion = 1.5;
+  let t = 0.3;
   /**
    * `choix` = when the right option is tapped (quiz); `frappe` = typing indicator (agent message);
    * `brouillon` = the team member types the reply in the input bar before sending it.
@@ -56,7 +57,7 @@ export function chronoTelephone(e: EcranTelephone) {
   const fil = e.fil.map((item): Beat => {
     if ('quiz' in item) {
       const beat = { item, t, choix: t + reflexion };
-      t += reflexion + 1.6;
+      t += reflexion + 1.1;
       return beat;
     }
     if (item.de === 'agent') {
@@ -64,11 +65,11 @@ export function chronoTelephone(e: EcranTelephone) {
       t += frappe + lecture(item.texte);
       return beat;
     }
-    // Typed at ~50 ms per character, then sent.
-    const saisie = 0.5 + item.texte.length * 0.05;
+    // Typed at ~35 ms per character, then sent.
+    const saisie = 0.3 + item.texte.length * 0.035;
     const beat = { item, t: t + saisie, brouillon: t };
     t += saisie + lecture(item.texte);
     return beat;
   });
-  return { fil, frappe, suivi: t, duree: t + 3.2 };
+  return { fil, frappe, suivi: t, duree: t + 2.6 };
 }

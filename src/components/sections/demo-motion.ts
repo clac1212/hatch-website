@@ -40,10 +40,18 @@ const $ = (racine: Element, sel: string) => racine.querySelector<HTMLElement>(se
 const $$ = (racine: Element, sel: string) => [...racine.querySelectorAll<HTMLElement>(sel)];
 const temps = (el: HTMLElement, cle = 't') => Number(el.dataset[cle]);
 
+/** Amounts in the page's language (the "caisse" visual counts up). */
+const euros = new Intl.NumberFormat(document.documentElement.lang || 'fr', {
+  style: 'currency',
+  currency: 'EUR',
+  maximumFractionDigits: 0,
+}).format;
+
 /**
  * Owl's iPad app. The question is heard (voice bubble, waveform, words), then Owl answers twice at
- * once: it generates the procedure as UI (skeleton, then the sheet resolves in place) and speaks it
- * (audio pill); the step being spoken is highlighted, then checked.
+ * once: it speaks the procedure (audio pill) and generates a small app that shows it — a rail of
+ * steps and a stage where each step plays as a visual (keypad, cash count, receipt) while it is
+ * spoken.
  */
 function tablette(ecr: HTMLElement, o: number) {
   const tl = gsap.timeline();
@@ -63,10 +71,11 @@ function tablette(ecr: HTMLElement, o: number) {
   const eq = $$(ecr, '.t-eq span');
   const carte = $(ecr, '.t-carte');
   const squelette = $(ecr, '.t-squelette');
-  const os = $$(ecr, '.t-squelette span');
+  const os = $$(ecr, '.t-squelette span:not(.s-rail)');
   const contenu = $(ecr, '.t-contenu');
-  const morceaux = [$(ecr, '.t-source'), $(ecr, '.t-titre'), ...$$(ecr, '.t-etapes li')];
-  const etapes = $$(ecr, '.t-etapes li');
+  const morceaux = [$(ecr, '.t-tete'), ...$$(ecr, '.t-rail li'), $(ecr, '.t-scene')];
+  const etapes = $$(ecr, '.t-rail li');
+  const visuels = $$(ecr, '.t-visuel');
   const roue = $(ecr, '.t-roue');
   const [ecoute, prepa, lit] = [$(ecr, '.t-ecoute'), $(ecr, '.t-prepare'), $(ecr, '.t-lit')];
 
@@ -89,7 +98,9 @@ function tablette(ecr: HTMLElement, o: number) {
     .set($$(ecr, '.t-num'), { opacity: 1 }, 0)
     .set($$(ecr, '.t-fait'), { autoAlpha: 0, scale: 0.4 }, 0)
     .set($$(ecr, '.t-lu'), { scaleX: 0, opacity: 1 }, 0)
-    .set(roue, { yPercent: 0, y: 0 }, 0);
+    .set(roue, { yPercent: 0, y: 0 }, 0)
+    .set(visuels, { autoAlpha: 0, x: 0 }, 0)
+    .set(visuels[0], { autoAlpha: 1 }, 0);
 
   // 1. Listening: the bubble opens, the live dot blinks, the waveform follows the voice, the
   //    words land one by one.
@@ -128,7 +139,8 @@ function tablette(ecr: HTMLElement, o: number) {
     b.to(m, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.45, ease: EASE.doux }, temps(m)),
   );
 
-  // 2. Generating: status "preparing", the card opens on a pulsing skeleton...
+  // 2. Generating: status "preparing", the card opens on a pulsing skeleton, then the small app
+  //    resolves in place, piece by piece, out of a blur.
   b.to(ecoute, { opacity: 0, duration: 0.2 }, prepare)
     .to(prepa, { opacity: 1, duration: 0.3 }, prepare + 0.1)
     .to(carte, { autoAlpha: 1, y: 0, duration: 0.7, ease: EASE.entree }, prepare)
@@ -140,16 +152,15 @@ function tablette(ecr: HTMLElement, o: number) {
         ease: 'sine.inOut',
         yoyo: true,
         repeat: 2 * Math.ceil((resolu - prepare) / 0.7) - 1,
-        stagger: 0.08,
+        stagger: 0.06,
       },
       prepare,
-    );
-  // ...then the sheet resolves in place, piece by piece, out of a blur.
-  b.to(squelette, { opacity: 0, duration: 0.3, ease: EASE.sortie }, resolu)
+    )
+    .to(squelette, { opacity: 0, duration: 0.3, ease: EASE.sortie }, resolu)
     .set(contenu, { opacity: 1 }, resolu)
     .to(
       morceaux,
-      { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.6, ease: EASE.entree, stagger: 0.09 },
+      { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.6, ease: EASE.entree, stagger: 0.08 },
       resolu + 0.05,
     );
 
@@ -174,10 +185,12 @@ function tablette(ecr: HTMLElement, o: number) {
     ),
   );
 
-  // 4. The step being spoken: tinted, its reading bar fills, the counter rolls, then a check.
-  const lu = etape * 0.85;
+  // 4. Each step, as it is spoken: its rail line lights up and its reading bar fills, the stage
+  //    switches to its visual, which plays its gesture; then the line gets its check.
+  const lu = etape * 0.9;
   etapes.forEach((li, i) => {
     const t = temps(li);
+    const v = visuels[i];
     b.to($(li, '.t-surligne'), { opacity: 1, duration: 0.3, ease: EASE.doux }, t)
       .to($(li, '.t-lu'), { scaleX: 1, duration: lu, ease: 'none' }, t)
       .to($(li, '.t-surligne'), { opacity: 0, duration: 0.3, ease: EASE.sortie }, t + lu)
@@ -188,14 +201,101 @@ function tablette(ecr: HTMLElement, o: number) {
         { autoAlpha: 1, scale: 1, duration: 0.45, ease: 'back.out(2)' },
         t + lu,
       );
-    if (i > 0)
+    if (i > 0) {
       b.to(
         roue,
         { yPercent: (-100 * i) / etapes.length, duration: 0.5, ease: EASE.camera },
         t - 0.1,
-      );
+      )
+        .to(visuels[i - 1], { autoAlpha: 0, x: -24, duration: 0.3, ease: EASE.sortie }, t - 0.2)
+        .fromTo(
+          v,
+          { autoAlpha: 0, x: 24 },
+          { autoAlpha: 1, x: 0, duration: 0.6, ease: EASE.entree, immediateRender: false },
+          t + 0.05,
+        );
+    }
+    const visuel = v.dataset.visuel;
+    if (visuel === 'code') code(v, t, tl, b);
+    else if (visuel === 'caisse') caisse(v, t, tl, b);
+    else if (visuel === 'ticket') ticket(v, t, tl, b);
   });
   return tl.add(b, o);
+}
+
+/** Visual "code": four keys pressed (a dot fills each time), then OK; the display shows a check. */
+function code(v: HTMLElement, t: number, tl: gsap.core.Timeline, b: gsap.core.Timeline) {
+  const points = $$(v, '.v-points span');
+  const ok = $(v, '.v-ok');
+  tl.set($(v, '.v-points'), { opacity: 1 }, 0)
+    .set(points, { scale: 0, opacity: 0.25 }, 0)
+    .set(ok, { autoAlpha: 0, scale: 0.4 }, 0)
+    .set($$(v, '.v-appui'), { opacity: 0 }, 0)
+    .set($$(v, '.v-touche'), { y: 0 }, 0);
+  const presser = (k: string, at: number) => {
+    const touche = $(v, `.v-touche[data-k="${k}"]`);
+    b.to($(touche, '.v-appui'), { opacity: 1, duration: 0.06 }, at)
+      .to(touche, { y: 1, duration: 0.06, yoyo: true, repeat: 1 }, at)
+      .to($(touche, '.v-appui'), { opacity: 0, duration: 0.3 }, at + 0.12);
+  };
+  ['1', '9', '4', '7'].forEach((k, j) => {
+    const at = t + 0.45 + j * 0.3;
+    presser(k, at);
+    b.to(points[j], { scale: 1, opacity: 1, duration: 0.25, ease: 'back.out(2.5)' }, at + 0.04);
+  });
+  presser('ok', t + 1.85);
+  b.to($(v, '.v-points'), { opacity: 0, duration: 0.2 }, t + 2).to(
+    ok,
+    { autoAlpha: 1, scale: 1, duration: 0.4, ease: 'back.out(2)' },
+    t + 2.05,
+  );
+}
+
+/** Visual "caisse": notes land one by one, the float counts up, the gauge fills to the target. */
+function caisse(v: HTMLElement, t: number, tl: gsap.core.Timeline, b: gsap.core.Timeline) {
+  const billets = $$(v, '.v-billet');
+  const montant = $(v, '.v-montant');
+  const jauge = $(v, '.v-jauge span');
+  const total = Number(v.querySelector<HTMLElement>('.v-caisse')!.dataset.total);
+  const compte = { v: 0 };
+  const ecrire = () => (montant.textContent = euros(Math.round(compte.v)));
+  tl.set(billets, { autoAlpha: 0, y: -30 }, 0).set(jauge, { scaleX: 0 }, 0);
+  // Before the visual shows, its count is back to zero.
+  b.fromTo(
+    compte,
+    { v: 0 },
+    { v: 0, duration: 0.01, onUpdate: ecrire, immediateRender: false },
+    t - 0.5,
+  );
+  let cumul = 0;
+  billets.forEach((billet, j) => {
+    const at = t + 0.4 + j * 0.32;
+    cumul += Number(billet.dataset.v);
+    b.to(billet, { autoAlpha: 1, y: 0, duration: 0.45, ease: EASE.entree }, at)
+      .to(compte, { v: cumul, duration: 0.3, ease: EASE.doux, onUpdate: ecrire }, at + 0.1)
+      .to(jauge, { scaleX: cumul / total, duration: 0.3, ease: EASE.doux }, at + 0.1);
+  });
+}
+
+/** Visual "ticket": the confirm button is pressed, then the receipt prints out of the slot. */
+function ticket(v: HTMLElement, t: number, tl: gsap.core.Timeline, b: gsap.core.Timeline) {
+  const bouton = $(v, '.v-bouton');
+  const recu = $(v, '.v-recu');
+  const tampon = $(v, '.v-tampon');
+  tl.set(recu, { clipPath: 'inset(0 0 100% 0)', y: '-40%' }, 0)
+    .set(tampon, { autoAlpha: 0, scale: 1.6, rotation: -12 }, 0)
+    .set(bouton, { scale: 1 }, 0);
+  b.to(
+    bouton,
+    { scale: 0.93, duration: 0.12, ease: 'power1.inOut', yoyo: true, repeat: 1 },
+    t + 0.4,
+  )
+    .to(recu, { clipPath: 'inset(0 0 0% 0)', y: '0%', duration: 1.2, ease: 'power1.out' }, t + 0.65)
+    .to(
+      tampon,
+      { autoAlpha: 1, scale: 1, rotation: 0, duration: 0.4, ease: 'back.out(2)' },
+      t + 1.95,
+    );
 }
 
 /** Pecker's WhatsApp chat: typing, replies typed then sent, the poll voted, head office notified. */
