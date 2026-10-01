@@ -769,18 +769,16 @@ for (const l of lieux) {
   .d2-lieu.auto .d2-calque {
     transition: none;
   }
-  /* The agent's reaction (squash and stretch from its feet), driven by --saut in the timeline. */
+  /* The cut-out agents stay still: their soft-edged patches show as soon as they move. */
   .d2-lieu.auto .d2-calque :global(.d2-agent) {
-    --saut: 0;
-    scale: 1 calc(1 + var(--saut) * 0.05);
-    transition: none;
+    animation: none;
   }
-  /* Focus: the scene dims, the agent on stage is lifted above this layer (z-index, timeline). */
+  /* Focus: the whole scene dims, agents included, so the device is the subject. */
   .d2-voile {
     position: absolute;
     inset: 0;
     z-index: 2;
-    background: color-mix(in srgb, var(--color-night) 32%, transparent);
+    background: color-mix(in srgb, var(--color-night) 40%, transparent);
     opacity: 0;
     pointer-events: none;
   }
@@ -899,10 +897,10 @@ for (const l of lieux) {
     visibility: visible;
   }
   .d2-ecran.tablette {
-    width: min(620px, 43vw);
+    width: min(700px, 47vw, 108svh);
   }
   .d2-ecran.telephone {
-    width: min(310px, 23vw, 33svh);
+    width: min(330px, 24vw, 37svh);
   }
 
   @media (max-width: 47.99rem) {

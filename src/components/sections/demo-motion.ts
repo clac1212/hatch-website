@@ -3,8 +3,8 @@ import { gsap } from 'gsap';
 /**
  * Motion design of an autoplay place (kitchen pilot, 01/10): one GSAP timeline per place plays its
  * agent demos in turn, in a loop. Choreography rules (research 01/10, Emil Kowalski, Material 3,
- * Apple, Stripe): one focal motion at a time — the camera travels to the agent, the scene dims
- * around it, the agent reacts, its device enters from its side, then the screen plays its beats
+ * Apple, Stripe): one focal motion at a time — the camera travels to the agent, the scene dims,
+ * the agent's device enters from its side, then the screen plays its beats
  * (DemoEcran.astro `data-t`). Exits are shorter than entrances. The timeline also drives the tabs'
  * progress bars, so pause, tab clicks and the loop stay in sync.
  * Reduced motion: no timeline; a tab shows its demo's final state, the camera cuts.
@@ -445,7 +445,6 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
   const barres = onglets.map((o) => $(o, '.d2-barre > span'));
   const vue = lireCam(lieu.dataset.vue!);
   const cams = ecrans.map((e) => lireCam(e.dataset.cam!));
-  const agents = ecrans.map((e) => $(lieu, `.d2-agent[data-cles~="${e.dataset.cle}"]`));
 
   let tl: gsap.core.Timeline | null = null;
   let debuts: number[] = [];
@@ -469,8 +468,7 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
   }
 
   function construire(mobile: boolean) {
-    // On phones the device covers the agent: the agent gets the stage alone for a beat first.
-    const { appareil, contenu } = mobile ? { appareil: 1.8, contenu: 2.2 } : T;
+    const { appareil, contenu } = T;
     const m = gsap.timeline({
       paused: true,
       repeat: scroll ? 0 : -1,
@@ -495,19 +493,15 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
       const duree = Number(ecr.dataset.duree);
       const s = gsap.timeline();
       const cam = cams[i];
-      const agent = agents[i];
-      // 1. The camera travels to the agent; the focus layer lifts it above the dimmed scene.
+      // 1. The camera travels to the agent, under the dimmed layer: the scene is only the setting,
+      //    the device is the subject (César 01/10: the cut-out agent must not move or stand out).
       s.fromTo(
         calque,
         i === 0 ? vue : { ...cams[i - 1], '--z': cams[i - 1]['--z'] * DERIVE },
         { ...cam, duration: T.camera, ease: EASE.camera, immediateRender: false },
         0,
-      ).set(agent, { zIndex: 3 }, 0);
-      // 2. The agent reacts as the camera lands: squash, stretch, settle.
-      s.to(agent, { '--saut': -1, duration: 0.14, ease: 'power2.out' }, T.camera - 0.35)
-        .to(agent, { '--saut': 1, duration: 0.2, ease: 'power2.out' }, '>')
-        .to(agent, { '--saut': 0, duration: 0.45, ease: 'power2.inOut' }, '>');
-      // 3. Its device enters from its side (left of the device on desktop, above on phones), tilted
+      );
+      // 2. Its device enters from its side (left of the device on desktop, above on phones), tilted
       //    in 3D like a keynote product shot, settles flat, and a glare sweeps its glass once.
       s.fromTo(
         e,
@@ -550,12 +544,12 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
         )
         .to($(ecr, '.reflet'), { opacity: 1, duration: 0.5, ease: 'power1.out' }, appareil + 0.2)
         .to($(ecr, '.reflet'), { opacity: 0, duration: 0.6, ease: 'power1.in' }, appareil + 1.1);
-      // 4. The screen plays; meanwhile the camera keeps a slow push-in so the scene never freezes.
+      // 3. The screen plays; meanwhile the camera keeps a slow push-in so the scene never freezes.
       s.add(
         ecr.classList.contains('tablette') ? tablette(ecr, contenu) : telephone(ecr, contenu),
         0,
       ).to(calque, { '--z': cam['--z'] * DERIVE, duration: duree, ease: 'sine.inOut' }, contenu);
-      // 5. Exit, shorter than the entrance.
+      // 4. Exit, shorter than the entrance.
       s.to(
         e,
         {
@@ -566,7 +560,7 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
           ease: EASE.sortie,
         },
         contenu + duree,
-      ).set(agent, { zIndex: '' }, '>');
+      );
 
       const debut = i === 0 ? 0 : m.duration() - 0.1;
       debuts.push(debut);
