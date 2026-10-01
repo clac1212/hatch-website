@@ -1,1046 +1,821 @@
 ---
 /**
- * 04 — Scroll-driven product demo (v4 node U6VXNJ): three pinned diorama scenes (head office,
- * kitchen, build site). Each scroll step moves a camera over the image, brings up the step's
- * overlays (labels, chat threads, cards) and a glass panel. Behaviour: src/scripts/demo.ts.
- * Without JS or with reduced motion (`.statique`), each scene shows whole, its panels stacked below.
+ * 04 — Diorama demo (César, 01/10). Three places on scroll (head office, kitchen, build site); inside a
+ * place, the visitor opens an agent's demo on demand: markers on the agents and the menu card both
+ * open it, the camera zooms on the agent and its card replaces the menu. Back, Escape, a click on the
+ * scene or leaving the place closes it.
+ *
+ * Scroll rules (research: NN/g on scroll-jacking, Apple product pages):
+ * - the scroll position picks the place DIRECTLY (no queue): a fast scroll lands on a clean state,
+ *   CSS transitions then play at their own pace;
+ * - the wheel is never captured; soft snap points (`proximity`) help stop on each place.
+ * Without JS, the three places stack, each with its menu. Videos will later replace the still scenes:
+ * one calm loop per place, one short clip per agent demo.
  */
 import { Image, Picture } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import { section } from '../../content/section';
 import type { Locale } from '../../i18n/ui';
 import siegeFond from '../../assets/demo/siege/fond.jpg';
-import lark from '../../assets/demo/siege/lark.png';
-import finch from '../../assets/demo/siege/finch.png';
-import jay from '../../assets/demo/siege/jay.png';
-import peep from '../../assets/demo/siege/peep.png';
+import imgLark from '../../assets/demo/siege/lark.png';
+import imgFinch from '../../assets/demo/siege/finch.png';
+import imgJay from '../../assets/demo/siege/jay.png';
+import imgPeep from '../../assets/demo/siege/peep.png';
 import cuisineFond from '../../assets/demo/cuisine/fond.jpg';
-import owl from '../../assets/demo/cuisine/owl.png';
-import pecker from '../../assets/demo/cuisine/pecker.png';
+import imgOwl from '../../assets/demo/cuisine/owl.png';
+import imgPecker from '../../assets/demo/cuisine/pecker.png';
 import chantierFond from '../../assets/demo/chantier/fond.jpg';
-import sparrow from '../../assets/demo/chantier/sparrow.png';
-import avPeep from '../../assets/demo/avatars/peep.png';
-import avOwl from '../../assets/demo/avatars/owl.png';
+import imgSparrow from '../../assets/demo/chantier/sparrow.png';
+import avPeep from '../../assets/hero/agents/peep.webp';
+import avLark from '../../assets/hero/agents/lark.webp';
+import avJay from '../../assets/hero/agents/jay.webp';
+import avFinch from '../../assets/hero/agents/finch.webp';
+import avOwl from '../../assets/hero/agents/owl.webp';
+import avPecker from '../../assets/hero/agents/pecker.webp';
 import avSparrow from '../../assets/demo/avatars/sparrow.png';
 
 interface Props {
   locale: Locale;
 }
-
 const { locale } = Astro.props;
 const data = await section('demo', locale);
-const { siege, cuisine, chantier } = data;
+type Cle = (typeof data.lieux)[number]['agents'][number]['cle'];
 
-interface Agent {
-  a: string;
-  img: ImageMetadata;
-  /** Box of the cut-out agent over the background, in fractions of the image; `d` = breathing delay. */
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-  d: number;
-}
+/** Camera: focus point (fractions of the image) and zoom. */
+type Cam = [fx: number, fy: number, z: number];
+/** Keep the image edges outside the frame: the focus centre is clamped by the zoom. */
+const centre = (v: number, z: number) => Math.min(Math.max(v, 0.5 / z), 1 - 0.5 / z);
+const camStyle = ([fx, fy, z]: Cam) => `--cx:${centre(fx, z)};--cy:${centre(fy, z)};--z:${z}`;
 
-interface Scene {
-  cle: 'siege' | 'cuisine' | 'chantier';
-  alt: string;
+/**
+ * Places, in YAML order: background, wide shot, cut-out agents (fractions of the image, from the v4
+ * prototype geometry). `cles` = the demos that highlight this cut-out (Sparrow carries two).
+ */
+const LIEUX: {
   fond: ImageMetadata;
-  /** Last step index (steps run 0 → etapes). */
-  etapes: number;
-  zoom: number;
-  /** Camera focus per step ≥ 1 (fractions of the image), `;`-separated. */
-  focus: string;
-  /** Agent that hops at each step (empty = none). */
-  parle: string;
-  agents: Agent[];
-  panneaux: { surtitre: string; titre: string; texte: string }[];
-  /** Step shown by the first panel. */
-  panneauDepuis: number;
-}
-
-// Geometry lifted verbatim from the v4 prototype (sections/U6VXNJ.html).
-const scenes: Scene[] = [
+  vue: Cam;
+  decoupes: { img: ImageMetadata; cles: Cle[]; x: number; y: number; w: number; d: number }[];
+}[] = [
   {
-    cle: 'siege',
-    alt: siege.alt,
     fond: siegeFond,
-    etapes: 4,
-    zoom: 1.6,
-    focus: '.665,.64;.215,.47;.55,.49;.335,.55',
-    parle: ',peep,lark,jay,finch',
-    agents: [
-      { a: 'lark', img: lark, x: 0.1523, y: 0.3743, w: 0.1286, h: 0.2116, d: 0 },
-      { a: 'finch', img: finch, x: 0.2747, y: 0.4577, w: 0.1188, h: 0.1908, d: 0.8 },
-      { a: 'jay', img: jay, x: 0.4873, y: 0.3789, w: 0.1352, h: 0.2324, d: 1.6 },
-      { a: 'peep', img: peep, x: 0.609, y: 0.5645, w: 0.1112, h: 0.1849, d: 2.4 },
+    vue: [0.45, 0.52, 1.08],
+    decoupes: [
+      { img: imgLark, cles: ['lark'], x: 0.1523, y: 0.3743, w: 0.1286, d: 0 },
+      { img: imgFinch, cles: ['finch'], x: 0.2747, y: 0.4577, w: 0.1188, d: 0.8 },
+      { img: imgJay, cles: ['jay'], x: 0.4873, y: 0.3789, w: 0.1352, d: 1.6 },
+      { img: imgPeep, cles: ['peep'], x: 0.609, y: 0.5645, w: 0.1112, d: 2.4 },
     ],
-    panneaux: siege.panneaux,
-    panneauDepuis: 1,
   },
   {
-    cle: 'cuisine',
-    alt: cuisine.alt,
     fond: cuisineFond,
-    etapes: 2,
-    zoom: 1.5,
-    focus: '.25,.47;.62,.66',
-    parle: ',owl,pecker',
-    agents: [
-      { a: 'owl', img: owl, x: 0.141, y: 0.3874, w: 0.1399, h: 0.2155, d: 0 },
-      { a: 'pecker', img: pecker, x: 0.5487, y: 0.556, w: 0.1126, h: 0.2129, d: 1.2 },
+    vue: [0.42, 0.55, 1.12],
+    decoupes: [
+      { img: imgOwl, cles: ['owl'], x: 0.141, y: 0.3874, w: 0.1399, d: 0 },
+      { img: imgPecker, cles: ['pecker'], x: 0.5487, y: 0.556, w: 0.1126, d: 1.2 },
     ],
-    panneaux: cuisine.panneaux,
-    panneauDepuis: 0,
   },
   {
-    cle: 'chantier',
-    alt: chantier.alt,
     fond: chantierFond,
-    etapes: 2,
-    zoom: 1.45,
-    focus: '.525,.53;.55,.53',
-    parle: ',sparrow,sparrow',
-    agents: [{ a: 'sparrow', img: sparrow, x: 0.4684, y: 0.416, w: 0.1148, h: 0.2396, d: 0 }],
-    panneaux: chantier.panneaux,
-    panneauDepuis: 0,
+    vue: [0.53, 0.53, 1.2],
+    decoupes: [
+      {
+        img: imgSparrow,
+        cles: ['sparrow-candidats', 'sparrow-ouverture'],
+        x: 0.4684,
+        y: 0.416,
+        w: 0.1148,
+        d: 0,
+      },
+    ],
   },
 ];
 
-/** "Réponses Peep **312**" → text runs, odd ones bold. */
-const gras = (s: string) => s.split('**').map((t, i) => ({ t, b: i % 2 === 1 }));
-const pos = (x: number, y: number) => `--x:${x};--y:${y}`;
+/**
+ * Per demo: marker point over the scene (fractions of the image), side its label opens to, camera.
+ * Sparrow's two demos sit left (on Sparrow: candidates) and right (on the franchisee: openings).
+ */
+const DEMOS: Record<
+  Cle,
+  { repere: [number, number]; cote: 'g' | 'd'; cam: Cam; avatar: ImageMetadata }
+> = {
+  lark: { repere: [0.216, 0.39], cote: 'd', cam: [0.215, 0.47, 1.6], avatar: avLark },
+  finch: { repere: [0.334, 0.47], cote: 'd', cam: [0.335, 0.55, 1.6], avatar: avFinch },
+  jay: { repere: [0.555, 0.39], cote: 'd', cam: [0.55, 0.49, 1.6], avatar: avJay },
+  peep: { repere: [0.665, 0.575], cote: 'd', cam: [0.665, 0.64, 1.6], avatar: avPeep },
+  owl: { repere: [0.211, 0.4], cote: 'd', cam: [0.25, 0.47, 1.5], avatar: avOwl },
+  pecker: { repere: [0.605, 0.57], cote: 'd', cam: [0.62, 0.66, 1.5], avatar: avPecker },
+  'sparrow-candidats': {
+    repere: [0.526, 0.43],
+    cote: 'g',
+    cam: [0.5, 0.45, 1.6],
+    avatar: avSparrow,
+  },
+  'sparrow-ouverture': {
+    repere: [0.625, 0.455],
+    cote: 'd',
+    cam: [0.62, 0.58, 1.6],
+    avatar: avSparrow,
+  },
+};
+const AVATARS: Record<string, ImageMetadata> = {
+  peep: avPeep,
+  lark: avLark,
+  jay: avJay,
+  finch: avFinch,
+  owl: avOwl,
+  pecker: avPecker,
+  sparrow: avSparrow,
+};
+/** Avatar of a message sender, when it is an agent ("Owl · sur la tablette" → owl). */
+const avatar = (qui: string) => AVATARS[qui.split(/[ ·]/)[0].toLowerCase()];
+/** "Sparrow · Candidats" → "Sparrow", for the kicker. */
+const prenom = (nom: string) => nom.split(' · ')[0];
+
+const lieux = data.lieux.map((l, i) => ({ ...l, ...LIEUX[i] }));
+for (const l of lieux) {
+  const ici = l.decoupes.flatMap((d) => d.cles);
+  const ailleurs = l.agents.filter((a) => !ici.includes(a.cle));
+  if (ailleurs.length)
+    throw new Error(`Demo "${l.surtitre}": no agent cut-out for ${ailleurs.map((a) => a.cle)}`);
+}
 ---
 
-<section class="demo statique" aria-labelledby="demo-titre" data-demo>
-  <script is:inline>
-    // Synchronous, before first paint: pinned scenes unless the visitor asked for reduced motion.
-    document.currentScript.parentElement.classList.toggle(
-      'statique',
-      matchMedia('(prefers-reduced-motion: reduce)').matches,
-    );
-  </script>
-  <h2 id="demo-titre" class="sr-only">{data.titre}</h2>
-
-  {
-    scenes.map((sc) => (
-      <div
-        class="piste scene"
-        data-piste={sc.cle}
-        data-etapes={sc.etapes}
-        data-long="120"
-        data-cadence="1300"
-        data-zoom={sc.zoom}
-        data-focus={sc.focus}
-        data-parle={sc.parle}
-      >
-        <div class="collant plateau">
-          <div class="cadre-piste" data-largeur="1440" data-hauteur="900">
-            <div class="pic">
+<section class="d2" style={`--n:${lieux.length}`} aria-labelledby="d2-titre">
+  <h2 id="d2-titre" class="sr-only">{data.titre}</h2>
+  {lieux.map((_, i) => <div class="d2-ancre" style={`--i:${i}`} aria-hidden="true" />)}
+  <div class="d2-scene-fixe">
+    {
+      lieux.map((l, i) => (
+        <div class:list={['d2-lieu', { on: i === 0 }]} data-vue={camStyle(l.vue)}>
+          <div class="d2-plateau">
+            <div class="d2-calque" style={camStyle(l.vue)}>
               <Picture
-                src={sc.fond}
-                alt={sc.alt}
-                widths={[1200, 1800, 2400]}
-                sizes="(max-width: 899px) 300vw, 115vw"
+                src={l.fond}
                 formats={['avif', 'webp']}
+                widths={[960, 1440, 2048]}
+                sizes="max(100vw, 179vh)"
+                alt=""
                 loading="lazy"
-                decoding="async"
-                class="fond"
+                class="d2-fond"
               />
-              {sc.agents.map((ag) => (
-                <div
-                  class="agent"
-                  data-a={ag.a}
-                  style={`${pos(ag.x, ag.y)};--w:${ag.w};--h:${ag.h};--d:${ag.d}s`}
-                >
-                  <Picture
-                    src={ag.img}
-                    alt=""
-                    formats={['avif', 'webp']}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                </div>
+              {l.decoupes.map((a) => (
+                <Image
+                  src={a.img}
+                  alt=""
+                  widths={[200, 400]}
+                  sizes="12vw"
+                  loading="lazy"
+                  class="d2-agent"
+                  data-cles={a.cles.join(' ')}
+                  style={`left:${a.x * 100}%;top:${a.y * 100}%;width:${a.w * 100}%;animation-delay:${-a.d}s`}
+                />
               ))}
-
-              {sc.cle === 'siege' && (
-                <>
-                  <div class="ov dessus" data-step="0" style={pos(0.216, 0.365)}>
-                    <div class="etiquette">
-                      <i />
-                      {siege.etiquettes.lark}
-                    </div>
-                  </div>
-                  <div class="ov dessus" data-step="0" style={pos(0.555, 0.37)}>
-                    <div class="etiquette">
-                      <i />
-                      {siege.etiquettes.jay}
-                    </div>
-                  </div>
-                  <div class="ov dessus" data-step="0" style={pos(0.334, 0.45)}>
-                    <div class="etiquette">
-                      <i />
-                      {siege.etiquettes.finch}
-                    </div>
-                  </div>
-
-                  <div class="ov dessus" data-step="1" style={pos(0.69, 0.555)}>
-                    <div class="fil-msg">
-                      <div class="msg recu">
-                        <b class="qui">{siege.peep.question.qui}</b>
-                        {siege.peep.question.texte}
-                        <span class="meta">{siege.peep.question.meta}</span>
-                      </div>
-                      <div class="msg envoye tape">
-                        <Image src={avPeep} alt="" width={32} densities={[2, 3]} class="av" />
-                        <span class="ecrit" aria-hidden="true">
-                          <i />
-                          <i />
-                          <i />
-                        </span>
-                        <span class="txt">
-                          {siege.peep.reponse.texte}
-                          <span class="meta">
-                            {siege.peep.reponse.meta} <em aria-hidden="true">✓✓</em>
-                          </span>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="ov" data-step="2" style={pos(0.04, 0.235)}>
-                    <div class="carte">
-                      <p class="h6">{siege.lark.titre}</p>
-                      <p>
-                        {gras(siege.lark.chiffresGras).map((r) =>
-                          r.b ? <span class="gros">{r.t}</span> : r.t,
-                        )}
-                      </p>
-                      <div class="barres" aria-hidden="true">
-                        {[40, 55, 70, 62, 95].map((h, n) => (
-                          <b style={`--h:${h}%;--n:${n}`} />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                  <div class="ov" data-step="2" style={pos(0.04, 0.322)}>
-                    <div class="rappel">{siege.lark.rappel}</div>
-                  </div>
-
-                  <div class="ov droite" data-step="3" style={pos(0.482, 0.31)}>
-                    <div class="carte">
-                      <p class="h6">{siege.jay.titre}</p>
-                      <p>
-                        {siege.jay.document}
-                        <br />
-                        <span class="gros">{siege.jay.diffusion}</span>
-                      </p>
-                    </div>
-                  </div>
-
-                  <div class="ov" data-step="4" style={pos(0.3, 0.665)}>
-                    <div class="carte">
-                      <p class="h6">{siege.finch.titre}</p>
-                      <ul class="coche">
-                        {siege.finch.coches.map((c) => (
-                          <li>
-                            <i />
-                            {c}
-                          </li>
-                        ))}
-                      </ul>
-                      <p class="score">
-                        <b>{siege.finch.score}</b>
-                        <span>{siege.finch.bareme}</span>
-                      </p>
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {sc.cle === 'cuisine' && (
-                <>
-                  <div class="ov dessus" data-step="0" style={pos(0.211, 0.38)}>
-                    <div class="etiquette">
-                      <i />
-                      {cuisine.etiquettes.owl}
-                    </div>
-                  </div>
-                  <div class="ov droite" data-step="0" style={pos(0.555, 0.585)}>
-                    <div class="etiquette">
-                      <i />
-                      {cuisine.etiquettes.pecker}
-                    </div>
-                  </div>
-
-                  <div class="ov dessus" data-step="1" style={pos(0.255, 0.375)}>
-                    <div class="fil-msg">
-                      <div class="msg recu vocal">
-                        <b class="qui">{cuisine.owl.question.qui}</b>
-                        <span class="onde" aria-hidden="true">
-                          {Array.from({ length: 12 }, () => (
-                            <i />
-                          ))}
-                        </span>
-                        {cuisine.owl.question.texte}
-                      </div>
-                      <div class="msg envoye tape vocal">
-                        <Image src={avOwl} alt="" width={32} densities={[2, 3]} class="av" />
-                        <span class="ecrit" aria-hidden="true">
-                          <i />
-                          <i />
-                          <i />
-                        </span>
-                        <span class="txt">
-                          <span class="onde" aria-hidden="true">
-                            {Array.from({ length: 14 }, () => (
-                              <i />
-                            ))}
-                          </span>
-                          {cuisine.owl.reponse.texte}
-                          <span class="meta meta-texte">{cuisine.owl.reponse.meta}</span>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="ov droite" data-step="2" style={pos(0.54, 0.6)}>
-                    <div class="carte">
-                      <p class="h6">{cuisine.pecker.titre}</p>
-                      <p>{cuisine.pecker.module}</p>
-                      <ul class="coche">
-                        {cuisine.pecker.coches.map((c) => (
-                          <li>
-                            <i />
-                            {c}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {sc.cle === 'chantier' && (
-                <>
-                  <div class="ov dessus" data-step="0" style={pos(0.525, 0.41)}>
-                    <div class="etiquette">
-                      <i />
-                      {chantier.etiquettes.sparrow}
-                    </div>
-                  </div>
-
-                  <div class="ov droite" data-step="1" style={pos(0.46, 0.28)}>
-                    <div class="carte">
-                      <p class="h6">{chantier.avancement.titre}</p>
-                      <p>
-                        {gras(chantier.avancement.ligneGras).map((r) =>
-                          r.b ? <span class="gros">{r.t}</span> : r.t,
-                        )}
-                      </p>
-                      <div class="progres" aria-hidden="true">
-                        <b style={`--w:${chantier.avancement.progression}%`} />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="ov dessus" data-step="2" style={pos(0.555, 0.405)}>
-                    <div class="fil-msg">
-                      <div class="msg envoye">
-                        <Image src={avSparrow} alt="" width={32} densities={[2, 3]} class="av" />
-                        <span class="txt">
-                          {chantier.sparrow.question.texte}
-                          <span class="meta">
-                            <em aria-hidden="true">✓✓</em>
-                          </span>
-                        </span>
-                      </div>
-                      <div class="msg recu tape">
-                        <span class="ecrit" aria-hidden="true">
-                          <i />
-                          <i />
-                          <i />
-                        </span>
-                        <span class="txt">
-                          <b class="qui">{chantier.sparrow.reponse.qui}</b>
-                          {chantier.sparrow.reponse.texte}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-
-            <div class="projecteur" aria-hidden="true" />
-
-            {sc.panneaux.map((p, i) => (
-              <div class="panneau" data-step={sc.panneauDepuis + i}>
-                <p class="surtitre">{p.surtitre}</p>
-                <h3>{p.titre}</h3>
-                <p class="corps">{p.texte}</p>
-              </div>
-            ))}
-
-            <div class="points" aria-hidden="true">
-              {Array.from({ length: sc.etapes + 1 }, () => (
-                <i />
-              ))}
+              {l.agents.map((d) => {
+                const g = DEMOS[d.cle];
+                return (
+                  <button
+                    type="button"
+                    class:list={['d2-repere', g.cote === 'g' && 'gauche']}
+                    style={`left:${g.repere[0] * 100}%;top:${g.repere[1] * 100}%`}
+                    data-ouvrir={d.cle}
+                    aria-controls={`d2-${d.cle}`}
+                    aria-expanded="false"
+                  >
+                    <span class="d2-point" aria-hidden="true" />
+                    <span>{d.nom}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
+
+          <div class="d2-ui d2-vue">
+            <div class="d2-panneau">
+              <p class="d2-surtitre">{l.surtitre}</p>
+              <h3 class="d2-titre">{l.titre}</h3>
+            </div>
+            <div class="d2-carte">
+              <p class="d2-consigne">{data.consigne}</p>
+              <ul class="d2-menu">
+                {l.agents.map((d) => (
+                  <li>
+                    <button
+                      type="button"
+                      data-ouvrir={d.cle}
+                      aria-controls={`d2-${d.cle}`}
+                      aria-expanded="false"
+                    >
+                      <Image
+                        src={DEMOS[d.cle].avatar}
+                        alt=""
+                        width={28}
+                        height={28}
+                        densities={[1, 2]}
+                        class="d2-av"
+                      />
+                      <span>
+                        <b>{d.nom}</b> {d.role}
+                      </span>
+                      <svg viewBox="0 0 24 24" class="d2-fleche" aria-hidden="true">
+                        <path d="M4 11v2h16v-2zm12 2v2h2v-2zm-2 2v2h2v-2zm-2 2v2h2v-2zm4-6V9h2v2zm-2 4V7h2v8zm-2 2V5h2v12z" />
+                      </svg>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {l.agents.map((d) => (
+            <div
+              class="d2-ui d2-demo"
+              id={`d2-${d.cle}`}
+              data-cle={d.cle}
+              data-cam={camStyle(DEMOS[d.cle].cam)}
+              role="region"
+              aria-label={d.nom}
+            >
+              <div class="d2-panneau">
+                <button type="button" class="d2-retour" data-fermer>
+                  <span aria-hidden="true">←</span> {l.retour}
+                </button>
+                <p class="d2-surtitre">
+                  {l.surtitre} · {prenom(d.nom)}
+                </p>
+                <h3 class="d2-titre">{d.titre}</h3>
+              </div>
+              <div class="d2-carte">
+                {'lignes' in d.carte ? (
+                  <ul class="d2-lignes">
+                    {d.carte.lignes.map((ligne) => (
+                      <li>
+                        {avatar(ligne.agent) && (
+                          <Image
+                            src={avatar(ligne.agent)}
+                            alt=""
+                            width={28}
+                            height={28}
+                            densities={[1, 2]}
+                            class="d2-av"
+                          />
+                        )}
+                        <span>
+                          <b>{ligne.agent}</b> {ligne.texte}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div class="d2-fil">
+                    {[d.carte, d.carte.reponse].map((m, j) => (
+                      <div class:list={['d2-msg', { 'd2-rep': j === 1 }]}>
+                        {avatar(m.qui) && (
+                          <Image
+                            src={avatar(m.qui)}
+                            alt=""
+                            width={28}
+                            height={28}
+                            densities={[1, 2]}
+                            class="d2-av"
+                          />
+                        )}
+                        <span>
+                          <b>{m.qui}</b>
+                          {m.texte}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
-      </div>
-    ))
-  }
+      ))
+    }
+
+    <ol class="d2-points" aria-hidden="true">
+      {lieux.map((_, i) => <li class:list={{ on: i === 0 }} />)}
+    </ol>
+  </div>
 </section>
 
-<script>
-  import '../../scripts/demo';
-</script>
-
 <style>
-  /*
-   * Everything inside .cadre-piste is in design px: the script sizes the stage to the viewport
-   * (1440 wide on desktop, the viewport width below 900 px) and pistes.ts scales it (--echelle).
-   * Colours: tokens only; `scene` is the edge colour of the renders, visible around the image on narrow screens.
-   */
-  .demo {
-    --scene: var(--color-scene);
-    --ombre-16: color-mix(in srgb, var(--color-shadow) 16%, transparent);
-    --ombre-18: color-mix(in srgb, var(--color-shadow) 18%, transparent);
-    background: var(--scene);
+  .d2 {
+    --pas: 90svh;
+    position: relative;
+    height: calc(var(--n) * var(--pas) + 100svh);
+    background: var(--color-scene);
   }
-  .plateau {
-    background: var(--scene);
-  }
-
-  /* ---------- Picture, agents ---------- */
-  .pic {
+  .d2-ancre {
     position: absolute;
     left: 0;
+    width: 1px;
+    height: 1px;
+    /* Mid-range, not on the boundary between two places (where rounding picks either). */
+    top: calc((var(--i) + 0.5) * var(--pas));
+    scroll-snap-align: start;
+  }
+  :global(html:has(.d2.js)) {
+    scroll-snap-type: y proximity;
+  }
+  .d2-scene-fixe {
+    position: sticky;
     top: 0;
-    transform-origin: 0 0;
-    will-change: transform;
-    transition: transform 1.5s var(--ease-hatch);
+    height: 100svh;
+    overflow: hidden;
   }
-  .pic :global(picture),
-  .pic :global(img.fond) {
-    display: block;
-    width: 100%;
-    height: 100%;
-  }
-  .agent {
+
+  /* A place: its scene and its overlays. Hidden places leave the tab order (visibility). */
+  .d2-lieu {
     position: absolute;
-    left: calc(var(--x) * 100%);
-    top: calc(var(--y) * 100%);
-    width: calc(var(--w) * 100%);
-    height: calc(var(--h) * 100%);
+    inset: 0;
+    overflow: hidden;
     opacity: 0;
-    transform: translateY(3%) scale(0.94);
-    transform-origin: 50% 88%;
+    visibility: hidden;
     transition:
-      opacity 0.5s var(--ease-hatch),
-      transform 0.7s var(--ease-hatch);
+      opacity 0.6s var(--ease-hatch),
+      visibility 0s 0.6s;
   }
-  .agent :global(picture) {
-    display: block;
-    width: 100%;
-    height: 100%;
-  }
-  .agent :global(img) {
-    display: block;
-    width: 100%;
-    height: 100%;
-    transform-origin: 50% 88%;
-    animation: demo-respire 3.4s ease-in-out infinite;
-    animation-delay: var(--d, 0s);
-  }
-  .agent.la {
+  .d2-lieu.on {
     opacity: 1;
-    transform: none;
+    visibility: visible;
+    transition-delay: 0s;
   }
-  .agent.actif :global(img) {
-    animation:
-      demo-hop 0.7s var(--ease-hatch),
-      demo-respire 3.4s ease-in-out 0.7s infinite;
+
+  /* The scene: an image box covering the viewport; the camera moves it so the focus sits centred. */
+  .d2-plateau {
+    --oy: 0.5;
+    position: absolute;
+    inset: 0;
+    container-type: size;
   }
-  @keyframes demo-respire {
-    0%,
-    100% {
-      transform: scale(1, 1);
-    }
+  .d2-calque {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100cqw, calc(100cqh * 2400 / 1340));
+    aspect-ratio: 2400 / 1340;
+    /* --oy = where the focus sits vertically: centred, or high on phones where the cards fill the bottom. */
+    translate: -50% calc(-50% + (var(--oy) - 0.5) * 100cqh);
+    transform-origin: calc(var(--cx) * 100%) calc(var(--cy) * 100%);
+    transform: translate(calc((0.5 - var(--cx)) * 100%), calc((0.5 - var(--cy)) * 100%))
+      scale(var(--z));
+    transition:
+      transform 1s cubic-bezier(0.32, 0.72, 0, 1),
+      transform-origin 1s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .d2-calque :global(.d2-fond) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .d2-calque :global(.d2-agent) {
+    position: absolute;
+    height: auto;
+    transform-origin: 50% 100%;
+    animation: d2-respire 4s ease-in-out infinite;
+    transition:
+      translate 0.5s var(--ease-hatch),
+      filter 0.5s var(--ease-hatch);
+  }
+  .d2-lieu:not([data-ouvert]) .d2-calque :global(.d2-agent.survol) {
+    translate: 0 -3%;
+    filter: drop-shadow(0 0 0.2vw rgb(255 255 255 / 0.85));
+  }
+  @keyframes d2-respire {
     50% {
-      transform: scale(1.006, 1.012);
-    }
-  }
-  @keyframes demo-hop {
-    0% {
-      transform: translateY(0);
-    }
-    35% {
-      transform: translateY(-4%);
-    }
-    70% {
-      transform: translateY(0.4%);
-    }
-    100% {
-      transform: translateY(0);
+      transform: scaleY(1.025);
     }
   }
 
-  /* ---------- Spotlight: a radial vignette around the active agent ---------- */
-  .projecteur {
+  /* Markers: a pulsing dot on the agent, its name beside. Counter-scaled so the zoom keeps them crisp. */
+  .d2-repere {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 12px 5px 5px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.9);
+    box-shadow: var(--shadow-2);
+    font: 600 13px/1 var(--font-sans);
+    color: var(--color-ink);
+    white-space: nowrap;
+    cursor: pointer;
+    translate: -14px -50%;
+    transform-origin: 14px 50%;
+    scale: calc(1 / var(--z));
+    transition:
+      opacity 0.4s var(--ease-hatch),
+      background-color 0.3s,
+      visibility 0s;
+  }
+  .d2-repere.gauche {
+    flex-direction: row-reverse;
+    padding: 5px 5px 5px 12px;
+    translate: calc(-100% + 14px) -50%;
+    transform-origin: calc(100% - 14px) 50%;
+  }
+  .d2-repere:hover,
+  .d2-repere:focus-visible {
+    background: var(--color-orange-tint);
+  }
+  .d2-repere:focus-visible {
+    outline: 2px solid var(--color-orange-txt);
+    outline-offset: 2px;
+  }
+  .d2-point {
+    position: relative;
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    background: var(--color-orange);
+    box-shadow: inset 0 0 0 4px var(--color-white);
+  }
+  .d2-point::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 2px solid var(--color-orange);
+    animation: d2-pulse 2.2s var(--ease-hatch) infinite;
+  }
+  @keyframes d2-pulse {
+    from {
+      scale: 1;
+      opacity: 0.8;
+    }
+    to {
+      scale: 2.4;
+      opacity: 0;
+    }
+  }
+  .d2-lieu[data-ouvert] .d2-repere {
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.3s,
+      visibility 0s 0.3s;
+  }
+
+  /* Overlays: the wide shot (panel + menu) or one agent demo (panel + card). */
+  .d2-ui {
     position: absolute;
     inset: 0;
     pointer-events: none;
+    visibility: hidden;
+    transition: visibility 0s 0.5s;
+  }
+  .d2-ui > * {
     opacity: 0;
-    transition: opacity 1.2s var(--ease-hatch);
-    background: radial-gradient(
-      circle var(--r, 675px) at var(--px, 36%) var(--py, 52%),
-      transparent 0,
-      transparent 42%,
-      color-mix(in srgb, var(--color-shadow) 24%, transparent) 100%
-    );
-  }
-  .zoome .projecteur {
-    opacity: 1;
-  }
-
-  /* ---------- Overlays: placed in fractions of the image, counter-scaled to keep their size ---------- */
-  .ov {
-    position: absolute;
-    left: calc(var(--x) * 100% + var(--dx, 0px));
-    top: calc(var(--y) * 100% + var(--dy, 0px));
-    transform: scale(var(--inv, 1));
-    transform-origin: var(--o, 0 0);
-    transition: transform 1.5s var(--ease-hatch);
-    pointer-events: none;
-  }
-  .ov > * {
-    opacity: 0;
-    translate: 0 10px;
-    scale: 0.96;
-    transition:
-      opacity 0.45s var(--ease-hatch),
-      translate 0.6s var(--ease-hatch),
-      scale 0.6s var(--ease-hatch);
-  }
-  .ov.on > * {
-    opacity: 1;
-    translate: 0 0;
-    scale: 1;
-  }
-  .ov.droite {
-    --o: 100% 0;
-    translate: -100% 0;
-  }
-  .ov.dessus {
-    --o: 50% 100%;
-    translate: -50% -100%;
-  }
-
-  .etiquette {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    border-radius: 999px;
-    white-space: nowrap;
-    background: rgb(255 255 255 / 0.72);
-    border: 1px solid rgb(255 255 255 / 0.8);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    box-shadow: 0 14px 36px var(--ombre-18);
-    font: 600 13px/1 var(--font-sans);
-    color: var(--color-ink);
-  }
-  .etiquette i,
-  .points i {
-    display: block;
-  }
-  .etiquette i {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--color-orange);
-    animation: demo-pulse 1.6s ease-out infinite;
-  }
-  @keyframes demo-pulse {
-    0% {
-      box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-orange) 53%, transparent);
-    }
-    100% {
-      box-shadow: 0 0 0 7px transparent;
-    }
-  }
-
-  /* Chat threads, WhatsApp style: bubbles appear one by one, "typing…" then the text. */
-  .fil-msg {
-    width: 330px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    font: 400 14px/1.38 var(--font-sans);
-    color: var(--color-ink);
-  }
-  .msg {
-    position: relative;
-    max-width: 270px;
-    padding: 8px 11px 7px;
-    border-radius: 14px;
-    box-shadow: 0 6px 18px var(--ombre-16);
-    opacity: 0;
-    transform: translateY(8px) scale(0.94);
-    transition:
-      opacity 0.4s var(--ease-hatch),
-      transform 0.5s var(--ease-hatch);
-  }
-  .msg.vu {
-    opacity: 1;
-    transform: none;
-  }
-  .msg.recu {
-    align-self: flex-start;
-    margin-left: 8px;
-    background: var(--color-white);
-    border-top-left-radius: 4px;
-    transform-origin: 0 100%;
-  }
-  .msg.envoye {
-    align-self: flex-end;
-    margin-right: 40px;
-    background: var(--color-whatsapp);
-    border-top-right-radius: 4px;
-    transform-origin: 100% 100%;
-  }
-  .msg.recu::before,
-  .msg.envoye::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    border-style: solid;
-  }
-  .msg.recu::before {
-    left: -8px;
-    border-color: var(--color-white) var(--color-white) transparent transparent;
-    border-width: 0 8px 10px 0;
-  }
-  .msg.envoye::before {
-    right: -8px;
-    border-color: var(--color-whatsapp) transparent transparent var(--color-whatsapp);
-    border-width: 0 0 10px 8px;
-  }
-  .msg .qui {
-    display: block;
-    font-weight: 600;
-    font-size: 12.5px;
-    color: var(--color-orange-txt);
-    margin-bottom: 2px;
-  }
-  .msg .meta {
-    display: block;
-    text-align: right;
-    font-size: 11px;
-    color: var(--color-gray-700);
-    margin-top: 2px;
-  }
-  .msg .meta em {
-    font-style: normal;
-    color: var(--color-gray-500);
-  }
-  .msg :global(.av) {
-    position: absolute;
-    right: -42px;
-    bottom: -2px;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    object-fit: contain;
-    background: var(--color-cream);
-    box-shadow: 0 4px 10px var(--ombre-18);
-  }
-  .msg .ecrit {
-    display: none;
-    gap: 4px;
-    padding: 6px 2px;
-  }
-  .msg .ecrit i,
-  .msg .onde i {
-    display: block;
-  }
-  .msg .ecrit i {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--color-gray-500);
-    animation: demo-ecrit 1s infinite;
-  }
-  .msg .ecrit i:nth-child(2) {
-    animation-delay: 0.15s;
-  }
-  .msg .ecrit i:nth-child(3) {
-    animation-delay: 0.3s;
-  }
-  @keyframes demo-ecrit {
-    0%,
-    60%,
-    100% {
-      opacity: 0.3;
-      transform: none;
-    }
-    30% {
-      opacity: 1;
-      transform: translateY(-2px);
-    }
-  }
-  .msg.tape:not(.repondu) .ecrit {
-    display: inline-flex;
-  }
-  .msg.tape:not(.repondu) .txt {
-    display: none;
-  }
-  .msg .txt {
-    display: block;
-  }
-  /* Measuring a thread at its final size (narrow layout): */
-  .ov.mesure .msg .ecrit {
-    display: none;
-  }
-  .ov.mesure .msg .txt {
-    display: block;
-  }
-  .msg .onde {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    height: 22px;
-    margin: 2px 0 4px;
-  }
-  .msg .onde i {
-    width: 3px;
-    border-radius: 2px;
-    background: var(--color-gray-500);
-    height: 30%;
-    animation: demo-onde 1.1s ease-in-out infinite;
-  }
-  .msg.envoye .onde i {
-    background: var(--color-success);
-  }
-  .msg .onde i:nth-child(3n) {
-    animation-delay: 0.2s;
-  }
-  .msg .onde i:nth-child(3n + 1) {
-    animation-delay: 0.45s;
-  }
-  .msg .onde i:nth-child(4n) {
-    animation-delay: 0.7s;
-  }
-  @keyframes demo-onde {
-    0%,
-    100% {
-      height: 25%;
-    }
-    50% {
-      height: 95%;
-    }
-  }
-
-  /* Cards */
-  .carte {
-    width: 270px;
-    padding: 13px 15px;
-    border-radius: 16px;
-    background: rgb(255 255 255 / 0.95);
-    box-shadow: 0 10px 28px var(--ombre-16);
-    font: 400 13.5px/1.4 var(--font-sans);
-    color: var(--color-ink);
-  }
-  .carte .h6 {
-    font: 400 10.5px/1 var(--font-mono);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--color-orange-txt);
-    margin: 0 0 8px;
-  }
-  .gros {
-    font-weight: 600;
-  }
-  .barres {
-    display: flex;
-    align-items: flex-end;
-    gap: 6px;
-    height: 44px;
-    margin-top: 10px;
-  }
-  .barres b {
-    flex: 1;
-    height: var(--h);
-    border-radius: 3px 3px 0 0;
-    background: var(--color-line);
-    transform: scaleY(0);
-    transform-origin: bottom;
-    transition: transform 0.7s var(--ease-hatch);
-    transition-delay: calc(var(--n) * 90ms + 250ms);
-  }
-  .barres b:last-child {
-    background: var(--color-orange);
-  }
-  .on .barres b {
-    transform: none;
-  }
-  .progres {
-    height: 6px;
-    margin-top: 10px;
-    border-radius: 3px;
-    background: var(--color-cream-2);
-    overflow: hidden;
-  }
-  .progres b {
-    display: block;
-    height: 100%;
-    width: 0;
-    background: var(--color-orange);
-    border-radius: 3px;
-    transition: width 1.1s var(--ease-hatch) 0.3s;
-  }
-  .on .progres b {
-    width: var(--w);
-  }
-  .rappel {
-    margin-top: 10px;
-    padding: 9px 12px;
-    border-radius: 12px;
-    background: rgb(255 255 255 / 0.95);
-    box-shadow: 0 8px 24px color-mix(in srgb, var(--color-shadow) 14%, transparent);
-    font: 400 13px/1.4 var(--font-sans);
-    width: 270px;
-    color: var(--color-ink);
-  }
-  .coche {
-    list-style: none;
-    padding: 0;
-    margin: 4px 0 0;
-  }
-  .coche li {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 6px 0;
-    opacity: 0.35;
-    transition: opacity 0.4s;
-  }
-  .coche li i {
-    display: block;
-    width: 14px;
-    height: 14px;
-    border-radius: 4px;
-    border: 1.5px solid var(--color-gray-400);
-    position: relative;
-    flex: none;
-    transition:
-      background 0.3s,
-      border-color 0.3s;
-  }
-  .coche li.fait {
-    opacity: 1;
-  }
-  .coche li.fait i {
-    background: var(--color-orange);
-    border-color: var(--color-orange);
-  }
-  .coche li.fait i::after {
-    content: '';
-    position: absolute;
-    left: 4px;
-    top: 1px;
-    width: 3px;
-    height: 7px;
-    border: solid var(--color-white);
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
-  }
-  .score {
-    display: flex;
-    align-items: baseline;
-    gap: 6px;
-    margin-top: 8px;
-  }
-  .score b {
-    font: 700 22px/1 var(--font-display);
-  }
-
-  /* ---------- Glass panel, one per step ---------- */
-  .panneau {
-    position: absolute;
-    z-index: 5;
-    right: 40px;
-    top: 50%;
-    translate: 0 -50%;
-    width: 428px;
-    padding: 28px;
-    border-radius: 24px;
-    background: rgb(255 255 255 / 0.35);
-    border: 1px solid rgb(255 255 255 / 0.8);
-    backdrop-filter: blur(18px) saturate(1.2);
-    -webkit-backdrop-filter: blur(18px) saturate(1.2);
-    box-shadow: 0 14px 36px var(--ombre-18);
-    color: var(--color-ink);
-    opacity: 0;
-    transform: translateY(24px);
-    transition:
-      opacity 0.3s,
-      transform 0s 0.3s;
-    pointer-events: none;
-  }
-  .panneau.on {
-    opacity: 1;
-    transform: none;
+    translate: 0 14px;
     pointer-events: auto;
     transition:
-      opacity 0.6s 0.45s var(--ease-hatch),
-      transform 0.8s 0.45s var(--ease-hatch);
+      opacity 0.45s var(--ease-hatch),
+      translate 0.7s var(--ease-hatch);
   }
-  .panneau .surtitre {
-    font: 400 11px/1.3 var(--font-mono);
-    letter-spacing: 0.08em;
+  .d2-lieu.on:not([data-ouvert]) > .d2-vue,
+  .d2-lieu.on > .d2-demo.on {
+    visibility: visible;
+    transition-delay: 0s;
+  }
+  .d2-lieu.on:not([data-ouvert]) > .d2-vue > *,
+  .d2-lieu.on > .d2-demo.on > * {
+    opacity: 1;
+    translate: 0 0;
+    transition-delay: 0.35s;
+  }
+  .d2-lieu.on:not([data-ouvert]) > .d2-vue > .d2-carte,
+  .d2-lieu.on > .d2-demo.on > .d2-carte {
+    transition-delay: 0.55s;
+  }
+
+  .d2-panneau {
+    position: absolute;
+    left: clamp(16px, 4vw, 64px);
+    bottom: clamp(56px, 9vh, 96px);
+    max-width: min(560px, calc(100vw - 32px));
+    padding: 22px 26px 24px;
+    border-radius: 22px;
+    background: linear-gradient(-120deg, rgb(255 255 255 / 0.78), rgb(255 255 255 / 0.58));
+    backdrop-filter: blur(16px) saturate(1.2);
+    -webkit-backdrop-filter: blur(16px) saturate(1.2);
+    box-shadow:
+      0 18px 44px color-mix(in srgb, var(--color-navy) 22%, transparent),
+      inset 0 1px 0 var(--color-white);
+  }
+  .d2-retour {
+    display: inline-flex;
+    gap: 6px;
+    margin-bottom: 12px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: var(--color-ink);
+    font: 600 13px/1.2 var(--font-sans);
+    color: var(--color-white);
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  .d2-retour:hover {
+    background: var(--color-orange-txt);
+  }
+  .d2-retour:focus-visible {
+    outline: 2px solid var(--color-orange-txt);
+    outline-offset: 2px;
+  }
+  .d2-surtitre,
+  .d2-consigne {
+    font: 400 12px/1.2 var(--font-mono);
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--color-orange-txt);
   }
-  .panneau h3 {
-    font: 700 30px/1.12 var(--font-display);
-    margin: 12px 0 0;
-    letter-spacing: -0.01em;
+  .d2-titre {
+    margin-top: 8px;
+    font: 700 clamp(24px, 2.4vw, 34px) / 1.12 var(--font-display);
+    letter-spacing: -0.02em;
+    color: var(--color-ink);
+    text-wrap: balance;
   }
-  .panneau .corps {
-    margin: 12px 0 0;
-    color: color-mix(in srgb, var(--color-ink) 90%, transparent);
-    font: 400 15.5px/1.5 var(--font-sans);
-  }
-
-  /* ---------- Step dots ---------- */
-  .points {
+  .d2-carte {
     position: absolute;
-    z-index: 6;
-    left: 50%;
-    bottom: 44px;
-    translate: -50% 0;
+    right: clamp(16px, 6vw, 120px);
+    top: clamp(96px, 18vh, 200px);
+    width: min(380px, calc(100vw - 32px));
+    padding: 14px;
+    border-radius: 18px;
+    background: rgb(255 255 255 / 0.92);
+    box-shadow: 0 16px 40px color-mix(in srgb, var(--color-navy) 22%, transparent);
+    font: 500 14px/1.4 var(--font-sans);
+    color: var(--color-ink);
+  }
+  .d2-consigne {
+    padding: 2px 4px 10px;
+  }
+  .d2-menu {
     display: flex;
-    gap: 6px;
+    flex-direction: column;
+    gap: 2px;
   }
-  .points i {
-    width: 18px;
-    height: 5px;
-    border-radius: 3px;
-    background: color-mix(in srgb, var(--color-ink) 15%, transparent);
+  .d2-menu button {
+    display: flex;
+    width: 100%;
+    gap: 10px;
+    align-items: center;
+    padding: 8px;
+    border-radius: 12px;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  .d2-menu button > span {
+    flex: 1;
+  }
+  .d2-menu button:hover,
+  .d2-menu button:focus-visible,
+  .d2-menu button.survol {
+    background: var(--color-cream-2);
+  }
+  .d2-menu button:focus-visible {
+    outline: 2px solid var(--color-orange-txt);
+  }
+  .d2-fleche {
+    flex: none;
+    width: 16px;
+    height: 16px;
+    fill: var(--color-soft);
     transition:
-      background 0.4s,
-      width 0.4s var(--ease-hatch);
+      fill 0.3s,
+      translate 0.35s var(--ease-hatch);
   }
-  .points i.on {
-    width: 36px;
-    background: var(--color-orange);
+  .d2-menu button:hover .d2-fleche,
+  .d2-menu button.survol .d2-fleche {
+    fill: var(--color-orange-txt);
+    translate: 3px 0;
   }
-
-  /* No transition for the very first placement (and on resize). */
-  .sans-transition :is(.pic, .ov) {
-    transition: none;
+  .d2-lignes {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
-
-  /* ---------- Narrow screens (< 900 px, stage = viewport, see demo.ts) ----------
-   * The step's overlays stack under the nav, the camera frames the active agent tighter in the
-   * space left, and the glass panel sits full width at the bottom. */
-  .etroit .pic :global(picture) {
-    mask-image: linear-gradient(
-      transparent,
-      var(--color-black) 14%,
-      var(--color-black) 86%,
-      transparent
-    );
+  .d2-lignes li,
+  .d2-msg {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
   }
-  .etroit .ov {
-    left: var(--lx, 0);
-    top: var(--ly, 0);
-    translate: none;
-    --o: 0 0;
+  .d2-fil {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
-  .etroit .fil-msg {
-    width: 330px;
+  .d2-msg > span {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 9px 12px;
+    border-radius: 14px;
+    background: var(--color-cream-2);
   }
-  .etroit .msg .qui {
-    font-size: 13px;
+  .d2-msg b {
+    font-size: 12px;
+    color: var(--color-soft);
   }
-  .etroit .msg .meta {
-    display: none;
+  .d2-rep > span {
+    background: var(--color-orange-tint);
   }
-  .etroit .msg .meta-texte {
-    display: block;
-    font-size: 13px;
+  .d2 :global(.d2-av) {
+    flex: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    background: var(--color-white);
+    object-fit: cover;
   }
-  .etroit .panneau {
-    left: 12px;
-    right: 12px;
-    top: auto;
-    bottom: 34px;
-    width: auto;
-    translate: none;
-    padding: 18px 20px 20px;
-    border-radius: 20px;
+  .d2-points {
+    position: absolute;
+    right: clamp(16px, 3vw, 40px);
+    top: 50%;
+    translate: 0 -50%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .d2-points li {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
     background: rgb(255 255 255 / 0.55);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-ink) 25%, transparent);
+    transition:
+      background-color 0.4s,
+      scale 0.4s var(--ease-hatch);
   }
-  .etroit .panneau h3 {
-    font-size: 22px;
-    margin-top: 8px;
-  }
-  .etroit .panneau .corps {
-    font-size: 14.5px;
-    margin-top: 8px;
-  }
-  .etroit .points {
-    bottom: 16px;
+  .d2-points li.on {
+    background: var(--color-orange);
+    scale: 1.35;
   }
 
-  /* ---------- Static: no JS, or reduced motion ---------- */
-  .statique .collant {
+  @media (max-width: 47.99rem) {
+    .d2-plateau {
+      --oy: 0.27;
+    }
+    .d2-carte {
+      left: 16px;
+      right: 16px;
+      width: auto;
+      top: auto;
+      bottom: calc(clamp(56px, 9vh, 96px) + 150px);
+    }
+    .d2-panneau {
+      right: 16px;
+      padding: 18px 20px;
+    }
+  }
+
+  /* Without JS: the three places stack, each with its wide shot and its menu. */
+  .d2:not(.js) {
+    height: auto;
+  }
+  .d2:not(.js) .d2-scene-fixe {
     position: relative;
     height: auto;
-    overflow: visible;
   }
-  .statique .cadre-piste {
+  .d2:not(.js) .d2-lieu {
     position: relative;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
-    gap: 16px;
-    max-width: 1440px;
-    margin-inline: auto;
-    padding: 16px 16px 64px;
-  }
-  .statique .pic {
-    position: relative;
-    grid-column: 1 / -1;
-    width: 100%;
-    aspect-ratio: 2752 / 1536;
-    transform: none;
-    transition: none;
-  }
-  .statique .agent {
+    height: 100svh;
     opacity: 1;
-    transform: none;
+    visibility: visible;
   }
-  .statique .agent :global(img) {
-    animation: none;
+  .d2:not(.js) .d2-vue,
+  .d2:not(.js) .d2-vue > * {
+    visibility: visible;
+    opacity: 1;
+    translate: none;
   }
-  .statique :is(.ov, .projecteur, .points) {
+  .d2:not(.js) :is(.d2-repere, .d2-points, .d2-fleche) {
     display: none;
   }
-  .statique .panneau {
-    position: static;
-    width: auto;
-    opacity: 1;
-    transform: none;
-    translate: none;
-    background: rgb(255 255 255 / 0.55);
-  }
-  .statique .panneau h3 {
-    font-size: 24px;
+
+  @media (prefers-reduced-motion: reduce) {
+    .d2 *,
+    .d2 *::after {
+      transition-duration: 0s !important;
+      transition-delay: 0s !important;
+      animation: none !important;
+    }
   }
 </style>
+
+<script>
+  /**
+   * The scroll position picks the place directly: place = floor(progress × n). No queue, so a fast
+   * scroll never leaves a step pending. Inside a place, agent demos open on demand.
+   */
+  const sec = document.querySelector<HTMLElement>('.d2')!;
+  const lieux = [...sec.querySelectorAll<HTMLElement>('.d2-lieu')];
+  const points = [...sec.querySelectorAll<HTMLElement>('.d2-points li')];
+  const n = lieux.length;
+  sec.classList.add('js');
+
+  let k = 0;
+  let source: HTMLElement | null = null;
+
+  const calque = (lieu: HTMLElement) => lieu.querySelector<HTMLElement>('.d2-calque')!;
+  const demos = (lieu: HTMLElement) => [...lieu.querySelectorAll<HTMLElement>('.d2-demo')];
+
+  function survol(lieu: HTMLElement, cle: string | null) {
+    lieu.querySelectorAll<HTMLElement>('.d2-agent').forEach((a) => {
+      a.classList.toggle('survol', !!cle && a.dataset.cles!.split(' ').includes(cle));
+    });
+    lieu.querySelectorAll<HTMLElement>('.d2-menu [data-ouvrir]').forEach((b) => {
+      b.classList.toggle('survol', b.dataset.ouvrir === cle);
+    });
+  }
+
+  function marquer(lieu: HTMLElement, cle: string | null) {
+    lieu.querySelectorAll<HTMLElement>('[data-ouvrir]').forEach((b) => {
+      b.setAttribute('aria-expanded', String(b.dataset.ouvrir === cle));
+    });
+  }
+
+  function ouvrir(lieu: HTMLElement, cle: string, depuis: HTMLElement) {
+    const demo = demos(lieu).find((d) => d.dataset.cle === cle)!;
+    demos(lieu).forEach((d) => d.classList.toggle('on', d === demo));
+    lieu.dataset.ouvert = cle;
+    calque(lieu).setAttribute('style', demo.dataset.cam!);
+    survol(lieu, cle);
+    marquer(lieu, cle);
+    source = depuis;
+    requestAnimationFrame(() =>
+      demo.querySelector<HTMLElement>('[data-fermer]')!.focus({ preventScroll: true }),
+    );
+  }
+
+  function fermer(lieu: HTMLElement, rendreFocus: boolean) {
+    if (!lieu.dataset.ouvert) return;
+    delete lieu.dataset.ouvert;
+    demos(lieu).forEach((d) => d.classList.remove('on'));
+    calque(lieu).setAttribute('style', lieu.dataset.vue!);
+    survol(lieu, null);
+    marquer(lieu, null);
+    if (rendreFocus && source?.isConnected) {
+      // The marker that opened the demo fades back in; the menu line is always focusable.
+      const cible = source.classList.contains('d2-repere')
+        ? lieu.querySelector<HTMLElement>(`.d2-menu [data-ouvrir="${source.dataset.ouvrir}"]`)
+        : source;
+      cible?.focus({ preventScroll: true });
+    }
+    source = null;
+  }
+
+  function maj() {
+    const r = sec.getBoundingClientRect();
+    const p = Math.min(Math.max(-r.top / (r.height - innerHeight), 0), 0.9999);
+    const suivant = Math.floor(p * n);
+    if (suivant === k) return;
+    fermer(lieux[k], false);
+    k = suivant;
+    lieux.forEach((l, i) => l.classList.toggle('on', i === k));
+    points.forEach((el, i) => el.classList.toggle('on', i === k));
+  }
+
+  sec.addEventListener('click', (ev) => {
+    const t = ev.target as HTMLElement;
+    const lieu = t.closest<HTMLElement>('.d2-lieu');
+    if (!lieu) return;
+    const b = t.closest<HTMLElement>('[data-ouvrir]');
+    if (b) return ouvrir(lieu, b.dataset.ouvrir!, b);
+    if (t.closest('[data-fermer]')) return fermer(lieu, true);
+    // A click on the scene itself (not on a card) goes back to the wide shot.
+    if (t.closest('.d2-plateau')) fermer(lieu, false);
+  });
+  for (const [on, off] of [
+    ['pointerover', 'pointerout'],
+    ['focusin', 'focusout'],
+  ]) {
+    sec.addEventListener(on, (ev) => {
+      const b = (ev.target as HTMLElement).closest<HTMLElement>('[data-ouvrir]');
+      const lieu = b?.closest<HTMLElement>('.d2-lieu');
+      if (b && lieu && !lieu.dataset.ouvert) survol(lieu, b.dataset.ouvrir!);
+    });
+    sec.addEventListener(off, (ev) => {
+      const b = (ev.target as HTMLElement).closest<HTMLElement>('[data-ouvrir]');
+      const lieu = b?.closest<HTMLElement>('.d2-lieu');
+      if (b && lieu && !lieu.dataset.ouvert) survol(lieu, null);
+    });
+  }
+  addEventListener('keydown', (ev) => {
+    if (ev.key === 'Escape' && lieux[k].dataset.ouvert) fermer(lieux[k], true);
+  });
+
+  let raf = 0;
+  addEventListener('scroll', () => (raf ||= requestAnimationFrame(() => ((raf = 0), maj()))), {
+    passive: true,
+  });
+  addEventListener('resize', maj);
+  maj();
+</script>

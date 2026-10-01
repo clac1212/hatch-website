@@ -5,7 +5,6 @@ import { schema as hero } from './content/schemas/hero';
 import { schema as clients } from './content/schemas/clients';
 import { schema as probleme } from './content/schemas/probleme';
 import { schema as demo } from './content/schemas/demo';
-import { schema as demoEtapes } from './content/schemas/demoEtapes';
 import { schema as equipe } from './content/schemas/equipe';
 import { schema as cas } from './content/schemas/cas';
 import { schema as miseEnPlace } from './content/schemas/miseEnPlace';
@@ -87,7 +86,6 @@ export const collections = {
   clients: sectionCollection('clients', clients),
   probleme: sectionCollection('probleme', probleme),
   demo: sectionCollection('demo', demo),
-  demoEtapes: sectionCollection('demoEtapes', demoEtapes),
   equipe: sectionCollection('equipe', equipe),
   cas: sectionCollection('cas', cas),
   miseEnPlace: sectionCollection('miseEnPlace', miseEnPlace),

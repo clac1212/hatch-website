@@ -1,101 +1,93 @@
-# Scroll-driven product demo (v4, node U6VXNJ).
+# Diorama demo: three places on scroll; in each place, the visitor opens an agent's demo.
 titre: Your agents at work
+consigne: Pick an agent
 
-siege:
-  alt: 'Head office: the managing director, two team members and four agents at work'
-  etiquettes:
-    lark: Lark · 3 follow-ups this morning
-    jay: Jay · procedure v4 → 30 sites
-    finch: Finch · audit 92 / 100
-  peep:
-    question:
-      qui: Crousty One Lille
-      texte: Where's the allergen sheet for the new burger?
-      meta: '14:02'
-    reponse:
-      texte: Here's the “Summer menu allergens” sheet, v3. 📎
-      meta: '14:02'
-  lark:
-    titre: Lark · this week
-    chiffresGras: Peep answers **312** · Audits **8**
-    rappel: '⏰ Chase Lyon Part-Dieu: audit 3 days overdue'
-  jay:
-    titre: Jay · documentation
-    document: “Fryer cleaning” v4
-    diffusion: sent to 30 sites
-  finch:
-    titre: Finch · audit
-    coches:
-      - Temperatures
-      - Labelling
-      - Action plan
-    score: '92'
-    bareme: / 100
-  panneaux:
-    - surtitre: At head office · Peep
-      titre: The field asks, Peep answers.
-      texte: Every question from your teams comes in on WhatsApp. Peep answers from your manual, in their language, and escalates to head office whatever it doesn't know.
-    - surtitre: At head office · Lark
-      titre: The state of your network, every morning.
-      texte: What moved this week, upcoming deadlines, openings in progress, follow-ups to make. Lark is your very own assistant.
-    - surtitre: At head office · Jay
-      titre: Your manual, up to date and rolled out.
-      texte: Jay finds any document, co-writes your procedures and pushes them to the whole network, citing its sources.
-    - surtitre: At head office · Finch
-      titre: Audits that turn into action plans.
-      texte: One shared checklist, a score, and every gap turned into a task for the location.
+lieux:
+  - surtitre: At head office
+    titre: Four agents work alongside your team.
+    retour: Back to head office
+    agents:
+      - cle: peep
+        nom: Peep
+        role: answers questions from the field
+        titre: The field writes, Peep answers.
+        carte:
+          qui: Crousty One Lille
+          texte: Where's the allergen sheet for the new burger?
+          reponse:
+            qui: Peep
+            texte: '“Summer menu allergens” v3, here it is.'
+      - cle: lark
+        nom: Lark
+        role: prepares your morning briefing
+        titre: The state of the network, every morning.
+        carte:
+          lignes:
+            - agent: Lark
+              texte: 312 answers from Peep this week
+            - agent: Lark
+              texte: follow up with Lyon Part-Dieu, audit 3 days late
+      - cle: jay
+        nom: Jay
+        role: keeps the manual up to date
+        titre: The manual, up to date and shared.
+        carte:
+          lignes:
+            - agent: Jay
+              texte: '“Fryer cleaning” v4 shared with 30 sites'
+      - cle: finch
+        nom: Finch
+        role: turns audits into actions
+        titre: Audits that turn into action plans.
+        carte:
+          lignes:
+            - agent: Finch
+              texte: Lille audit 92 / 100, 2 gaps turned into actions
 
-cuisine:
-  alt: 'The kitchen: Owl answers out loud, Pecker trains the team during the break'
-  etiquettes:
-    owl: Owl · 6 questions this morning
-    pecker: Pecker · Opening module in progress
-  owl:
-    question:
-      qui: Team · out loud
-      texte: “Owl, how do we open the till?”
-    reponse:
-      texte: “Till” sheet, steps 1 to 3
-      meta: read out loud · 20 s
-  pecker:
-    titre: Pecker · break-time training
-    module: “Opening” module · 5 min
-    coches:
-      - Mise en place
-      - Till
-      - Quiz
-  panneaux:
-    - surtitre: In the field · Owl & Pecker
-      titre: In the kitchen, teams ask. Agents answer.
-      texte: 'A question out loud during service, a training module on the phone during the break: Owl and Pecker live right there on site.'
-    - surtitre: Owl · on the tablet
-      titre: A question out loud, an answer within a minute.
-      texte: "No phones during service: the team talks to the tablet, and Owl answers by voice from your manual, in everyone's own language."
-    - surtitre: Pecker · training
-      titre: Training happens on the floor, during the break.
-      texte: A five-minute module on the phone, no login needed. Pecker tracks who has completed what and flags the learning paths falling behind.
+  - surtitre: In the kitchen
+    titre: Teams ask, agents answer.
+    retour: Back to the kitchen
+    agents:
+      - cle: owl
+        nom: Owl
+        role: answers out loud
+        titre: A question out loud, an answer within a minute.
+        carte:
+          qui: Team · out loud
+          texte: '“Owl, how do we open the till?”'
+          reponse:
+            qui: Owl · on the tablet
+            texte: '“Till” sheet, steps 1 to 3, read out loud.'
+      - cle: pecker
+        nom: Pecker
+        role: trains the team during the break
+        titre: Training happens during the break.
+        carte:
+          lignes:
+            - agent: Pecker
+              texte: '“Opening” module, 5 min, completed by Inès'
 
-chantier:
-  alt: 'The build site: Sparrow follows the opening with Karim, the franchisee'
-  etiquettes:
-    sparrow: Sparrow · Nantes · D-18
-  avancement:
-    titre: Sparrow · Nantes opening
-    ligneGras: Works **75%** · Opening D-18
-    progression: 75
-  sparrow:
-    question:
-      texte: Is the tiling done? We still need to schedule the team training 📅
-    reponse:
-      qui: Karim · franchisee
-      texte: Yes, finished yesterday. Shall we do Thursday?
-  panneaux:
-    - surtitre: On the build site · Sparrow
-      titre: Every opening followed through to day one.
-      texte: 'Sparrow qualifies your franchise candidates, then supports every opening project: works, milestones, follow-ups, team training to schedule.'
-    - surtitre: Sparrow · progress
-      titre: Where every opening stands, milestone by milestone.
-      texte: 'Works, equipment, hiring: head office sees how every project is progressing without chasing anyone.'
-    - surtitre: Sparrow · WhatsApp
-      titre: The franchisee nudged at the right moment.
-      texte: Sparrow asks the question, the franchisee answers from the site, and everything flows back into the project.
+  - surtitre: On the build site
+    titre: From first contact to opening day.
+    retour: Back to the build site
+    agents:
+      - cle: sparrow-candidats
+        nom: Sparrow · Candidates
+        role: qualifies your franchise candidates
+        titre: Every candidate qualified, right away.
+        carte:
+          qui: Julien · candidate in Rennes
+          texte: Hi, I'm interested in the franchise. How do we start?
+          reponse:
+            qui: Sparrow
+            texte: Glad to hear it! Target city, budget, ideal timing? I'll prepare your file.
+      - cle: sparrow-ouverture
+        nom: Sparrow · Opening
+        role: follows every opening through to day one
+        titre: Every opening followed through to day one.
+        carte:
+          qui: Sparrow
+          texte: Are the tiles done? The team training still needs a date.
+          reponse:
+            qui: Karim · franchisee
+            texte: Yes, finished yesterday. Thursday?
