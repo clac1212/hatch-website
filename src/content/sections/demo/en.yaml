@@ -164,15 +164,15 @@ lieux:
             - de: equipe
               texte: Let's go
             - quiz:
-                question: Before opening the till, you need to…
+                question: At opening, the cold room reads 6 °C. What do you do?
                 aide: Select one answer.
                 options:
-                  - Switch on the fryer
-                  - Count the cash float
-                  - Start the music
+                  - Open, it'll cool down
+                  - Tell the manager
+                  - Turn the thermostat down
                 bonne: 1
             - de: agent
-              texte: Well done, module passed! Next one tomorrow during the break.
+              texte: Right, above 4 °C we alert and log it. Module passed! Next one tomorrow during the break.
           suivi:
             app: Hatch OS
             quand: now

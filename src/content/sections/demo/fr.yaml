@@ -164,15 +164,15 @@ lieux:
             - de: equipe
               texte: C'est parti
             - quiz:
-                question: Avant d'ouvrir la caisse, tu dois…
+                question: À l'ouverture, la chambre froide affiche 6 °C. Tu fais quoi ?
                 aide: Choisis une réponse.
                 options:
-                  - Allumer la friteuse
-                  - Compter le fond de caisse
-                  - Lancer la musique
+                  - J'ouvre, ça va redescendre
+                  - Je préviens le manager
+                  - Je baisse le thermostat
                 bonne: 1
             - de: agent
-              texte: Bravo, module validé ! Prochain module demain à la pause.
+              texte: Exact, au-dessus de 4 °C on alerte et on trace. Module validé ! Prochain module demain à la pause.
           suivi:
             app: Hatch OS
             quand: maintenant
