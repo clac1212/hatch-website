@@ -58,13 +58,13 @@ lieux:
       - cle: jay
         nom: Jay
         role: keeps the manual up to date
-        titre: The manual up to date, and shared.
+        titre: The manual always up to date.
         ecran:
           appareil: tableau
           heure: "10:15"
           entete: Jay · Manual
           statut: Updated
-          intro: I updated the sheet after feedback from BunBun Lille.
+          intro: Updating the sheet after feedback from BunBun Lille.
           titre: Fryer cleaning
           source: BunBun manual · Hygiene sheet
           blocs:
@@ -72,15 +72,16 @@ lieux:
               version:
                 avant: v3
                 apres: v4
+              etat:
+                enCours: Editing
+                publiee: Published
               lignes:
                 - Switch off the fryer, let it cool for 30 min
                 - Drain the oil once a week
                 - Clean the tank with degreaser
               modifiee: 1
               apres: Drain the oil every three days
-            - type: diffusion
-              total: 30
-              libelle: sites received v4
+              note: "Why: oil saturated by the end of the week, feedback from BunBun Lille"
       - cle: finch
         nom: Finch
         role: turns audits into actions

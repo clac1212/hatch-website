@@ -2,8 +2,8 @@
 /**
  * Head-office dashboard on an iPad (Lark, Jay, Finch; César 01/10): the agent posts a line, then
  * the UI it generates resolves out of a skeleton, block by block — key figures counting up, an
- * alert with its button, a manual sheet edited in place, a broadcast to N sites, a score, an
- * action plan written out. The markup renders the FINAL state (no JS, reduced motion); the GSAP
+ * alert with its button, a manual sheet edited like a document then published, a score, an
+ * action plan written out as a document. The markup renders the FINAL state (no JS, reduced motion); the GSAP
  * timeline (demo-motion.ts `tableau`) replays it on the beats from demo-ecran.ts.
  */
 import { Image } from 'astro:assets';
@@ -114,51 +114,46 @@ const I = {
                   )}
                   {b.type === 'edition' && (
                     <>
-                      <p class="b-doc-tete">
+                      <p class="b-meta">
                         <span class="b-badge" aria-hidden="true">
                           <span class="b-roue">
                             <span>{b.version.avant}</span>
                             <span>{b.version.apres}</span>
                           </span>
                         </span>
+                        <span class="b-etat">
+                          <span class="b-en-cours">{b.etat.enCours}</span>
+                          <span class="b-publiee">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                              <path d={I.ok} />
+                            </svg>
+                            {b.etat.publiee}
+                          </span>
+                        </span>
                       </p>
                       <ol class="b-doc">
-                        {b.lignes.map((ligne, j) =>
-                          j === b.modifiee ? (
-                            <li class="b-modifiee">
-                              <span class="b-suivi" aria-hidden="true" />
-                              <span class="b-num">{j + 1}</span>
+                        {b.lignes.map((ligne, j) => (
+                          <li class:list={{ 'b-modifiee': j === b.modifiee }}>
+                            <span class="b-num">{j + 1}.</span>
+                            {j === b.modifiee ? (
                               <span class="b-edite">
+                                <span class="b-teinte" aria-hidden="true" />
                                 <span class="b-avant-txt" aria-hidden="true">
                                   {ligne}
                                 </span>
                                 <span class="b-apres-txt">{b.apres}</span>
                                 <span class="b-curseur" aria-hidden="true" />
                               </span>
-                            </li>
-                          ) : (
-                            <li>
-                              <span class="b-num">{j + 1}</span>
+                            ) : (
                               <span>{ligne}</span>
-                            </li>
-                          ),
-                        )}
-                      </ol>
-                    </>
-                  )}
-                  {b.type === 'diffusion' && (
-                    <>
-                      <p class="b-compteur">
-                        <span class="b-valeur" data-valeur={b.total}>
-                          {nombre(b.total)}
-                        </span>
-                        <span class="b-libelle">{b.libelle}</span>
-                      </p>
-                      <div class="b-sites" aria-hidden="true">
-                        {Array.from({ length: b.total }, () => (
-                          <span />
+                            )}
+                          </li>
                         ))}
-                      </div>
+                      </ol>
+                      <p class="b-note">
+                        <span class="b-note-txt">{b.note}</span>
+                        <span class="b-curseur" aria-hidden="true" />
+                      </p>
                     </>
                   )}
                   {b.type === 'score' && (
@@ -192,7 +187,10 @@ const I = {
                             <li>
                               <span class="b-num">{j + 1}</span>
                               <span class="b-plan-corps">
-                                <span class="b-action-txt">{a.action}</span>
+                                <span class="b-ecrit">
+                                  <span class="b-action-txt">{a.action}</span>
+                                  <span class="b-curseur" aria-hidden="true" />
+                                </span>
                                 <span class="b-ecart-txt">
                                   <svg viewBox="0 0 24 24" aria-hidden="true">
                                     <path d={I.alerte} />
@@ -474,12 +472,14 @@ const I = {
     fill: var(--color-white);
   }
 
-  /* A manual sheet edited in place: the changed line is tinted (tracked change), its old text is
-     deleted and the new one typed after a caret; the version badge rolls to the new version. */
-  .b-doc-tete {
+  /* A manual sheet edited like a document (no boxes: a page). The changed line gets a tracked-
+     change tint; its old text is deleted and the new one typed after a caret; a note on the change
+     is typed under the steps; then the badge rolls to the new version and the sheet is published. */
+  .b-meta {
     display: flex;
-    justify-content: flex-end;
-    margin-top: -1cqw;
+    align-items: center;
+    gap: 1cqw;
+    margin-top: -0.6cqw;
   }
   .b-badge {
     height: 1.4em;
@@ -494,89 +494,102 @@ const I = {
     flex-direction: column;
     transform: translateY(-50%);
   }
+  .b-etat {
+    display: grid;
+    font: 600 1.5cqw/1.4 var(--font-sans);
+    color: var(--color-soft);
+  }
+  .b-etat > * {
+    grid-area: 1 / 1;
+    display: flex;
+    align-items: center;
+    gap: 0.5cqw;
+  }
+  .b-en-cours {
+    opacity: 0;
+  }
+  .b-publiee {
+    color: var(--color-success-txt);
+  }
+  .b-publiee svg {
+    width: 1.8cqw;
+    fill: currentColor;
+  }
   .b-doc {
     display: flex;
     flex-direction: column;
-    gap: 0.8cqw;
-    margin-top: 1cqw;
+    gap: 1.1cqw;
+    margin-top: 1.6cqw;
+    padding-top: 1.6cqw;
+    border-top: 1px solid var(--color-line);
+    font-size: 2cqw;
+    line-height: 1.4;
   }
   .b-doc li {
-    position: relative;
     display: flex;
-    align-items: center;
-    gap: 1.3cqw;
-    padding: 1.2cqw 1.5cqw;
-    border-radius: 1.3cqw;
-    background: var(--color-surface-2);
-    box-shadow: inset 0 0 0 1px var(--color-line);
-    font-size: 1.9cqw;
-  }
-  .b-doc li > * {
-    position: relative;
-  }
-  .b-doc li > .b-suivi {
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: var(--color-orange-tint);
-    box-shadow: inset 0 0 0 1px var(--color-orange);
+    gap: 1.2cqw;
   }
   .b-num {
-    display: grid;
-    place-items: center;
     flex: none;
-    width: 2.9cqw;
-    height: 2.9cqw;
-    border-radius: 999px;
-    background: var(--color-surface);
-    box-shadow: inset 0 0 0 1px var(--color-stone);
-    font: 600 1.5cqw/1 var(--font-sans);
+    min-width: 2.4cqw;
+    font-weight: 600;
+    color: var(--color-soft);
   }
   .b-edite {
+    position: relative;
     display: flex;
     align-items: center;
+    padding: 0 0.6cqw;
+    margin: 0 -0.6cqw;
     white-space: nowrap;
   }
+  .b-edite > * {
+    position: relative;
+  }
+  /* Tracked-change tint behind the edited line. */
+  .b-edite > .b-teinte {
+    position: absolute;
+    inset: 0;
+    border-radius: 0.6cqw;
+    background: var(--color-orange-tint);
+    box-shadow: inset 0 -0.25cqw 0 var(--color-orange);
+  }
   .b-avant-txt,
-  .b-apres-txt {
+  .b-apres-txt,
+  .b-note-txt,
+  .b-action-txt {
     display: inline-block;
     overflow: hidden;
+    white-space: nowrap;
     vertical-align: bottom;
   }
   .b-avant-txt {
     width: 0;
   }
   .b-curseur {
-    width: 0.25cqw;
-    height: 1.2em;
+    display: inline-block;
+    width: 0.22cqw;
+    height: 1.15em;
     margin-left: 0.15cqw;
+    vertical-align: middle;
     background: var(--color-ink);
     opacity: 0;
   }
-
-  /* Broadcast: the count runs while a dot per site lights up. */
-  .b-diffusion {
+  .b-note {
     display: flex;
-    flex-direction: column;
-    gap: 1.2cqw;
+    align-items: center;
+    margin-top: 1.4cqw;
+    font-size: 1.7cqw;
+    font-style: italic;
+    color: var(--color-soft);
   }
+
+  /* Score with its gauge. */
   .b-compteur {
     display: flex;
     align-items: baseline;
     gap: 1cqw;
   }
-  .b-sites {
-    display: grid;
-    grid-template-columns: repeat(15, 1fr);
-    gap: 0.8cqw;
-  }
-  .b-sites span {
-    aspect-ratio: 1;
-    border-radius: 999px;
-    background: var(--color-orange);
-  }
-
-  /* Score with its gauge. */
   .b-score {
     display: flex;
     flex-direction: column;
@@ -634,28 +647,40 @@ const I = {
     border-radius: 999px;
     background: var(--color-orange);
   }
+  /* The plan is a document: a page with its title, the actions written one by one. */
   .b-plan-doc {
-    padding: 1.6cqw 1.8cqw;
-    border-radius: 1.6cqw;
-    background: var(--color-surface-2);
-    box-shadow: inset 0 0 0 1px var(--color-line);
+    padding: 1.8cqw 2.2cqw 2cqw;
+    border-radius: 0.8cqw;
+    background: var(--color-surface);
+    box-shadow:
+      0 0 0 1px var(--color-line),
+      0 0.3cqw 0 var(--color-cream-2),
+      0 0.6cqw 0 var(--color-line);
   }
   .b-plan-titre {
-    font: 400 1.4cqw/1.2 var(--font-mono);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--color-orange-txt);
+    padding-bottom: 1cqw;
+    border-bottom: 1px solid var(--color-line);
+    font: 700 2.4cqw/1.15 var(--font-display);
+    letter-spacing: -0.01em;
   }
   .b-plan-doc ol {
     display: flex;
     flex-direction: column;
-    gap: 1.2cqw;
-    margin-top: 1.2cqw;
+    gap: 1.3cqw;
+    margin-top: 1.3cqw;
   }
   .b-plan-doc li {
     display: flex;
     align-items: flex-start;
-    gap: 1.3cqw;
+    gap: 1.2cqw;
+  }
+  .b-plan-doc .b-num {
+    font-size: 1.9cqw;
+    line-height: 1.35;
+  }
+  .b-ecrit {
+    display: flex;
+    align-items: center;
   }
   .b-plan-corps {
     display: flex;
@@ -667,6 +692,7 @@ const I = {
   .b-action-txt {
     font-size: 1.9cqw;
     font-weight: 600;
+    line-height: 1.35;
   }
   .b-ecart-txt {
     display: flex;
@@ -681,10 +707,10 @@ const I = {
   }
   .b-echeance {
     flex: none;
-    padding: 0.5cqw 1cqw;
-    border-radius: 999px;
-    background: var(--color-orange-tint);
-    box-shadow: inset 0 0 0 1px var(--color-orange);
-    font: 600 1.45cqw/1.2 var(--font-sans);
+    margin-top: 0.3cqw;
+    font: 400 1.35cqw/1.4 var(--font-mono);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-orange-txt);
   }
 </style>

@@ -120,26 +120,23 @@ const ecranTableau = z.strictObject({
         /** Something to act on, with its button. */
         z.strictObject({ type: z.literal('alerte'), texte, bouton: texte }),
         /**
-         * A manual sheet edited in place: line `modifiee` is deleted and retyped as `apres`, the
-         * version badge goes from `avant` to `apres`.
+         * A manual sheet edited like a document: line `modifiee` is deleted and retyped as `apres`,
+         * a note on the change is typed under it, then the new version is published.
          */
         z
           .strictObject({
             type: z.literal('edition'),
             version: z.strictObject({ avant: texte, apres: texte }),
+            /** Status of the sheet while it is edited, then once published. */
+            etat: z.strictObject({ enCours: texte, publiee: texte }),
             lignes: z.array(texte).min(2).max(4),
             modifiee: z.number().int().min(0),
             apres: texte,
+            note: texte,
           })
           .refine((e) => e.modifiee < e.lignes.length, {
             message: '`modifiee` is past the last line',
           }),
-        /** Sent to N sites: dots light up as the count runs. */
-        z.strictObject({
-          type: z.literal('diffusion'),
-          total: z.number().int().min(1).max(60),
-          libelle: texte,
-        }),
         /** A score out of a maximum, with its gauge. */
         z.strictObject({
           type: z.literal('score'),

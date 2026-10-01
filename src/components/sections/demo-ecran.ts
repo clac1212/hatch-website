@@ -90,8 +90,7 @@ export function chronoTelephone(e: EcranTelephone) {
 const DUREE_BLOC: Record<EcranTableau['blocs'][number]['type'], number> = {
   chiffres: 2.6,
   alerte: 2.2,
-  edition: 4.6,
-  diffusion: 3,
+  edition: 6,
   score: 2.2,
   plan: 0,
 };

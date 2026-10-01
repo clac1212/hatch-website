@@ -58,13 +58,13 @@ lieux:
       - cle: jay
         nom: Jay
         role: tient le manuel à jour
-        titre: Le manuel à jour, et diffusé.
+        titre: Le manuel toujours à jour.
         ecran:
           appareil: tableau
           heure: "10:15"
           entete: Jay · Manuel
           statut: Mise à jour
-          intro: J'ai mis à jour la fiche après le retour de BunBun Lille.
+          intro: Je mets à jour la fiche après le retour de BunBun Lille.
           titre: Nettoyage friteuse
           source: Manuel BunBun · fiche Hygiène
           blocs:
@@ -72,15 +72,16 @@ lieux:
               version:
                 avant: v3
                 apres: v4
+              etat:
+                enCours: Modification en cours
+                publiee: Publiée
               lignes:
                 - Couper la friteuse, laisser refroidir 30 min
                 - Vidanger l'huile une fois par semaine
                 - Nettoyer la cuve au dégraissant
               modifiee: 1
               apres: Vidanger l'huile tous les trois jours
-            - type: diffusion
-              total: 30
-              libelle: sites ont reçu la v4
+              note: "Pourquoi : huile saturée en fin de semaine, retour de BunBun Lille"
       - cle: finch
         nom: Finch
         role: transforme les audits en actions
