@@ -63,7 +63,8 @@ const SHOPS: (
   { shop: 8, anchor: 'center' }, // Stuttgart (Lark)
   // Marseille opening (Sparrow): the construction site of the map (decor, not a shop), card above its crane
   { x: 1190, y: 650, roof: 140, anchor: 'center' },
-  { shop: 13, anchor: 'right' }, // Zurich (Owl, off the map)
+  // Huesca (Owl, off the map), Spanish side of the middle of the Pyrenees: Owl answers in the team's language
+  { shop: 25, anchor: 'center' },
 ];
 if (SHOPS.length !== events.length) {
   throw new Error(
@@ -455,9 +456,10 @@ const tick =
     max-width: 100%;
     transition: grid-template-rows 0.6s var(--ease-hatch);
   }
+  /* No overflow clipping here: it cut the card's soft shadow into a faint rectangle (César, 01/10). The
+     card's own fade and slide make the entrance; the grid row only gives the slot its height. */
   .h-slot > div {
     min-height: 0;
-    overflow: hidden;
     padding: 3px 2px;
   }
   .h-slot.on {

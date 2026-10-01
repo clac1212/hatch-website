@@ -8,7 +8,7 @@ tasks:
   status:
     running: In progress
     done: Done
-  # The three agents drawn on the map first (Peep, Lark, Sparrow: the shop writes, a message travels to the bird, it answers), then one agent off the map (Owl), and the loop restarts.
+  # The three agents drawn on the map first (Peep, Lark, Sparrow: the shop writes, the bird types its answer), then one agent off the map (Owl, answering in the team's language: Huesca, in Spanish), and the loop restarts.
   events:
     - agent: peep
       running: 'Question from the Dijon team'
@@ -20,5 +20,5 @@ tasks:
       running: 'Marseille opening · D-18'
       done: 'Team training booked for Thursday'
     - agent: owl
-      running: "Zurich: the oven won't heat up"
-      done: 'Troubleshooting read out in the kitchen'
+      running: 'Huesca: “¿Cómo se limpia la freidora?”'
+      done: 'Answered in Spanish, out loud'

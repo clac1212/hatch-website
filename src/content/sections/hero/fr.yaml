@@ -9,7 +9,7 @@ tasks:
   status:
     running: En cours
     done: Terminé
-  # Les trois agents visibles sur la carte d'abord (Peep, Lark, Sparrow : la boutique écrit, un message part vers l'oiseau, il répond), puis un agent hors carte (Owl), et la boucle repart (César, 01/10).
+  # Les trois agents visibles sur la carte d'abord (Peep, Lark, Sparrow : la boutique écrit, l'oiseau tape sa réponse), puis un agent hors carte (Owl, qui répond dans la langue de l'équipe : Huesca, en espagnol), et la boucle repart (César, 01/10).
   events:
     - agent: peep
       running: "Question de l'équipe de Dijon"
@@ -21,5 +21,5 @@ tasks:
       running: 'Ouverture Marseille · J-18'
       done: "Formation de l'équipe calée jeudi"
     - agent: owl
-      running: 'Zurich : le four ne chauffe plus'
-      done: 'Procédure de dépannage lue en cuisine'
+      running: 'Huesca : « ¿Cómo se limpia la freidora? »'
+      done: 'Réponse lue en espagnol, à voix haute'
