@@ -14,14 +14,15 @@ const carte = z.union([
 
 /**
  * Animated device mock-up (pilot, kitchen, 01/10): the demo plays on a screen instead of a card.
- * Timings are derived from the copy in src/components/sections/demo-ecran.ts.
+ * Beats are derived from the copy in src/components/sections/demo-ecran.ts.
  */
 const ecranTablette = z.strictObject({
   appareil: z.literal('tablette'),
   /** Top bar of the tablet app. */
   entete: texte,
-  /** Listening state, before the question. */
+  /** Status in the top bar: listening (question), then reading (procedure). */
   ecoute: texte,
+  lit: texte,
   /** Spoken question, shown word by word. */
   question: texte,
   /** Procedure sheet the agent answers with, and where it comes from. */

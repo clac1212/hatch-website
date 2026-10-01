@@ -6,6 +6,8 @@
  * scene or leaving the place closes it.
  * Pilot (01/10): a place whose demos all carry an `ecran` (the kitchen) plays them instead, one after
  * the other, as animated device mock-ups (DemoEcran.astro) with tabs, progress bars and a pause button.
+ * Its motion design (camera, focus, agents, screens) is one GSAP timeline, demo-motion.ts, loaded
+ * when the section comes near the viewport.
  *
  * Scroll rules (research: NN/g on scroll-jacking, Apple product pages):
  * - the scroll position picks the place DIRECTLY (no queue): a fast scroll lands on a clean state,
@@ -36,7 +38,6 @@ import avOwl from '../../assets/hero/agents/owl.webp';
 import avPecker from '../../assets/hero/agents/pecker.webp';
 import avSparrow from '../../assets/demo/avatars/sparrow.png';
 import DemoEcran from './DemoEcran.astro';
-import { chronoTablette, chronoTelephone } from './demo-ecran';
 
 interface Props {
   locale: Locale;
@@ -54,7 +55,7 @@ type Cam = [fx: number, fy: number, z: number];
 const centre = (v: number, z: number, o: number) => Math.min(Math.max(v, o / z), 1 - (1 - o) / z);
 const camStyle = ([fx, fy, z]: Cam, [ox, oy] = [0.5, 0.5]) =>
   `--cx:${centre(fx, z, ox)};--cy:${centre(fy, z, oy)};--z:${z}`;
-/** Focus position of autoplay places on desktop, mirrored in the CSS (.d2-lieu.auto --ox/--oy). */
+/** Focus position of autoplay places on desktop (wide shot and agents), mirrored in the CSS (.d2-lieu.auto --ox/--oy). */
 const VISEE_AUTO: [number, number] = [0.3, 0.45];
 
 /**
@@ -149,9 +150,6 @@ const lieux = data.lieux.map((l, i) => {
     );
   return { ...l, ...LIEUX[i], auto };
 });
-/** Length of an animated demo, in seconds (tab progress bar). */
-const duree = (e: NonNullable<(typeof data.lieux)[number]['agents'][number]['ecran']>) =>
-  (e.appareil === 'tablette' ? chronoTablette(e) : chronoTelephone(e)).duree;
 for (const l of lieux) {
   const ici = l.decoupes.flatMap((d) => d.cles);
   const ailleurs = l.agents.filter((a) => !ici.includes(a.cle));
@@ -166,9 +164,12 @@ for (const l of lieux) {
   <div class="d2-scene-fixe">
     {
       lieux.map((l, i) => (
-        <div class:list={['d2-lieu', { on: i === 0, auto: l.auto }]} data-vue={camStyle(l.vue)}>
+        <div
+          class:list={['d2-lieu', { on: i === 0, auto: l.auto }]}
+          data-vue={camStyle(l.vue, l.auto ? VISEE_AUTO : undefined)}
+        >
           <div class="d2-plateau">
-            <div class="d2-calque" style={camStyle(l.vue)}>
+            <div class="d2-calque" style={camStyle(l.vue, l.auto ? VISEE_AUTO : undefined)}>
               <Picture
                 src={l.fond}
                 formats={['avif', 'webp']}
@@ -190,6 +191,7 @@ for (const l of lieux) {
                   style={`left:${a.x * 100}%;top:${a.y * 100}%;width:${a.w * 100}%;animation-delay:${-a.d}s`}
                 />
               ))}
+              {l.auto && <div class="d2-voile" aria-hidden="true" />}
               {!l.auto &&
                 l.agents.map((d) => {
                   const g = DEMOS[d.cle];
@@ -239,7 +241,7 @@ for (const l of lieux) {
                         <b>{d.nom}</b> {d.role}
                       </span>
                       <span class="d2-barre" aria-hidden="true">
-                        <span style={`--duree:${d.ecran ? duree(d.ecran) : 0}s`} />
+                        <span />
                       </span>
                     </button>
                   ))}
@@ -265,6 +267,7 @@ for (const l of lieux) {
                     d.ecran && (
                       <div
                         class:list={['d2-ecran', d.ecran.appareil, { on: j === 0 }]}
+                        data-cle={d.cle}
                         data-cam={camStyle(DEMOS[d.cle].cam, VISEE_AUTO)}
                       >
                         <DemoEcran ecran={d.ecran} avatar={DEMOS[d.cle].avatar} />
@@ -753,10 +756,29 @@ for (const l of lieux) {
     scale: 1.35;
   }
 
-  /* Autoplay place: the agent sits left of centre, its device on the right. */
+  /* Autoplay place: the agent sits left of centre, its device on the right. The timeline drives
+     the camera, so no CSS transition smooths it a second time. */
   .d2-lieu.auto .d2-plateau {
     --ox: 0.3;
     --oy: 0.45;
+  }
+  .d2-lieu.auto .d2-calque {
+    transition: none;
+  }
+  /* The agent's reaction (squash and stretch from its feet), driven by --saut in the timeline. */
+  .d2-lieu.auto .d2-calque :global(.d2-agent) {
+    --saut: 0;
+    scale: 1 calc(1 + var(--saut) * 0.05);
+    transition: none;
+  }
+  /* Focus: the scene dims, the agent on stage is lifted above this layer (z-index, timeline). */
+  .d2-voile {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: color-mix(in srgb, var(--color-night) 32%, transparent);
+    opacity: 0;
+    pointer-events: none;
   }
   .d2-titres {
     display: grid;
@@ -821,27 +843,14 @@ for (const l of lieux) {
     border-radius: 999px;
     background: var(--color-line);
   }
+  /* Filled by the timeline, in step with its demo. */
   .d2-barre > span {
     display: block;
     height: 100%;
     border-radius: inherit;
     background: var(--color-orange);
     transform-origin: left;
-    scale: 0 1;
-  }
-  [data-onglet].on .d2-barre > span {
-    scale: 1 1;
-  }
-  [data-onglet].joue .d2-barre > span {
-    animation: d2-progres var(--duree) linear both;
-  }
-  @keyframes d2-progres {
-    from {
-      scale: 0 1;
-    }
-  }
-  .d2-lieu.pause [data-onglet] .d2-barre > span {
-    animation-play-state: paused;
+    transform: scaleX(0);
   }
   .d2-pause {
     display: grid;
@@ -877,20 +886,13 @@ for (const l of lieux) {
   .d2-appareils > * {
     pointer-events: auto;
   }
+  /* Devices: shown by the timeline (inline styles). Without JS, the first one stays. */
   .d2-ecran {
     grid-area: 1 / 1;
-    opacity: 0;
     visibility: hidden;
-    transition:
-      opacity 0.3s var(--ease-hatch),
-      visibility 0s 0.3s;
   }
-  .d2-ecran.on {
-    opacity: 1;
+  .d2:not(.js) .d2-ecran.on {
     visibility: visible;
-    transition:
-      opacity 0.45s var(--ease-hatch) 0.3s,
-      visibility 0s;
   }
   .d2-ecran.tablette {
     width: min(560px, 40vw);
@@ -955,11 +957,15 @@ for (const l of lieux) {
     opacity: 1;
     translate: none;
   }
-  .d2:not(.js) :is(.d2-repere, .d2-points, .d2-fleche, .d2-pause) {
+  .d2:not(.js) :is(.d2-repere, .d2-points, .d2-fleche, .d2-pause, .d2-barre) {
     display: none;
   }
 
   @media (prefers-reduced-motion: reduce) {
+    /* Nothing plays: a tab shows its demo's final state, so there is nothing to pause. */
+    .d2-pause {
+      display: none;
+    }
     .d2 *,
     .d2 *::after {
       transition-duration: 0s !important;
@@ -970,9 +976,11 @@ for (const l of lieux) {
 </style>
 
 <script>
+  import type { Pilote } from './demo-motion';
   /**
    * The scroll position picks the place directly: place = floor(progress × n). No queue, so a fast
-   * scroll never leaves a step pending. Inside a place, agent demos open on demand.
+   * scroll never leaves a step pending. Inside a place, agent demos open on demand, or play on their
+   * own (autoplay places, timeline in demo-motion.ts).
    */
   const sec = document.querySelector<HTMLElement>('.d2')!;
   const lieux = [...sec.querySelectorAll<HTMLElement>('.d2-lieu')];
@@ -982,8 +990,20 @@ for (const l of lieux) {
 
   let k = 0;
   let source: HTMLElement | null = null;
-  const fige = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (fige) sec.querySelectorAll('.ecr').forEach((e) => e.classList.add('fige'));
+  const auto = (lieu: HTMLElement) => lieu.classList.contains('auto');
+
+  /** Autoplay places' timelines: GSAP and the choreography load when the section comes near. */
+  const pilotes = new Map<HTMLElement, Pilote>();
+  new IntersectionObserver(
+    async (entrees, io) => {
+      if (!entrees.some((e) => e.isIntersecting)) return;
+      io.disconnect();
+      const { piloter } = await import('./demo-motion');
+      lieux.filter(auto).forEach((l) => pilotes.set(l, piloter(l)));
+      if (auto(lieux[k])) pilotes.get(lieux[k])!.jouer(0);
+    },
+    { rootMargin: '100% 0px' },
+  ).observe(sec);
 
   const calque = (lieu: HTMLElement) => lieu.querySelector<HTMLElement>('.d2-calque')!;
   const demos = (lieu: HTMLElement) => [...lieu.querySelectorAll<HTMLElement>('.d2-demo')];
@@ -1033,32 +1053,7 @@ for (const l of lieux) {
     source = null;
   }
 
-  /** Autoplay places: demo i plays on its device; its tab's progress bar ends it (see animationend). */
-  function jouer(lieu: HTMLElement, i: number) {
-    const ecrans = [...lieu.querySelectorAll<HTMLElement>('.d2-ecran')];
-    const onglets = [...lieu.querySelectorAll<HTMLElement>('[data-onglet]')];
-    lieu
-      .querySelectorAll('.d2-titres > .d2-titre')
-      .forEach((t, j) => t.classList.toggle('on', j === i));
-    onglets.forEach((o, j) => {
-      o.classList.toggle('on', j === i);
-      o.classList.remove('joue');
-      o.setAttribute('aria-pressed', String(j === i));
-    });
-    ecrans.forEach((e, j) => {
-      e.classList.toggle('on', j === i);
-      e.querySelector('.ecr')!.classList.remove('joue');
-    });
-    calque(lieu).setAttribute('style', ecrans[i].dataset.cam!);
-    if (fige) return;
-    const ecr = ecrans[i].querySelector<HTMLElement>('.ecr')!;
-    void ecr.offsetWidth; // restart the CSS animations from 0
-    ecr.classList.add('joue');
-    onglets[i].classList.add('joue');
-  }
-  function arreter(lieu: HTMLElement) {
-    lieu.querySelectorAll('.joue').forEach((e) => e.classList.remove('joue'));
-  }
+  /** The pause button shows the visitor's state (icon and label). */
   function pause(lieu: HTMLElement, oui: boolean) {
     lieu.classList.toggle('pause', oui);
     const b = lieu.querySelector<HTMLElement>('.d2-pause')!;
@@ -1071,10 +1066,13 @@ for (const l of lieux) {
     const suivant = Math.floor(p * n);
     if (suivant === k) return;
     fermer(lieux[k], false);
-    if (lieux[k].classList.contains('auto')) arreter(lieux[k]);
+    if (auto(lieux[k])) {
+      pilotes.get(lieux[k])?.arreter();
+      pause(lieux[k], false);
+    }
     k = suivant;
     lieux.forEach((l, i) => l.classList.toggle('on', i === k));
-    if (lieux[k].classList.contains('auto')) jouer(lieux[k], 0);
+    if (auto(lieux[k])) pilotes.get(lieux[k])?.jouer(0);
     points.forEach((el, i) => el.classList.toggle('on', i === k));
   }
 
@@ -1083,11 +1081,12 @@ for (const l of lieux) {
     const lieu = t.closest<HTMLElement>('.d2-lieu');
     if (!lieu) return;
     const onglet = t.closest<HTMLElement>('[data-onglet]');
+    const pilote = pilotes.get(lieu);
     if (onglet) {
       pause(lieu, false);
-      return jouer(lieu, Number(onglet.dataset.onglet));
+      return pilote?.jouer(Number(onglet.dataset.onglet));
     }
-    if (t.closest('.d2-pause')) return pause(lieu, !lieu.classList.contains('pause'));
+    if (t.closest('.d2-pause')) return pilote && pause(lieu, pilote.basculer());
     const b = t.closest<HTMLElement>('[data-ouvrir]');
     if (b) return ouvrir(lieu, b.dataset.ouvrir!, b);
     if (t.closest('[data-fermer]')) return fermer(lieu, true);
@@ -1109,15 +1108,6 @@ for (const l of lieux) {
       if (b && lieu && !lieu.dataset.ouvert) survol(lieu, null);
     });
   }
-  // A demo's progress bar is full: next demo of the place, in a loop.
-  sec.addEventListener('animationend', (ev) => {
-    const barre = (ev.target as HTMLElement).closest('.d2-barre');
-    const onglet = barre?.closest<HTMLElement>('[data-onglet]');
-    if (!onglet?.classList.contains('joue')) return;
-    const lieu = onglet.closest<HTMLElement>('.d2-lieu')!;
-    const n = lieu.querySelectorAll('[data-onglet]').length;
-    jouer(lieu, (Number(onglet.dataset.onglet) + 1) % n);
-  });
   addEventListener('keydown', (ev) => {
     if (ev.key === 'Escape' && lieux[k].dataset.ouvert) fermer(lieux[k], true);
   });
@@ -1128,5 +1118,4 @@ for (const l of lieux) {
   });
   addEventListener('resize', maj);
   maj();
-  if (lieux[k].classList.contains('auto')) jouer(lieux[k], 0);
 </script>

@@ -58,6 +58,7 @@ lieux:
           appareil: tablette
           entete: Owl · Tablette cuisine
           ecoute: Je vous écoute
+          lit: Je lis la fiche
           question: Owl, comment on ouvre la caisse ?
           fiche: Ouverture de caisse
           source: Manuel BunBun · fiche Caisse v4
