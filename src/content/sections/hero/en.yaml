@@ -1,4 +1,4 @@
-# One entry per line of the desktop title (on mobile, the title reflows as a single paragraph).
+# The title, as fragments joined with spaces: the browser wraps the lines (Fraunces, balanced).
 title:
   - Hire AI agents
   - to run and grow your

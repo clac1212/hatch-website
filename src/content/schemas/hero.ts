@@ -2,7 +2,7 @@ import { z } from 'astro/zod';
 
 /**
  * Copy of the hero (src/content/sections/hero/{fr,en}.yaml).
- * `title` is split into the lines of the desktop layout (joined into one paragraph on mobile).
+ * `title` is a list of fragments joined with spaces; the browser wraps the lines (Fraunces, balanced).
  * `tasks.events` feeds the animation of the map: one event per shop, in loop order (the shops, timings
  * and positions live in Hero.astro, which checks that both lists have the same length).
  */

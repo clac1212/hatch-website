@@ -1,4 +1,4 @@
-# Une entrée par ligne du titre en desktop (sur mobile, le titre se recompose en un seul paragraphe).
+# Le titre, en fragments joints par des espaces : le navigateur répartit les lignes (Fraunces, équilibré).
 title:
   - Recrutez des agents IA
   - pour piloter et
