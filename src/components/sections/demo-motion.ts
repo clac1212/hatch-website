@@ -614,6 +614,9 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
       { ...vue, duration: 1.3, ease: EASE.camera, immediateRender: false },
       fin,
     ).to(voile, { opacity: 0, duration: 0.8, ease: 'power1.inOut' }, fin + 0.2);
+    // The place ends on its wide shot, held: with the scroll in play, the last stretch of the
+    // place's scroll is this calm frame, so leaving the place never cuts a demo mid-sentence.
+    m.to({}, { duration: 1.2 });
     return m;
   }
 
@@ -695,7 +698,14 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
       if (scroll) {
         // A short catch-up tween smooths the wheel's steps without lagging behind the scroll.
         gsap.to(tl, { progress: p, duration: 0.6, ease: 'power3.out', overwrite: true });
-      } else if (mode === 'mixte' && dq) pousser(dq * tl.duration() * POUSSEE);
+      } else if (mode === 'mixte' && dq) {
+        // Going down, the scroll is a floor: at q the demo is at least at q of its length, so at
+        // the bottom of the place it has reached its end (wide shot) before the next place shows.
+        // Going up, it rewinds relatively.
+        const d = tl.duration();
+        const ici = cible ?? tl.time();
+        pousser(dq > 0 ? Math.max(ici + dq * d * POUSSEE, p * d) - ici : dq * d * POUSSEE);
+      }
     },
     jouer(i) {
       if (scroll) return;

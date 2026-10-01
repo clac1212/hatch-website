@@ -416,10 +416,9 @@ for (const l of lieux) {
     top: calc((var(--i) + 0.5) * var(--pas));
     scroll-snap-align: start;
   }
-  :global(html:has(.d2.js:not(.long))) {
+  :global(html:has(.d2.js)) {
     scroll-snap-type: y proximity;
   }
-  /* With the scroll in play, no snap points pulling it. */
   .d2-scene-fixe {
     position: sticky;
     top: 0;
@@ -1050,6 +1049,11 @@ for (const l of lieux) {
   if (POIDS > 1) {
     sec.classList.add('long');
     sec.style.setProperty('--n', String(total));
+    // Soft snap points: mid-place for one-step places, on the opening wide shot for longer ones
+    // (the page helps you stop there, it never holds the wheel).
+    sec.querySelectorAll<HTMLElement>('.d2-ancre').forEach((a, i) => {
+      a.style.top = `calc(${debuts[i] + (poids[i] > 1 ? 0.12 : 0.5)} * var(--pas))`;
+    });
   }
   if (mode === 'scroll') sec.classList.add('scrub');
   /** Where the scroll is: the place, and the position inside it (0–1). */
