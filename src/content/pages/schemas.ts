@@ -23,59 +23,57 @@ export const demoPage = z.strictObject({
 });
 
 /**
- * /securite (César 01/10): three guarantees, each held by a voxel agent (hero), the access control
- * shown on an iPad (who sees what in the BunBun network), one call to action.
- * Every claim must be true of Hatch OS: hosting is in Europe.
+ * /securite (César 01/10): the content of the current site (v1), four themes of three points each,
+ * in the v2 design — voxel agents in the hero, access control shown on an iPad (who sees what in the
+ * BunBun network), one call to action. Every claim must be true of Hatch OS: hosting is in Europe.
  */
 const accessState = z.enum(['visible', 'perimetre', 'masque']);
+const item = z.strictObject({ title: z.string(), text: z.string() });
 export const securityPage = z.strictObject({
   seo,
   hero: z.strictObject({
     kicker: z.string(),
     title: z.string(),
     lead: z.string(),
-    proofs: z.array(z.string()).length(3),
+    proofs: z.array(z.string()).min(2).max(3),
     /** Alt texts of the three agents (Jay: servers and EU flag, Owl: safe, Finch: stamp). */
     alts: z.strictObject({ jay: z.string(), owl: z.string(), finch: z.string() }),
   }),
-  guarantees: z
+  sections: z
     .array(
       z.strictObject({
-        kicker: z.string(),
         title: z.string(),
-        points: z.array(z.string()).min(2).max(3),
+        subtitle: z.string(),
+        items: z.array(item).length(3),
+        /** This theme also shows the access screen (iPad). */
+        screen: z.boolean().optional(),
       }),
     )
-    .length(3),
-  access: z.strictObject({
-    kicker: z.string(),
-    title: z.string(),
-    points: z.array(z.string()).length(3),
-    /** The iPad screen: one view per role, each row visible, limited to the role's scope, or hidden. */
-    screen: z.strictObject({
-      app: z.string(),
-      viewing: z.string(),
-      roles: z.array(z.string()).length(3),
-      states: z.strictObject({
-        visible: z.string(),
-        perimetre: z.string(),
-        masque: z.string(),
-        nonPartage: z.string(),
-      }),
-      rows: z
-        .array(
-          z.strictObject({
-            label: z.string(),
-            meta: z.string(),
-            /** One state per role; absent = the source is not shared with Hatch at all. */
-            access: z.array(accessState).length(3).optional(),
-          }),
-        )
-        .min(3)
-        .max(5),
+    .length(4),
+  /** The iPad screen: one view per role, each row visible, limited to the role's scope, or hidden. */
+  screen: z.strictObject({
+    app: z.string(),
+    viewing: z.string(),
+    roles: z.array(z.string()).length(3),
+    states: z.strictObject({
+      visible: z.string(),
+      perimetre: z.string(),
+      masque: z.string(),
+      nonPartage: z.string(),
     }),
+    rows: z
+      .array(
+        z.strictObject({
+          label: z.string(),
+          meta: z.string(),
+          /** One state per role; absent = the source is not shared with Hatch at all. */
+          access: z.array(accessState).length(3).optional(),
+        }),
+      )
+      .min(3)
+      .max(5),
   }),
-  cta: z.strictObject({ title: z.string(), text: z.string() }),
+  contact: z.strictObject({ title: z.string(), text: z.string() }),
 });
 
 /**

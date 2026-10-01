@@ -1,71 +1,83 @@
 seo:
   title: 'Sécurité & confidentialité — Hatch OS'
-  description: 'Vos données restent les vôtres : hébergées en Europe, jamais utilisées pour entraîner une IA, accessibles seulement à qui vous décidez.'
+  description: 'Vous gardez le contrôle de vos données : hébergées en Europe, jamais utilisées pour entraîner une IA, et accessibles uniquement à qui vous décidez.'
 hero:
   kicker: 'Sécurité & confidentialité'
-  title: 'Vos données restent les vôtres.'
-  lead: "Vous décidez de ce que Hatch utilise et de qui y accède. Vos données restent hébergées en Europe, et aucune IA ne s'entraîne dessus."
+  title: 'Vos données, en sécurité dès le premier jour.'
+  lead: "Vous gardez le contrôle de ce que vous partagez, de l'endroit où c'est hébergé et de qui y accède."
   proofs:
+    - 'Conforme RGPD'
     - 'Hébergé en Europe'
     - 'Aucun entraînement IA'
-    - 'Conforme RGPD'
   alts:
     jay: "Jay, l'oiseau voxel, sur deux serveurs avec un drapeau européen"
     owl: 'Owl devant un coffre-fort fermé par un cadenas'
     finch: 'Finch appose un tampon de validation sur un dossier'
-guarantees:
-  - kicker: 'Hébergement'
-    title: 'Hébergées en Europe.'
-    points:
-      - 'Vos données et leurs sauvegardes restent en Europe.'
-      - 'Chiffrées en transit et au repos (TLS, AES-256).'
-      - 'Cloisonnées par client : aucun partage entre réseaux.'
-  - kicker: 'Intelligence artificielle'
-    title: "Aucune IA ne s'entraîne sur vos données."
-    points:
-      - 'Vos contenus servent à vous répondre, jamais à entraîner un modèle.'
-      - 'Zéro rétention chez nos fournisseurs de modèles.'
-      - "Les agents ne s'appuient que sur vos documents."
-  - kicker: 'Conformité'
-    title: 'RGPD et AI Act, sans jargon.'
-    points:
-      - 'Accès, export et suppression de vos données quand vous le souhaitez.'
-      - "Aucune IA n'évalue, ne note ni ne classe une personne."
-      - 'DPA et documentation de sécurité sur demande.'
-access:
-  kicker: "Contrôle d'accès"
-  title: 'Chacun ne voit que son périmètre.'
-  points:
-    - "Vous choisissez ce que Hatch utilise, source par source. Le reste n'est jamais partagé."
-    - 'Le siège voit tout, un site voit son site, un équipier ce qui le concerne.'
-    - 'Vos équipes se connectent avec votre SSO (SAML).'
-  screen:
-    app: 'Hatch · Accès'
-    viewing: 'Vu par'
-    roles:
-      - 'Siège'
-      - 'BunBun Lille'
-      - 'Équipier'
-    states:
-      visible: 'Visible'
-      perimetre: 'Son périmètre'
-      masque: 'Masqué'
-      nonPartage: 'Non partagé avec Hatch'
-    rows:
-      - label: 'Manuel BunBun'
-        meta: 'Toutes les fiches'
-        access: [visible, visible, visible]
-      - label: 'Audits qualité'
-        meta: 'Tous les sites'
-        access: [visible, perimetre, masque]
-      - label: 'Plannings'
-        meta: 'Équipes des sites'
-        access: [visible, perimetre, perimetre]
-      - label: 'Chiffres du réseau'
-        meta: "Chiffre d'affaires, fréquentation"
-        access: [visible, masque, masque]
-      - label: 'Recettes en test'
-        meta: 'Dossier R&D'
-cta:
-  title: 'Une question de votre DSI ?'
-  text: 'Questionnaire de sécurité, DPA, documentation : on vous répond avec le détail.'
+sections:
+  - title: 'Vous décidez de ce que vous partagez'
+    subtitle: 'Vous choisissez précisément les données que Hatch OS utilise.'
+    items:
+      - title: 'Sélection à la source'
+        text: 'Choisissez exactement ce que Hatch OS utilise, source par source.'
+      - title: 'Hébergé en Europe'
+        text: 'Vos données et leurs sauvegardes restent en Europe.'
+      - title: 'Chiffrement de bout en bout'
+        text: 'Chiffrées en transit et au repos (TLS, AES-256).'
+  - title: "Vos données n'entraînent aucune IA"
+    subtitle: 'Vos contenus servent à vous rendre service, jamais à entraîner des modèles.'
+    items:
+      - title: 'Aucun entraînement'
+        text: "Vos données ne sont jamais utilisées pour entraîner un modèle d'IA."
+      - title: 'Zéro rétention côté modèles'
+        text: "Vous gardez vos données ; nos fournisseurs de modèles n'en conservent rien."
+      - title: 'Cloisonnées par client'
+        text: "L'assistant ne s'appuie que sur vos documents, isolés de ceux des autres clients."
+  - title: "Un contrôle d'accès granulaire, à chaque niveau"
+    subtitle: "Chaque membre de votre réseau n'accède qu'à ce qui le concerne."
+    screen: true
+    items:
+      - title: 'SSO entreprise'
+        text: 'Vos équipes se connectent via votre SSO (SAML).'
+      - title: 'Accès par rôle'
+        text: 'Des droits distincts pour le franchiseur et les franchisés.'
+      - title: 'Permissions fines'
+        text: 'Vous choisissez qui accède à quels documents, au sein de vos équipes.'
+  - title: 'Conformité'
+    subtitle: 'Le cadre européen respecté, sans le jargon.'
+    items:
+      - title: 'RGPD'
+        text: 'Accès, export et suppression de vos données quand vous le souhaitez.'
+      - title: 'AI Act'
+        text: "Aucune IA n'évalue, ne note ni ne classe une personne."
+      - title: 'Documentation'
+        text: 'DPA et détail de nos mesures de sécurité disponibles sur demande.'
+screen:
+  app: 'Hatch · Accès'
+  viewing: 'Vu par'
+  roles:
+    - 'Siège'
+    - 'BunBun Lille'
+    - 'Équipier'
+  states:
+    visible: 'Visible'
+    perimetre: 'Son périmètre'
+    masque: 'Masqué'
+    nonPartage: 'Non partagé avec Hatch'
+  rows:
+    - label: 'Manuel BunBun'
+      meta: 'Toutes les fiches'
+      access: [visible, visible, visible]
+    - label: 'Audits qualité'
+      meta: 'Tous les sites'
+      access: [visible, perimetre, masque]
+    - label: 'Plannings'
+      meta: 'Équipes des sites'
+      access: [visible, perimetre, perimetre]
+    - label: 'Chiffres du réseau'
+      meta: "Chiffre d'affaires, fréquentation"
+      access: [visible, masque, masque]
+    - label: 'Recettes en test'
+      meta: 'Dossier R&D'
+contact:
+  title: 'Une question sur la sécurité ?'
+  text: 'Notre équipe répond à vos questionnaires sécurité et partage notre documentation détaillée sur demande.'
