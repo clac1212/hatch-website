@@ -8,30 +8,17 @@ tasks:
   status:
     running: In progress
     done: Done
-  # One event per shop, in loop order: the shop sends its wave, then the agent's card appears above it ("running"), switches to "done" and fades out.
-  # The shops are picked in Hero.astro (same order).
+  # The three agents drawn on the map first (Peep, Lark, Sparrow: the shop writes, a message travels to the bird, it answers), then one agent off the map (Owl), and the loop restarts.
   events:
     - agent: peep
       running: 'Question from the Dijon team'
       done: 'Allergen sheet sent'
-    - agent: pecker
-      running: 'New hire in Geneva'
-      done: 'Onboarding course sent'
-    - agent: finch
-      running: 'Hygiene audit in Nice'
-      done: '3 gaps turned into actions'
-    - agent: jay
-      running: 'Metz asks for the opening checklist'
-      done: 'Checklist shared with the team'
-    - agent: sparrow
-      running: 'Marseille opening · D-18'
-      done: 'Team training booked for Thursday'
-    - agent: peep
-      running: 'Question in Spanish · Barcelona'
-      done: 'Reply sent in Spanish'
-    - agent: owl
-      running: "Zurich: the oven won't heat up"
-      done: 'Troubleshooting read out in the kitchen'
     - agent: lark
       running: 'Stuttgart behind on revenue'
       done: 'Follow-up scheduled tomorrow 9 am'
+    - agent: sparrow
+      running: 'Marseille opening · D-18'
+      done: 'Team training booked for Thursday'
+    - agent: owl
+      running: "Zurich: the oven won't heat up"
+      done: 'Troubleshooting read out in the kitchen'

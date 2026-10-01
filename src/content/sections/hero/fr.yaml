@@ -9,30 +9,17 @@ tasks:
   status:
     running: En cours
     done: Terminé
-  # Un événement par point de vente, dans l'ordre de la boucle : le point de vente émet son onde, puis la carte de l'agent apparaît au-dessus (« running »), passe à « done » et s'efface.
-  # Les points de vente sont choisis dans Hero.astro (même ordre).
+  # Les trois agents visibles sur la carte d'abord (Peep, Lark, Sparrow : la boutique écrit, un message part vers l'oiseau, il répond), puis un agent hors carte (Owl), et la boucle repart (César, 01/10).
   events:
     - agent: peep
       running: "Question de l'équipe de Dijon"
       done: 'Fiche allergènes envoyée'
-    - agent: pecker
-      running: 'Nouvelle recrue à Genève'
-      done: "Parcours d'intégration envoyé"
-    - agent: finch
-      running: 'Audit hygiène à Nice'
-      done: '3 écarts transformés en actions'
-    - agent: jay
-      running: "Metz demande la procédure d'ouverture"
-      done: "Procédure partagée à l'équipe"
-    - agent: sparrow
-      running: 'Ouverture Marseille · J-18'
-      done: "Formation de l'équipe calée jeudi"
-    - agent: peep
-      running: 'Question en espagnol · Barcelone'
-      done: 'Réponse envoyée en espagnol'
-    - agent: owl
-      running: 'Zurich : le four ne chauffe plus'
-      done: 'Procédure de dépannage lue en cuisine'
     - agent: lark
       running: 'Stuttgart en retard sur le CA'
       done: 'Relance programmée demain 9 h'
+    - agent: sparrow
+      running: 'Ouverture Marseille · J-18'
+      done: "Formation de l'équipe calée jeudi"
+    - agent: owl
+      running: 'Zurich : le four ne chauffe plus'
+      done: 'Procédure de dépannage lue en cuisine'

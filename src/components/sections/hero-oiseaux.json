@@ -1,5 +1,5 @@
 {
-  "_doc": "Box of each bird sprite in the hero frame (1440 x 804), written by hero-v4-relief/oiseaux.py with the map. Do not edit by hand.",
+  "_doc": "Box of each bird drawn on the hero map (frame 1440 x 804), written by hero-v4-relief/oiseaux.py with the image. Anchors the message arcs and the typing bubbles. Do not edit by hand.",
   "lark": {
     "left": 1045.99,
     "top": 87.65,
