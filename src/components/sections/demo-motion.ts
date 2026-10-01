@@ -292,9 +292,17 @@ export interface Pilote {
   arreter(): void;
   /** Toggle the visitor's pause; returns the new state. */
   basculer(): boolean;
+  /** Scroll mode: show the timeline at progress q (0–1), smoothed. */
+  scruter(q: number): void;
+  /** Scroll mode: progress (0–1) where demo i starts, to scroll a tab click there. */
+  position(i: number): number;
 }
 
-export function piloter(lieu: HTMLElement): Pilote {
+/**
+ * `scroll` (test variant, `?scroll=1`): the timeline does not play on its own; the scroll position
+ * inside the place drives it (`scruter`), so the visitor scrubs the demo like a video.
+ */
+export function piloter(lieu: HTMLElement, { scroll = false } = {}): Pilote {
   const calque = $(lieu, '.d2-calque');
   const voile = $(lieu, '.d2-voile');
   const ecrans = $$(lieu, '.d2-ecran');
@@ -310,6 +318,8 @@ export function piloter(lieu: HTMLElement): Pilote {
   let actif = false;
   let enPause = false;
   let courant = -1;
+  /** Scroll mode: the last progress asked for, reapplied when the timeline is rebuilt. */
+  let q = 0;
 
   /** Tabs and titles follow the demo on screen (classes: their CSS transitions do the rest). */
   function marquer(i: number) {
@@ -327,7 +337,7 @@ export function piloter(lieu: HTMLElement): Pilote {
     const { appareil, contenu } = mobile ? { appareil: 1.8, contenu: 2.2 } : T;
     const m = gsap.timeline({
       paused: true,
-      repeat: -1,
+      repeat: scroll ? 0 : -1,
       onUpdate() {
         const t = m.time();
         marquer(
@@ -442,7 +452,8 @@ export function piloter(lieu: HTMLElement): Pilote {
       { ...vue, duration: 1.3, ease: EASE.camera, immediateRender: false },
       fin,
     ).to(voile, { opacity: 0, duration: 0.8, ease: 'power1.inOut' }, fin + 0.2);
-    m.to({}, { duration: 1.4 });
+    // Autoplay: a breath on the wide shot before the loop starts again.
+    if (!scroll) m.to({}, { duration: 1.4 });
     return m;
   }
 
@@ -455,6 +466,9 @@ export function piloter(lieu: HTMLElement): Pilote {
     gsap.set(barres[i], { scaleX: 1 });
     marquer(i);
   }
+
+  /** Reduced motion in scroll mode: the demos split the place's scroll evenly. */
+  const indice = (p: number) => Math.min(ecrans.length - 1, Math.floor(p * ecrans.length));
 
   // gsap.matchMedia runs the handler only while one condition matches: `mobile` and `large` cover
   // every width, so it always runs, and runs again (reverting the last timeline) when one flips.
@@ -469,7 +483,8 @@ export function piloter(lieu: HTMLElement): Pilote {
       const { mobile, reduit } = ctx.conditions!;
       courant = -1;
       tl = reduit ? null : construire(!!mobile);
-      if (!tl) montrer(0);
+      if (!tl) montrer(scroll ? indice(q) : 0);
+      else if (scroll) tl.progress(q);
       else if (actif) tl.play(0).paused(enPause);
       return () => {
         tl = null;
@@ -478,18 +493,20 @@ export function piloter(lieu: HTMLElement): Pilote {
   );
 
   document.addEventListener('visibilitychange', () => {
-    if (tl && actif && !enPause) tl.paused(document.hidden);
+    if (tl && actif && !enPause && !scroll) tl.paused(document.hidden);
   });
 
   return {
     jouer(i) {
       actif = true;
+      if (scroll) return;
       if (!tl) return montrer(i);
       enPause = false;
       tl.play(i === 0 ? 0 : `d${i}`);
     },
     arreter() {
       actif = false;
+      if (scroll) return;
       if (tl) tl.pause(0);
       else montrer(0);
     },
@@ -497,6 +514,17 @@ export function piloter(lieu: HTMLElement): Pilote {
       enPause = !enPause;
       tl?.paused(enPause);
       return enPause;
+    },
+    scruter(p) {
+      q = p;
+      if (!tl) return montrer(indice(p));
+      // A short catch-up tween smooths the wheel's steps without lagging behind the scroll.
+      gsap.to(tl, { progress: p, duration: 0.6, ease: 'power3.out', overwrite: true });
+    },
+    position(i) {
+      if (!tl) return (i + 0.5) / ecrans.length;
+      // Just past the camera travel, so the click lands on the device entering.
+      return Math.min(1, (debuts[i] + T.camera) / tl.duration());
     },
   };
 }

@@ -409,8 +409,12 @@ for (const l of lieux) {
     top: calc((var(--i) + 0.5) * var(--pas));
     scroll-snap-align: start;
   }
-  :global(html:has(.d2.js)) {
+  :global(html:has(.d2.js:not(.scrub))) {
     scroll-snap-type: y proximity;
+  }
+  /* Scroll mode: the scroll is the playhead, so no snap points pulling it and no pause button. */
+  .d2.scrub .d2-pause {
+    display: none;
   }
   .d2-scene-fixe {
     position: sticky;
@@ -985,12 +989,30 @@ for (const l of lieux) {
   const sec = document.querySelector<HTMLElement>('.d2')!;
   const lieux = [...sec.querySelectorAll<HTMLElement>('.d2-lieu')];
   const points = [...sec.querySelectorAll<HTMLElement>('.d2-points li')];
-  const n = lieux.length;
   sec.classList.add('js');
 
   let k = 0;
   let source: HTMLElement | null = null;
   const auto = (lieu: HTMLElement) => lieu.classList.contains('auto');
+
+  /**
+   * Test variant `?scroll=1` (César, 01/10): autoplay places don't play, the scroll drives their
+   * timeline. They get SCRUB steps of scroll instead of one, so the demo reads at scroll pace.
+   */
+  const scrub = new URLSearchParams(location.search).has('scroll');
+  const SCRUB = 5;
+  const poids = lieux.map((l) => (scrub && auto(l) ? SCRUB : 1));
+  const debuts = poids.map((_, i) => poids.slice(0, i).reduce((a, b) => a + b, 0));
+  const total = poids.reduce((a, b) => a + b, 0);
+  if (scrub) {
+    sec.classList.add('scrub');
+    sec.style.setProperty('--n', String(total));
+  }
+  /** Where the scroll is in the section, in place steps (0 → total). */
+  function pas() {
+    const r = sec.getBoundingClientRect();
+    return Math.min(Math.max(-r.top / (r.height - innerHeight), 0), 0.9999) * total;
+  }
 
   /** Autoplay places' timelines: GSAP and the choreography load when the section comes near. */
   const pilotes = new Map<HTMLElement, Pilote>();
@@ -999,8 +1021,9 @@ for (const l of lieux) {
       if (!entrees.some((e) => e.isIntersecting)) return;
       io.disconnect();
       const { piloter } = await import('./demo-motion');
-      lieux.filter(auto).forEach((l) => pilotes.set(l, piloter(l)));
+      lieux.filter(auto).forEach((l) => pilotes.set(l, piloter(l, { scroll: scrub })));
       if (auto(lieux[k])) pilotes.get(lieux[k])!.jouer(0);
+      maj();
     },
     { rootMargin: '100% 0px' },
   ).observe(sec);
@@ -1061,9 +1084,10 @@ for (const l of lieux) {
   }
 
   function maj() {
-    const r = sec.getBoundingClientRect();
-    const p = Math.min(Math.max(-r.top / (r.height - innerHeight), 0), 0.9999);
-    const suivant = Math.floor(p * n);
+    const u = pas();
+    const suivant = debuts.findLastIndex((d) => u >= d);
+    if (scrub && auto(lieux[suivant]))
+      pilotes.get(lieux[suivant])?.scruter((u - debuts[suivant]) / poids[suivant]);
     if (suivant === k) return;
     fermer(lieux[k], false);
     if (auto(lieux[k])) {
@@ -1082,6 +1106,17 @@ for (const l of lieux) {
     if (!lieu) return;
     const onglet = t.closest<HTMLElement>('[data-onglet]');
     const pilote = pilotes.get(lieu);
+    if (onglet && scrub && pilote) {
+      // Scroll mode: a tab scrolls to where its demo starts.
+      const i = lieux.indexOf(lieu);
+      const u = debuts[i] + poids[i] * pilote.position(Number(onglet.dataset.onglet));
+      const r = sec.getBoundingClientRect();
+      const top = scrollY + r.top + (u / total) * (r.height - innerHeight);
+      return scrollTo({
+        top,
+        behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+      });
+    }
     if (onglet) {
       pause(lieu, false);
       return pilote?.jouer(Number(onglet.dataset.onglet));

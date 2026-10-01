@@ -1107,11 +1107,12 @@ const I = {
     background: var(--color-ink);
   }
 
-  /* Head office's notification, beside the phone (over the scene); on phones, over its bottom edge. */
+  /* Head office's notification, beside the phone's top (clear of the agent); on phones, over its
+     bottom edge. */
   .p-suivi {
     position: absolute;
     right: calc(100% + 14px);
-    bottom: 34%;
+    top: 9%;
     display: flex;
     align-items: flex-start;
     gap: 11px;
@@ -1158,6 +1159,7 @@ const I = {
   }
   @media (max-width: 47.99rem) {
     .p-suivi {
+      top: auto;
       right: auto;
       left: -14%;
       bottom: 3%;
