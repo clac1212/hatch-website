@@ -35,18 +35,24 @@ export const securityPage = z.strictObject({
     kicker: z.string(),
     title: z.string(),
     lead: z.string(),
-    proofs: z.array(z.string()).min(2).max(3),
+    /** Key promises, each a link down to the theme that backs it (`section`: its index). */
+    proofs: z
+      .array(z.strictObject({ label: z.string(), section: z.number().int().min(0).max(3) }))
+      .min(2)
+      .max(4),
     /** Alt texts of the three agents (Jay: servers and EU flag, Owl: safe, Finch: stamp). */
     alts: z.strictObject({ jay: z.string(), owl: z.string(), finch: z.string() }),
   }),
   sections: z
     .array(
       z.strictObject({
+        /** Function of the theme, also the hero's anchor to it. */
+        kicker: z.string(),
         title: z.string(),
         subtitle: z.string(),
         items: z.array(item).length(3),
-        /** This theme also shows the access screen (iPad). */
-        screen: z.boolean().optional(),
+        /** Shown by: an agent (its image, alt from `hero.alts`), or the access screen (iPad). */
+        visual: z.enum(['jay', 'owl', 'finch', 'ecran']),
       }),
     )
     .length(4),

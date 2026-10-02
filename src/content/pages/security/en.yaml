@@ -6,15 +6,22 @@ hero:
   title: 'Your data, secure from day one.'
   lead: "You stay in control of what you share, where it's hosted, and who can access it."
   proofs:
-    - 'GDPR compliant'
-    - 'Hosted in Europe'
-    - 'No AI training'
+    - label: 'Hosted in Europe'
+      section: 0
+    - label: 'No AI training'
+      section: 1
+    - label: 'Role-based access'
+      section: 2
+    - label: 'GDPR compliant'
+      section: 3
   alts:
     jay: 'Jay, the voxel bird, standing on two servers with a European flag'
     owl: 'Owl in front of a safe closed with a padlock'
     finch: 'Finch stamping a file as approved'
 sections:
-  - title: 'You decide what you share'
+  - kicker: 'Sharing & hosting'
+    visual: jay
+    title: 'You decide what you share'
     subtitle: 'You choose exactly which data Hatch OS uses.'
     items:
       - title: 'Source-level selection'
@@ -23,7 +30,9 @@ sections:
         text: 'Your data and its backups stay in Europe.'
       - title: 'End-to-end encryption'
         text: 'Encrypted in transit and at rest (TLS, AES-256).'
-  - title: 'Your data never trains AI'
+  - kicker: 'Artificial intelligence'
+    visual: owl
+    title: 'Your data never trains AI'
     subtitle: 'Your content is used to serve you, never to train models.'
     items:
       - title: 'No training'
@@ -32,9 +41,10 @@ sections:
         text: 'You keep your data; our model providers retain none of it.'
       - title: 'Isolated per customer'
         text: "The assistant draws only on your documents, isolated from other customers'."
-  - title: 'Granular access control, at every level'
+  - kicker: 'Access control'
+    visual: ecran
+    title: 'Granular access control, at every level'
     subtitle: 'Everyone in your network only accesses what concerns them.'
-    screen: true
     items:
       - title: 'Enterprise SSO'
         text: 'Your teams sign in via your SSO (SAML).'
@@ -42,7 +52,9 @@ sections:
         text: 'Distinct rights for the franchisor and franchisees.'
       - title: 'Fine-grained permissions'
         text: 'You choose who accesses which documents across your teams.'
-  - title: 'Compliance'
+  - kicker: 'Compliance'
+    visual: finch
+    title: 'Compliance'
     subtitle: 'The European framework, minus the jargon.'
     items:
       - title: 'GDPR'

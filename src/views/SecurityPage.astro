@@ -1,9 +1,11 @@
 ---
 import { getEntry } from 'astro:content';
-import { Picture } from 'astro:assets';
+import { Picture, getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import Base from '../layouts/Base.astro';
 import Button from '../components/ui/Button.astro';
 import Ipad from '../components/ui/Ipad.astro';
+import fond from '../assets/securite/fond-orange-grain.jpg';
 import jay from '../assets/securite/jay.png';
 import owl from '../assets/securite/owl.png';
 import finch from '../assets/securite/finch.png';
@@ -11,10 +13,14 @@ import { routes, useTranslations, type Locale } from '../i18n/ui';
 
 /**
  * Security page (César 01/10), shared by /securite and /en/security. The content of the current site
- * (v1): four themes of three points each, in the v2 design — the three guardian agents in the hero
- * (Jay: hosting in Europe, Owl: no AI training, Finch: compliance), each theme as a title + its
- * points, the access-control theme shown as product on an iPad (who sees what in the BunBun network,
- * role by role), and the site's single call to action.
+ * (v1), in the landing's patterns:
+ * - the hero is the home's security band, enlarged (orange grain, night text), its promises linking
+ *   down to the theme that backs each one;
+ * - each theme is a two-panel block, like the agent and pricing cards: the guardian agent large on a
+ *   tint (Jay: sharing and hosting in Europe, Owl: no AI training, Finch: compliance), the text and
+ *   its three points as ruled rows; sides alternate;
+ * - access control is shown as product, on an iPad in a night section (who sees what in the BunBun
+ *   network, role by role); then the site's single call to action.
  * The H1 is in Fraunces, not the pixel font (César 01/10: exception to the H1 rule, like the home).
  * The access screen cycles through the roles while in view (not under reduced motion); a click on a
  * role takes over and stops the cycle. Without JS it shows the head office's view.
@@ -29,68 +35,68 @@ const entry = await getEntry('securityPage', locale);
 if (!entry) throw new Error(`Missing src/content/pages/security/${locale}.yaml`);
 const { seo, hero, sections, screen, contact } = entry.data;
 const wrap = 'mx-auto w-full max-w-site px-6 md:px-12';
+const bg = await getImage({ src: fond, format: 'webp', width: 1600, quality: 70 });
+const AGENTS: Record<'jay' | 'owl' | 'finch', ImageMetadata> = { jay, owl, finch };
+/** Tint behind each agent, from the warm side of the palette (as the agent cards of the home). */
+const TEINTES = { jay: 'bg-sand', owl: 'bg-stone', finch: 'bg-peach' };
+const ancre = (i: number) => `theme-${i + 1}`;
+const num = (i: number) => String(i + 1).padStart(2, '0');
 ---
 
 <Base locale={locale} paths={routes.security} title={seo.title} description={seo.description}>
   <header
-    class:list={[
-      wrap,
-      'grid items-center gap-12 pt-32 pb-16 md:grid-cols-[1.05fr_1fr] md:pt-40 md:pb-24',
-    ]}
-    data-rv-groupe
+    class="bg-orange bg-cover bg-center pt-32 pb-16 md:pt-40 md:pb-20"
+    style={`background-image:url(${bg.src})`}
   >
-    <div class="flex flex-col items-start gap-6">
-      <p class="font-mono text-kicker text-orange-txt uppercase" data-rv>{hero.kicker}</p>
-      <h1 class="font-display text-h1 font-bold tracking-[-0.02em] text-ink" data-rv>
+    <div class:list={[wrap, 'flex flex-col items-start gap-6']} data-rv-groupe>
+      <p class="font-mono text-kicker text-night uppercase" data-rv>{hero.kicker}</p>
+      <h1 class="max-w-[16ch] font-display text-h1 font-bold tracking-[-0.02em] text-night" data-rv>
         {hero.title}
       </h1>
-      <p class="max-w-[34rem] text-body text-soft" data-rv>{hero.lead}</p>
-      <ul class="preuves flex flex-wrap gap-x-6 gap-y-2" data-rv>
-        {hero.proofs.map((p) => <li>{p}</li>)}
+      <p class="max-w-[36rem] text-body text-night" data-rv>{hero.lead}</p>
+      <ul
+        class="mt-4 grid w-full gap-px overflow-hidden rounded-card bg-night/15 sm:grid-cols-2 lg:grid-cols-4"
+        data-rv
+      >
+        {
+          hero.proofs.map((p) => (
+            <li>
+              <a href={`#${ancre(p.section)}`} class="ancre">
+                <span class="font-mono text-kicker text-night/70 uppercase">{num(p.section)}</span>
+                <span class="flex items-center justify-between gap-3 font-display text-card font-bold text-night">
+                  {p.label}
+                  <svg
+                    viewBox="0 0 24 24"
+                    class="size-4 shrink-0 rotate-90"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path d="M4 11v2h16v-2zm12 2v2h2v-2zm-2 2v2h2v-2zm-2 2v2h2v-2zm4-6V9h2v2zm-2 4V7h2v8zm-2 2V5h2v12z" />
+                  </svg>
+                </span>
+              </a>
+            </li>
+          ))
+        }
       </ul>
-      <div data-rv>
-        <Button href={routes.demo[locale]} size="lg">{t('cta.demo')}</Button>
-      </div>
-    </div>
-    <div class="trio" data-rv>
-      <Picture
-        src={jay}
-        alt={hero.alts.jay}
-        width={300}
-        densities={[1, 2]}
-        formats={['avif', 'webp']}
-        class="jay"
-      />
-      <Picture
-        src={owl}
-        alt={hero.alts.owl}
-        width={250}
-        densities={[1, 2]}
-        formats={['avif', 'webp']}
-        class="owl"
-      />
-      <Picture
-        src={finch}
-        alt={hero.alts.finch}
-        width={250}
-        densities={[1, 2]}
-        formats={['avif', 'webp']}
-        class="finch"
-      />
     </div>
   </header>
 
   {
     sections.map((sec, i) =>
-      sec.screen ? (
-        <section aria-labelledby={`secu-${i}`} class="bg-night py-20 text-white md:py-28">
+      sec.visual === 'ecran' ? (
+        <section
+          id={ancre(i)}
+          aria-labelledby={`secu-${i}`}
+          class="scroll-mt-24 bg-night py-20 text-white md:py-28"
+        >
           <div
             class:list={[wrap, 'grid items-center gap-12 md:grid-cols-[0.9fr_1.1fr]']}
             data-rv-groupe
           >
             <div class="flex flex-col items-start gap-5">
-              <p class="font-mono text-kicker text-orange uppercase" data-rv>
-                {String(i + 1).padStart(2, '0')}
+              <p class="font-mono text-kicker text-white/60 uppercase" data-rv>
+                {num(i)} · {sec.kicker}
               </p>
               <h2 id={`secu-${i}`} class="font-display text-section font-bold" data-rv>
                 {sec.title}
@@ -98,14 +104,17 @@ const wrap = 'mx-auto w-full max-w-site px-6 md:px-12';
               <p class="text-body text-white/75" data-rv>
                 {sec.subtitle}
               </p>
-              <ul class="points points-nuit flex w-full flex-col" data-rv>
-                {sec.items.map((it) => (
+              <ol class="points points-nuit flex w-full flex-col" data-rv>
+                {sec.items.map((it, j) => (
                   <li>
-                    <b>{it.title}</b>
-                    {it.text}
+                    <span class="rang">{num(j)}</span>
+                    <span>
+                      <b>{it.title}</b>
+                      {it.text}
+                    </span>
                   </li>
                 ))}
-              </ul>
+              </ol>
             </div>
             <div data-rv>
               <Ipad>
@@ -152,38 +161,55 @@ const wrap = 'mx-auto w-full max-w-site px-6 md:px-12';
         </section>
       ) : (
         <section
+          id={ancre(i)}
           aria-labelledby={`secu-${i}`}
-          class:list={[
-            wrap,
-            'grid gap-8 border-t border-line py-16 md:grid-cols-[0.75fr_1.25fr] md:gap-12 md:py-20',
-          ]}
+          class:list={[wrap, 'scroll-mt-24 py-10 md:py-14', i === 0 && 'pt-20 md:pt-24']}
           data-rv-groupe
         >
-          <div class="flex flex-col items-start gap-4">
-            <p class="font-mono text-kicker text-orange-txt uppercase" data-rv>
-              {String(i + 1).padStart(2, '0')}
-            </p>
-            <h2 id={`secu-${i}`} class="font-display text-section font-bold text-ink" data-rv>
-              {sec.title}
-            </h2>
-            <p class="text-body text-soft" data-rv>
-              {sec.subtitle}
-            </p>
+          <div
+            class:list={[
+              'bloc grid overflow-hidden rounded-card bg-surface md:grid-cols-2',
+              i % 2 === 1 && 'inverse',
+            ]}
+            data-rv
+          >
+            <div class:list={['tuile grid place-items-center', TEINTES[sec.visual]]}>
+              <Picture
+                src={AGENTS[sec.visual]}
+                alt={hero.alts[sec.visual]}
+                width={360}
+                densities={[1, 2]}
+                formats={['avif', 'webp']}
+                loading="lazy"
+              />
+            </div>
+            <div class="flex flex-col items-start gap-4 p-8 md:p-12">
+              <p class="font-mono text-kicker text-orange-txt uppercase">
+                {num(i)} · {sec.kicker}
+              </p>
+              <h2 id={`secu-${i}`} class="font-display text-section font-bold text-ink">
+                {sec.title}
+              </h2>
+              <p class="text-body text-soft">{sec.subtitle}</p>
+              <ol class="points mt-2 flex w-full flex-col">
+                {sec.items.map((it, j) => (
+                  <li>
+                    <span class="rang">{num(j)}</span>
+                    <span>
+                      <b>{it.title}</b>
+                      {it.text}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </div>
           </div>
-          <ul class="cartes grid gap-4 sm:grid-cols-3 md:grid-cols-1 lg:grid-cols-3" data-rv>
-            {sec.items.map((it) => (
-              <li>
-                <b>{it.title}</b>
-                {it.text}
-              </li>
-            ))}
-          </ul>
         </section>
       ),
     )
   }
 
-  <section aria-labelledby="secu-contact" class="bg-cream-2 py-20 md:py-24" data-rv-groupe>
+  <section aria-labelledby="secu-contact" class="py-20 md:py-28" data-rv-groupe>
     <div class:list={[wrap, 'flex flex-col items-start gap-5 md:items-center md:text-center']}>
       <h2 id="secu-contact" class="font-display text-section font-bold text-ink" data-rv>
         {contact.title}
@@ -195,84 +221,87 @@ const wrap = 'mx-auto w-full max-w-site px-6 md:px-12';
     </div>
   </section>
 </Base>
+
 <style>
-  /* Proofs under the lead: plain facts, a small orange square instead of an icon. */
-  .preuves li {
+  /* Hero promises: a ruled strip of links to the themes (the home band's labels, enlarged). */
+  .ancre {
     display: flex;
-    align-items: center;
+    flex-direction: column;
     gap: 10px;
-    font: 600 15px/1.3 var(--font-sans);
-    color: var(--color-ink);
+    height: 100%;
+    padding: 20px 22px 22px;
+    background: color-mix(in srgb, var(--color-white) 72%, transparent);
+    transition: background-color 0.3s var(--ease-doux);
   }
-  .preuves li::before {
-    content: '';
-    width: 8px;
-    height: 8px;
-    background: var(--color-orange);
+  .ancre:hover {
+    background: var(--color-white);
+  }
+  .ancre svg {
+    transition: translate 0.35s var(--ease-entree);
+  }
+  .ancre:hover svg {
+    translate: 0 3px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ancre,
+    .ancre svg {
+      transition: none;
+    }
+  }
+  .ancre:focus-visible {
+    outline: 2px solid var(--color-night);
+    outline-offset: -2px;
   }
 
-  /* The three agents, staged as a small group: Jay behind, Owl and Finch in front. */
-  .trio {
-    position: relative;
-    aspect-ratio: 1.15;
-    width: 100%;
-    max-width: 560px;
-    justify-self: center;
+  /* A theme: the agent on its tint, the text beside; every other block puts the agent right. */
+  .bloc {
+    box-shadow: inset 0 0 0 1px var(--color-line);
   }
-  .trio :global(img) {
-    position: absolute;
+  .tuile {
+    min-height: 320px;
+    padding: 40px;
+  }
+  .tuile :global(img) {
+    width: min(78%, 360px);
     height: auto;
-    filter: drop-shadow(0 18px 22px color-mix(in srgb, var(--color-shadow) 22%, transparent));
+    filter: drop-shadow(0 22px 26px color-mix(in srgb, var(--color-shadow) 22%, transparent));
   }
-  .trio :global(.jay) {
-    left: 26%;
-    top: 0;
-    width: 52%;
-  }
-  .trio :global(.owl) {
-    left: 0;
-    bottom: 2%;
-    width: 44%;
-  }
-  .trio :global(.finch) {
-    right: 0;
-    bottom: 0;
-    width: 44%;
+  @media (min-width: 48rem) {
+    .bloc.inverse .tuile {
+      order: 2;
+    }
   }
 
-  /* Points: a bold title then its line, separated by rules, no icons. */
+  /* Points: index in the pixel font, a bold title then its line, rows separated by rules. */
   .points li {
-    padding: 12px 0;
+    display: grid;
+    grid-template-columns: 2.4rem 1fr;
+    padding: 16px 0;
     border-top: 1px solid var(--color-line);
-    font: 400 16px/1.45 var(--font-sans);
+    font: 400 16px/1.5 var(--font-sans);
     color: var(--color-soft);
   }
-  .points li:first-child {
-    border-top: 0;
-    padding-top: 0;
-  }
-  .points li b,
-  .cartes li b {
+  .points li b {
     display: block;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     font: 700 17px/1.3 var(--font-sans);
     color: var(--color-ink);
   }
-  .points-nuit li b {
-    color: var(--color-white);
-  }
-  /* The three points of a theme, as light cards (relief from the line border). */
-  .cartes li {
-    padding: 22px 22px 24px;
-    border-radius: var(--radius-card);
-    background: var(--color-surface);
-    box-shadow: inset 0 0 0 1px var(--color-line);
-    font: 400 15px/1.5 var(--font-sans);
-    color: var(--color-soft);
+  .rang {
+    padding-top: 2px;
+    font: 400 13px/1.3 var(--font-mono);
+    letter-spacing: 0.06em;
+    color: var(--color-orange-txt);
   }
   .points-nuit li {
     border-color: var(--color-line-night);
     color: color-mix(in srgb, var(--color-white) 78%, transparent);
+  }
+  .points-nuit li b {
+    color: var(--color-white);
+  }
+  .points-nuit .rang {
+    color: color-mix(in srgb, var(--color-white) 60%, transparent);
   }
 
   /* ---------- The access screen (iPad), sized in cqw of the screen ---------- */

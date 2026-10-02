@@ -6,15 +6,22 @@ hero:
   title: 'Vos données, en sécurité dès le premier jour.'
   lead: "Vous gardez le contrôle de ce que vous partagez, de l'endroit où c'est hébergé et de qui y accède."
   proofs:
-    - 'Conforme RGPD'
-    - 'Hébergé en Europe'
-    - 'Aucun entraînement IA'
+    - label: 'Hébergé en Europe'
+      section: 0
+    - label: 'Aucun entraînement IA'
+      section: 1
+    - label: 'Accès par rôle'
+      section: 2
+    - label: 'Conforme RGPD'
+      section: 3
   alts:
     jay: "Jay, l'oiseau voxel, sur deux serveurs avec un drapeau européen"
     owl: 'Owl devant un coffre-fort fermé par un cadenas'
     finch: 'Finch appose un tampon de validation sur un dossier'
 sections:
-  - title: 'Vous décidez de ce que vous partagez'
+  - kicker: 'Partage & hébergement'
+    visual: jay
+    title: 'Vous décidez de ce que vous partagez'
     subtitle: 'Vous choisissez précisément les données que Hatch OS utilise.'
     items:
       - title: 'Sélection à la source'
@@ -23,7 +30,9 @@ sections:
         text: 'Vos données et leurs sauvegardes restent en Europe.'
       - title: 'Chiffrement de bout en bout'
         text: 'Chiffrées en transit et au repos (TLS, AES-256).'
-  - title: "Vos données n'entraînent aucune IA"
+  - kicker: 'Intelligence artificielle'
+    visual: owl
+    title: "Vos données n'entraînent aucune IA"
     subtitle: 'Vos contenus servent à vous rendre service, jamais à entraîner des modèles.'
     items:
       - title: 'Aucun entraînement'
@@ -32,9 +41,10 @@ sections:
         text: "Vous gardez vos données ; nos fournisseurs de modèles n'en conservent rien."
       - title: 'Cloisonnées par client'
         text: "L'assistant ne s'appuie que sur vos documents, isolés de ceux des autres clients."
-  - title: "Un contrôle d'accès granulaire, à chaque niveau"
+  - kicker: "Contrôle d'accès"
+    visual: ecran
+    title: "Un contrôle d'accès granulaire, à chaque niveau"
     subtitle: "Chaque membre de votre réseau n'accède qu'à ce qui le concerne."
-    screen: true
     items:
       - title: 'SSO entreprise'
         text: 'Vos équipes se connectent via votre SSO (SAML).'
@@ -42,7 +52,9 @@ sections:
         text: 'Des droits distincts pour le franchiseur et les franchisés.'
       - title: 'Permissions fines'
         text: 'Vous choisissez qui accède à quels documents, au sein de vos équipes.'
-  - title: 'Conformité'
+  - kicker: 'Conformité'
+    visual: finch
+    title: 'Conformité'
     subtitle: 'Le cadre européen respecté, sans le jargon.'
     items:
       - title: 'RGPD'
