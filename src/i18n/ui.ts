@@ -33,9 +33,6 @@ const fr = {
   'nav.pricing': 'Tarifs',
   'nav.security': 'Sécurité',
   'cta.demo': 'Réserver une démo',
-  /** Hero: primary CTA to the app's self-serve signup, then the demo as the secondary one. */
-  'cta.try': 'Essayez maintenant',
-  'cta.demoAsk': 'Demandez une démo',
   'lang.switch': 'English',
   'footer.product': 'Produit',
   'footer.company': 'Hatch OS',
@@ -63,8 +60,6 @@ const en: Record<keyof typeof fr, string> = {
   'nav.pricing': 'Pricing',
   'nav.security': 'Security',
   'cta.demo': 'Book a demo',
-  'cta.try': 'Try it now',
-  'cta.demoAsk': 'Book a demo',
   'lang.switch': 'Français',
   'footer.product': 'Product',
   'footer.company': 'Hatch OS',

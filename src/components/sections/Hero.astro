@@ -16,8 +16,8 @@ import sparrow from '../../assets/hero/agents/sparrow.png';
 import oiseauxPos from './hero-oiseaux.json';
 
 /**
- * Hero of the home: full-screen voxel map of the network (hero v3), the text block, and one living
- * rule on top of the map (César, 01/10): a shop writes, its agent answers. Each event, in turn:
+ * Hero of the home: full-screen voxel map of the network (hero v3), liquid-glass title card, and one
+ * living rule on top of the map (César, 01/10): a shop writes, its agent answers. Each event, in turn:
  *   1. a real shop sends a ground wave;
  *   2. the agent's card appears right above that shop, "running";
  *   3. it switches to "done", then fades out, and the next shop takes over.
@@ -30,12 +30,6 @@ import oiseauxPos from './hero-oiseaux.json';
  * Coordinates are in the image's frame (1440 × 804) and expressed in % of it, so they stay on their
  * shop whatever the screen: the shops' ground points are measured by the composition script
  * (hero-boutiques.json), only the choice of shops and the card anchors are made here.
- *
- * Text block (cofounders, 02/10): the glass title card took too much room. The H1 is now a short fact
- * in Departure Mono, the former Fraunces title becomes the tagline under it, then two CTAs: try it now
- * (the app's signup, primary) and book a demo (secondary). Three layouts are on trial (?hero=1|2|3,
- * described above the variant styles); the cards and the birds' bubbles were checked clear of the text
- * in each, from 1024 × 768 to 1920 × 1080 and at 390 × 844.
  */
 interface Props {
   locale: Locale;
@@ -57,7 +51,7 @@ const surCarte = (agent: string): agent is Oiseau => agent in OISEAUX;
 
 /**
  * The shop of each event (index in hero-boutiques.json), in the order of `tasks.events`. Picked among
- * the shops visible on every screen (right of the text column, below the nav). `anchor` keeps the card
+ * the shops visible on every screen (right of the title card, below the nav). `anchor` keeps the card
  * inside the frame near its right edge.
  */
 type Ancre = 'center' | 'right';
@@ -88,147 +82,129 @@ const steps = events.map((e, i) => {
 /** Seconds per event (wave, card running, card done, exit). */
 const STEP = 5.6;
 
-/** Primary CTA: the app's self-serve signup. Same URL in both locales: the app has no locale prefix. */
-const SIGNUP = 'https://app.gethatch.io/auth?tab=signup';
-/**
- * Layout variant served without `?hero=` (the three are described in the <style> below). The inline
- * script at the top of the section swaps it for `?hero=1|2|3` before the first paint.
- */
-const DEFAUT = '1';
-
 const tick =
   'M10 18H8v-2h2v2Zm-2-2H6v-2h2v2Zm4-2v2h-2v-2h2Zm-6 0H4v-2h2v2Zm8 0h-2v-2h2v2Zm2-2h-2v-2h2v2Zm2-2h-2V8h2v2Zm2-2h-2V6h2v2Z';
 ---
 
 <section
   class="hero relative h-dvh min-h-[640px] overflow-hidden bg-night [container-type:size]"
-  data-hero={DEFAUT}
   aria-labelledby="hero-titre"
   data-rv-groupe
 >
-  <script is:inline>
-    // Layout variant under test (?hero=1|2|3), set before the first paint: nothing shifts.
-    (function (hero) {
-      var v = new URLSearchParams(location.search).get('hero');
-      if (v === '1' || v === '2' || v === '3') hero.dataset.hero = v;
-    })(document.currentScript.parentElement);
-  </script>
-
-  <div class="h-scene" aria-hidden="true">
-    <div class="h-decor">
-      <Picture
-        src={carte}
-        formats={['avif', 'webp']}
-        widths={[800, 1200, 1600, 2000, 2400, 2880, 3840]}
-        quality={80}
-        sizes="max(100vw, 179.1vh, 1146px)"
-        alt=""
-        loading="eager"
-        fetchpriority="high"
-        class="absolute inset-0 size-full object-cover"
-      />
-      {
-        steps.map((e) => (
-          <div class="h-ping" style={`left:${pct(e.x, W)};top:${pct(e.y, H)}`}>
-            <span />
-            <span />
+  <div class="h-decor" aria-hidden="true">
+    <Picture
+      src={carte}
+      formats={['avif', 'webp']}
+      widths={[800, 1200, 1600, 2000, 2400, 2880, 3840]}
+      quality={80}
+      sizes="max(100vw, 179.1vh, 1146px)"
+      alt=""
+      loading="eager"
+      fetchpriority="high"
+      class="absolute inset-0 size-full object-cover"
+    />
+    {
+      steps.map((e) => (
+        <div class="h-ping" style={`left:${pct(e.x, W)};top:${pct(e.y, H)}`}>
+          <span />
+          <span />
+        </div>
+      ))
+    }
+    {
+      (Object.keys(OISEAUX) as Oiseau[]).map((agent) => {
+        const b = OISEAUX[agent];
+        return (
+          <div
+            class="h-oiseau"
+            data-agent={agent}
+            style={`left:${pct(b.left, W)};top:${pct(b.top, H)};width:${pct(b.width, W)};height:${pct(b.height, H)}`}
+          >
+            <span class="h-bulle">
+              <i />
+              <i />
+              <i />
+            </span>
           </div>
-        ))
-      }
-      {
-        (Object.keys(OISEAUX) as Oiseau[]).map((agent) => {
-          const b = OISEAUX[agent];
-          return (
-            <div
-              class="h-oiseau"
-              data-agent={agent}
-              style={`left:${pct(b.left, W)};top:${pct(b.top, H)};width:${pct(b.width, W)};height:${pct(b.height, H)}`}
-            >
-              <span class="h-bulle">
-                <i />
-                <i />
-                <i />
-              </span>
-            </div>
-          );
-        })
-      }
-    </div>
+        );
+      })
+    }
   </div>
 
   <!-- Film grain at screen scale (the photo itself is denoised): hides the AI micro-texture and the
-       banding, stays fine whatever image size is served. Under the piles and the text. -->
+       banding, stays fine whatever image size is served. Under the piles and the glass card. -->
   <div class="h-grain" aria-hidden="true" style={`background-image:url(${grain.src})`}></div>
 
   <div
-    class="h-contenu relative z-1 mx-auto flex h-full max-w-[1440px] flex-col justify-end gap-2 px-4 pt-24 pb-4 sm:px-6 sm:pb-6 lg:static lg:gap-0 lg:px-14 lg:pt-16"
+    class="relative z-1 mx-auto flex h-full max-w-[1440px] flex-col justify-end gap-2 px-4 pt-24 pb-4 sm:px-6 sm:pb-6 lg:static lg:justify-center lg:gap-0 lg:px-14 lg:pt-16 lg:pb-[149px]"
   >
     <div class="h-piles" aria-hidden="true" data-pas={STEP}>
-      <div class="h-cadre">
-        {
-          steps.map((e) => (
-            <div
-              class="h-pile"
-              data-agent={e.agent}
-              style={`--x:${pct(e.x, W)};--y:${pct(e.y - e.roof, H)};--dx:${e.anchor === 'right' ? '-78%' : '-50%'};--ax:${e.anchor === 'right' ? '78%' : '50%'}`}
-            >
-              <div class="h-slot">
-                <div>
-                  <div class="h-tache">
-                    <Image
-                      src={e.avatar}
-                      width={40}
-                      height={40}
-                      densities={[1, 2]}
-                      format="webp"
-                      alt=""
-                      class="h-avatar"
-                    />
-                    <span class="h-corps">
-                      <span class="h-titre h-bascule">
-                        <span class="lib-cours">{e.running.title}</span>
-                        <span class="lib-fait">{e.done.title}</span>
+      {
+        steps.map((e) => (
+          <div
+            class="h-pile"
+            data-agent={e.agent}
+            style={`--x:${pct(e.x, W)};--y:${pct(e.y - e.roof, H)};--dx:${e.anchor === 'right' ? '-78%' : '-50%'};--ax:${e.anchor === 'right' ? '78%' : '50%'}`}
+          >
+            <div class="h-slot">
+              <div>
+                <div class="h-tache">
+                  <Image
+                    src={e.avatar}
+                    width={40}
+                    height={40}
+                    densities={[1, 2]}
+                    format="webp"
+                    alt=""
+                    class="h-avatar"
+                  />
+                  <span class="h-corps">
+                    <span class="h-titre h-bascule">
+                      <span class="lib-cours">{e.running.title}</span>
+                      <span class="lib-fait">{e.done.title}</span>
+                    </span>
+                    <span class="h-meta">
+                      <span class="h-statut">
+                        <span class="h-point" />
+                        <svg class="h-coche" viewBox="0 0 24 24">
+                          <path d={tick} />
+                        </svg>
+                        <span class="h-etat lib-cours">{status.running}</span>
+                        <span class="h-etat lib-fait">{status.done}</span>
                       </span>
-                      <span class="h-meta">
-                        <span class="h-statut">
-                          <span class="h-point" />
-                          <svg class="h-coche" viewBox="0 0 24 24">
-                            <path d={tick} />
-                          </svg>
-                          <span class="h-etat lib-cours">{status.running}</span>
-                          <span class="h-etat lib-fait">{status.done}</span>
-                        </span>
-                        <span class="h-detail h-bascule">
-                          <span class="lib-cours">{e.running.detail}</span>
-                          <span class="lib-fait">{e.done.detail}</span>
-                        </span>
+                      <span class="h-detail h-bascule">
+                        <span class="lib-cours">{e.running.detail}</span>
+                        <span class="lib-fait">{e.done.detail}</span>
                       </span>
                     </span>
-                  </div>
+                  </span>
                 </div>
               </div>
             </div>
-          ))
-        }
-      </div>
+          </div>
+        ))
+      }
     </div>
 
-    <div class="h-bloc" data-rv style="--rd: 0.2s">
-      <h1 id="hero-titre" class="h-h1 font-mono text-ink">{data.title}</h1>
-      <div class="h-carte">
-        <p class="h-ligne font-display font-semibold text-ink">{data.tagline}</p>
-        <!-- Grey under the tagline, for hierarchy (César, 01/10): a quarter of ink keeps the plain
-             `soft` grey above AA over the scrim's lightest-covered spots. -->
-        <p class="h-lead text-[color-mix(in_srgb,var(--color-soft)_75%,var(--color-ink))]">
-          {data.lead}
-        </p>
-        <div class="h-ctas">
-          <Button href={SIGNUP} variant="orange" size="lg">{t('cta.try')}</Button>
-          <Button href={routes.demo[locale]} variant="secondary" size="lg">
-            {t('cta.demoAsk')}
-          </Button>
-        </div>
-      </div>
+    <div
+      class="carte-hero relative z-2 flex flex-col items-start gap-[18px] rounded-[28px] px-5 pt-6 pb-6 sm:gap-6 sm:px-8 sm:pt-8 sm:pb-9 md:max-w-[600px] lg:w-[clamp(480px,45.56vw,656px)] lg:max-w-none lg:gap-[26px] lg:rounded-[36px] lg:px-[clamp(36px,3.334vw,48px)] lg:pt-[clamp(34px,3.195vw,46px)] lg:pb-[clamp(38px,3.473vw,50px)]"
+      data-rv
+      style="--rd: 0.2s"
+    >
+      <h1
+        id="hero-titre"
+        class="font-display text-[32px] leading-[1.08] font-semibold tracking-[-0.015em] text-ink sm:text-[38px] md:text-[42px] lg:text-[clamp(38px,3.195vw,46px)]"
+      >
+        {data.title.join(' ')}
+      </h1>
+      <!-- Lighter and grey under the title, for hierarchy (César, 01/10). On the liquid glass the plain
+           `soft` grey fell to 4.3:1 on its darkest spots: a quarter of ink brings it back above AA. -->
+      <p
+        class="lead text-base leading-6 font-normal text-[color-mix(in_srgb,var(--color-soft)_75%,var(--color-ink))] sm:text-[17px] lg:text-lg lg:leading-[27px]"
+      >
+        {data.lead}
+      </p>
+      <Button href={routes.demo[locale]} variant="orange" size="lg">{t('cta.demo')}</Button>
     </div>
   </div>
 </section>
@@ -307,20 +283,11 @@ const tick =
 </script>
 
 <style>
-  /* The scene: the image's 1440 × 804 frame, covering its stage (container units), pinned right. The
-     stage is the whole section, except in variant 2 where it is the space under the text. */
+  /* The scene: the image's 1440 × 804 frame, covering the section (container units), pinned right. */
   .hero {
     --sw: max(100cqw, calc(100cqh * 1440 / 804));
     --sh: calc(var(--sw) * 804 / 1440);
     --fx: 0.78;
-  }
-  .h-scene {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    overflow: hidden;
-    pointer-events: none;
-    container-type: size;
   }
   .h-grain {
     position: absolute;
@@ -333,10 +300,12 @@ const tick =
   }
   .h-decor {
     position: absolute;
+    z-index: 0;
     width: var(--sw);
     height: var(--sh);
     left: calc((100cqw - var(--sw)) * var(--fx));
     top: calc((100cqh - var(--sh)) / 2);
+    pointer-events: none;
   }
 
   /* Birds on the map: an empty box over the bird of the image, anchoring its bubble. */
@@ -439,11 +408,9 @@ const tick =
     transform: scale(calc(0.25 + var(--p2, 1) * 0.95));
   }
 
-  /* Task stacks. Mobile: a single slot just above the text (below it in variant 2); lg+: each card on
-     its shop, in a copy of the scene's frame (.h-cadre) laid over the same stage. */
+  /* Task stacks. Mobile: a single slot just above the title card; lg+: on their duo, in the scene. */
   .h-piles {
     position: relative;
-    z-index: 1; /* above the text's scrim, which rises behind the slot on mobile */
     height: 84px;
     flex: none;
     pointer-events: none;
@@ -466,13 +433,7 @@ const tick =
     }
     .h-piles {
       position: absolute;
-      inset: 0;
       z-index: 1;
-      height: auto;
-      container-type: size;
-    }
-    .h-cadre {
-      position: absolute;
       width: var(--sw);
       height: var(--sh);
       left: calc((100cqw - var(--sw)) * var(--fx));
@@ -684,245 +645,8 @@ const tick =
     animation-play-state: paused;
   }
 
-  /* ---------- Text block and its three layout variants (cofounders' feedback, 02/10) ----------
-     Every variant: pixel H1 (a fact), the Fraunces tagline, then two CTAs (try it now, book a demo).
-     The section carries the variant in `data-hero` (?hero=1|2|3, else DEFAUT in the frontmatter).
-     1. Left column, no card: the text stands on the map over a soft local cream scrim.
-     2. Centred block on a cream band at the top, the whole map below it, fading into the cream.
-     3. Pixel H1 on the map, then a compact glass card (tagline + CTAs) at the bottom left.
-     Contrast: ink on the scrim's thinnest spot (~45 % cream over the darkest sea) stays above 8:1, and
-     above 4.5:1 even on the bare sea; the grey lead is only shown where the scrim is dense (variant 1). */
-  .h-bloc {
-    position: relative;
-    isolation: isolate;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 14px;
-  }
-  .h-h1 {
-    font-size: 28px; /* two lines at 390 px in both locales */
-    line-height: 1.1;
-    text-wrap: balance;
-  }
-  .h-carte {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 18px;
-  }
-  .h-ligne {
-    font-size: 21px;
-    line-height: 1.2;
-    letter-spacing: -0.015em;
-    text-wrap: balance;
-  }
-  .h-lead {
-    display: none;
-    font-size: 18px;
-    line-height: 27px;
-  }
-  .h-ctas {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  /* Mobile: the two CTAs share the width, the label shrinks a notch to fit 390 px. Inside the glass
-     card of variant 3 the row is narrower still: they stack. */
-  @media (max-width: 39.999rem) {
-    .h-ctas {
-      width: 100%;
-    }
-    .h-ctas > :global(a) {
-      flex: 1 1 0;
-      justify-content: center;
-      gap: 6px;
-      padding-inline: 14px;
-      font-size: 15px;
-    }
-    .hero[data-hero='3'] .h-ctas {
-      flex-direction: column;
-    }
-    .hero[data-hero='3'] .h-ctas > :global(a) {
-      flex: none;
-    }
-  }
-  /* Narrow desktops (1024-1279 px): the map's birds and cards come closer to the text column, so the
-     CTAs take the nav's smaller pill to stay on one row in a narrower column. */
-  @media (min-width: 64rem) and (max-width: 79.999rem) {
-    .h-ctas > :global(a) {
-      gap: 8px;
-      padding: 12px 20px;
-      font-size: 14px;
-    }
-  }
-  @media (min-width: 40rem) {
-    .h-h1 {
-      font-size: 38px;
-    }
-    .h-ligne {
-      font-size: 26px;
-    }
-  }
-  @media (min-width: 64rem) {
-    .h-bloc {
-      gap: 22px;
-    }
-    /* Departure Mono advances 0.64 em: at this size « franchise networks. » (19 characters) still
-       fits the column of variants 1 and 3, so neither locale breaks on three lines. */
-    .h-h1 {
-      font-size: clamp(34px, 3.2vw, 48px);
-    }
-    .h-carte {
-      gap: 26px;
-    }
-    .h-ligne {
-      font-size: clamp(25px, 2.08vw, 30px);
-      line-height: 1.16;
-    }
-  }
-
-  /* Scrim under the text over the map (variants 1 and 3). Mobile: a cream band rising from the bottom
-     of the screen; lg+: a blurred cream patch, local to the text. */
-  .hero:not([data-hero='2']) .h-bloc::before {
-    content: '';
-    position: absolute;
-    z-index: -1;
-    inset: -96px -24px -24px;
-    background: linear-gradient(
-      to top,
-      color-mix(in srgb, var(--color-cream) 88%, transparent),
-      color-mix(in srgb, var(--color-cream) 80%, transparent) calc(100% - 96px),
-      transparent
-    );
-    pointer-events: none;
-  }
-  @media (min-width: 64rem) {
-    .hero:not([data-hero='2']) .h-bloc::before {
-      inset: -56px -88px -64px;
-      border-radius: 96px;
-      background: color-mix(in srgb, var(--color-cream) 74%, transparent);
-      filter: blur(40px);
-    }
-  }
-
-  /* 1. Left column, no card. */
-  @media (min-width: 64rem) {
-    .hero[data-hero='1'] .h-contenu {
-      justify-content: center;
-      padding-bottom: 120px;
-    }
-    .hero[data-hero='1'] .h-bloc {
-      width: clamp(420px, 41vw, 600px);
-    }
-    .hero[data-hero='1'] .h-lead {
-      display: block;
-      margin-top: -8px;
-      max-width: 34em;
-    }
-  }
-
-  /* 2. Centred band on top, the map below. The section turns into a grid: the band (row 1) takes its
-     height, the map's stage (row 2) the rest; the stage shows the whole frame and fades into the cream. */
-  .hero[data-hero='2'] {
-    display: grid;
-    grid-template-rows: auto minmax(0, 1fr);
-    background: var(--color-cream);
-  }
-  .hero[data-hero='2'] .h-contenu {
-    display: contents;
-  }
-  .hero[data-hero='2'] .h-scene {
-    position: relative;
-    inset: auto;
-    grid-area: 2 / 1;
-  }
-  .hero[data-hero='2'] .h-grain {
-    display: none;
-  }
-  .hero[data-hero='2'] .h-decor {
-    mask-image:
-      linear-gradient(
-        to right,
-        transparent,
-        var(--color-black) 6%,
-        var(--color-black) 94%,
-        transparent
-      ),
-      linear-gradient(transparent, var(--color-black) 9%, var(--color-black) 92%, transparent);
-    mask-composite: intersect;
-  }
-  .hero[data-hero='2'] .h-bloc {
-    grid-area: 1 / 1;
-    z-index: 2;
-    align-items: center;
-    justify-self: center;
-    width: 100%;
-    max-width: 1100px;
-    padding: 92px 16px 8px;
-    text-align: center;
-  }
-  .hero[data-hero='2'] .h-carte,
-  .hero[data-hero='2'] .h-ctas {
-    align-items: center;
-    justify-content: center;
-  }
-  .hero[data-hero='2'] .h-piles {
-    grid-area: 2 / 1;
-    align-self: end;
-    z-index: 1;
-    margin: 0 16px 16px;
-  }
-  @media (min-width: 64rem) {
-    .hero[data-hero='2'] {
-      --sw: min(100cqw, calc(100cqh * 1440 / 804));
-      --fx: 0.5;
-    }
-    .hero[data-hero='2'] .h-bloc {
-      padding: 112px 56px 12px;
-    }
-    .hero[data-hero='2'] .h-ligne {
-      max-width: 30em;
-    }
-    .hero[data-hero='2'] .h-piles {
-      position: relative;
-      inset: auto;
-      align-self: stretch;
-      margin: 0;
-    }
-  }
-
-  /* 3. Pixel H1 on the map, compact glass card under it, bottom left. Lg+: the scrim only backs the H1,
-     the glass backs the rest. */
-  @media (min-width: 64rem) {
-    /* Bottom left, but its foot stays above Owl's card, which stands on Huesca near the bottom of the
-       frame (top of that card ≈ 92 % of the height minus its own 64 px). */
-    .hero[data-hero='3'] .h-contenu {
-      padding-bottom: calc(8.1cqh + 88px);
-    }
-    .hero[data-hero='3'] .h-bloc {
-      width: clamp(420px, 40vw, 600px);
-    }
-    .hero[data-hero='3'] .h-bloc::before {
-      content: none;
-    }
-    .hero[data-hero='3'] .h-h1 {
-      position: relative;
-    }
-    .hero[data-hero='3'] .h-h1::before {
-      content: '';
-      position: absolute;
-      z-index: -1;
-      inset: -36px -64px -28px;
-      border-radius: 64px;
-      background: color-mix(in srgb, var(--color-cream) 74%, transparent);
-      filter: blur(32px);
-    }
-  }
-  .hero[data-hero='3'] .h-carte {
-    position: relative;
-    padding: 20px;
-    border-radius: 24px;
+  /* Liquid-glass title card; the gradient rim is a masked layer so it follows the radius. */
+  .carte-hero {
     isolation: isolate;
     background-image: linear-gradient(
       -123deg,
@@ -937,8 +661,7 @@ const tick =
     backdrop-filter: blur(18px) saturate(1.15);
     -webkit-backdrop-filter: blur(18px) saturate(1.15);
   }
-  /* The glass rim: a masked gradient layer, so it follows the radius. */
-  .hero[data-hero='3'] .h-carte::before {
+  .carte-hero::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -959,15 +682,7 @@ const tick =
       linear-gradient(var(--color-black) 0 0) content-box exclude,
       linear-gradient(var(--color-black) 0 0);
   }
-  @media (min-width: 64rem) {
-    .hero[data-hero='3'] .h-carte {
-      width: 100%;
-      gap: 22px;
-      padding: 28px 32px 32px;
-      border-radius: 28px;
-    }
-    .hero[data-hero='3'] .h-ligne {
-      font-size: clamp(24px, 1.94vw, 28px);
-    }
+  .lead {
+    filter: drop-shadow(0 0 5px color-mix(in srgb, var(--color-white) 50%, transparent));
   }
 </style>

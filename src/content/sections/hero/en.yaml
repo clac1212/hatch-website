@@ -1,7 +1,8 @@
-# H1 in Departure Mono: a short fact (César, 02/10).
-title: 'The OS for franchise networks.'
-# The promise, in Fraunces under the H1 (the former title).
-tagline: 'Hire AI agents to run and grow your network of locations'
+# The title, as fragments joined with spaces: the browser wraps the lines (Fraunces, balanced).
+title:
+  - Hire AI agents
+  - to run and grow your
+  - network of locations
 lead: 'They answer your teams, train new hires, audit your sites and follow your openings, while you stay in control.'
 tasks:
   status:
