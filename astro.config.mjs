@@ -8,10 +8,12 @@ import { sitemapOptions } from './src/seo/sitemap.ts';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://www.gethatch.io',
-  // One URL form: never a trailing slash (`/conditions`, `/en`), except the root. Canonicals,
-  // hreflang, internal links and the sitemap all use it; on Vercel the adapter redirects `/x/` to
-  // `/x` (308). Pages are still built as `x/index.html`, which Vercel serves at `/x`.
-  trailingSlash: 'never',
+  // One URL form: no trailing slash (`/conditions`, `/en`), except the root. Canonicals, hreflang,
+  // internal links and the sitemap all use it, and the canonical consolidates a stray `/x/`.
+  // Not `'never'`: that makes the adapter redirect every `/x/` (308) and the dev server 404 it, which
+  // breaks the PostHog proxy (`/relais/i/v0/e/`, `/relais/flags/`: posthog-js always ends its paths
+  // with a slash). Pages are built as `x/index.html`, which Vercel serves at `/x`.
+  trailingSlash: 'ignore',
 
   // PostHog project key (public, but kept out of the repo): Vercel env + local `.env`.
   env: {

@@ -379,9 +379,13 @@ if (existsSync(vercelConfig)) {
   else if (!existsSync(join('.vercel/output/static', notFound.dest)))
     fail('vercel', `${notFound.dest} missing`);
   else vercelNotes.push(`unknown URLs → ${notFound.dest} with status 404`);
-  const slash = routes.find((r) => r.src === '^/(.*)/$' && r.status === 308);
-  if (!slash) fail('vercel', 'no /x/ → /x redirect');
-  else vercelNotes.push(`/x/ → ${slash.headers.Location.replace('$1', 'x')} (308)`);
+  // A blanket trailing-slash redirect would also catch the PostHog proxy, whose paths end with `/`.
+  const slash = routes.find((r) => r.status >= 300 && r.status < 400 && /\/\$$/.test(r.src ?? ''));
+  if (slash) fail('vercel', `trailing-slash redirect ${slash.src} would break /relais/…/`);
+  else
+    vercelNotes.push(
+      'no trailing-slash redirect: canonicals consolidate /x/, /relais/…/ is proxied',
+    );
 }
 
 // ── Report ────────────────────────────────────────────────────────────────────────────────────
