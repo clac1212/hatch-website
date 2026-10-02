@@ -33,11 +33,21 @@ const T = { camera: 1.1, appareil: 0.85, contenu: 1.25, sortie: 0.4 };
  * slow push-in, then the camera glides in to the first agent, slower than between two agents.
  */
 const ARRIVEE = { plan: 2.2, voyage: 2, ease: 'power2.inOut' };
+/**
+ * Seconds for a place to wrap up before a hand-over: its device fades out, then the camera glides
+ * back to the wide shot (most of the 1 s CSS transition on .d2-calque).
+ */
+const CONCLURE = { fondu: 0.35, retour: 0.85 };
 /** Slow push-in while a demo plays: the zoom grows by 4 %. */
 const DERIVE = 1.04;
 
-type Cam = { '--cx': number; '--cy': number; '--z': number };
-/** "--cx:0.3;--cy:0.45;--z:1.5" (written by Demo.astro) → tweenable values. */
+/**
+ * Camera: focus point (fractions of the image), zoom, and where the focus sits in the viewport
+ * (`--ox/--oy`, 0.5 = centred). The wide shot is centred (César 02/10: "the scene is too
+ * imposing"); a demo puts its agent left of centre and its device on the right.
+ */
+type Cam = { '--cx': number; '--cy': number; '--z': number; '--ox': number; '--oy': number };
+/** "--cx:0.3;--cy:0.45;--z:1.5;--ox:0.27;--oy:0.4" (written by Demo.astro) → tweenable values. */
 function lireCam(style: string): Cam {
   const v = Object.fromEntries(
     style.split(';').map((d) => {
@@ -45,8 +55,16 @@ function lireCam(style: string): Cam {
       return [k.trim(), parseFloat(x)];
     }),
   );
-  return { '--cx': v['--cx'], '--cy': v['--cy'], '--z': v['--z'] };
+  return {
+    '--cx': v['--cx'],
+    '--cy': v['--cy'],
+    '--z': v['--z'],
+    '--ox': v['--ox'],
+    '--oy': v['--oy'],
+  };
 }
+/** On phones the device covers the top of the screen: the agent sits centred, high. */
+const VISEE_MOBILE = { '--ox': 0.5, '--oy': 0.25 };
 
 const $ = (racine: Element, sel: string) => racine.querySelector<HTMLElement>(sel)!;
 const $$ = (racine: Element, sel: string) => [...racine.querySelectorAll<HTMLElement>(sel)];
@@ -769,6 +787,11 @@ export interface Pilote {
   jouer(i: number): void;
   /** The place is left: back to its wide shot (`remettre`), or frozen where it is. */
   arreter(remettre?: boolean): void;
+  /**
+   * The place is about to hand over to the next one: it stops and ends on its wide shot (its device
+   * fades out, the camera glides back). Returns the seconds until the wide shot is reached.
+   */
+  conclure(): number;
   /** Scroll mode: progress (0–1) where demo i starts, to scroll a tab click there. */
   position(i: number): number;
 }
@@ -783,15 +806,22 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
   const scroll = mode === 'scroll';
   const calque = $(lieu, '.d2-calque');
   const voile = $(lieu, '.d2-voile');
+  const appareils = $(lieu, '.d2-appareils');
   const ecrans = $$(lieu, '.d2-ecran');
   const onglets = $$(lieu, '[data-onglet]');
   const titres = $$(lieu, '[data-titre]');
   const barres = onglets.map((o) => $(o, '.d2-barre > span'));
   const vue = lireCam(lieu.dataset.vue!);
-  const cams = ecrans.map((e) => lireCam(e.dataset.cam!));
+  const camsLarge = ecrans.map((e) => lireCam(e.dataset.cam!));
+  /** The demos' cameras for the current width (set by the matchMedia handler below). */
+  let cams = camsLarge;
 
   let tl: gsap.core.Timeline | null = null;
   let debuts: number[] = [];
+  /** Time at which the camera is back on the wide shot, at the end of the timeline. */
+  let finLarge = 0;
+  /** `conclure`'s pending jump to the end, cancelled if the place plays again first. */
+  let saut: gsap.core.Tween | null = null;
   let actif = false;
   let courant = -1;
   /** Last scroll position inside the place (0–1): scroll mode reapplies it, mixte diffs it. */
@@ -959,10 +989,24 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
       { ...vue, duration: 1.3, ease: EASE.camera, immediateRender: false },
       fin,
     ).to(voile, { opacity: 0, duration: 0.8, ease: 'power1.inOut' }, fin + 0.2);
+    finLarge = fin + 1.3;
     // The place ends on its wide shot, held: with the scroll in play, the last stretch of the
     // place's scroll is this calm frame, so leaving the place never cuts a demo mid-sentence.
     m.to({}, { duration: 1.2 });
     return m;
+  }
+
+  /** On a wide shot: the arrival hold, or the end once the camera is back. */
+  const large = (t: number) => t <= ARRIVEE.plan || t >= finLarge - 0.05;
+
+  /** `conclure`'s fade (killed by reference: killTweensOf would also kill the timeline's tweens). */
+  let fondu: gsap.core.Tween | null = null;
+  function annulerSaut() {
+    if (!saut) return;
+    saut.kill();
+    fondu?.kill();
+    saut = fondu = null;
+    gsap.set(appareils, { clearProps: 'opacity' });
   }
 
   /** Reduced motion: no timeline. A demo = its device in its final state, camera cut to its agent. */
@@ -996,6 +1040,7 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
     (ctx) => {
       const { mobile, reduit } = ctx.conditions!;
       courant = -1;
+      cams = mobile ? camsLarge.map((c) => ({ ...c, ...VISEE_MOBILE })) : camsLarge;
       tl = reduit ? null : construire(!!mobile);
       if (!tl) montrer(scroll ? indice(q) : 0);
       else if (scroll) tl.progress(q);
@@ -1032,6 +1077,7 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
     entrer(p) {
       actif = true;
       q = p;
+      annulerSaut();
       if (!tl) return montrer(scroll ? indice(p) : 0);
       if (scroll) return void tl.progress(p);
       tl.play(depart(p));
@@ -1056,22 +1102,379 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
       if (scroll) return;
       if (!tl) return montrer(i);
       cible = null;
+      annulerSaut();
       gsap.killTweensOf(tl);
       tl.play(i === 0 ? 0 : `d${i}`);
     },
     arreter(remettre = true) {
       actif = false;
       cible = null;
+      annulerSaut();
       if (!tl) return scroll ? undefined : montrer(0);
       gsap.killTweensOf(tl);
       if (scroll) return;
       if (remettre) tl.pause(0);
       else tl.pause();
     },
+    conclure() {
+      actif = false;
+      cible = null;
+      if (!tl) return 0;
+      if (scroll) {
+        // Scroll mode: straight to the nearer wide shot (the start or the end of the place).
+        gsap.killTweensOf(tl);
+        tl.progress(tl.progress() < 0.5 ? 0 : 1);
+        return 0;
+      }
+      if (saut) return CONCLURE.fondu + CONCLURE.retour;
+      gsap.killTweensOf(tl);
+      tl.pause();
+      if (large(tl.time())) return 0;
+      // No fast-forward through the remaining demos: the device and the dimming fade out, then the
+      // playhead jumps to the end; the camera's CSS transition (.d2-calque) glides back to the wide
+      // shot.
+      fondu = gsap.to([appareils, voile], {
+        opacity: 0,
+        duration: CONCLURE.fondu,
+        ease: EASE.sortie,
+      });
+      saut = gsap.delayedCall(CONCLURE.fondu, () => {
+        tl?.time(tl.duration() - 0.05);
+        gsap.set(appareils, { clearProps: 'opacity' });
+        saut = fondu = null;
+      });
+      return CONCLURE.fondu + CONCLURE.retour;
+    },
     position(i) {
       if (!tl) return (i + 0.5) / ecrans.length;
       // Just past the camera travel, so the click lands on the device entering.
       return Math.min(1, (debuts[i] + T.camera) / tl.duration());
+    },
+  };
+}
+
+/**
+ * Hand-over between two places (César 02/10: a fast scroll cut straight to the next place). Two
+ * variants to compare on the same build, `?transition=a|b`:
+ * - `a` (default), travel between islands: the three dioramas sit side by side like models on a
+ *   table (their backdrop is the section's colour, so they blend into it). At the end of a place the
+ *   camera pulls out, slides to the next model and zooms into it. Time plays the trip (mixte, auto),
+ *   the scroll pushes it (a floor going down); in scroll mode the scroll is the playhead.
+ * - `b`, stacked blocks: each place is a card; the next one slides up over it with the scroll, the
+ *   previous one scales back and dims underneath.
+ * In both, a place ends on its wide shot before the hand-over starts (`Pilote.conclure`).
+ */
+export type Variante = 'a' | 'b';
+
+/** Where the scroll is (in place/bridge weight units), and whether the section is pinned. */
+export interface Lecture {
+  u: number;
+  epingle: boolean;
+  /** Above the section (not reached yet). */
+  dessus: boolean;
+}
+
+export interface Regie {
+  /** The scroll moved, or the viewport changed. */
+  maj(): void;
+  /** The timeline of a place, while it is the one on stage (tabs). */
+  pilote(lieu: HTMLElement): Pilote | undefined;
+}
+
+/** Trip: seconds for the pull-out and zoom-in, plus per diorama travelled. */
+const VOL = { base: 1.8, parLieu: 0.7, ease: gsap.parseEase('power2.inOut') };
+/** Pulled out, a model is this share of the viewport width (desktop: in a row; phones: a column). */
+const MAQUETTE = { large: 0.36, mobile: 0.86 };
+/** Stacked blocks: how far the card underneath scales back, and how much it dims. */
+const PILE = { recul: 0.06, sombre: 0.45 };
+/** Seconds: how fast the smoothed scroll catches up (scroll-linked hand-overs). */
+const LISSAGE = 0.16;
+/** Seconds: the shortest a bridge (a hand-over) or a place passed over can last, however fast the scroll. */
+const LISSAGE_MIN = { pont: 0.9, lieu: 0.3 };
+
+export function regir(o: {
+  sec: HTMLElement;
+  lieux: HTMLElement[];
+  mode: Mode;
+  variante: Variante;
+  /** Scroll segments, in order: place 0, bridge to place 1, place 1, bridge to place 2… */
+  debuts: number[];
+  poids: number[];
+  lire: () => Lecture;
+}): Regie {
+  const { sec, lieux, mode, variante, debuts, poids, lire } = o;
+  const pilotes = lieux.map((l) => piloter(l, mode));
+  const plateaux = lieux.map((l) => $(l, '.d2-plateau'));
+  const calque = $(lieux[0], '.d2-calque');
+  const sombres = lieux.map((l) => $(l, '.d2-sombre'));
+  const zLarge = lireCam(lieux[0].dataset.vue!)['--z'];
+  const reduit = matchMedia('(prefers-reduced-motion: reduce)');
+  const mobile = matchMedia('(max-width: 47.99rem)');
+  /** Time plays the trip (A in mixte and auto); otherwise the hand-over follows the scroll. */
+  const temporel = variante === 'a' && mode !== 'scroll';
+
+  /** Segment at u: a place (`pont` false, f = position inside it) or the bridge into place i. */
+  function couper(u: number) {
+    const s = Math.max(
+      0,
+      debuts.findLastIndex((d) => u >= d),
+    );
+    const f = Math.min(1, Math.max(0, (u - debuts[s]) / poids[s]));
+    return { i: Math.ceil(s / 2), pont: s % 2 === 1, f };
+  }
+  const bornes = (i: number) => [debuts[2 * i], debuts[2 * i] + poids[2 * i]];
+
+  /** The place on stage: its timeline plays while the section is pinned. */
+  let k = 0;
+  let enJeu = false;
+  function afficher(on: number[]) {
+    lieux.forEach((l, i) => l.classList.toggle('on', on.includes(i)));
+  }
+  function jouer(q: number, e: Lecture) {
+    const p = pilotes[k];
+    if (!e.epingle) {
+      if (enJeu) p.arreter(e.dessus);
+      enJeu = false;
+    } else if (!enJeu) {
+      p.entrer(q);
+      enJeu = true;
+    } else p.suivre(q);
+  }
+  /** Land on place i: the place left goes back to its start (it is off stage). */
+  function poser(i: number) {
+    if (i === k) return;
+    pilotes[k].arreter();
+    k = i;
+    enJeu = false;
+  }
+  function nettoyer() {
+    sec.classList.remove('vol');
+    for (const el of [...plateaux, ...lieux]) el.style.transform = el.style.visibility = '';
+    for (const l of lieux) l.classList.remove('monte');
+    for (const s of sombres) s.style.opacity = '';
+  }
+
+  // ——— Reduced motion: the scroll picks the place directly, nothing moves.
+  function direct(e: Lecture) {
+    const s = couper(e.u);
+    const tot = s.pont && s.f < 0.5;
+    const i = tot ? s.i - 1 : s.i;
+    if (i !== k) {
+      if (enJeu) pilotes[k].arreter();
+      enJeu = false;
+      k = i;
+    }
+    nettoyer();
+    afficher([k]);
+    jouer(s.pont ? (tot ? 1 : 0) : s.f, e);
+  }
+
+  // ——— A: the table of models. x = camera along the table (0 = first place), h = pull-out (0–1).
+  let x = 0;
+  let h = 0;
+  function table(cx: number, ch: number) {
+    const colonne = mobile.matches;
+    const w = calque.offsetWidth * zLarge;
+    const hh = calque.offsetHeight * zLarge;
+    const vh = plateaux[0].offsetHeight;
+    const min = colonne
+      ? Math.min((MAQUETTE.mobile * innerWidth) / w, (0.34 * vh) / hh)
+      : Math.min((MAQUETTE.large * innerWidth) / w, (0.7 * vh) / hh);
+    // Geometric, so the zoom reads at an even pace.
+    const s = min ** ch;
+    const pas = (colonne ? hh * 1.04 : w) * s;
+    /** A model whose diorama (the middle ~80 % of the render) is out of frame stays hidden. */
+    const bord = colonne ? (vh + 0.8 * hh * s) / 2 : (innerWidth + 0.8 * w * s) / 2;
+    plateaux.forEach((p, i) => {
+      const d = (i - cx) * pas;
+      p.style.transform = `translate3d(${colonne ? 0 : d}px, ${colonne ? d : 0}px, 0) scale(${s})`;
+      p.style.visibility = Math.abs(d) < bord ? '' : 'hidden';
+    });
+  }
+  /** Pull out, slide, zoom in, from (x0, h0) to place b, at progress v (0–1). */
+  function profil(x0: number, h0: number, b: number, v: number): [number, number] {
+    const e = VOL.ease;
+    const ch = v < 0.35 ? h0 + (1 - h0) * e(v / 0.35) : v < 0.65 ? 1 : 1 - e((v - 0.65) / 0.35);
+    return [x0 + (b - x0) * e(Math.min(1, Math.max(0, (v - 0.2) / 0.6))), ch];
+  }
+  function decoller() {
+    sec.classList.add('vol');
+    afficher([]);
+  }
+
+  /** Time-driven trip (mixte, auto). `plancher` = the scroll's position in the bridge (mixte). */
+  let vol: {
+    x0: number;
+    h0: number;
+    b: number;
+    v: number;
+    d: number;
+    attente: number;
+    plancher: number | null;
+  } | null = null;
+  function majVol(e: Lecture) {
+    const s = couper(e.u);
+    const b = s.i;
+    const plancher = mode === 'mixte' && s.pont ? s.f : null;
+    if (vol && b === k && x === k && h === 0) {
+      // Back before the trip took off: the place resumes.
+      vol = null;
+      nettoyer();
+      afficher([k]);
+    }
+    if (!vol && b === k) return jouer(s.pont ? 0 : s.f, e);
+    if (vol?.b === b) {
+      vol.plancher = plancher;
+      return;
+    }
+    if (!vol) {
+      // Leaving k: it ends on its wide shot first; its overlay fades out meanwhile.
+      const attente = pilotes[k].conclure();
+      enJeu = false;
+      x = k;
+      h = 0;
+      decoller();
+      table(x, h);
+      vol = { x0: k, h0: 0, b, v: 0, d: 0, attente, plancher };
+    } else vol = { x0: x, h0: h, b, v: 0, d: 0, attente: vol.attente, plancher };
+    vol.d = VOL.base + VOL.parLieu * Math.abs(b - vol.x0);
+    boucler();
+  }
+  function pasVol(dt: number) {
+    if (!vol) return false;
+    if (vol.attente > 0) {
+      vol.attente -= dt;
+      return true;
+    }
+    let v = vol.v + dt / vol.d;
+    // The scroll pushes: the trip is at least where the scroll is in the bridge, eased.
+    if (vol.plancher !== null && vol.plancher > v)
+      v = Math.max(v, vol.v + (vol.plancher - vol.v) * (1 - Math.exp(-dt / 0.3)));
+    vol.v = Math.min(1, v);
+    [x, h] = profil(vol.x0, vol.h0, vol.b, vol.v);
+    table(x, h);
+    if (vol.v < 1) return true;
+    const b = vol.b;
+    vol = null;
+    poser(b);
+    x = b;
+    h = 0;
+    nettoyer();
+    afficher([b]);
+    majVol(lire());
+    return false;
+  }
+
+  // ——— Scroll-linked hand-overs (A in scroll mode, B): a smoothed scroll position drives them.
+  let us = lire().u;
+  /** B: seconds left before the place on stage reaches its wide shot (null: not asked yet). */
+  let porte: number | null = null;
+  function pasGlisse(dt: number) {
+    const e = lire();
+    // Eased catch-up, with a speed limit per segment so a jump still shows every hand-over.
+    const s = Math.max(
+      0,
+      debuts.findLastIndex((d) => us >= d),
+    );
+    const vmax = (poids[s] / (s % 2 ? LISSAGE_MIN.pont : LISSAGE_MIN.lieu)) * dt;
+    const pas = (e.u - us) * (1 - Math.exp(-dt / LISSAGE));
+    let suivant = us + Math.min(Math.max(pas, -vmax), vmax);
+    if (Math.abs(e.u - suivant) < 2e-3) suivant = e.u;
+    const [lo, hi] = bornes(k);
+    const ici = e.u >= lo && e.u < hi;
+    if (ici) porte = null;
+    else if (mode !== 'scroll' && (suivant < lo || suivant >= hi)) {
+      // The place on stage ends on its wide shot before the next card moves.
+      if (porte === null) {
+        porte = pilotes[k].conclure();
+        enJeu = false;
+      }
+      if (porte > 0) {
+        porte -= dt;
+        suivant = Math.min(Math.max(suivant, lo), hi - 1e-4);
+      }
+    }
+    us = suivant;
+    rendreGlisse(e);
+    return us !== e.u || (porte ?? 0) > 0;
+  }
+  function rendreGlisse(e: Lecture) {
+    const s = couper(us);
+    if (!s.pont) {
+      if (s.i !== k) {
+        poser(s.i);
+        porte = null;
+      }
+      nettoyer();
+      afficher([k]);
+      // A place the smoothed scroll only passes over keeps its wide shot.
+      const r = couper(e.u);
+      if (!r.pont && r.i === k) jouer(r.f, e);
+      else if (mode === 'scroll') pilotes[k].conclure();
+      return;
+    }
+    const [a, b] = [s.i - 1, s.i];
+    if (mode === 'scroll') {
+      pilotes[a].conclure();
+      pilotes[b].conclure();
+    }
+    if (variante === 'a') {
+      if (!sec.classList.contains('vol')) decoller();
+      [x, h] = profil(a, 0, b, s.f);
+      return table(x, h);
+    }
+    // B: the next card slides up over the previous one, which scales back and dims.
+    afficher([a, b]);
+    lieux.forEach((l, i) => {
+      l.classList.toggle('monte', i === b);
+      l.style.transform =
+        i === b
+          ? `translate3d(0, ${(1 - s.f) * 100}%, 0)`
+          : i === a
+            ? `scale(${1 - PILE.recul * s.f})`
+            : '';
+    });
+    sombres.forEach((el, i) => (el.style.opacity = i === a ? String(PILE.sombre * s.f) : ''));
+  }
+
+  let raf = 0;
+  let avant = 0;
+  function boucler() {
+    if (raf) return;
+    avant = performance.now();
+    raf = requestAnimationFrame(tic);
+  }
+  function tic(t: number) {
+    // Cleared first: a landing can start the next trip (boucler) from inside the step.
+    raf = 0;
+    const dt = Math.min(0.1, Math.max(0, (t - avant) / 1000));
+    avant = t;
+    if ((temporel ? pasVol(dt) : pasGlisse(dt)) && !raf) raf = requestAnimationFrame(tic);
+  }
+
+  // Start on the place the scroll is at (a reload mid-section lands there, no trip).
+  {
+    const s = couper(us);
+    k = s.pont && s.f < 0.5 ? s.i - 1 : s.i;
+    x = k;
+    afficher([k]);
+  }
+
+  return {
+    maj() {
+      const e = lire();
+      if (reduit.matches) {
+        vol = null;
+        us = e.u;
+        return direct(e);
+      }
+      if (temporel) return majVol(e);
+      boucler();
+    },
+    pilote(lieu) {
+      const i = lieux.indexOf(lieu);
+      const sur = temporel ? !vol : !couper(us).pont;
+      return i === k && sur ? pilotes[i] : undefined;
     },
   };
 }

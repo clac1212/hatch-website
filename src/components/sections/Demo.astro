@@ -9,6 +9,9 @@
  *
  * Scroll rules (research: NN/g on scroll-jacking, Apple product pages):
  * - the scroll position picks the place DIRECTLY (no queue): a fast scroll lands on a clean state;
+ * - between two places, a bridge of scroll carries the hand-over (César 02/10: a fast scroll cut
+ *   straight to the next place). Two variants to compare, `?transition=a|b` (demo-motion.ts
+ *   `regir`); the place ends on its wide shot first;
  * - the wheel is never captured, and no snap point pulls the page (it would rewind the demo).
  * Without JS, the three places stack, each with its first demo in its final state.
  */
@@ -46,13 +49,22 @@ type Cle = (typeof data.lieux)[number]['agents'][number]['cle'];
 type Cam = [fx: number, fy: number, z: number];
 /**
  * Keep the image edges outside the frame: the focus is clamped by the zoom and by where it sits in
- * the viewport (`o`, 0.5 = centred; autoplay places put the agent left of centre, see --ox/--oy).
+ * the viewport (`o`, 0.5 = centred). Below a zoom of 1 the edges show, on purpose: the renders'
+ * backdrop is the section's colour (`--color-scene`), so the diorama sits on it like a model.
  */
-const centre = (v: number, z: number, o: number) => Math.min(Math.max(v, o / z), 1 - (1 - o) / z);
-const camStyle = ([fx, fy, z]: Cam, [ox, oy] = [0.5, 0.5]) =>
-  `--cx:${centre(fx, z, ox)};--cy:${centre(fy, z, oy)};--z:${z}`;
-/** Where the focus sits in the viewport on desktop (wide shot and agents), mirrored in the CSS (--ox/--oy). */
+const centre = (v: number, z: number, o: number) =>
+  z < 1 ? v : Math.min(Math.max(v, o / z), 1 - (1 - o) / z);
+const camStyle = ([fx, fy, z]: Cam, [ox, oy]: [number, number]) =>
+  `--cx:${centre(fx, z, ox)};--cy:${centre(fy, z, oy)};--z:${z};--ox:${ox};--oy:${oy}`;
+/**
+ * Where the focus sits in the viewport. The wide shot is centred and zoomed out (César 02/10: "the
+ * scenes aren't centred, the scene feels too imposing"); during a demo the agent sits left of
+ * centre and its device on the right (phones: demo-motion.ts VISEE_MOBILE).
+ */
+const CENTRE: [number, number] = [0.5, 0.5];
 const VISEE: [number, number] = [0.27, 0.4];
+/** Wide shot of every place: the diorama's centre in the renders, zoomed out to breathe. */
+const LARGE: Cam = [0.5, 0.48, 0.86];
 
 /**
  * Places, in YAML order: background, wide shot, cut-out agents (fractions of the image, from the v4
@@ -65,7 +77,7 @@ const LIEUX: {
 }[] = [
   {
     fond: siegeFond,
-    vue: [0.45, 0.52, 1.08],
+    vue: LARGE,
     decoupes: [
       { img: imgLark, cles: ['lark'], x: 0.1523, y: 0.3743, w: 0.1286 },
       { img: imgFinch, cles: ['finch'], x: 0.2747, y: 0.4577, w: 0.1188 },
@@ -75,7 +87,7 @@ const LIEUX: {
   },
   {
     fond: cuisineFond,
-    vue: [0.42, 0.55, 1.12],
+    vue: LARGE,
     decoupes: [
       { img: imgOwl, cles: ['owl'], x: 0.141, y: 0.3874, w: 0.1399 },
       { img: imgPecker, cles: ['pecker'], x: 0.5487, y: 0.556, w: 0.1126 },
@@ -83,7 +95,7 @@ const LIEUX: {
   },
   {
     fond: chantierFond,
-    vue: [0.53, 0.53, 1.2],
+    vue: LARGE,
     decoupes: [
       {
         img: imgSparrow,
@@ -123,9 +135,9 @@ for (const l of lieux) {
   <div class="d2-scene-fixe">
     {
       lieux.map((l, i) => (
-        <div class:list={['d2-lieu', { on: i === 0 }]} data-vue={camStyle(l.vue, VISEE)}>
+        <div class:list={['d2-lieu', { on: i === 0 }]} data-vue={camStyle(l.vue, CENTRE)}>
           <div class="d2-plateau">
-            <div class="d2-calque" style={camStyle(l.vue, VISEE)}>
+            <div class="d2-calque" style={camStyle(l.vue, CENTRE)}>
               <Picture
                 src={l.fond}
                 formats={['avif', 'webp']}
@@ -147,8 +159,9 @@ for (const l of lieux) {
                   style={`left:${a.x * 100}%;top:${a.y * 100}%;width:${a.w * 100}%`}
                 />
               ))}
-              <div class="d2-voile" aria-hidden="true" />
             </div>
+            {/* Over the whole frame, not the image: zoomed out, the image no longer covers it. */}
+            <div class="d2-voile" aria-hidden="true" />
           </div>
 
           <div class="d2-ui">
@@ -218,6 +231,8 @@ for (const l of lieux) {
               ))}
             </div>
           </div>
+          {/* Stacked blocks (?transition=b): dims this place while the next card slides over it. */}
+          <div class="d2-sombre" aria-hidden="true" />
         </div>
       ))
     }
@@ -271,9 +286,6 @@ for (const l of lieux) {
 
   /* The scene: an image box covering the viewport; the camera moves it so the focus sits centred. */
   .d2-plateau {
-    /* --ox/--oy = where the focus sits in the viewport. */
-    --ox: 0.5;
-    --oy: 0.5;
     position: absolute;
     inset: 0;
     container-type: size;
@@ -284,14 +296,15 @@ for (const l of lieux) {
     top: 50%;
     width: max(100cqw, calc(100cqh * 2400 / 1340));
     aspect-ratio: 2400 / 1340;
-    /* --oy = where the focus sits vertically: centred, or high on phones where the cards fill the bottom. */
+    /* --ox/--oy = where the focus sits in the viewport (inline, tweened with the camera). */
     translate: calc(-50% + (var(--ox) - 0.5) * 100cqw) calc(-50% + (var(--oy) - 0.5) * 100cqh);
     transform-origin: calc(var(--cx) * 100%) calc(var(--cy) * 100%);
     transform: translate(calc((0.5 - var(--cx)) * 100%), calc((0.5 - var(--cy)) * 100%))
       scale(var(--z));
     transition:
       transform 1s cubic-bezier(0.32, 0.72, 0, 1),
-      transform-origin 1s cubic-bezier(0.32, 0.72, 0, 1);
+      transform-origin 1s cubic-bezier(0.32, 0.72, 0, 1),
+      translate 1s cubic-bezier(0.32, 0.72, 0, 1);
   }
   .d2-calque :global(.d2-fond) {
     position: absolute;
@@ -299,6 +312,12 @@ for (const l of lieux) {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    /* The renders' backdrop is a soft gradient: its edges fade into the section's colour, so a
+       zoomed-out diorama reads as a model on the table, with no rectangle around it. */
+    mask-image:
+      linear-gradient(to right, transparent, #000 9%, #000 91%, transparent),
+      linear-gradient(transparent, #000 2.5%, #000 95%, transparent);
+    mask-composite: intersect;
   }
   /* The cut-out agents stay still: their soft-edged patches show as soon as they move. */
   .d2-calque :global(.d2-agent) {
@@ -348,16 +367,10 @@ for (const l of lieux) {
     object-fit: cover;
   }
 
-  /* The agent sits left of centre, its device on the right (VISEE in the frontmatter). */
-  .d2-plateau {
-    --ox: 0.27;
-    --oy: 0.4;
-  }
   /* Focus: the whole scene dims, agents included, so the device is the subject. */
   .d2-voile {
     position: absolute;
     inset: 0;
-    z-index: 2;
     background: color-mix(in srgb, var(--color-night) 40%, transparent);
     opacity: 0;
     pointer-events: none;
@@ -521,10 +534,6 @@ for (const l of lieux) {
   }
 
   @media (max-width: 47.99rem) {
-    .d2-plateau {
-      --ox: 0.5;
-      --oy: 0.25;
-    }
     .d2-appareils {
       left: 16px;
       right: 16px;
@@ -546,6 +555,39 @@ for (const l of lieux) {
     .d2-ou {
       top: 76px;
     }
+  }
+
+  /* Hand-overs (demo-motion.ts `regir`). With JS, places switch at once: the hand-over is the motion. */
+  .d2.js .d2-lieu {
+    transition: none;
+  }
+  /* A, travel between islands: every diorama shows on the section's backdrop, overlays hidden. */
+  .d2.vol .d2-lieu {
+    opacity: 1;
+    visibility: visible;
+  }
+  .d2.vol .d2-plateau {
+    will-change: transform;
+  }
+  /* B, stacked blocks: each place is an opaque card carrying its own overlay. */
+  .d2.tb .d2-lieu {
+    background: var(--color-scene);
+  }
+  .d2.tb .d2-ui,
+  .d2.tb .d2-ui > * {
+    transition: none;
+  }
+  .d2.tb .d2-lieu.monte {
+    border-radius: var(--radius-glass) var(--radius-glass) 0 0;
+    box-shadow: var(--shadow-3);
+    will-change: transform;
+  }
+  .d2-sombre {
+    position: absolute;
+    inset: 0;
+    background: var(--color-night);
+    opacity: 0;
+    pointer-events: none;
   }
 
   /* Without JS: the three places stack, each with its first demo in its final state. */
@@ -571,6 +613,13 @@ for (const l of lieux) {
   .d2:not(.js) .d2-barre {
     display: none;
   }
+  /* The first device stays on screen: the centred wide shot moves left to make room for it
+     (!important: the camera is an inline style). */
+  @media (min-width: 48rem) {
+    .d2:not(.js) .d2-calque {
+      --ox: 0.36 !important;
+    }
+  }
 
   @media (prefers-reduced-motion: reduce) {
     .d2 *,
@@ -583,91 +632,75 @@ for (const l of lieux) {
 </style>
 
 <script>
-  import type { Mode, Pilote } from './demo-motion';
+  import type { Mode, Regie, Variante } from './demo-motion';
   /**
-   * The scroll position picks the place directly (no queue, so a fast scroll never leaves a step
-   * pending); inside a place, its timeline (demo-motion.ts) plays the demos.
+   * The scroll position picks where we are (no queue, so a fast scroll never leaves a step
+   * pending): a place, or the bridge between two places. demo-motion.ts plays the places' demos
+   * and the hand-overs between them (`regir`).
    */
   const sec = document.querySelector<HTMLElement>('.d2')!;
   const lieux = [...sec.querySelectorAll<HTMLElement>('.d2-lieu')];
   sec.classList.add('js');
 
-  let k = 0;
-
   /**
    * demo-motion.ts `Mode`: `mixte` by default, `?scroll=1` (scroll only) and `?auto=1` (time only)
    * to compare. With the scroll in play, a place gets several steps of scroll instead of one, so
-   * scrolling through it covers its whole timeline.
+   * scrolling through it covers its whole timeline. `?transition=a|b` picks the hand-over between
+   * places (demo-motion.ts `Variante`), to compare the two on the same build (César 02/10).
    */
   const params = new URLSearchParams(location.search);
   const mode: Mode = params.has('scroll') ? 'scroll' : params.has('auto') ? 'auto' : 'mixte';
+  const variante: Variante = params.get('transition') === 'b' ? 'b' : 'a';
+  sec.classList.add(`t${variante}`);
   const POIDS = { auto: 1, scroll: 5, mixte: 3 }[mode];
-  const poids = lieux.map(() => POIDS);
+  /** Steps of scroll for the bridge between two places: the hand-over gets its own stretch. */
+  const PONT = 1;
+  /** Segments, in order: place 0, bridge, place 1, bridge, place 2. */
+  const poids = lieux.flatMap((_, i) => (i ? [PONT, POIDS] : [POIDS]));
   const debuts = poids.map((_, i) => poids.slice(0, i).reduce((a, b) => a + b, 0));
   const total = poids.reduce((a, b) => a + b, 0);
-  if (POIDS > 1) {
-    sec.classList.add('long');
-    sec.style.setProperty('--n', String(total));
-  }
+  sec.style.setProperty('--n', String(total));
+  if (POIDS > 1) sec.classList.add('long');
   if (mode === 'scroll') sec.classList.add('scrub');
-  /** Where the scroll is: the place, and the position inside it (0–1). */
-  function ici() {
+  // Snap points (?auto=1) sit mid-place.
+  sec.querySelectorAll<HTMLElement>('.d2-ancre').forEach((a, i) => {
+    a.style.setProperty('--i', String(debuts[2 * i] + POIDS / 2 - 0.5));
+  });
+
+  /** Where the scroll is, in steps, and whether the section is pinned. */
+  function lire() {
     const r = sec.getBoundingClientRect();
     const u = Math.min(Math.max(-r.top / (r.height - innerHeight), 0), 0.9999) * total;
-    const i = debuts.findLastIndex((d) => u >= d);
-    return { i, q: (u - debuts[i]) / poids[i] };
+    return { u, epingle: r.top <= 1 && r.bottom >= innerHeight - 1, dessus: r.top > 1 };
   }
 
-  /** The places' timelines: GSAP and the choreography load when the section comes near. */
-  const pilotes = new Map<HTMLElement, Pilote>();
+  /**
+   * GSAP and the choreography load when the section comes near. A place plays only while the
+   * section is pinned (César 01/10: the head office's first demo had played out of sight, while
+   * the section was still scrolling in from below).
+   */
+  let regie: Regie | null = null;
   new IntersectionObserver(
     async (entrees, io) => {
       if (!entrees.some((e) => e.isIntersecting)) return;
       io.disconnect();
-      const { piloter } = await import('./demo-motion');
-      lieux.forEach((l) => pilotes.set(l, piloter(l, mode)));
-      maj();
+      const { regir } = await import('./demo-motion');
+      regie = regir({ sec, lieux, mode, variante, debuts, poids, lire });
+      regie.maj();
     },
     { rootMargin: '100% 0px' },
   ).observe(sec);
 
-  /**
-   * A place plays only while the section is pinned (César 01/10: the head office's first demo had
-   * played out of sight, while the section was still scrolling in from below). Above it, the first
-   * place waits on its wide shot; past it, the last one freezes where it is.
-   */
-  let enJeu = false;
-  function maj() {
-    const r = sec.getBoundingClientRect();
-    const epingle = r.top <= 1 && r.bottom >= innerHeight - 1;
-    const { i: suivant, q } = ici();
-    if (suivant !== k) {
-      if (enJeu) pilotes.get(lieux[k])?.arreter();
-      enJeu = false;
-      k = suivant;
-      lieux.forEach((l, i) => l.classList.toggle('on', i === k));
-    }
-    const pilote = pilotes.get(lieux[k]);
-    if (!pilote) return;
-    if (!epingle) {
-      if (enJeu) pilote.arreter(r.top > 1);
-      enJeu = false;
-    } else if (!enJeu) {
-      pilote.entrer(q);
-      enJeu = true;
-    } else pilote.suivre(q);
-  }
-
   sec.addEventListener('click', (ev) => {
     const t = ev.target as HTMLElement;
     const lieu = t.closest<HTMLElement>('.d2-lieu');
-    if (!lieu) return;
     const onglet = t.closest<HTMLElement>('[data-onglet]');
-    const pilote = pilotes.get(lieu);
-    if (onglet && mode === 'scroll' && pilote) {
+    const pilote = lieu && regie?.pilote(lieu);
+    if (!lieu || !onglet || !pilote) return;
+    if (mode === 'scroll') {
       // Scroll mode: a tab scrolls to where its demo starts.
-      const i = lieux.indexOf(lieu);
-      const u = debuts[i] + poids[i] * pilote.position(Number(onglet.dataset.onglet));
+      const s = 2 * lieux.indexOf(lieu);
+      const u = debuts[s] + poids[s] * pilote.position(Number(onglet.dataset.onglet));
       const r = sec.getBoundingClientRect();
       const top = scrollY + r.top + (u / total) * (r.height - innerHeight);
       return scrollTo({
@@ -675,13 +708,13 @@ for (const l of lieux) {
         behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
       });
     }
-    if (onglet) pilote?.jouer(Number(onglet.dataset.onglet));
+    pilote.jouer(Number(onglet.dataset.onglet));
   });
 
   let raf = 0;
+  const maj = () => regie?.maj();
   addEventListener('scroll', () => (raf ||= requestAnimationFrame(() => ((raf = 0), maj()))), {
     passive: true,
   });
   addEventListener('resize', maj);
-  maj();
 </script>
