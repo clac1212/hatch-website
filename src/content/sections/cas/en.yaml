@@ -1,20 +1,17 @@
-kicker: Customer stories
+# Quotes and authors: drafts, to be validated by each customer before launch.
 title: They rolled it out across their network
 label: Customer stories
 with: With
 readCase: Read the story
-controls:
-  carousel: carousel
-  slideRole: slide
-  previous: Previous story
-  next: Next story
-  slide: '{n} of {total}'
-  dot: 'Show the {client} story'
+sites: sites
+open: 'Show the {client} story'
 cases:
   - id: la-meulerie
     client: La Meulerie
     agent: jay
-    visualAlt: The La Meulerie storefront, in voxels.
+    visualAlt: The La Meulerie storefront.
+    quote: “When a procedure changes, our four sites have it the same day. It used to take weeks and three reminders.”
+    author: '[First Last] · Founder, La Meulerie'
     figures:
       - value: '4'
         label: locations equipped
@@ -24,7 +21,9 @@ cases:
   - id: nobinobi
     client: Nobinobi
     agent: peep
-    visualAlt: The Nobinobi storefront, in voxels, with Peep at the door.
+    visualAlt: The Nobinobi storefront.
+    quote: “The teams ask Peep instead of calling me. I only keep the real issues.”
+    author: '[First Last] · Founder, Nobinobi'
     figures:
       - value: '12'
         label: locations equipped
@@ -34,7 +33,9 @@ cases:
   - id: pny
     client: PNY
     agent: owl
-    visualAlt: The PNY storefront, in voxels.
+    visualAlt: The PNY storefront.
+    quote: “Mid-rush, a crew member asks Owl and hears the answer out loud, without dropping the order.”
+    author: '[First Last] · Head of operations, PNY'
     figures:
       - value: '13'
         label: locations equipped

@@ -37,6 +37,11 @@
   --color-orange-tint: #fdeadb;
   --color-copper: #c98a4b; /* secondary chart series */
 
+  /* Customer brand colours: the slices of the customer cases shelf (Cas.astro), white text on them. */
+  --color-client-meulerie: #1414e6;
+  --color-client-nobinobi: #121212;
+  --color-client-pny: #17804a;
+
   /* Product UI mockups only (phones, chat threads, app windows) — never for site chrome. */
   --color-success: #16a34a;
   --color-whatsapp: #d9fdd3; /* outgoing chat bubble */

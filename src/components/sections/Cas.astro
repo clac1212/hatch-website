@@ -5,24 +5,25 @@ import { Picture } from 'astro:assets';
 import { section } from '../../content/section';
 import type { CaseId } from '../../content/schemas/cas';
 import type { Locale } from '../../i18n/ui';
-import meulerieFront from '../../assets/cas/la-meulerie-devanture.png';
-import nobinobiFront from '../../assets/cas/nobinobi-devanture.png';
-import pnyFront from '../../assets/cas/pny-devanture.png';
-import meulerieLogo from '../../assets/cas/logo-la-meulerie.png';
-import nobinobiLogo from '../../assets/cas/logo-nobinobi.png';
-import pnyLogo from '../../assets/cas/logo-pny.png';
+import meulerieFront from '../../assets/clients/devantures/la-meulerie.png';
+import nobinobiFront from '../../assets/clients/devantures/nobinobi.png';
+import pnyFront from '../../assets/clients/devantures/pny.png';
+import meulerieLogo from '../../assets/cas/logo-la-meulerie-blanc.png';
+import nobinobiLogo from '../../assets/cas/logo-nobinobi-blanc.png';
+import pnyLogo from '../../assets/cas/logo-pny-blanc.png';
 import voxelJay from '../../assets/cas/voxel-jay.webp';
 import voxelPeep from '../../assets/cas/voxel-peep.webp';
 import voxelOwl from '../../assets/cas/voxel-owl.webp';
 
 /**
- * 06 — "Ils l'ont déployé dans leur réseau" (v4 node VEEFh): carousel of customer cases.
- * Compact card (César 02/10: the v4's 1000 × 520 card was oversized): 840 × 340 from lg, storefront
- * on the left, logo and two figures on the right. Three rotating slots 872 px apart (the card is
- * scaled down below 1080 px), side cards at 45 %; arrows, dots, auto-advance every 6 s paused on hover,
- * keyboard focus, off-screen or reduced motion. No pause button (César 02/10).
- * Below lg: full-width cards in a horizontal scroll-snap strip, same controls.
- * Without JS: the strip (mobile) or the prototype's initial state (desktop), all content readable.
+ * 06 — "Ils l'ont déployé dans leur réseau": a shelf of slices (Pencil node OjYOb, note wZ8mR, chosen
+ * 02/10 over the v4 carousel). One slice per customer in its brand colour; one is open (white logo,
+ * quote, figures, storefront, "Avec <agent>"), the others are closed (agent voxel, vertical name, site
+ * count). Auto-advance every 7 s (white bar under the text), paused on hover, keyboard focus, off-screen
+ * and under reduced motion; clicking a slice opens it (width 0.7 s, content fades in after).
+ * The bar's CSS animation is the clock: its `animationend` opens the next slice.
+ * From lg the slices sit side by side (+124 px per case); below lg they stack, closed ones as rows.
+ * Without JS: the first case is open, all content in the markup.
  */
 interface Props {
   locale: Locale;
@@ -31,11 +32,14 @@ interface Props {
 const { locale } = Astro.props;
 const data = await section('cas', locale);
 
-/** Storefront (transparent voxel PNG) and logo of each case. */
-const visuals: Record<CaseId, { front: ImageMetadata; logo: ImageMetadata }> = {
-  'la-meulerie': { front: meulerieFront, logo: meulerieLogo },
-  nobinobi: { front: nobinobiFront, logo: nobinobiLogo },
-  pny: { front: pnyFront, logo: pnyLogo },
+const visuals: Record<CaseId, { front: ImageMetadata; logo: ImageMetadata; color: string }> = {
+  'la-meulerie': {
+    front: meulerieFront,
+    logo: meulerieLogo,
+    color: 'var(--color-client-meulerie)',
+  },
+  nobinobi: { front: nobinobiFront, logo: nobinobiLogo, color: 'var(--color-client-nobinobi)' },
+  pny: { front: pnyFront, logo: pnyLogo, color: 'var(--color-client-pny)' },
 };
 const voxels = { jay: voxelJay, peep: voxelPeep, owl: voxelOwl };
 
@@ -46,173 +50,134 @@ const cases = await Promise.all(
     return { ...c, ...visuals[c.id], voxel: voxels[c.agent], agentName: agent.data.name };
   }),
 );
-const total = cases.length;
-/** The v4 opens on the second case, centred. */
-const first = 1;
-const fill = (s: string, vars: Record<string, string | number>) =>
-  s.replace(/\{(\w+)\}/g, (_, k: string) => String(vars[k]));
-
-const arrow =
-  'M4 11v2h16v-2zm12 2v2h2v-2zm-2 2v2h2v-2zm-2 2v2h2v-2zm4-6V9h2v2zm-2 4V7h2v8zm-2 2V5h2v12z';
+const fill = (s: string, vars: Record<string, string>) =>
+  s.replace(/\{(\w+)\}/g, (_, k: string) => vars[k]!);
 ---
 
 <section
   id="cas-clients"
   aria-labelledby="cas-titre"
-  class="cas-section section-y overflow-hidden"
+  class="section-y px-5 md:px-12"
   data-rv-groupe
 >
-  <div data-rv class="flex flex-col items-center gap-3.5 px-5 text-center">
-    <p class="font-mono text-[13px] leading-[1.27] tracking-[0.08em] text-orange-txt uppercase">
-      {data.kicker}
-    </p>
+  <div class="mx-auto flex max-w-[1200px] flex-col gap-10 lg:gap-12">
     <h2
       id="cas-titre"
-      class="font-display text-[34px] leading-[1.1] font-bold tracking-[-1.2px] text-ink lg:text-[44px] lg:leading-[54px] lg:whitespace-nowrap"
+      data-rv
+      class="font-display text-[34px] leading-[1.1] font-bold tracking-[-1.2px] text-ink lg:text-[44px] lg:leading-[54px]"
     >
       {data.title}
     </h2>
-  </div>
-
-  <div
-    class="carrousel relative mt-10 grid grid-cols-[auto_1fr_auto] items-center gap-y-6 lg:mt-14 lg:flex lg:flex-col lg:items-stretch lg:gap-y-10"
-    role="region"
-    aria-roledescription={data.controls.carousel}
-    aria-label={data.label}
-    data-carrousel
-  >
-    <div
-      data-rv
-      style="--rd:.09s"
-      class="fleche-pos fleche-prec col-start-1 row-start-2 pl-5 lg:pl-0"
-    >
-      <button
-        type="button"
-        data-prec
-        aria-label={data.controls.previous}
-        aria-controls="cas-diapos"
-        class="fleche flex size-10 cursor-pointer items-center justify-center rounded-full bg-white outline outline-1 -outline-offset-[0.5px] outline-line lg:size-12"
-      >
-        <svg viewBox="0 0 24 24" aria-hidden="true" class="size-[18px] -scale-x-100 fill-ink">
-          <path d={arrow}></path>
-        </svg>
-      </button>
-    </div>
-
-    <div data-rv style="--rd:.18s" class="col-start-2 row-start-2 flex items-center justify-center">
-      {
-        cases.map((c, k) => (
-          <button
-            type="button"
-            data-pastille={k}
-            aria-label={fill(data.controls.dot, { client: c.client })}
-            aria-controls="cas-diapos"
-            aria-current={k === first ? 'true' : undefined}
-            class="group flex h-6 cursor-pointer items-center px-1"
-          >
-            <span class="pastille block h-1.5 w-1.5 rounded-full bg-line group-aria-[current=true]:w-6 group-aria-[current=true]:bg-orange" />
-          </button>
-        ))
-      }
-    </div>
 
     <div
       data-rv
-      style="--rd:.09s"
-      class="fleche-pos fleche-suiv col-start-3 row-start-2 pr-5 lg:pr-0"
-    >
-      <button
-        type="button"
-        data-suiv
-        aria-label={data.controls.next}
-        aria-controls="cas-diapos"
-        class="fleche flex size-10 cursor-pointer items-center justify-center rounded-full bg-night lg:size-12"
-      >
-        <svg viewBox="0 0 24 24" aria-hidden="true" class="size-[18px] fill-white">
-          <path d={arrow}></path>
-        </svg>
-      </button>
-    </div>
-
-    <div
-      id="cas-diapos"
-      data-rv
-      style="--rd:.09s"
-      aria-live="off"
-      class="diapos col-span-3 row-start-1 lg:order-first"
-      data-diapos
+      style={`--rd:.09s;--n:${cases.length}`}
+      class="etagere"
+      role="region"
+      aria-label={data.label}
+      data-etagere
     >
       {
         cases.map((c, k) => (
-          <div
-            class="cas group"
-            role="group"
-            aria-roledescription={data.controls.slideRole}
-            aria-label={`${c.client} · ${fill(data.controls.slide, { n: k + 1, total })}`}
-            style={`--s:${k - first}`}
-            data-actif={k === first ? '' : undefined}
+          <article
+            class="tranche"
+            style={`--marque:${c.color}`}
+            data-ouvert={k === 0 ? '' : undefined}
+            aria-labelledby={`cas-${c.id}-nom`}
           >
-            <div class="carte flex h-full flex-col overflow-hidden rounded-card bg-white outline outline-1 -outline-offset-[0.5px] outline-line lg:flex-row">
-              <div class="visuel relative aspect-[16/10] shrink-0 overflow-hidden lg:aspect-auto lg:h-full lg:w-[340px]">
+            {/* Closed face: the whole slice is the button that opens it. */}
+            <button
+              type="button"
+              class="ferme"
+              aria-expanded={k === 0 ? 'true' : 'false'}
+              aria-controls={`cas-${c.id}`}
+              aria-label={fill(data.open, { client: c.client })}
+              data-ouvrir={k}
+            >
+              <span class="avatar" aria-hidden="true">
+                <Picture
+                  src={c.voxel}
+                  alt=""
+                  formats={['avif', 'webp']}
+                  width={42}
+                  densities={[1, 2]}
+                  class="size-[42px] object-contain"
+                />
+              </span>
+              <span id={`cas-${c.id}-nom`} class="nom font-display">
+                {c.client}
+              </span>
+              <span class="compte" aria-hidden="true">
+                <span class="font-display text-[36px] leading-none">{c.figures[0].value}</span>
+                <span class="text-[14px]">{data.sites}</span>
+              </span>
+            </button>
+
+            {/* Open content: laid out at the open width, so it never reflows while the slice grows. */}
+            <div id={`cas-${c.id}`} class="ouvert" inert={k === 0 ? undefined : true}>
+              <div class="texte">
+                <div class="flex flex-col gap-6">
+                  <Picture
+                    src={c.logo}
+                    alt={c.client}
+                    formats={['avif', 'webp']}
+                    height={26}
+                    densities={[1, 2]}
+                    class="h-[22px] w-auto max-w-[208px] self-start object-contain object-left lg:h-[26px]"
+                  />
+                  <blockquote class="citation font-display text-white">
+                    <p>{c.quote}</p>
+                  </blockquote>
+                  <p class="text-[14px] text-white/85">{c.author}</p>
+                </div>
+                <div class="flex flex-wrap items-end gap-x-10 gap-y-5">
+                  <dl class="flex gap-10">
+                    {c.figures.map((f) => (
+                      <div class="flex flex-col-reverse gap-1.5">
+                        <dt class="text-[14px] text-white/85">{f.label}</dt>
+                        <dd class="font-display text-[44px] leading-none tracking-[-1.5px] text-white lg:text-[56px]">
+                          {f.value}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                  {c.href && (
+                    <a
+                      href={c.href}
+                      class="rounded-full bg-white px-4 py-2.5 text-[14px] font-semibold text-(--marque)"
+                    >
+                      {data.readCase} →
+                    </a>
+                  )}
+                </div>
+                <span class="lecture" aria-hidden="true">
+                  <span />
+                </span>
+              </div>
+              <div class="devanture">
                 <Picture
                   src={c.front}
                   alt={c.visualAlt}
                   formats={['avif', 'webp']}
-                  widths={[320, 480, 680]}
-                  sizes="(min-width: 1024px) 300px, 80vw"
-                  class="devanture absolute top-[24%] left-[12%] h-[68%] w-[76%] lg:top-[18%] lg:left-[10%] lg:h-[75%] lg:w-[80%] object-contain object-bottom"
+                  widths={[340, 680]}
+                  sizes="340px"
+                  loading="lazy"
+                  class="size-full object-contain object-bottom"
                 />
-                <p class="absolute top-3.5 left-3.5 z-1 flex items-center gap-1.5 rounded-full bg-white/85 py-1 pr-3 pl-1 text-[13px] font-semibold text-ink">
-                  <Picture
-                    src={c.voxel}
-                    alt=""
-                    formats={['avif', 'webp']}
-                    width={24}
-                    densities={[1, 2]}
-                    class="size-6 object-contain"
-                  />
-                  {data.with} {c.agentName}
-                </p>
               </div>
-
-              <div class="flex flex-1 flex-col gap-7 p-6 lg:gap-0 lg:px-11 lg:py-10">
+              <p class="agent">
                 <Picture
-                  src={c.logo}
-                  alt={c.client}
+                  src={c.voxel}
+                  alt=""
                   formats={['avif', 'webp']}
-                  height={32}
+                  width={28}
                   densities={[1, 2]}
-                  class="h-7 w-auto self-start lg:h-8"
+                  class="size-7 object-contain"
                 />
-                <dl class="grid grid-cols-2 gap-6 lg:mt-auto lg:gap-10">
-                  {c.figures.map((f, i) => (
-                    <div class="flex flex-col-reverse gap-1.5">
-                      <dt class="text-[14px] leading-snug text-soft">{f.label}</dt>
-                      <dd
-                        class:list={[
-                          'font-display text-[36px] leading-none tracking-[-1px] lg:text-[44px] lg:tracking-[-1.5px]',
-                          i === 1 ? 'text-orange-txt' : 'text-ink',
-                        ]}
-                      >
-                        {f.value}
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
-                {c.href && (
-                  <a
-                    href={c.href}
-                    class="inline-flex items-center gap-2 self-start border-b-[1.5px] border-ink pb-1 text-[14px] font-semibold text-ink lg:mt-7"
-                  >
-                    {data.readCase}
-                    <svg viewBox="0 0 24 24" aria-hidden="true" class="size-4 fill-ink">
-                      <path d={arrow} />
-                    </svg>
-                  </a>
-                )}
-              </div>
+                {data.with} {c.agentName}
+              </p>
             </div>
-          </div>
+          </article>
         ))
       }
     </div>
@@ -220,232 +185,293 @@ const arrow =
 </section>
 
 <style>
-  .cas-section {
-    container-type: inline-size;
+  .tranche {
+    position: relative;
+    overflow: hidden;
+    border-radius: 28px;
+    background-color: var(--marque);
+    color: var(--color-white);
   }
 
-  /* Storefront visual: pale peach of the v4 (#F7E4CB), mixed from the two closest tokens. */
-  .visuel {
-    background-color: color-mix(in srgb, var(--color-cream-2) 50%, var(--color-sand));
+  .ferme {
+    display: flex;
+    cursor: pointer;
+    text-align: left;
+    transition: opacity 0.25s var(--ease-hatch);
   }
-  .devanture {
-    transition: scale 1.2s var(--ease-hatch);
-    transform-origin: 50% 100%;
+  .ferme:focus-visible {
+    outline: 2px solid var(--color-white);
+    outline-offset: -6px;
+    border-radius: 28px;
+  }
+  .avatar {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 999px;
+    background-color: color-mix(in srgb, var(--color-white) 12%, transparent);
+  }
+  .nom {
+    font-size: 30px;
+    letter-spacing: -0.4px;
+    line-height: 1;
+    transition: translate 0.4s var(--ease-hatch);
+  }
+  .compte {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
   }
 
-  .carte {
-    box-shadow: 0 16px 40px color-mix(in srgb, var(--color-shadow) 8%, transparent);
+  .texte {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+  .citation {
+    font-size: clamp(1.375rem, 2.4cqw, 1.75rem);
+    line-height: 1.25;
+    letter-spacing: -0.4px;
+    max-width: 32rem;
+  }
+  .agent {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 999px;
+    background-color: var(--color-white);
+    padding: 5px 14px 5px 5px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-ink);
   }
 
-  .fleche {
-    box-shadow: 0 6px 18px color-mix(in srgb, var(--color-ink) 12%, transparent);
-    transition:
-      scale 0.3s var(--ease-hatch),
-      background-color 0.3s;
+  /* Reading bar: the auto-advance clock (JS sets data-auto unless reduced motion). */
+  .lecture {
+    position: absolute;
+    height: 4px;
+    border-radius: 999px;
+    background-color: color-mix(in srgb, var(--color-white) 20%, transparent);
+    overflow: hidden;
   }
-  .fleche:hover {
-    background-color: var(--color-orange);
-    scale: 1.08;
+  .lecture > span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background-color: var(--color-white);
+    transform-origin: 0 50%;
+    scale: 0 1;
   }
-
-  .pastille {
-    transition:
-      width 0.5s var(--ease-hatch),
-      background-color 0.5s;
+  .etagere:not([data-auto]) .lecture {
+    display: none;
   }
-
-  /* ---------- Below lg: cards in a scroll-snap strip, the next one peeking ---------- */
-  @media (width < 64rem) {
-    .diapos {
-      display: flex;
-      gap: 0.875rem;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      scrollbar-width: none;
-      padding-inline: 1.25rem;
-      scroll-padding-inline: 1.25rem;
-      position: relative;
+  .etagere[data-auto] .tranche[data-ouvert] .lecture > span {
+    animation: lecture 7s linear forwards;
+  }
+  .etagere[data-auto]:is(:hover, :focus-within, :not([data-visible]))
+    .tranche[data-ouvert]
+    .lecture
+    > span {
+    animation-play-state: paused;
+  }
+  @keyframes lecture {
+    to {
+      scale: 1 1;
     }
-    .diapos::-webkit-scrollbar {
+  }
+
+  /* ---------- Below lg: stacked; closed slices are rows, the open one a card ---------- */
+  @media (width < 64rem) {
+    .etagere {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .tranche {
+      border-radius: 22px;
+    }
+    .ferme {
+      width: 100%;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 20px 12px 12px;
+    }
+    .avatar {
+      width: 48px;
+      height: 48px;
+    }
+    .nom {
+      flex: 1;
+      font-size: 24px;
+    }
+    .compte {
+      flex-direction: row;
+      align-items: baseline;
+      gap: 6px;
+    }
+    .compte > :first-child {
+      font-size: 28px;
+    }
+    .tranche[data-ouvert] .ferme,
+    .tranche:not([data-ouvert]) .ouvert {
       display: none;
     }
-    .cas {
-      flex: 0 0 min(86%, 26rem);
-      scroll-snap-align: center;
+    .ouvert {
+      display: flex;
+      flex-direction: column;
+      animation: apparait 0.5s var(--ease-hatch);
     }
-  }
-  @media (48rem <= width < 64rem) {
-    .diapos {
-      padding-inline: calc(50% - 13rem);
-      scroll-padding-inline: calc(50% - 13rem);
+    .texte {
+      padding: 76px 22px 44px;
+    }
+    .lecture {
+      bottom: 22px;
+      left: 22px;
+      right: 22px;
+    }
+    .devanture {
+      height: 220px;
+      padding-inline: 12%;
+    }
+    .agent {
+      top: 18px;
+      left: 18px;
     }
   }
 
-  /* ---------- lg+: three rotating slots, the 840 × 340 card scaled to fit ---------- */
+  /* ---------- lg+: slices side by side, the open one takes the rest of the width ---------- */
   @media (width >= 64rem) {
-    .carrousel {
-      /* Scale factor: 1 from 1080 px up, down to ≈ 0.93 at 1024 px (card + arrows + margins). */
-      --k: min(1, tan(atan2(100cqw - 240px, 840px)));
+    .etagere {
+      container-type: inline-size;
+      display: flex;
+      gap: 12px;
+      height: 420px;
     }
-    .diapos {
-      position: relative;
-      height: calc(340px * var(--k));
+    .tranche {
+      flex: 0 0 112px;
+      transition: flex-grow 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
-    .cas {
+    .tranche[data-ouvert] {
+      flex-grow: 1;
+    }
+    .ferme {
       position: absolute;
-      top: 0;
-      width: 840px;
-      height: 340px;
-      left: calc(50% - 420px * var(--k) + var(--s) * 872px * var(--k));
-      transform-origin: 0 0;
-      scale: var(--k);
-      opacity: 0.45;
-      z-index: 0;
-      transition:
-        left 0.8s var(--ease-hatch),
-        opacity 0.8s var(--ease-hatch);
+      inset: 0;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 0 33px;
     }
-    .cas[data-actif] {
-      opacity: 1;
-      z-index: 1;
+    .nom {
+      margin-top: auto;
+      margin-bottom: 30px;
+      writing-mode: vertical-rl;
+      rotate: 180deg;
+      white-space: nowrap;
     }
-    /* Wrapping from one side to the other: jump without sliding across the screen, then fade in. */
-    .cas.saute {
-      transition: none;
+    .compte {
+      align-self: flex-start;
+      margin-left: 28px;
+    }
+    /* Hovering a closed slice: only its name moves, never the slice (Pencil note). */
+    .tranche:not([data-ouvert]):hover .nom {
+      translate: 0 -8px;
+    }
+    .tranche[data-ouvert] .ferme {
       opacity: 0;
+      pointer-events: none;
     }
-    .cas:hover .devanture {
-      scale: 1.04;
-    }
-    /* Arrows 24 px off the active card's edges, centred on its height. */
-    .fleche-pos {
+
+    .ouvert {
       position: absolute;
-      z-index: 3;
-      top: calc(170px * var(--k) - 24px);
+      inset: 0 auto 0 0;
+      width: calc(100cqw - (var(--n) - 1) * 124px);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) clamp(220px, 36%, 340px);
+      column-gap: 26px;
+      opacity: 0;
+      transition: opacity 0.2s var(--ease-hatch);
     }
-    .fleche-prec {
-      left: calc(50% - 420px * var(--k) - 72px);
+    .tranche[data-ouvert] .ouvert {
+      opacity: 1;
+      transition: opacity 0.45s var(--ease-hatch) 0.3s;
     }
-    .fleche-suiv {
-      left: calc(50% + 420px * var(--k) + 24px);
+    .texte {
+      padding: 40px 0 52px 44px;
+    }
+    .lecture {
+      left: 44px;
+      right: 0;
+      bottom: 24px;
+      max-width: 476px;
+    }
+    .devanture {
+      align-self: end;
+      height: 285px;
+      margin-right: 26px;
+    }
+    .agent {
+      top: 32px;
+      right: 30px;
+    }
+  }
+
+  @keyframes apparait {
+    from {
+      opacity: 0;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .cas,
-    .devanture {
+    .tranche,
+    .ouvert,
+    .ferme,
+    .nom {
       transition: none !important;
+      animation: none !important;
     }
   }
 </style>
 
 <script>
   /**
-   * Customer cases carousel (ported from the v4 prototype, site.js "Carrousel cas clients").
-   * lg+: the active case sits in the centre slot, the others at ±1 slot (`--s`); a case wrapping from
-   * one side to the other jumps invisibly then fades in. Below lg: the strip scrolls to the case.
-   * Auto-advance every 6 s while visible and not hovered, focused (keyboard) or reduced-motion.
+   * Customer cases shelf: one slice open at a time. A click on a closed slice opens it; the open
+   * slice's reading bar (CSS, 7 s) opens the next one when it ends. The bar pauses on hover, keyboard
+   * focus and off-screen (CSS, from `data-visible`); no auto-advance under reduced motion.
    */
-  const root = document.querySelector<HTMLElement>('[data-carrousel]');
-  if (root) {
-    const strip = root.querySelector<HTMLElement>('[data-diapos]')!;
-    const slides = [...strip.querySelectorAll<HTMLElement>('.cas')];
-    const dots = [...root.querySelectorAll<HTMLButtonElement>('[data-pastille]')];
-    const n = slides.length;
-    const desktop = matchMedia('(min-width: 64rem)');
+  const shelf = document.querySelector<HTMLElement>('[data-etagere]');
+  if (shelf) {
+    const slices = [...shelf.querySelectorAll<HTMLElement>('.tranche')];
+    const n = slices.length;
+    let open = slices.findIndex((s) => s.hasAttribute('data-ouvert'));
+
+    function show(k: number) {
+      open = (k + n) % n;
+      slices.forEach((s, j) => {
+        const on = j === open;
+        s.toggleAttribute('data-ouvert', on);
+        s.querySelector('.ferme')!.setAttribute('aria-expanded', String(on));
+        s.querySelector<HTMLElement>('.ouvert')!.inert = !on;
+      });
+    }
+
+    slices.forEach((s, k) => {
+      s.querySelector('.ferme')!.addEventListener('click', () => show(k));
+      s.querySelector('.lecture > span')!.addEventListener('animationend', () => show(k + 1));
+    });
+
     const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+    const auto = () => shelf.toggleAttribute('data-auto', !reduced.matches);
+    reduced.addEventListener('change', auto);
+    auto();
 
-    let active = slides.findIndex((s) => s.hasAttribute('data-actif'));
-    const slots = slides.map((_, k) => k - active);
-    let hovered = false;
-    let focused = false;
-    let visible = false;
-
-    /** Slot of case k relative to the active one: -1, 0 or 1. */
-    const slotOf = (k: number) => ((((k - active + 1) % n) + n) % n) - 1;
-
-    function mark() {
-      slides.forEach((s, k) => {
-        s.toggleAttribute('data-actif', k === active);
-        s.inert = k !== active;
-      });
-      dots.forEach((d, k) => {
-        if (k === active) d.setAttribute('aria-current', 'true');
-        else d.removeAttribute('aria-current');
-      });
-    }
-
-    function place(jump: boolean) {
-      slides.forEach((s, k) => {
-        const slot = slotOf(k);
-        const wraps = jump && Math.abs(slot - slots[k]!) > 1;
-        if (wraps) s.classList.add('saute');
-        s.style.setProperty('--s', String(slot));
-        if (wraps) {
-          void s.offsetWidth;
-          s.classList.remove('saute');
-        }
-        slots[k] = slot;
-      });
-    }
-
-    function scrollToActive(smooth: boolean) {
-      const s = slides[active]!;
-      strip.scrollTo({
-        left: s.offsetLeft - (strip.clientWidth - s.clientWidth) / 2,
-        behavior: smooth && !reduced.matches ? 'smooth' : 'auto',
-      });
-    }
-
-    function go(k: number) {
-      active = (k + n) % n;
-      mark();
-      if (desktop.matches) place(true);
-      else scrollToActive(true);
-    }
-
-    root.querySelector('[data-prec]')!.addEventListener('click', () => go(active - 1));
-    root.querySelector('[data-suiv]')!.addEventListener('click', () => go(active + 1));
-    dots.forEach((d, k) => d.addEventListener('click', () => go(k)));
-
-    // Below lg, a swipe changes the active case.
-    const seen = new IntersectionObserver(
-      (entries) => {
-        if (desktop.matches) return;
-        for (const e of entries) {
-          if (!e.isIntersecting) continue;
-          const k = slides.indexOf(e.target as HTMLElement);
-          if (k !== active) {
-            active = k;
-            mark();
-          }
-        }
-      },
-      { root: strip, threshold: 0.6 },
-    );
-    slides.forEach((s) => seen.observe(s));
-
-    desktop.addEventListener('change', () => {
-      place(false);
-      if (!desktop.matches) scrollToActive(false);
-    });
-
-    root.addEventListener('mouseenter', () => (hovered = true));
-    root.addEventListener('mouseleave', () => (hovered = false));
-    root.addEventListener('focusin', () => {
-      focused = root.querySelector(':focus-visible') !== null;
-    });
-    root.addEventListener('focusout', () => (focused = false));
-    new IntersectionObserver((e) => (visible = e[0]!.isIntersecting), { threshold: 0.4 }).observe(
-      root,
-    );
-
-    mark();
-    place(false);
-    scrollToActive(false);
-
-    setInterval(() => {
-      if (visible && !hovered && !focused && !reduced.matches && !document.hidden) go(active + 1);
-    }, 6000);
+    new IntersectionObserver((e) => shelf.toggleAttribute('data-visible', e[0]!.isIntersecting), {
+      threshold: 0.4,
+    }).observe(shelf);
   }
 </script>

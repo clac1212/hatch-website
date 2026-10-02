@@ -1,20 +1,17 @@
-kicker: Cas clients
+# Citations et auteurs : brouillons à faire valider par chaque client avant la mise en ligne.
 title: Ils l’ont déployé dans leur réseau
 label: Cas clients
 with: Avec
 readCase: Lire le cas
-controls:
-  carousel: carrousel
-  slideRole: diapositive
-  previous: Cas précédent
-  next: Cas suivant
-  slide: '{n} sur {total}'
-  dot: 'Afficher le cas {client}'
+sites: sites
+open: 'Afficher le cas {client}'
 cases:
   - id: la-meulerie
     client: La Meulerie
     agent: jay
-    visualAlt: La devanture de La Meulerie, en voxels.
+    visualAlt: La devanture de La Meulerie.
+    quote: « Une procédure change, nos quatre sites l’ont le jour même. Avant, il fallait des semaines et trois relances. »
+    author: '[Prénom Nom] · Fondateur, La Meulerie'
     figures:
       - value: '4'
         label: sites équipés
@@ -24,7 +21,9 @@ cases:
   - id: nobinobi
     client: Nobinobi
     agent: peep
-    visualAlt: La devanture de Nobinobi, en voxels, avec Peep à l'entrée.
+    visualAlt: La devanture de Nobinobi.
+    quote: « Les équipes posent leurs questions à Peep au lieu de m’appeler. Je ne garde que les vrais sujets. »
+    author: '[Prénom Nom] · Fondateur, Nobinobi'
     figures:
       - value: '12'
         label: sites équipés
@@ -34,7 +33,9 @@ cases:
   - id: pny
     client: PNY
     agent: owl
-    visualAlt: La devanture de PNY, en voxels.
+    visualAlt: La devanture de PNY.
+    quote: « En plein rush, un équipier demande à Owl et a la réponse à voix haute, sans lâcher la commande. »
+    author: '[Prénom Nom] · Directeur des opérations, PNY'
     figures:
       - value: '13'
         label: sites équipés
