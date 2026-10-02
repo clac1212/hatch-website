@@ -5,11 +5,11 @@ const bird = z.enum(['sparrow', 'jay', 'owl']);
 
 /**
  * Copy of the "Mise en place" home section (src/content/sections/miseEnPlace/{fr,en}.yaml):
- * a pinned track with three app windows — connect the sources, agents set themselves up, teams use them.
+ * a product tour of three app windows — connect the sources, agents set themselves up, teams use them.
  */
 export const schema = z.strictObject({
   title: z.string(),
-  /** Step labels, shown in the step indicator (pinned) or above each window (stacked). */
+  /** Step labels: the tabs under the window (tabs layout) or the title above each window (stacked). */
   steps: z.array(z.string()).length(3),
   /** Decorative "Continue" button of the first two windows. */
   next: z.string(),

@@ -15,15 +15,15 @@ import jay from '../../assets/miseEnPlace/jay.png';
 import owl from '../../assets/miseEnPlace/owl.png';
 
 /**
- * "Mise en place" (v4 node REj0g): a pinned track with three app windows that play by themselves, like
- * the diorama's agent demos — the sources connect one by one, the agents set themselves up, the teams
- * use them; scrolling pushes the play forward or back.
+ * "Mise en place" (v4 node REj0g): three app windows played as a product tour — the sources connect
+ * one by one, the agents set themselves up, the teams use them. A normal section: nothing is pinned or
+ * scroll-linked (the diorama above already is, César + cofounder 02/10).
  * Two layouts share this markup:
- * - pinned (`.epingle`, set by src/scripts/miseEnPlace.ts from md up when motion is allowed): a fixed
- *   1000 × 980 stage scaled by the shared track engine, one window at a time, driven by one GSAP
- *   timeline;
- * - stacked (default: mobile, no JS, reduced motion): the three windows one below the other, each under
- *   its step title, in their final state.
+ * - tabs (`.onglets`, set by src/scripts/miseEnPlace.ts from md up): one window at a time in a "Time
+ *   Machine" stack, the three steps as tabs under it; with motion allowed, one GSAP timeline plays the
+ *   tour while the section is in view, each tab's bar filling with time;
+ * - stacked (default: mobile, no JS): the three windows one below the other, each under its step
+ *   title, in their final state.
  */
 interface Props {
   locale: Locale;
@@ -87,71 +87,43 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
 
 <section
   id="mise-en-place"
-  class="piste mep overflow-x-clip bg-night"
-  data-piste="mep"
-  data-longueurs="200"
+  class="mep relative overflow-x-clip bg-night"
   aria-labelledby="mep-titre"
 >
-  <div class="collant">
-    <div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-      {
-        trails.map((tr) => (
-          <span
-            class:list={['trainee', tr.c]}
-            style={`left:${tr.l}%;top:${tr.t}%;width:${tr.w}%;height:${tr.h}px;opacity:${tr.o};rotate:${tr.r}deg`}
-          />
-        ))
-      }
-    </div>
+  <div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+    {
+      trails.map((tr) => (
+        <span
+          class:list={['trainee', tr.c]}
+          style={`left:${tr.l}%;top:${tr.t}%;width:${tr.w}%;height:${tr.h}px;opacity:${tr.o};rotate:${tr.r}deg`}
+        />
+      ))
+    }
+  </div>
 
-    <div class="cadre-piste px-4 py-20 md:px-8 md:py-28" data-largeur="1000" data-hauteur="980">
-      <div class="halo" aria-hidden="true"></div>
+  <div class="relative px-4 py-20 md:px-8 md:py-24">
+    <div class="halo" aria-hidden="true"></div>
 
-      <h2
-        id="mep-titre"
-        class="mep-titre relative text-center font-sans text-[clamp(2.125rem,1.4rem+3vw,3.75rem)] leading-[1.08] font-semibold tracking-[-0.033em] text-balance text-white"
-      >
-        {data.title}
-      </h2>
+    <h2
+      id="mep-titre"
+      class="relative text-center font-sans text-[clamp(2.125rem,1.4rem+3vw,3.75rem)] leading-[1.08] font-semibold tracking-[-0.033em] text-balance text-white"
+    >
+      {data.title}
+    </h2>
 
-      <!--
-        Step indicator of the pinned layout (the stacked layout titles each window instead): one segment
-        per step, like the demo's chapters; its bar fills as the timeline plays that step.
-      -->
-      <ol class="mep-etapes hidden leading-[normal]" aria-hidden="true">
-        {
-          data.steps.map((step, i) => (
-            <li
-              class="pas flex min-w-0 flex-col gap-3"
-              data-mep-pas={i}
-              data-etat={i === 0 ? 'actif' : 'a-venir'}
-            >
-              <span class="jauge block h-[3px] overflow-hidden rounded-full">
-                <span class="block h-full" />
-              </span>
-              <span class="flex items-center gap-2.5">
-                <span class="num grid size-6 shrink-0 place-items-center rounded-full font-mono text-[12px]">
-                  {i + 1}
-                </span>
-                <span class="lib text-[15px] font-medium whitespace-nowrap">{step}</span>
-              </span>
-            </li>
-          ))
-        }
-      </ol>
-
-      <ol class="mep-etats relative mt-12 flex flex-col gap-14 md:mt-16 md:gap-20">
+    <div class="mep-scene mx-auto mt-12 max-w-[760px] md:mt-16">
+      <div class="mep-etats relative flex flex-col gap-14 md:gap-20">
         {
           [sources.title, agents.title, channels.title].map((windowTitle, i) => (
-            <li class="mep-etat" data-mep-etat={i} data-d={i}>
-              <h3 class="mep-etat-titre mx-auto mb-4 flex max-w-[760px] items-center gap-2.5 text-[15px] font-medium text-white">
-                <span class="grid size-6 shrink-0 place-items-center rounded-full bg-orange font-mono text-[13px] text-white">
+            <div class="mep-etat" id={`mep-etat-${i}`} data-mep-etat={i} data-d={i}>
+              <h3 class="mep-etat-titre mb-4 flex items-center gap-2.5 text-[15px] font-medium text-white">
+                <span class="grid size-6 shrink-0 place-items-center rounded-full bg-orange font-mono text-[13px] text-ink">
                   {i + 1}
                 </span>
                 {data.steps[i]}
               </h3>
 
-              <div class="fenetre mx-auto w-full max-w-[760px] overflow-hidden leading-[normal] rounded-[10px] bg-white font-sans text-ink">
+              <div class="fenetre w-full overflow-hidden leading-[normal] rounded-[10px] bg-white font-sans text-ink">
                 <div class="flex items-center gap-3 px-4 py-4 md:px-7 md:py-5">
                   <div class="flex flex-1 items-center gap-3">
                     <Logo class="w-16 shrink-0" />
@@ -166,7 +138,7 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
                   </svg>
                 </div>
 
-                <div class="flex flex-col gap-[18px] px-4 pt-1 pb-6 md:px-7">
+                <div class="corps flex flex-col gap-[18px] px-4 pt-1 pb-6 md:px-7">
                   {i === 0 && (
                     <>
                       <div
@@ -462,10 +434,49 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
                   )}
                 </div>
               </div>
-            </li>
+            </div>
           ))
         }
-      </ol>
+      </div>
+
+      <!--
+        Tabs of the tabs layout (the stacked layout titles each window instead): one segment per step,
+        like the demo's chapters, under the window; its bar fills as the timeline plays that step.
+        Named by the section title; src/scripts/miseEnPlace.ts turns the windows into their tabpanels.
+      -->
+      <div class="mep-etapes hidden leading-[normal]" role="tablist" aria-labelledby="mep-titre">
+        {
+          data.steps.map((step, i) => (
+            <button
+              type="button"
+              role="tab"
+              id={`mep-onglet-${i}`}
+              aria-controls={`mep-etat-${i}`}
+              aria-selected={i === 0 ? 'true' : 'false'}
+              tabindex={i === 0 ? 0 : -1}
+              class="pas flex min-w-0 cursor-pointer flex-col gap-3 rounded-btn pb-1 text-left"
+              data-mep-pas={i}
+              data-etat={i === 0 ? 'actif' : 'a-venir'}
+            >
+              <span
+                class="jauge block h-[3px] w-full overflow-hidden rounded-full"
+                aria-hidden="true"
+              >
+                <span class="block h-full" />
+              </span>
+              <span class="flex items-start gap-2.5">
+                <span
+                  class="num grid size-6 shrink-0 place-items-center rounded-full font-mono text-[12px]"
+                  aria-hidden="true"
+                >
+                  {i + 1}
+                </span>
+                <span class="lib pt-0.5 text-[15px] font-medium text-balance">{step}</span>
+              </span>
+            </button>
+          ))
+        }
+      </div>
     </div>
   </div>
 </section>
@@ -502,52 +513,35 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
       0 8px 24px color-mix(in srgb, var(--color-black) 4%, transparent);
   }
 
-  /* ---------- Stacked layout (default): the shared engine sizes the track and stage inline, undo it ---------- */
-  .mep:not(.epingle) {
-    height: auto !important;
+  /*
+   * ---------- Tabs layout: the three windows share one grid cell, so the stage is as tall as the
+   * tallest one and every window gets that height (no sheet sticks out under the front one). ----------
+   */
+  .onglets .mep-etats {
+    display: grid;
+    gap: 0;
   }
-  .mep:not(.epingle) .collant {
-    position: static;
-    height: auto;
-    overflow: visible;
+  .onglets .mep-etat {
+    grid-area: 1 / 1;
   }
-  .mep:not(.epingle) .cadre-piste {
-    position: relative;
-    width: auto !important;
-    height: auto !important;
-    transform: none !important;
+  .onglets .fenetre {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
   }
-
-  /* ---------- Pinned layout: 1000 × 980 stage, v4 positions (window at 340 px in the 1440 mockup) ---------- */
-  .epingle .cadre-piste {
-    padding: 0;
-  }
-  .epingle .mep-titre {
-    position: absolute;
-    top: 110px;
-    left: 0;
-    width: 100%;
-    font-size: 60px;
-    line-height: normal;
-    letter-spacing: -2px;
-    white-space: nowrap;
-  }
-  .epingle .mep-etats {
-    position: static;
-    margin: 0;
+  .onglets .corps {
+    flex: 1;
   }
   /*
    * "Time Machine" stack (data-d = distance from the current step, set by the script). Only the front
    * window shows content; the next ones are blank sheets peeking a few pixels above it, so the sequence
-   * reads without adding noise (the step bar below already names the steps). A finished window lifts
-   * towards the viewer and dissolves; the next sheet glides forward, then its content fades in.
+   * reads without adding noise (the tabs below already name the steps). A finished window lifts
+   * towards the viewer and dissolves; the next sheet glides forward, then its content fades in. Going
+   * back (a tab clicked, the tour looping), the same moves play in reverse.
    */
-  .epingle .mep-etat {
+  .onglets .mep-etat {
     --courbe-apple: cubic-bezier(0.32, 0.72, 0, 1);
-    position: absolute;
-    left: 120px;
-    top: 330px;
-    width: 760px;
+    position: relative;
     transform-origin: 50% 0;
     pointer-events: none;
     transition:
@@ -555,11 +549,11 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
       opacity 0.7s var(--courbe-apple),
       filter 0.7s var(--courbe-apple);
   }
-  .epingle .mep-etat .fenetre {
+  .onglets .mep-etat .fenetre {
     position: relative;
   }
   /* Blank sheet: a white veil over the window's content, lifted once the window is in front. */
-  .epingle .mep-etat .fenetre::after {
+  .onglets .mep-etat .fenetre::after {
     content: '';
     position: absolute;
     inset: 0;
@@ -569,42 +563,42 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
       opacity 0.45s ease-out 0.3s,
       background-color 0.6s var(--courbe-apple);
   }
-  .epingle .mep-etat[data-d='0'] {
+  .onglets .mep-etat[data-d='0'] {
     z-index: 3;
     pointer-events: auto;
   }
-  .epingle .mep-etat:is([data-d='0'], [data-d='-1'], [data-d='-2']) .fenetre::after {
+  .onglets .mep-etat:is([data-d='0'], [data-d='-1'], [data-d='-2']) .fenetre::after {
     opacity: 0;
   }
-  .epingle .mep-etat:not([data-d='0']) .fenetre {
+  .onglets .mep-etat:not([data-d='0']) .fenetre {
     box-shadow: none;
   }
   /* Sheets are opaque (no see-through between them): a solid tint, darker with depth. */
-  .epingle .mep-etat[data-d='1'] {
+  .onglets .mep-etat[data-d='1'] {
     z-index: 2;
     transform: translateY(-14px) scale(0.95);
   }
-  .epingle .mep-etat[data-d='1'] .fenetre::after {
+  .onglets .mep-etat[data-d='1'] .fenetre::after {
     background-color: color-mix(in srgb, var(--color-white) 34%, var(--color-night));
   }
-  .epingle .mep-etat[data-d='2'] {
+  .onglets .mep-etat[data-d='2'] {
     z-index: 1;
     transform: translateY(-27px) scale(0.9);
   }
-  .epingle .mep-etat[data-d='2'] .fenetre::after {
+  .onglets .mep-etat[data-d='2'] .fenetre::after {
     background-color: color-mix(in srgb, var(--color-white) 17%, var(--color-night));
   }
-  .epingle .mep-etat:is([data-d='1'], [data-d='2']) .fenetre::after {
+  .onglets .mep-etat:is([data-d='1'], [data-d='2']) .fenetre::after {
     transition-delay: 0s;
   }
-  .epingle .mep-etat:is([data-d='-1'], [data-d='-2']) {
+  .onglets .mep-etat:is([data-d='-1'], [data-d='-2']) {
     z-index: 4;
     opacity: 0;
     transform: translateY(18px) scale(1.04);
     filter: blur(6px);
     transition-duration: 0.7s, 0.5s, 0.5s;
   }
-  .epingle .mep-etat-titre {
+  .onglets .mep-etat-titre {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -613,15 +607,12 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
     white-space: nowrap;
   }
 
-  /* Step indicator: three segments under the window, aligned with it. */
-  .epingle .mep-etapes {
+  /* Tabs: three segments under the window, aligned with it. */
+  .onglets .mep-etapes {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 16px;
-    position: absolute;
-    top: 862px;
-    left: 120px;
-    width: 760px;
+    margin-top: 40px;
   }
   .num,
   .lib {
@@ -642,14 +633,17 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
   .jauge {
     background-color: var(--color-gray-800);
   }
-  /* Filled by the timeline (scaleX, every frame), so no transition (it would lag). */
+  /*
+   * Without the timeline (reduced motion, GSAP not loaded yet), the bars say where the tour is: full up
+   * to the current step. The timeline overrides this inline, every frame, so no transition (it would lag).
+   */
   .jauge > span {
     background-color: var(--color-orange);
     transform-origin: left;
     transform: scaleX(0);
   }
-  .epingle .pas {
-    cursor: pointer;
+  .pas:is([data-etat='fait'], [data-etat='actif']) .jauge > span {
+    transform: scaleX(1);
   }
   /* Ink on the orange fill: white on orange is under 3:1. */
   .pas[data-etat='actif'] .num {
@@ -668,13 +662,20 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
   .pas[data-etat='fait'] .lib {
     color: var(--color-gray-400);
   }
+  /* A tab under the pointer lights up like the current one. */
+  .pas:hover .lib {
+    color: var(--color-white);
+  }
+  .pas:hover .num {
+    outline-color: var(--color-orange);
+  }
 
   /*
-   * In-window animations (pinned only): the timeline tweens opacity, widths and `--y`, the entrance
-   * offset, kept on `translate` so it never fights the cards' hover transform. No CSS transitions on
-   * those properties: the timeline renders every frame, scrubbing included.
+   * In-window animations (tabs layout with motion): the timeline tweens opacity, widths and `--y`, the
+   * entrance offset, kept on `translate` so it never fights the cards' hover transform. No CSS
+   * transitions on those properties: the timeline renders every frame, jumps included.
    */
-  .epingle .anim {
+  .onglets .anim {
     translate: 0 calc(var(--y, 0) * 1px);
   }
   .eteint .point {

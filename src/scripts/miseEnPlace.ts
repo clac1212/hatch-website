@@ -1,23 +1,25 @@
 /**
- * "Mise en place" pinned track (ported from the v4 prototype, site.js `miseEnPlace()`), played like
- * the diorama's agent demos (src/components/sections/demo-motion.ts, César 02/10).
+ * "Mise en place" product tour (ported from the v4 prototype, site.js `miseEnPlace()`), its beats
+ * played like the diorama's agent demos (src/components/sections/demo-motion.ts, César 02/10).
  *
- * The markup renders the stacked layout in its final state (mobile, no JS, reduced motion). From md up,
- * when motion is allowed, the section gets `.epingle`: the three windows are stacked one behind the
- * other ("Time Machine": the front window flies towards the viewer and the next one comes forward).
- * One GSAP timeline covers the three states — sources connecting one by one with a counter, then the
- * conversation and the migration bars, then the channels and the Inès → Owl exchange — each followed
- * by a hold so it can be read. The timeline drives everything: the window in front, the step
- * indicator under it (the active step's bar fills with the timeline's progress inside that step),
- * and the content of each window.
+ * The markup renders the stacked layout in its final state (mobile, no JS). From md up the section
+ * gets `.onglets`: the three windows are stacked one behind the other ("Time Machine": the front
+ * window flies towards the viewer and the next one comes forward) and the three steps under them
+ * become tabs (role=tablist/tab/tabpanel, arrows/Home/End, focus follows the selection).
  *
- * It plays on its own while the section is pinned, and the scroll pushes it ("mixte" mode of the
- * demo): scrolling down moves the playhead forward, never behind the scroll position (so the last
- * state has been reached by the bottom of the track), scrolling up rewinds. Leaving the section above
- * puts it back to its start; leaving it below finishes it. The shared engine (src/scripts/pistes.ts)
- * only sizes the track and scales the stage here.
+ * Nothing is scroll-linked (the diorama above already pins the scroll, César + cofounder 02/10): when
+ * motion is allowed, one GSAP timeline covers the three states — sources connecting one by one with a
+ * counter, then the conversation and the migration bars, then the channels and the Inès → Owl
+ * exchange — each followed by a hold so it can be read. It plays while the windows are substantially
+ * in view, pauses when they leave (or the page is hidden, or keyboard focus is inside), resumes where
+ * it was when they come back,
+ * and loops to the first state after the last one. A tab (or "Continuer") jumps to its state and the
+ * tour plays on from there. The timeline drives the window in front, the tabs (the current tab's bar
+ * fills with the timeline's progress inside that state) and the content of each window.
  *
- * Capture/debug: `?etape=mep:<k>` (read by the engine too) freezes state k, its bar half full.
+ * Reduced motion: no timeline, no autoplay; the tabs still switch, each window in its final state.
+ *
+ * Capture/debug: `?etape=mep:<k>` freezes state k, its bar half full.
  */
 type Gsap = (typeof import('gsap'))['gsap'];
 type Timeline = ReturnType<Gsap['timeline']>;
@@ -26,18 +28,19 @@ type Timeline = ReturnType<Gsap['timeline']>;
 const DUREES = [5, 8.5, 7];
 /** Seconds into a state before its content plays: the Time Machine move (0.95 s) settles first. */
 const DEBUT = 0.8;
-/** Share of the scroll that moves the playhead (the rest is left to time), as in the demo. */
-const POUSSEE = 0.7;
+/** Share of the windows in view that starts the tour; below the lower one, it pauses. */
+const VU = 0.6;
+const HORS_VUE = 0.25;
 
-const section = document.querySelector<HTMLElement>('.piste[data-piste="mep"]');
+const section = document.querySelector<HTMLElement>('#mise-en-place');
 if (section) init(section);
 
 function init(section: HTMLElement) {
   const $$ = (el: ParentNode, sel: string) => [...el.querySelectorAll<HTMLElement>(sel)];
+  const scene = section.querySelector<HTMLElement>('.mep-scene')!;
   const etats = $$(section, '[data-mep-etat]');
   const pas = $$(section, '[data-mep-pas]');
   const jauges = pas.map((p) => p.querySelector<HTMLElement>('.jauge > span')!);
-  const cta = section.querySelector<HTMLElement>('[data-mep-cta]');
   const suivants = $$(section, '[data-mep-suivant]');
   if (etats.length !== 3 || pas.length !== 3) throw new Error('MiseEnPlace: unexpected markup');
 
@@ -86,21 +89,24 @@ function init(section: HTMLElement) {
     lignes.forEach((l) => (l.valeur.textContent = `${l.fait} / ${l.total}`));
   }
 
-  const mq = matchMedia('(min-width: 48rem) and (prefers-reduced-motion: no-preference)');
+  /** The tabs layout; the timeline needs motion on top of it. */
+  const mqOnglets = matchMedia('(min-width: 48rem)');
+  const mqJeu = matchMedia('(min-width: 48rem) and (prefers-reduced-motion: no-preference)');
   const force = new URLSearchParams(location.search).get('etape')?.match(/^mep:([0-2])$/);
-  let epingle = false;
+  let onglets = false;
   let k = 0;
 
   function afficher() {
     // Distance from the current step: drives the "Time Machine" stack in the component's CSS.
-    etats.forEach((el, i) => (el.dataset.d = String(i - k)));
-    pas.forEach((p, i) => (p.dataset.etat = i < k ? 'fait' : i === k ? 'actif' : 'a-venir'));
-    // Windows behind the front one keep their buttons out of the tab order.
-    if (epingle && k !== 2) cta?.setAttribute('tabindex', '-1');
-    else cta?.removeAttribute('tabindex');
-    suivants.forEach((b) => {
-      if (epingle && Number(b.dataset.mepSuivant) !== k) b.setAttribute('tabindex', '-1');
-      else b.removeAttribute('tabindex');
+    etats.forEach((el, i) => {
+      el.dataset.d = String(i - k);
+      // Windows behind the front one are out of reach (focus, pointer, assistive tech).
+      el.inert = onglets && i !== k;
+    });
+    pas.forEach((p, i) => {
+      p.dataset.etat = i < k ? 'fait' : i === k ? 'actif' : 'a-venir';
+      p.setAttribute('aria-selected', String(i === k));
+      p.tabIndex = i === k ? 0 : -1;
     });
   }
   function marquer(i: number) {
@@ -110,25 +116,29 @@ function init(section: HTMLElement) {
   }
 
   function mode() {
-    epingle = mq.matches;
-    section.classList.toggle('epingle', epingle);
+    onglets = mqOnglets.matches;
+    section.classList.toggle('onglets', onglets);
+    // Tabpanels only while there are tabs: stacked, the windows are plain blocks under their h3.
+    etats.forEach((el, i) => {
+      if (onglets) {
+        el.setAttribute('role', 'tabpanel');
+        el.setAttribute('aria-labelledby', pas[i].id);
+      } else {
+        el.removeAttribute('role');
+        el.removeAttribute('aria-labelledby');
+      }
+    });
     afficher();
-    if (!epingle) final();
-    // The layout changed: let the engine re-frame the stage.
-    window.dispatchEvent(new Event('resize'));
+    if (!tl) final();
   }
 
-  // ---------- Timeline (GSAP, loaded when the section comes near, only for the pinned layout) ----------
+  // ---------- Timeline (GSAP, loaded when the section comes near, only with motion allowed) ----------
 
   let g: Gsap | null = null;
   let tl: Timeline | null = null;
   let debuts: number[] = [];
-  /** The section is pinned: the timeline plays. */
-  let enJeu = false;
-  /** Last scroll position inside the track (0–1), to diff it. */
-  let q = 0;
-  /** Where the scroll is pushing the playhead to (seconds), while it catches up. */
-  let cible: number | null = null;
+  /** The windows are substantially in view (with hysteresis, see VU / HORS_VUE). */
+  let visible = false;
   /** Brings what the timeline writes as text or class in line with the playhead (set by `construire`). */
   let synchro = () => {};
 
@@ -138,7 +148,7 @@ function init(section: HTMLElement) {
     const n = { v: 0 };
     const comptes = lignes.map(() => ({ v: 0 }));
     // One place renders them, on every frame and after every jump: GSAP's play(t)/pause(t) suppress
-    // the tweens' callbacks, so per-tween onUpdates would leave stale text after a rewind.
+    // the tweens' callbacks, so per-tween onUpdates would leave stale text after a jump back.
     synchro = () => {
       const t = m.time();
       marquer(
@@ -153,7 +163,12 @@ function init(section: HTMLElement) {
         if (l.valeur.textContent !== txt) l.valeur.textContent = txt;
       });
     };
-    const m = gsap.timeline({ paused: true, onUpdate: () => synchro() });
+    const m = gsap.timeline({
+      paused: true,
+      onUpdate: () => synchro(),
+      // The last state has held: back to the first one. Only reached while playing, i.e. in view.
+      onComplete: () => aller(0, true),
+    });
     /** Something arrives: it fades in from a few pixels below (`--y`, the CSS's `translate`). */
     const entrer = (el: HTMLElement, at: number) =>
       m.fromTo(
@@ -163,7 +178,7 @@ function init(section: HTMLElement) {
         at,
       );
 
-    // Step indicator: the bar of a step fills over its state, and stays full once done.
+    // Tabs: the bar of a step fills over its state, and stays full once done.
     jauges.forEach((j, i) =>
       m.fromTo(j, { scaleX: 0 }, { scaleX: 1, duration: DUREES[i], ease: 'none' }, debuts[i]),
     );
@@ -225,11 +240,10 @@ function init(section: HTMLElement) {
     return m;
   }
 
-  /**
-   * Where the playhead starts when the section pins: from the top when coming in from above; coming
-   * in from below, near the end, so scrolling up rewinds it.
-   */
-  const depart = (p: number) => (p > 0.5 ? p * (tl?.duration() ?? 0) : 0);
+  /** Keyboard focus is in the tour: it holds still under the reader (as an APG carousel does). */
+  let tenu = false;
+  /** The tour plays only while its windows are in view, the page is shown and no keyboard is in it. */
+  const enJeu = () => visible && !tenu && !document.hidden;
 
   /** Jump the playhead to `t` (seconds), then play from there or stay paused. */
   function aller(t: number, jouer: boolean) {
@@ -239,109 +253,33 @@ function init(section: HTMLElement) {
     synchro();
   }
 
-  /** Move the playhead by `dt` seconds, eased, then let it play on from there. */
-  function pousser(dt: number) {
-    if (!tl || !g) return;
-    const d = tl.duration();
-    cible = Math.min(Math.max((cible ?? tl.time()) + dt, 0), d);
-    tl.pause();
-    g.to(tl, {
-      time: cible,
-      duration: 0.5,
-      ease: 'power3.out',
-      overwrite: true,
-      onComplete() {
-        cible = null;
-        if (enJeu) tl?.play();
-      },
-    });
-  }
-
-  function entrer(p: number) {
-    if (!tl || !g) return;
-    q = p;
-    cible = null;
-    g.killTweensOf(tl);
-    aller(depart(p), true);
-  }
-
-  function suivre(p: number) {
-    if (!tl || !g) return;
-    const dq = p - q;
-    q = p;
-    if (!dq) return;
-    // Going down, the scroll is a floor: at p the timeline is at least at p of its length, so at the
-    // bottom of the track the last state has played. Going up, it rewinds relatively.
-    const d = tl.duration();
-    const ici = cible ?? tl.time();
-    pousser(dq > 0 ? Math.max(ici + dq * d * POUSSEE, p * d) - ici : dq * d * POUSSEE);
-  }
-
-  /** The section is left: above, back to its start; below, it finishes (last state, complete). */
-  function arreter(dessus: boolean) {
-    if (!tl || !g) return;
-    cible = null;
-    g.killTweensOf(tl);
-    if (dessus) aller(0, false);
-    else {
-      tl.pause();
-      g.to(tl, { time: tl.duration(), duration: 0.6, ease: 'power3.out' });
-    }
-  }
-
-  /** A step label or "Continuer" was clicked: go to state i. */
-  function jouer(i: number) {
-    if (!tl || !g) {
-      marquer(i);
-      return;
-    }
-    cible = null;
-    g.killTweensOf(tl);
-    aller(debuts[i], enJeu);
-  }
-
-  /**
-   * The timeline plays only while the section is pinned (as the demo: nothing plays while it is still
-   * scrolling in from below).
-   */
-  function maj() {
+  /** Play or pause where the playhead is, as visibility says. */
+  function regler() {
     if (!tl) return;
-    const r = section.getBoundingClientRect();
-    const colle = r.top <= 1 && r.bottom >= innerHeight - 1;
-    const p = Math.min(Math.max(-r.top / (r.height - innerHeight), 0), 1);
-    if (colle) {
-      if (!enJeu) {
-        enJeu = true;
-        entrer(p);
-      } else suivre(p);
-      return;
-    }
-    if (enJeu) {
-      enJeu = false;
-      arreter(r.top > 1);
-    } else if (r.top <= 1 && cible === null && tl.time() === 0) {
-      // Below the section without having played it (page loaded or jumped past it): its last state.
-      aller(tl.duration(), false);
-    }
+    tl.paused(!enJeu());
+  }
+
+  /** A tab or "Continuer" was used: go to state i, the tour plays on from there. */
+  function choisir(i: number) {
+    if (tl) aller(debuts[i], enJeu());
+    else marquer(i);
   }
 
   let chargement = false;
   /** The section is within a screen of the viewport: time to load GSAP. */
   let proche = false;
   function charger() {
-    if (g || chargement || !proche || !mq.matches || force) return;
+    if (g || chargement || !proche || !mqJeu.matches || force) return;
     chargement = true;
     import('gsap').then(({ gsap }) => {
       g = gsap;
-      // gsap.matchMedia builds the timeline while the pinned layout applies, and reverts it (the
-      // tweens' inline styles) when it stops applying.
-      gsap.matchMedia().add(mq.media, () => {
+      // gsap.matchMedia builds the timeline while motion is allowed in the tabs layout, and reverts it
+      // (the tweens' inline styles) when that stops.
+      gsap.matchMedia().add(mqJeu.media, () => {
         tl = construire(gsap);
-        maj();
+        regler();
         return () => {
           tl = null;
-          enJeu = false;
-          cible = null;
           synchro = () => {};
           final();
         };
@@ -358,40 +296,65 @@ function init(section: HTMLElement) {
     { rootMargin: '100% 0px' },
   ).observe(section);
 
-  let raf = 0;
-  addEventListener('scroll', () => (raf ||= requestAnimationFrame(() => ((raf = 0), maj()))), {
-    passive: true,
+  new IntersectionObserver(
+    ([e]) => {
+      if (e.intersectionRatio >= VU) visible = true;
+      else if (e.intersectionRatio < HORS_VUE) visible = false;
+      regler();
+    },
+    { threshold: [0, HORS_VUE, VU] },
+  ).observe(scene);
+  document.addEventListener('visibilitychange', regler);
+  // A pointer click focuses too, but not `:focus-visible`: a clicked tab keeps the tour playing.
+  scene.addEventListener('focusin', (e) => {
+    tenu = (e.target as HTMLElement).matches(':focus-visible');
+    regler();
   });
-  addEventListener('resize', maj);
-  document.addEventListener('visibilitychange', () => {
-    if (tl && enJeu && cible === null) tl.paused(document.hidden);
+  scene.addEventListener('focusout', (e) => {
+    if (scene.contains(e.relatedTarget as Node | null)) return;
+    tenu = false;
+    regler();
   });
 
-  // "Continuer": pinned, the timeline jumps to the next state (focus follows to its button);
-  // stacked, it scrolls to the next window.
+  // Tabs: a click selects; arrows (wrapping), Home and End move the selection and the focus with it.
+  pas.forEach((p, i) => p.addEventListener('click', () => choisir(i)));
+  section.querySelector('[role="tablist"]')!.addEventListener('keydown', (ev) => {
+    const e = ev as KeyboardEvent;
+    // From the focused tab: the tour may have moved the selection since it got focus.
+    const ici = Math.max(pas.indexOf(e.target as HTMLElement), 0);
+    const cible = {
+      ArrowRight: (ici + 1) % 3,
+      ArrowLeft: (ici + 2) % 3,
+      Home: 0,
+      End: 2,
+    }[e.key];
+    if (cible === undefined) return;
+    e.preventDefault();
+    choisir(cible);
+    pas[cible].focus();
+  });
+
+  // "Continuer": tabs, the tour jumps to the next state (focus follows to its button, the clicked
+  // one has just gone inert); stacked, it scrolls to the next window.
   suivants.forEach((bouton) =>
     bouton.addEventListener('click', () => {
       const suivant = Number(bouton.dataset.mepSuivant) + 1;
-      if (!epingle) {
+      if (!onglets) {
         const behavior = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
         etats[suivant].scrollIntoView({ behavior, block: 'start' });
         return;
       }
-      jouer(suivant);
-      if (document.activeElement === bouton)
+      const avait = document.activeElement === bouton;
+      choisir(suivant);
+      if (avait)
         etats[suivant]
           .querySelector<HTMLElement>('[data-mep-suivant], [data-mep-cta]')
           ?.focus({ preventScroll: true });
     }),
   );
-  // The step labels under the window work like the demo's tabs (pointer only: "Continuer" is the
-  // keyboard path).
-  pas.forEach((p, i) => p.addEventListener('click', () => epingle && jouer(i)));
 
-  mq.addEventListener('change', () => {
-    mode();
-    charger();
-  });
+  mqOnglets.addEventListener('change', mode);
+  mqJeu.addEventListener('change', charger);
   mode();
 
   if (force) {
@@ -400,5 +363,6 @@ function init(section: HTMLElement) {
     final();
     afficher();
     jauges.forEach((j, i) => (j.style.transform = `scaleX(${i < k ? 1 : i === k ? 0.5 : 0})`));
+    section.scrollIntoView();
   }
 }
