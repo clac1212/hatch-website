@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig, fontProviders } from 'astro/config';
+import { defineConfig, envField, fontProviders } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 import vercel from '@astrojs/vercel';
 import sitemap from '@astrojs/sitemap';
@@ -7,6 +7,13 @@ import sitemap from '@astrojs/sitemap';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://www.gethatch.io',
+
+  // PostHog project key (public, but kept out of the repo): Vercel env + local `.env`.
+  env: {
+    schema: {
+      PUBLIC_POSTHOG_KEY: envField.string({ context: 'client', access: 'public', optional: true }),
+    },
+  },
 
   // FR is the default locale, served at "/" (no prefix). EN is served at "/en/...".
   i18n: {
@@ -60,6 +67,21 @@ export default defineConfig({
     // Pre-bundle it at dev start, or Vite discovers it late, re-optimises, and the page's request for
     // the old bundle fails with "504 Outdated Optimize Dep".
     optimizeDeps: { include: ['gsap'] },
+    // Dev twin of the vercel.json rewrites: PostHog through our own `/relais` path (assets first).
+    server: {
+      proxy: {
+        '/relais/static': {
+          target: 'https://eu-assets.i.posthog.com',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/relais/, ''),
+        },
+        '/relais': {
+          target: 'https://eu.i.posthog.com',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/relais/, ''),
+        },
+      },
+    },
   },
 
   // Web Analytics is injected by the Vercel adapter at deploy time (Preview + Production only).

@@ -1,4 +1,5 @@
 import { gsap } from 'gsap';
+import { suivre } from '../../scripts/suivi';
 
 /**
  * Motion design of an autoplay place (kitchen pilot, 01/10): one GSAP timeline per place plays its
@@ -642,6 +643,9 @@ export interface Pilote {
   position(i: number): number;
 }
 
+/** Agents whose demo has played on this page, so a replay isn't counted twice (analytics). */
+const vus = new Set<string>();
+
 /** Mixte: share of the scroll that moves the playhead (the rest is left to time). */
 const POUSSEE = 0.7;
 
@@ -674,6 +678,12 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
       o.setAttribute('aria-pressed', String(j === i));
     });
     titres.forEach((t, j) => t.classList.toggle('on', j === i));
+    // `actif`: only while the place is on screen, not when a reset rewinds it to its first demo.
+    const agent = onglets[i].dataset.agent!;
+    if (actif && !vus.has(agent)) {
+      vus.add(agent);
+      suivre('diorama_agent_vu', { agent });
+    }
   }
 
   function construire(mobile: boolean) {

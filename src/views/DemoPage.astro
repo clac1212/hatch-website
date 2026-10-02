@@ -86,6 +86,8 @@ const calLink = 'patrick-rakotondrajao-bjremk/presentation-hatch';
 </Base>
 
 <script>
+  import { suivre } from '../scripts/suivi';
+
   // Cal.com inline embed (official loader snippet, typed). Only bundled on this page.
   type CalApi = ((...args: unknown[]) => void) & {
     loaded?: boolean;
@@ -160,5 +162,10 @@ const calLink = 'patrick-rakotondrajao-bjremk/presentation-hatch';
   Cal('on', {
     action: 'linkReady',
     callback: () => document.getElementById('cal-attente')?.remove(),
+  });
+  // The site's conversion: Cal.com confirmed the booking.
+  Cal('on', {
+    action: 'bookingSuccessfulV2',
+    callback: () => suivre('demo_reservee'),
   });
 </script>
