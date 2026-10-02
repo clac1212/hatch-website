@@ -10,7 +10,7 @@ lieux:
         titre: Le terrain écrit, Peep répond.
         ecran:
           appareil: telephone
-          heure: "11:48"
+          heure: '11:48'
           contact: Peep
           statut: Assistant du réseau
           ecrit: écrit…
@@ -37,7 +37,7 @@ lieux:
         titre: L'état du réseau, chaque matin.
         ecran:
           appareil: tableau
-          heure: "8:00"
+          heure: '8:00'
           entete: Lark · Point du matin
           statut: Lundi 8 h
           intro: Bonjour Claire, voici l'état du réseau ce matin.
@@ -61,7 +61,7 @@ lieux:
         titre: Le manuel toujours à jour.
         ecran:
           appareil: tableau
-          heure: "10:15"
+          heure: '10:15'
           entete: Jay · Manuel
           statut: Mise à jour
           demande:
@@ -84,14 +84,14 @@ lieux:
                 - Nettoyer la cuve au dégraissant
               modifiee: 1
               apres: Vidanger l'huile tous les trois jours
-              note: "Pourquoi : huile saturée en fin de semaine, retour de BunBun Lille"
+              note: 'Pourquoi : huile saturée en fin de semaine, retour de BunBun Lille'
       - cle: finch
         nom: Finch
         role: transforme les audits en actions
         titre: Des audits qui deviennent des plans d'action.
         ecran:
           appareil: tableau
-          heure: "17:30"
+          heure: '17:30'
           entete: Finch · Audits
           statut: Audit terminé
           intro: Audit de BunBun Lille terminé, deux écarts à traiter.
@@ -121,7 +121,7 @@ lieux:
         titre: Une question à voix haute, la procédure lue étape par étape.
         ecran:
           appareil: tablette
-          heure: "15:02"
+          heure: '15:02'
           entete: Owl · Tablette cuisine
           ecoute: Je vous écoute
           prepare: Je prépare la fiche
@@ -152,7 +152,7 @@ lieux:
         titre: Cinq minutes de formation pendant la pause, et le siège sait qui a validé.
         ecran:
           appareil: telephone
-          heure: "15:02"
+          heure: '15:02'
           contact: Pecker
           statut: Formation
           ecrit: écrit…
@@ -187,7 +187,7 @@ lieux:
         titre: Chaque candidat qualifié, sans attendre.
         ecran:
           appareil: telephone
-          heure: "21:12"
+          heure: '21:12'
           contact: Sparrow
           statut: Recrutement BunBun
           ecrit: écrit…
@@ -213,7 +213,7 @@ lieux:
         titre: Chaque ouverture suivie jusqu'au jour J.
         ecran:
           appareil: telephone
-          heure: "9:05"
+          heure: '9:05'
           contact: Sparrow
           statut: Ouverture BunBun Angers
           ecrit: écrit…
