@@ -150,16 +150,30 @@ function animer(section: HTMLElement) {
     }
     viser();
   });
+  const remettre = () => {
+    if (minuterie !== null) clearTimeout(minuterie);
+    minuterie = null;
+    vue = false;
+    interne = cible = 0;
+    precedente = -1;
+    rendre(0);
+  };
   new IntersectionObserver(
-    (entrees, obs) => {
+    (entrees) => {
       if (!entrees.some((e) => e.isIntersecting)) return;
       vue = true;
-      obs.disconnect();
       viser();
     },
     // Once the pinned stage fills the screen (the section has reached the top), not while it is
     // still scrolling in: at half visible the 7 notifications used to drop before being seen.
     { threshold: 0.95 },
   ).observe(collant);
+  new IntersectionObserver((entrees) => {
+    const e = entrees[entrees.length - 1]!;
+    // Fully below the screen again (the visitor went back up the page): the next visit replays
+    // the avalanche from an empty screen (cofounder's feedback 02/10). Leaving it downwards keeps
+    // its state, so scrolling back up into it rewinds as usual.
+    if (!e.isIntersecting && e.boundingClientRect.top > 0) remettre();
+  }).observe(section);
   rendre(0);
 }
