@@ -19,7 +19,7 @@ import voxelOwl from '../../assets/cas/voxel-owl.webp';
  * 06 — "Ils l'ont déployé dans leur réseau" (v4 node VEEFh): carousel of customer cases.
  * From lg: three rotating slots, 1032 px apart at 1440 (the whole 1000 × 520 card is scaled down
  * below that width), side cards at 45 %; arrows, dots, auto-advance every 6 s paused on hover,
- * keyboard focus, off-screen, reduced motion or the pause button.
+ * keyboard focus, off-screen or reduced motion. No pause button (César 02/10).
  * Below lg: full-width cards in a horizontal scroll-snap strip, same controls.
  * Without JS: the strip (mobile) or the prototype's initial state (desktop), all content readable.
  */
@@ -134,8 +134,7 @@ const arrow =
     </div>
 
     <div data-rv style="--rd:.18s" class="col-start-2 row-start-2 flex items-center justify-center">
-      <!-- The pause button hangs off the right of the dots, so the dots stay centred as in the v4. -->
-      <div class="relative flex items-center">
+      <div class="flex items-center">
         {
           cases.map((c, k) => (
             <button
@@ -150,29 +149,6 @@ const arrow =
             </button>
           ))
         }
-        <button
-          type="button"
-          data-pause
-          aria-label={data.controls.pause}
-          data-label-pause={data.controls.pause}
-          data-label-play={data.controls.play}
-          class="group absolute top-1/2 left-full ml-2 flex size-7 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-soft outline outline-1 -outline-offset-1 outline-line transition-colors hover:text-ink [.no-js_&]:hidden"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-            class="size-3.5 fill-current group-data-[etat=lecture]:hidden"
-          >
-            <path d="M6 5h4v14H6zm8 0h4v14h-4z"></path>
-          </svg>
-          <svg
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-            class="hidden size-3.5 fill-current group-data-[etat=lecture]:block"
-          >
-            <path d="M7 4v16l13-8z"></path>
-          </svg>
-        </button>
       </div>
     </div>
 
@@ -434,14 +410,13 @@ const arrow =
    * Customer cases carousel (ported from the v4 prototype, site.js "Carrousel cas clients").
    * lg+: the active case sits in the centre slot, the others at ±1 slot (`--s`); a case wrapping from
    * one side to the other jumps invisibly then fades in. Below lg: the strip scrolls to the case.
-   * Auto-advance every 6 s while visible and not hovered, focused (keyboard), paused or reduced-motion.
+   * Auto-advance every 6 s while visible and not hovered, focused (keyboard) or reduced-motion.
    */
   const root = document.querySelector<HTMLElement>('[data-carrousel]');
   if (root) {
     const strip = root.querySelector<HTMLElement>('[data-diapos]')!;
     const slides = [...strip.querySelectorAll<HTMLElement>('.cas')];
     const dots = [...root.querySelectorAll<HTMLButtonElement>('[data-pastille]')];
-    const pause = root.querySelector<HTMLButtonElement>('[data-pause]')!;
     const n = slides.length;
     const desktop = matchMedia('(min-width: 64rem)');
     const reduced = matchMedia('(prefers-reduced-motion: reduce)');
@@ -451,7 +426,6 @@ const arrow =
     let hovered = false;
     let focused = false;
     let visible = false;
-    let paused = reduced.matches;
 
     /** Slot of case k relative to the active one: -1, 0 or 1. */
     const slotOf = (k: number) => ((((k - active + 1) % n) + n) % n) - 1;
@@ -522,15 +496,6 @@ const arrow =
       if (!desktop.matches) scrollToActive(false);
     });
 
-    function setPaused(p: boolean) {
-      paused = p;
-      pause.dataset.etat = p ? 'lecture' : 'pause';
-      pause.setAttribute('aria-label', (p ? pause.dataset.labelPlay : pause.dataset.labelPause)!);
-      strip.setAttribute('aria-live', p ? 'polite' : 'off');
-    }
-    pause.addEventListener('click', () => setPaused(!paused));
-    setPaused(paused);
-
     root.addEventListener('mouseenter', () => (hovered = true));
     root.addEventListener('mouseleave', () => (hovered = false));
     root.addEventListener('focusin', () => {
@@ -546,7 +511,7 @@ const arrow =
     scrollToActive(false);
 
     setInterval(() => {
-      if (visible && !hovered && !focused && !paused && !document.hidden) go(active + 1);
+      if (visible && !hovered && !focused && !reduced.matches && !document.hidden) go(active + 1);
     }, 6000);
   }
 </script>

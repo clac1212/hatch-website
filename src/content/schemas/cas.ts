@@ -22,8 +22,6 @@ export const schema = z.strictObject({
     slideRole: z.string(),
     previous: z.string(),
     next: z.string(),
-    pause: z.string(),
-    play: z.string(),
     /** Slide label, `{n}` and `{total}` are replaced. */
     slide: z.string(),
     /** Dot label, `{client}` is replaced. */

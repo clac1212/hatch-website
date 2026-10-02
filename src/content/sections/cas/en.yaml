@@ -8,8 +8,6 @@ controls:
   slideRole: slide
   previous: Previous story
   next: Next story
-  pause: Pause the slideshow
-  play: Resume the slideshow
   slide: '{n} of {total}'
   dot: 'Show the {client} story'
 cases:

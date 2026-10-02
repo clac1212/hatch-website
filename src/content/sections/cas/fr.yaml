@@ -8,8 +8,6 @@ controls:
   slideRole: diapositive
   previous: Cas précédent
   next: Cas suivant
-  pause: Mettre en pause le défilement
-  play: Relancer le défilement
   slide: '{n} sur {total}'
   dot: 'Afficher le cas {client}'
 cases:
