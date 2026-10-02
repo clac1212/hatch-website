@@ -2,15 +2,18 @@
 import type { HTMLAttributes } from 'astro/types';
 
 /**
- * Buttons of the v4 mockups. The site has a single call to action (book a demo), in three looks:
- * - `orange`: the pill of the nav and the hero (`size` sm | lg);
+ * Buttons of the v4 mockups. Two calls to action: try Hatch OS (the app's signup, primary) and book a
+ * demo (secondary, except where it stands alone: nav, pricing, footer). Looks:
+ * - `orange`: the primary pill of the nav and the hero (`size` sm | lg);
+ * - `secondary`: the same pill in translucent white with ink text, next to an orange one; it reads over
+ *   the hero map (frosted, white rim) as well as on cream (hairline ring);
  * - `ink`: dark block button of the pricing cards, turns orange on hover;
  * - `cream`: its counterpart on night backgrounds (footer, dark pricing card).
  * All are "vif": they lift on hover, the arrow slides and a light sweep crosses them.
  */
 interface Props extends HTMLAttributes<'a'> {
   href: string;
-  variant?: 'orange' | 'ink' | 'cream';
+  variant?: 'orange' | 'secondary' | 'ink' | 'cream';
   size?: 'sm' | 'lg';
   block?: boolean;
 }
@@ -36,6 +39,10 @@ const {
         ? 'gap-2 px-5 py-3 text-[0.875rem] shadow-[0_6px_16px_rgb(248_122_1/0.35)]'
         : 'gap-2.5 px-6 py-4 text-base shadow-[0_10px_24px_rgb(248_122_1/0.4)]',
     ],
+    variant === 'secondary' && [
+      'rounded-full bg-white/80 font-bold text-ink shadow-1 ring-1 ring-ink/12 backdrop-blur-md ring-inset hover:bg-white hover:shadow-2',
+      size === 'sm' ? 'gap-2 px-5 py-3 text-[0.875rem]' : 'gap-2.5 px-6 py-4 text-base',
+    ],
     variant === 'ink' &&
       'gap-2.5 rounded-btn bg-ink px-5.5 py-3.5 text-[0.9375rem] font-semibold text-white hover:bg-orange',
     variant === 'cream' &&
@@ -47,7 +54,9 @@ const {
   <slot />
   <svg
     viewBox="0 0 24 24"
-    class:list={[variant === 'orange' && size === 'lg' ? 'size-[18px]' : 'size-4']}
+    class:list={[
+      (variant === 'orange' || variant === 'secondary') && size === 'lg' ? 'size-[18px]' : 'size-4',
+    ]}
     fill="none"
     stroke="currentColor"
     stroke-width="2.25"

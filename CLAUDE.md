@@ -61,12 +61,12 @@ pnpm format:check
 - FR and EN must have **identical keys**. The Zod schemas are strict objects, so a missing or extra key fails the build.
 - A new page gets an entry in `routes` (`src/i18n/ui.ts`) with its URL in both locales, and a file under `src/pages/` and `src/pages/en/`.
 - Writing rules from the DS:
-  - one H1 per page, in Departure Mono, stating a fact; exception: the home hero title is in Fraunces 600 (more legible over the map, César 01/10);
+  - one H1 per page, in Departure Mono, stating a fact; the home hero H1 is back to Departure Mono too (César 02/10), with its Fraunces tagline under it and a cream scrim keeping it ≥ 4.5:1 over the map;
   - a kicker naming the section's function;
   - agents presented by job first, speaking in the first person;
   - every number carries a source;
   - no em dash inside a sentence, no « opérationnel en quelques minutes ».
-- A single call to action site-wide: book a demo, which leads to `/demo` (Cal.com).
+- Two calls to action (César 02/10): primary « Essayez maintenant » / « Try it now » (`Button variant="orange"`) → the app's self-serve signup `https://app.gethatch.io/auth?tab=signup` (same URL in both locales); secondary « Demandez une démo » / « Book a demo » (`variant="secondary"`) → `/demo` (Cal.com). Only the home hero carries both so far; the other CTAs (nav, pricing, footer, inner pages) still point to the demo alone.
 
 ## Styling (DS Hatch OS v4)
 

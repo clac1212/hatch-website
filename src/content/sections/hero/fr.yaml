@@ -1,9 +1,7 @@
-# Le titre, en fragments joints par des espaces : le navigateur répartit les lignes (Fraunces, équilibré).
-title:
-  - Recrutez des agents IA
-  - pour piloter et
-  - développer votre
-  - réseau d'établissements
+# H1 en Departure Mono : un fait, court (César, 02/10).
+title: "L'OS des réseaux de franchise."
+# La promesse, en Fraunces sous le H1 (l'ancien titre).
+tagline: "Recrutez des agents IA pour piloter et développer votre réseau d'établissements"
 lead: 'Ils répondent aux équipes, forment les recrues, auditent les sites et suivent les ouvertures, pendant que vous gardez la main.'
 tasks:
   status:
