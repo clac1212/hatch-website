@@ -17,8 +17,8 @@ const data = await section('clients', locale);
  * Drawn size of each client in the v4 band, in desktop px: storefront box, logo box, top offset and
  * storefront→logo gap. Images are `contain`ed in their box, so the boxes also set the spacing.
  * La Meulerie is the mockup's "hover" state: drawn bigger, shrunk to 0.82 at rest (`zoom`).
- * Logos are drawn LOGO× the v4 size, in colour (cofounder's feedback 02/10: grey and small, they were
- * lost under the storefronts).
+ * Logos in colour at rest (cofounder's feedback 02/10: in grey they were lost under the storefronts),
+ * at their v4 size (César 02/10: bigger was too much).
  */
 type Dims = {
   dev: [number, number];
@@ -41,9 +41,6 @@ const DIMS: Record<ClientId, Dims> = {
   ponzu: { dev: [158, 118], logo: [92, 19] },
   bomaye: { dev: [143, 118], logo: [34, 34] },
 };
-
-const LOGO = 1.4;
-const logoBox = ([w, h]: [number, number]): [number, number] => [w * LOGO, h * LOGO];
 
 const devantures = import.meta.glob<ImageMetadata>('../../assets/clients/devantures/*.png', {
   eager: true,
@@ -75,9 +72,9 @@ const clients = data.clients.map(({ id, name }) => {
   return {
     name,
     zoom: d.zoom === true,
-    style: `--dw:${d.dev[0]};--dh:${d.dev[1]};--lw:${d.logo[0] * LOGO};--lh:${d.logo[1] * LOGO};--top:${d.top ?? 32};--gap:${d.gap ?? 10}`,
+    style: `--dw:${d.dev[0]};--dh:${d.dev[1]};--lw:${d.logo[0]};--lh:${d.logo[1]};--top:${d.top ?? 32};--gap:${d.gap ?? 10}`,
     dev: { src: dev, ...fit(dev, d.dev) },
-    logo: { src: couleur, ...fit(couleur, logoBox(d.logo)) },
+    logo: { src: couleur, ...fit(couleur, d.logo) },
   };
 });
 const formats: ('avif' | 'webp')[] = ['avif', 'webp'];
@@ -171,7 +168,7 @@ const formats: ('avif' | 'webp')[] = ['avif', 'webp'];
   /* Band scale: storefronts at 60 % on phones, the v4 size from 768 px. Sizes below are v4 px × --k. */
   .bande {
     --k: 0.6;
-    height: calc(224px * var(--k));
+    height: calc(200px * var(--k));
   }
   @media (min-width: 768px) {
     .bande {
