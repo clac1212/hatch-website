@@ -207,18 +207,27 @@ lieux:
           saisie: Message
           fil:
             - de: equipe
-              texte: Hello, I'm interested in the franchise. How do we start?
+              texte: Hi, I saw BunBun on a franchise directory. I'm interested in the concept for Rennes.
             - de: agent
-              texte: Glad to hear it! Which city are you aiming for, and when?
+              texte: "Hi Julien, thanks for your interest! I'm BunBun's sales assistant. To guide you well: what's your background, and would you run the restaurant day to day?"
             - de: equipe
-              texte: Rennes, next spring
+              texte: 12 years in retail, as a department manager. Yes, I want to run it myself.
             - de: agent
-              texte: Perfect, I'm preparing your file. A call with the development team on Thursday?
+              texte: A real hands-on profile, that's what we look for. On financing, how much personal capital do you plan to put in? BunBun asks for €80k minimum.
+            - de: equipe
+              texte: I have €95k, and my bank will cover the rest.
+            - de: agent
+              texte: Your project meets our criteria. Here's the concept presentation, and how about a discovery call on Thursday at 6 pm?
+            - document:
+                titre: BunBun · concept presentation
+                meta: PDF · 14 pages
+            - de: equipe
+              texte: Thursday 6 pm, noted!
           suivi:
             app: Hatch OS
             quand: now
-            titre: CRM · new candidate
-            texte: Julien · future BunBun Rennes · spring 2027, file ready
+            titre: CRM · qualified candidate
+            texte: Julien Morel · Rennes · €95k capital · discovery call Thursday 6 pm
       - cle: sparrow-ouverture
         nom: Sparrow · Opening
         role: follows every opening until day one
@@ -233,15 +242,19 @@ lieux:
           saisie: Message
           fil:
             - de: agent
-              texte: Hi Sophie, are the tiles laid?
+              texte: Morning Sophie! The extraction hood was due to be installed yesterday. All good on your side?
             - de: equipe
-              texte: Yes, finished yesterday
+              texte: No… the supplier pushed the delivery to November 4.
             - de: agent
-              texte: Great. The team training is left, shall we set it for Thursday?
+              texte: Got it. No hood means the kitchen can't be commissioned, so no hands-on training on the 6th.
+            - de: agent
+              texte: "Here's my proposal: install on the 4th, team training on the 8th, opening on November 15 instead of the 9th. Does that work?"
             - de: equipe
-              texte: Thursday works
+              texte: Yes, perfect. Will you let head office know?
+            - de: agent
+              texte: Done. I also chased the supplier for an install on the morning of the 4th.
           suivi:
             app: Hatch OS
             quand: now
-            titre: BunBun Angers · opening 80%
-            texte: Team training scheduled for Thursday
+            titre: BunBun Angers · opening moved
+            texte: Opening on 11/15 · team training on 11/08
