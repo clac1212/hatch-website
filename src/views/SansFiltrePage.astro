@@ -3,7 +3,17 @@ import { getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import SansFiltreEdition from '../components/pages/SansFiltreEdition.astro';
 import { sortedEditions } from '../content/pages/editions';
-import { routes, type Locale, type Paths } from '../i18n/ui';
+import { routes, useTranslations, type Locale, type Paths } from '../i18n/ui';
+import {
+  BRAND,
+  breadcrumbList,
+  founderOf,
+  languageTag,
+  organizationId,
+  person,
+  type JsonLdNode,
+} from '../seo/jsonld';
+import { defaultOgImage, isOgSized, resolveOgImage, type OgImage } from '../seo/og';
 
 /**
  * Hatch OS Sans Filtre, shared by FR (/sans-filtre[/<edition>]) and EN (/en/unfiltered[/<edition>]).
@@ -27,9 +37,56 @@ const paths: Paths = edition
   ? { fr: `${routes.sansFiltre.fr}/${edition}`, en: `${routes.sansFiltre.en}/${edition}` }
   : routes.sansFiltre;
 const title = edition ? `${d.month} · ${ui.titleSuffix}` : ui.seo.title;
-const description = edition ? d.intro.slice(0, 155) : ui.seo.description;
+const description = edition ? d.description : ui.seo.description;
+
+// Share image: the edition's first screenshot large enough for a card (featured first), else the
+// site's default one.
+const t = useTranslations(locale);
+const image: OgImage =
+  [
+    { src: d.featured.image, alt: d.featured.title },
+    ...d.updates.map((u) => ({ src: u.image, alt: u.title })),
+  ].flatMap(({ src, alt }) => (src && isOgSized(src) ? [{ src, alt }] : []))[0] ??
+  defaultOgImage(t('seo.ogImageAlt'));
+
+// An edition page is an article signed by a co-founder, dated by the edition (no later revision
+// date is recorded, so it is also its modification date).
+const site = Astro.site!;
+let jsonLd: JsonLdNode[] = [];
+if (edition) {
+  const url = new URL(paths[locale], site).href;
+  const og = await resolveOgImage(image, site);
+  jsonLd = [
+    breadcrumbList(site, [
+      { name: BRAND, path: routes.home[locale] },
+      { name: ui.titleSuffix, path: routes.sansFiltre[locale] },
+      { name: d.month, path: paths[locale] },
+    ]),
+    {
+      '@type': 'Article',
+      '@id': `${url}#article`,
+      mainEntityOfPage: url,
+      headline: d.issueTitle,
+      description: d.description,
+      inLanguage: languageTag[locale],
+      datePublished: entry.data.date,
+      dateModified: entry.data.date,
+      author: person(founderOf(d.signature).name),
+      publisher: { '@id': organizationId(site) },
+      image: og.url,
+    },
+  ];
+}
 ---
 
-<Base locale={locale} paths={paths} title={title} description={description}>
+<Base
+  locale={locale}
+  paths={paths}
+  title={title}
+  description={description}
+  image={image}
+  ogType={edition ? 'article' : 'website'}
+  jsonLd={jsonLd}
+>
   <SansFiltreEdition entry={entry} editions={editions} ui={ui} locale={locale} />
 </Base>

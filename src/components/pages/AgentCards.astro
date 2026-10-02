@@ -1,0 +1,89 @@
+---
+import { getEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+import type { AgentSlug } from '../../content/schemas/agents';
+import { entryRoutes, type Locale } from '../../i18n/ui';
+import { avatars } from './agent-visuels';
+
+/**
+ * Cards linking to agent pages (an agent page's "works with", a case page's agents): voxel avatar,
+ * name, job, and the agent's line in its own voice. An agent without a page yet is not a link.
+ */
+interface Props {
+  slugs: AgentSlug[];
+  locale: Locale;
+}
+const { slugs, locale } = Astro.props;
+const cards = await Promise.all(
+  slugs.map(async (slug) => {
+    const e = await getEntry('agents', `${locale}/${slug}`);
+    if (!e) throw new Error(`Missing src/content/agents/${locale}/${slug}.md`);
+    return { slug, ...e.data, href: e.data.page ? entryRoutes.agents(slug)[locale] : undefined };
+  }),
+);
+---
+
+<ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+  {
+    cards.map((c) => {
+      const Tag = c.href ? 'a' : 'div';
+      return (
+        <li>
+          <Tag href={c.href} class="carte group">
+            <Image
+              src={avatars[c.slug]}
+              alt=""
+              width={64}
+              densities={[1, 2]}
+              class="size-16 shrink-0 object-contain"
+            />
+            <span class="flex min-w-0 flex-1 flex-col gap-1.5">
+              <span class="font-mono text-kicker text-orange-txt uppercase">{c.job}</span>
+              <span class="font-display text-card font-bold text-ink">{c.name}</span>
+              <span class="text-caption text-soft">{c.pitch}</span>
+            </span>
+            {c.href && (
+              <span
+                aria-hidden="true"
+                class="flex size-9 shrink-0 items-center justify-center self-center rounded-full bg-ink transition-[background-color,translate] duration-300 ease-hatch group-hover:translate-x-[3px] group-hover:bg-orange group-focus-visible:bg-orange"
+              >
+                <svg viewBox="0 0 24 24" class="size-4 fill-white">
+                  <path d="M4 11v2h16v-2zm12 2v2h2v-2zm-2 2v2h2v-2zm-2 2v2h2v-2zm4-6V9h2v2zm-2 4V7h2v8zm-2 2V5h2v12z" />
+                </svg>
+              </span>
+            )}
+          </Tag>
+        </li>
+      );
+    })
+  }
+</ul>
+
+<style>
+  .carte {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    height: 100%;
+    padding: 20px;
+    border-radius: var(--radius-card);
+    background: var(--color-surface);
+    box-shadow: inset 0 0 0 1px var(--color-line);
+    transition: box-shadow 0.3s var(--ease-doux);
+  }
+  a.carte:hover,
+  a.carte:focus-visible {
+    box-shadow:
+      inset 0 0 0 2px var(--color-orange),
+      var(--shadow-1);
+  }
+  a.carte:focus-visible {
+    outline: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .carte,
+    .carte span {
+      transition: none !important;
+    }
+  }
+</style>

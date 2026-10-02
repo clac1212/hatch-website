@@ -1,7 +1,7 @@
 ---
 seo:
   title: 'Politique de Confidentialité — Hatch OS'
-  description: 'Politique de confidentialité de Hatch OS : comment nous collectons, utilisons et protégeons vos données personnelles.'
+  description: 'Politique de confidentialité de Hatch OS : données collectées, finalités, base légale RGPD, sous-traitants, durées de conservation, cookies et vos droits.'
 title: 'Politique de Confidentialité'
 meta: 'Mise à jour : 22 avril 2026 · Entrée en vigueur : 22 avril 2026'
 ---

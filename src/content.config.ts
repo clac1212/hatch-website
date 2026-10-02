@@ -11,7 +11,16 @@ import { schema as miseEnPlace } from './content/schemas/miseEnPlace';
 import { schema as securite } from './content/schemas/securite';
 import { schema as tarifs } from './content/schemas/tarifs';
 import { schema as piedDePage } from './content/schemas/piedDePage';
-import { demoPage, securityPage, sansFiltrePage, sansFiltreEdition } from './content/pages/schemas';
+import { schema as agent } from './content/schemas/agents';
+import { schema as customerCase } from './content/schemas/cases';
+import {
+  demoPage,
+  securityPage,
+  sansFiltrePage,
+  sansFiltreEdition,
+  agentPage,
+  casePage,
+} from './content/pages/schemas';
 
 /**
  * One collection per home section (+ the footer): `src/content/sections/<name>/{fr,en}.yaml`,
@@ -33,18 +42,18 @@ const home = defineCollection({
 });
 
 /**
- * The seven agents, one Markdown file per agent and per locale (`fr/peep.md`, `en/peep.md`).
- * The body is the agent's dedicated page; `page: false` until Rako's copy for it is ready.
+ * The seven agents, one Markdown file per agent and per locale (`fr/peep.md`, `en/peep.md`). The
+ * frontmatter's `page` block is the agent's dedicated page (/agents/<slug>); without it, no page.
  */
 const agents = defineCollection({
   loader: glob({ pattern: '*/*.md', base: './src/content/agents' }),
-  schema: z.strictObject({
-    name: z.string(),
-    job: z.string(),
-    pitch: z.string(),
-    order: z.int().min(1),
-    page: z.boolean(),
-  }),
+  schema: agent,
+});
+
+/** Customer case pages, one YAML file per case and per locale (`fr/nobinobi.yaml`). */
+const cases = defineCollection({
+  loader: glob({ pattern: '*/*.yaml', base: './src/content/cases' }),
+  schema: customerCase,
 });
 
 /**
@@ -80,8 +89,11 @@ export const collections = {
   demoPage: pageCollection('demo', demoPage),
   securityPage: pageCollection('security', securityPage),
   sansFiltrePage: pageCollection('sansFiltre', sansFiltrePage),
+  agentPage: pageCollection('agent', agentPage),
+  casePage: pageCollection('case', casePage),
   home,
   agents,
+  cases,
   hero: sectionCollection('hero', hero),
   clients: sectionCollection('clients', clients),
   probleme: sectionCollection('probleme', probleme),

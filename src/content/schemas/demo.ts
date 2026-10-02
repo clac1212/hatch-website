@@ -198,22 +198,25 @@ const ecranTableau = z.strictObject({
     .max(3),
 });
 
+/** Keys of the agent demos (an agent page shows one of them, see src/content/schemas/agents.ts). */
+export const demoCles = [
+  'peep',
+  'lark',
+  'jay',
+  'finch',
+  'owl',
+  'pecker',
+  'sparrow-candidats',
+  'sparrow-ouverture',
+] as const;
+
 /**
  * An agent demo inside a place. `cle` ties it to its cut-out and camera in Demo.astro; Sparrow
  * has two (candidates, openings). `cle` ties it to its marker and camera in
  * Demo.astro; Sparrow has two (candidates, openings).
  */
 const demoAgent = z.strictObject({
-  cle: z.enum([
-    'peep',
-    'lark',
-    'jay',
-    'finch',
-    'owl',
-    'pecker',
-    'sparrow-candidats',
-    'sparrow-ouverture',
-  ]),
+  cle: z.enum(demoCles),
   nom: texte,
   /** What the agent does here, in a few words. */
   role: texte,

@@ -1,7 +1,7 @@
 ---
 seo:
   title: 'Privacy Policy — Hatch OS'
-  description: 'Hatch OS privacy policy: how we collect, use and protect your personal data.'
+  description: 'Hatch OS privacy policy: the data we collect and why, our GDPR legal basis, subprocessors, retention periods, cookies and your rights over your data.'
 title: 'Privacy Policy'
 meta: 'Last updated: April 22, 2026 · Effective date: April 22, 2026'
 ---

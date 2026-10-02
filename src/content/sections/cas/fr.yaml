@@ -29,7 +29,7 @@ cases:
         label: sites équipés
       - value: '[Y] sem.'
         label: pour tout déployer
-    href: null
+    href: /clients/nobinobi
   - id: pny
     client: PNY
     agent: owl

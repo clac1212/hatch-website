@@ -1,0 +1,15 @@
+---
+import { getCollection } from 'astro:content';
+import CasePage from '../../views/CasePage.astro';
+import type { CaseId } from '../../content/schemas/cas';
+
+/** One page per customer case of src/content/cases/fr. */
+export async function getStaticPaths() {
+  const cases = await getCollection('cases', (e) => e.id.startsWith('fr/'));
+  return cases.map((e) => ({ params: { id: e.id.slice('fr/'.length) } }));
+}
+
+const id = Astro.params.id as CaseId;
+---
+
+<CasePage locale="fr" id={id} />

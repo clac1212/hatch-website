@@ -1,0 +1,37 @@
+# Draft: name, quote and figures to be validated in writing by Nobinobi before launch.
+# The [X] / [Y] and the bracketed text are to be replaced with the real data.
+brouillon: true
+published: '2026-10-02'
+updated: '2026-10-02'
+author: null
+seo:
+  title: 'Nobinobi · field questions on WhatsApp | Hatch OS'
+  description: "How the Nobinobi network handed its teams' daily questions to Peep, the Hatch OS WhatsApp agent: before, after, and what changed."
+client: Nobinobi
+visualAlt: The Nobinobi storefront.
+title: 'At Nobinobi, questions from the field go through Peep'
+lead: "Nobinobi handed the daily questions of its 12 locations' teams to Peep, on WhatsApp: the founder now only handles the issues that need him."
+agents: [peep]
+figures:
+  - label: locations equipped
+    before: null
+    after: '12'
+    source: 'Source: Hatch OS, [date to be confirmed]'
+  - label: to roll out the whole network
+    before: null
+    after: '[Y] wks'
+    source: 'Source: Hatch OS, [date to be confirmed]'
+  - label: field questions reaching the founder, per week
+    before: '[X]'
+    after: '[Y]'
+    source: 'Source: [Nobinobi records, period to be confirmed]'
+quote:
+  text: “The teams ask Peep instead of calling me. I only keep the real issues.”
+  author: '[First Last] · Founder, Nobinobi'
+sections:
+  - title: The network
+    text: '[To be completed with Nobinobi: concept, cities, number of locations and date they joined Hatch OS.]'
+  - title: Before Hatch OS
+    text: "[To be completed with Nobinobi] The teams' questions (recipes, allergens, procedures) went straight to the founder, by phone and on WhatsApp."
+  - title: What Peep changed
+    text: "[To be completed with Nobinobi] The teams write to Peep on WhatsApp. It answers from the network's procedures and passes on to head office what it doesn't know."

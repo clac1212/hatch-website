@@ -3,10 +3,15 @@ import { defineConfig, envField, fontProviders } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 import vercel from '@astrojs/vercel';
 import sitemap from '@astrojs/sitemap';
+import { sitemapOptions } from './src/seo/sitemap.ts';
 
 // https://astro.build/config
 export default defineConfig({
   site: 'https://www.gethatch.io',
+  // One URL form: never a trailing slash (`/conditions`, `/en`), except the root. Canonicals,
+  // hreflang, internal links and the sitemap all use it; on Vercel the adapter redirects `/x/` to
+  // `/x` (308). Pages are still built as `x/index.html`, which Vercel serves at `/x`.
+  trailingSlash: 'never',
 
   // PostHog project key (public, but kept out of the repo): Vercel env + local `.env`.
   env: {
@@ -90,11 +95,7 @@ export default defineConfig({
   }),
 
   integrations: [
-    sitemap({
-      i18n: {
-        defaultLocale: 'fr',
-        locales: { fr: 'fr-FR', en: 'en-US' },
-      },
-    }),
+    // hreflang alternates (incl. pages whose slugs differ per locale) and git-based lastmod.
+    sitemap(sitemapOptions()),
   ],
 });

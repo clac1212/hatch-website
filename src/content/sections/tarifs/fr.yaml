@@ -13,15 +13,15 @@ offres:
   - nom: Kiosques & comptoirs
     type: 1 à 2 employés par point de vente
     prix: { annuel: 16, mensuel: 19 }
-    alt: Un kiosque en voxels, avec les agents Hatch autour du comptoir
+    alt: Un kiosque en voxels, avec les agents Hatch OS autour du comptoir
   - nom: "Dark kitchens &\nhost kitchens"
     type: 3 à 5 employés par point de vente
     prix: { annuel: 25, mensuel: 29 }
-    alt: Une dark kitchen en voxels sur deux niveaux, avec les agents Hatch en cuisine
+    alt: Une dark kitchen en voxels sur deux niveaux, avec les agents Hatch OS en cuisine
   - nom: Franchises & restaurants
     type: 6 employés et plus par point de vente
     prix: { annuel: 33, mensuel: 39 }
-    alt: Un restaurant en coupe, en voxels, de la salle au bureau, avec les agents Hatch à chaque étage
+    alt: Un restaurant en coupe, en voxels, de la salle au bureau, avec les agents Hatch OS à chaque étage
 inclus:
   titre: Tout est inclus
   agents: Les 7 agents

@@ -1,0 +1,37 @@
+# Brouillon : nom, citation et chiffres à faire valider par écrit par Nobinobi avant la mise en ligne.
+# Les [X] / [Y] et le texte entre crochets sont à remplacer par les vraies données.
+brouillon: true
+published: '2026-10-02'
+updated: '2026-10-02'
+author: null
+seo:
+  title: 'Nobinobi · les questions du terrain sur WhatsApp | Hatch OS'
+  description: "Comment le réseau Nobinobi a confié les questions quotidiennes de ses équipes à Peep, l'agent WhatsApp de Hatch OS : avant, après, et ce qui a changé."
+client: Nobinobi
+visualAlt: La devanture de Nobinobi.
+title: 'Chez Nobinobi, les questions du terrain passent par Peep'
+lead: 'Nobinobi a confié à Peep, sur WhatsApp, les questions quotidiennes des équipes de ses 12 sites : le fondateur ne traite plus que les sujets qui le demandent.'
+agents: [peep]
+figures:
+  - label: sites équipés
+    before: null
+    after: '12'
+    source: 'Source : Hatch OS, [date à préciser]'
+  - label: pour équiper tout le réseau
+    before: null
+    after: '[Y] sem.'
+    source: 'Source : Hatch OS, [date à préciser]'
+  - label: questions du terrain reçues par le fondateur, par semaine
+    before: '[X]'
+    after: '[Y]'
+    source: 'Source : [relevé Nobinobi, période à préciser]'
+quote:
+  text: « Les équipes posent leurs questions à Peep au lieu de m’appeler. Je ne garde que les vrais sujets. »
+  author: '[Prénom Nom] · Fondateur, Nobinobi'
+sections:
+  - title: Le réseau
+    text: "[À compléter avec Nobinobi : concept, villes, nombre de sites et date d'arrivée sur Hatch OS.]"
+  - title: Avant Hatch OS
+    text: '[À compléter avec Nobinobi] Les questions des équipes (recettes, allergènes, procédures) arrivaient directement au fondateur, par téléphone et sur WhatsApp.'
+  - title: Ce que Peep a changé
+    text: "[À compléter avec Nobinobi] Les équipes écrivent à Peep sur WhatsApp. Il répond à partir des procédures du réseau et transmet au siège ce qu'il ne sait pas."

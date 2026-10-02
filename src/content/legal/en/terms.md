@@ -1,7 +1,7 @@
 ---
 seo:
   title: 'Terms of Service — Hatch OS'
-  description: 'Terms of Service governing access to and use of the Hatch OS platform.'
+  description: 'Terms of Service of Hatch OS: your account, access to the platform, use of the AI agents, personal data, liability and termination of the service.'
 title: 'Terms of Service'
 meta: 'Last updated: April 22, 2026 · Effective date: April 22, 2026'
 ---

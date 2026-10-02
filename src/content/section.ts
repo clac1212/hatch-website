@@ -3,7 +3,16 @@ import type { Locale } from '../i18n/ui';
 
 type Section = Exclude<
   CollectionKey,
-  'home' | 'agents' | 'legal' | 'sansFiltre' | 'demoPage' | 'securityPage' | 'sansFiltrePage'
+  | 'home'
+  | 'agents'
+  | 'cases'
+  | 'legal'
+  | 'sansFiltre'
+  | 'demoPage'
+  | 'securityPage'
+  | 'sansFiltrePage'
+  | 'agentPage'
+  | 'casePage'
 >;
 
 /** Loads a section's copy for a locale; a missing file is a build error, not a silent blank. */

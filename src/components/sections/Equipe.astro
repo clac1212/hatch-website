@@ -3,7 +3,7 @@ import { getCollection } from 'astro:content';
 import type { ImageMetadata } from 'astro';
 import { Picture } from 'astro:assets';
 import { section } from '../../content/section';
-import type { Locale } from '../../i18n/ui';
+import { entryRoutes, type Locale } from '../../i18n/ui';
 import peep from '../../assets/equipe/peep.jpg';
 import finch from '../../assets/equipe/finch.jpg';
 import owl from '../../assets/equipe/owl.jpg';
@@ -16,7 +16,7 @@ import { cadrage } from './equipe-cadrage';
 /**
  * 05 — "Rencontrez vos nouveaux collègues" (v4 node W8OOQW): a 3-column mosaic of the seven agents.
  * The agents fill the mosaic slots by `order` (column 1: title + 2 tiles, column 2: 3 tiles, column 3: 2 tiles).
- * A tile links to /agents/<slug> only once the agent's `page` is true.
+ * A tile links to /agents/<slug> once the agent has its `page` (its page's copy).
  * Below lg, the columns dissolve into a 2-column grid; tall tiles span both columns.
  * Hover (v4 "tuiles"): photo zooms, label rises, arrow turns orange, orange border — the border is an
  * ::after overlay, since an inset outline would be painted under the positioned photo.
@@ -92,7 +92,7 @@ const sizes: Record<Size, string> = {
 
 let next = 0;
 const mosaic = columns.map((col) => col.map((slot) => ({ ...slot, agent: agents[next++]! })));
-const pageHref = (slug: string) => (locale === 'fr' ? `/agents/${slug}` : `/en/agents/${slug}`);
+const pageHref = (slug: string) => entryRoutes.agents(slug)[locale];
 ---
 
 <section id="agents" aria-labelledby="equipe-titre" class="bg-white" data-rv-groupe>

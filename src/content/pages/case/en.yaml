@@ -1,0 +1,28 @@
+# Labels shared by the customer story pages (/en/clients/<id>). {date} = date, {author} = author, {client} = customer.
+breadcrumb:
+  label: Breadcrumb
+  home: Home
+  cases: Customer stories
+kicker: Customer story
+with: With
+published: Published on {date}
+updated: Updated on {date}
+by: By {author}
+# Roles to be confirmed (Sébastien in particular).
+authors:
+  patrick: { name: Patrick, role: Co-founder of Hatch OS }
+  cesar: { name: César, role: CPTO of Hatch OS }
+  sebastien: { name: Sébastien, role: Co-founder of Hatch OS }
+figures:
+  kicker: Before, after
+  title: What changed, in figures
+  before: Before
+  after: After
+story:
+  kicker: The story
+agents:
+  kicker: The network's agents
+  title: The agents working at {client}
+cta:
+  title: What about your network?
+  text: We show you Hatch OS on your own documents, with the agents that serve your teams.

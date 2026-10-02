@@ -1,0 +1,27 @@
+# Libellés communs aux pages agents (/agents/<slug>). {name} = nom de l'agent, {client} = nom du client, {date} = date.
+breadcrumb:
+  label: Fil d'Ariane
+  home: Accueil
+  agents: Les agents
+problem:
+  kicker: Le problème
+  answer: '{name} répond'
+actions:
+  kicker: Ce que je fais
+scenario:
+  kicker: Un cas client
+  readCase: Lire le cas {client}
+tools:
+  kicker: Outils
+  title: Avec quels outils je travaille
+faq:
+  kicker: Questions fréquentes
+  title: Vos questions sur {name}
+related:
+  kicker: En équipe
+  title: Les agents qui travaillent avec moi
+allCases: Voir les cas clients
+cta:
+  title: Voir {name} au travail, sur vos propres documents
+  text: 'On vous montre Hatch OS avec les procédures de votre réseau, et ce que {name} en fait.'
+updated: Mis à jour le {date}

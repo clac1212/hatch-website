@@ -29,7 +29,7 @@ cases:
         label: locations equipped
       - value: '[Y] wks'
         label: to roll everything out
-    href: null
+    href: /en/clients/nobinobi
   - id: pny
     client: PNY
     agent: owl

@@ -1,10 +1,33 @@
 ---
+/**
+ * Every page's shell: <head> (SEO, social cards, structured data, fonts), nav, footer.
+ *
+ * Props:
+ * - `locale`, `paths`: the page's locale and its URL in each locale (`routes.<key>` of
+ *   src/i18n/ui.ts, or a `{ fr, en }` object for dynamic pages). They drive the canonical, the
+ *   hreflang alternates, og:url and the language switch. URLs never end with a slash
+ *   (`trailingSlash: 'never'`), except the root `/`.
+ * - `title` (≤ 60 characters, contains "Hatch OS") and `description` (120 to 160 characters,
+ *   ends with a full sentence): `scripts/seo-audit.mjs` checks both after `pnpm build`.
+ * - `image` (optional): the share image (og:image, twitter:image). Either an image of src/assets,
+ *   cropped to 1200 × 630 at build time: `{ src: import('…/x.jpg'), alt }`, or a file already at
+ *   that size: `{ src: '/x.png', alt, width, height }`. Defaults to public/og-image.png.
+ * - `ogType` (optional): `website` (default) or `article`.
+ * - `jsonLd` (optional): extra schema.org nodes for this page, appended to the Organization
+ *   rendered on every page, in one `@graph`. Plain objects without `@context`; build them with the
+ *   helpers of src/seo/jsonld.ts (`breadcrumbList`, `organizationId` for `publisher`…).
+ * - `noindex` (optional): `<meta name="robots" content="noindex">`, no canonical nor hreflang
+ *   (the 404 page).
+ */
 import { Font } from 'astro:assets';
 import SpeedInsights from '@vercel/speed-insights/astro';
 import Analytics from '../components/Analytics.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
-import { locales, useTranslations, type Locale, type Paths } from '../i18n/ui';
+import { locales, otherLocale, useTranslations, type Locale, type Paths } from '../i18n/ui';
+import { BRAND, organization, serializeJsonLd, type JsonLdNode } from '../seo/jsonld';
+import { defaultOgImage, resolveOgImage, type OgImage } from '../seo/og';
+import logo from '../assets/brand/hatch-os.png';
 import '../styles/global.css';
 
 interface Props {
@@ -13,13 +36,33 @@ interface Props {
   paths: Paths;
   title: string;
   description: string;
+  image?: OgImage;
+  ogType?: 'website' | 'article';
+  jsonLd?: JsonLdNode[];
+  noindex?: boolean;
 }
 
-const { locale, paths, title, description } = Astro.props;
+const {
+  locale,
+  paths,
+  title,
+  description,
+  image,
+  ogType = 'website',
+  jsonLd = [],
+  noindex = false,
+} = Astro.props;
 const t = useTranslations(locale);
 // `site` is set in astro.config.mjs, so Astro.site is always defined.
 const site = Astro.site!;
 const url = (path: string) => new URL(path, site).href;
+const ogLocale: Record<Locale, string> = { fr: 'fr_FR', en: 'en_US' };
+
+const og = await resolveOgImage(image ?? defaultOgImage(t('seo.ogImageAlt')), site);
+const structuredData = serializeJsonLd([
+  organization(site, { url: url(logo.src), width: logo.width, height: logo.height }),
+  ...jsonLd,
+]);
 ---
 
 <!doctype html>
@@ -32,16 +75,38 @@ const url = (path: string) => new URL(path, site).href;
     </script>
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={url(paths[locale])} />
-    {locales.map((l) => <link rel="alternate" hreflang={l} href={url(paths[l])} />)}
-    <link rel="alternate" hreflang="x-default" href={url(paths.fr)} />
+    {
+      noindex ? (
+        <meta name="robots" content="noindex" />
+      ) : (
+        <>
+          <link rel="canonical" href={url(paths[locale])} />
+          {locales.map((l) => (
+            <link rel="alternate" hreflang={l} href={url(paths[l])} />
+          ))}
+          <link rel="alternate" hreflang="x-default" href={url(paths.fr)} />
+        </>
+      )
+    }
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
-    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={BRAND} />
+    <meta property="og:type" content={ogType} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={url(paths[locale])} />
-    <meta property="og:locale" content={locale === 'fr' ? 'fr_FR' : 'en_US'} />
+    {!noindex && <meta property="og:url" content={url(paths[locale])} />}
+    <meta property="og:locale" content={ogLocale[locale]} />
+    <meta property="og:locale:alternate" content={ogLocale[otherLocale(locale)]} />
+    <meta property="og:image" content={og.url} />
+    <meta property="og:image:width" content={String(og.width)} />
+    <meta property="og:image:height" content={String(og.height)} />
+    <meta property="og:image:alt" content={og.alt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={og.url} />
+    <meta name="twitter:image:alt" content={og.alt} />
+    <script type="application/ld+json" set:html={structuredData} />
     <Font cssVariable="--font-fraunces" />
     <Font cssVariable="--font-inter" preload />
     <Font cssVariable="--font-departure" preload />

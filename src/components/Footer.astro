@@ -3,6 +3,7 @@ import { Image, Picture } from 'astro:assets';
 import Button from './ui/Button.astro';
 import { section } from '../content/section';
 import { routes, otherLocale, useTranslations, type Locale, type Paths } from '../i18n/ui';
+import { socialLinks } from '../seo/jsonld';
 import logo from '../assets/brand/hatch-os-night.png';
 import immeuble from '../assets/footer/immeuble.jpg';
 
@@ -25,10 +26,6 @@ const produit = [
   { href: `${home}#cas-clients`, label: t('nav.cases') },
   { href: `${home}#tarifs`, label: t('nav.pricing') },
   { href: routes.security[locale], label: t('nav.security') },
-];
-const reseaux = [
-  { href: 'https://www.linkedin.com/company/gethatchos/', label: 'LinkedIn' },
-  { href: 'https://www.instagram.com/get_hatch.os/', label: 'Instagram' },
 ];
 const legal = [
   { href: routes.terms[locale], label: data.legal.conditions },
@@ -109,7 +106,7 @@ const lien = 'lien-pied block w-fit text-[14.5px] leading-[normal] text-paper';
             <h2 id="pied-hatch" class={titre}>{t('footer.company')}</h2>
             <ul class="flex flex-col gap-3">
               {
-                reseaux.map((l) => (
+                socialLinks.map((l) => (
                   <li>
                     <a href={l.href} rel="noopener" class={lien}>
                       {l.label}

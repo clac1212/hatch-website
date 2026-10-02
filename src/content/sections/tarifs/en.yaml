@@ -13,15 +13,15 @@ offres:
   - nom: Kiosks & counters
     type: 1 to 2 staff per location
     prix: { annuel: 16, mensuel: 19 }
-    alt: A voxel kiosk with the Hatch agents gathered around the counter
+    alt: A voxel kiosk with the Hatch OS agents gathered around the counter
   - nom: "Dark kitchens &\nhost kitchens"
     type: 3 to 5 staff per location
     prix: { annuel: 25, mensuel: 29 }
-    alt: A two-storey voxel dark kitchen with the Hatch agents at work
+    alt: A two-storey voxel dark kitchen with the Hatch OS agents at work
   - nom: Franchises & restaurants
     type: 6 or more staff per location
     prix: { annuel: 33, mensuel: 39 }
-    alt: A cutaway voxel restaurant, from dining room to back office, with a Hatch agent on every floor
+    alt: A cutaway voxel restaurant, from dining room to back office, with a Hatch OS agent on every floor
 inclus:
   titre: Everything included
   agents: All 7 agents
