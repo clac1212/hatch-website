@@ -60,7 +60,7 @@ const SHOPS: (
   | { x: number; y: number; roof: number; anchor: Ancre }
 )[] = [
   { shop: 12, anchor: 'center' }, // Dijon (Peep)
-  { shop: 8, anchor: 'center' }, // Strasbourg (Lark)
+  { shop: 8, anchor: 'right' }, // Strasbourg (Lark), close to the right edge of the screen
   // Marseille opening (Sparrow): the construction site of the map (decor, not a shop), card above its crane
   { x: 1190, y: 650, roof: 140, anchor: 'center' },
   // Huesca (Owl, off the map), Spanish side of the middle of the Pyrenees: Owl answers in the team's language
@@ -144,31 +144,39 @@ const tick =
           <div
             class="h-pile"
             data-agent={e.agent}
-            style={`--x:${pct(e.x, W)};--y:${pct(e.y - e.roof, H)};--dx:${e.anchor === 'right' ? '-88%' : '-50%'}`}
+            style={`--x:${pct(e.x, W)};--y:${pct(e.y - e.roof, H)};--dx:${e.anchor === 'right' ? '-78%' : '-50%'};--ax:${e.anchor === 'right' ? '78%' : '50%'}`}
           >
             <div class="h-slot">
               <div>
                 <div class="h-tache">
                   <Image
                     src={e.avatar}
-                    width={28}
-                    height={28}
+                    width={40}
+                    height={40}
                     densities={[1, 2]}
                     format="webp"
                     alt=""
                     class="h-avatar"
                   />
-                  <span class="h-statut">
-                    <span class="h-point" />
-                    <svg class="h-coche" viewBox="0 0 24 24">
-                      <path d={tick} />
-                    </svg>
-                    <span class="lib-cours">{status.running}</span>
-                    <span class="lib-fait">{status.done}</span>
-                  </span>
-                  <span class="h-texte">
-                    <span class="lib-cours">{e.running}</span>
-                    <span class="lib-fait">{e.done}</span>
+                  <span class="h-corps">
+                    <span class="h-titre h-bascule">
+                      <span class="lib-cours">{e.running.title}</span>
+                      <span class="lib-fait">{e.done.title}</span>
+                    </span>
+                    <span class="h-meta">
+                      <span class="h-statut">
+                        <span class="h-point" />
+                        <svg class="h-coche" viewBox="0 0 24 24">
+                          <path d={tick} />
+                        </svg>
+                        <span class="h-etat lib-cours">{status.running}</span>
+                        <span class="h-etat lib-fait">{status.done}</span>
+                      </span>
+                      <span class="h-detail h-bascule">
+                        <span class="lib-cours">{e.running.detail}</span>
+                        <span class="lib-fait">{e.done.detail}</span>
+                      </span>
+                    </span>
                   </span>
                 </div>
               </div>
@@ -435,7 +443,7 @@ const tick =
       left: var(--x);
       top: var(--y);
       bottom: auto;
-      width: 420px;
+      width: max-content;
       max-width: none;
       transform: translate(var(--dx), -100%);
     }
@@ -449,6 +457,7 @@ const tick =
   /* No overflow clipping here: it cut the card's soft shadow into a faint rectangle (César, 01/10). The
      card's own fade and slide make the entrance; the grid row only gives the slot its height. */
   .h-slot > div {
+    min-width: 0; /* lets the card shrink to the frame on mobile instead of overflowing it */
     min-height: 0;
     padding: 3px 2px;
   }
@@ -456,12 +465,22 @@ const tick =
     grid-template-rows: 1fr;
   }
   /* ---------- Task cards ----------
-     Light glass pill, the language of the title card (chosen by César among three looks, 01/10). */
+     Light card in the language of the title card (white rim, generous radius), made opaque and bigger
+     so it reads at first glance over the map: the earlier 12-13 px glass pill was too small to notice
+     (cofounder's feedback, 02/10). Two lines, outcome first: title in ink, then status and detail. */
   .h-tache {
+    position: relative;
     display: flex;
     align-items: center;
-    white-space: nowrap;
-    font: 600 12px/1.25 var(--font-sans);
+    gap: 12px;
+    padding: 9px 18px 9px 9px;
+    border-radius: var(--radius-glass);
+    color: var(--color-ink);
+    background: var(--color-surface);
+    box-shadow:
+      var(--shadow-2),
+      0 0 0 1px var(--color-line),
+      inset 0 1px 0 var(--color-white);
     opacity: 0;
     filter: blur(6px);
     transform: translateY(14px) scale(0.94);
@@ -469,11 +488,6 @@ const tick =
       opacity 0.45s var(--ease-doux),
       filter 0.45s var(--ease-doux),
       transform 0.7s var(--ease-entree);
-  }
-  @media (min-width: 40rem) {
-    .h-tache {
-      font-size: 13px;
-    }
   }
   .h-slot.on .h-tache {
     opacity: 1;
@@ -489,21 +503,68 @@ const tick =
   }
   .h-avatar {
     flex: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
     object-fit: cover;
+    background: var(--color-white);
+    box-shadow: 0 0 0 1px var(--color-line);
   }
-  .h-texte {
+  .h-corps {
+    display: flex;
     min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .h-titre {
+    font: 600 15px/1.25 var(--font-sans);
+    letter-spacing: -0.005em;
+    text-wrap: balance;
+  }
+  .h-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  /* One line in practice (short copy); wraps rather than truncating if a screen is narrower still. */
+  .h-detail {
+    min-width: 0;
+    font: 500 13px/1.3 var(--font-sans);
+    color: var(--color-soft);
+  }
+  /* Both states share one grid cell, the idle one only hidden: the card keeps the width of its
+     longest line when it switches from running to done, instead of jumping. */
+  .h-bascule {
+    display: grid;
+  }
+  .h-bascule > * {
+    grid-area: 1 / 1;
+  }
+  .h-tache.fait .lib-cours,
+  .h-tache:not(.fait) .lib-fait {
+    visibility: hidden;
+  }
+  /* The status chip, though, just swaps its label: a "Done" chip as wide as "In progress" looked empty. */
+  .h-tache.fait .h-etat.lib-cours,
+  .h-tache:not(.fait) .h-etat.lib-fait {
+    display: none;
   }
   .h-statut {
     display: inline-flex;
     flex: none;
     align-items: center;
     gap: 6px;
-    font: 400 10.5px/1 var(--font-mono);
+    padding: 4px 7px;
+    border-radius: 999px;
+    font: 400 11px/1 var(--font-mono);
     letter-spacing: 0.08em;
     text-transform: uppercase;
+    color: var(--color-orange-txt);
+    background: var(--color-orange-tint);
+  }
+  .fait .h-statut {
+    color: var(--color-soft);
+    background: color-mix(in srgb, var(--color-ink) 7%, transparent);
   }
   .h-point {
     width: 6px;
@@ -526,47 +587,58 @@ const tick =
     display: none;
     fill: currentColor;
   }
-  .h-tache.fait .h-point,
-  .h-tache.fait .lib-cours,
-  .h-tache:not(.fait) .lib-fait {
+  .h-tache.fait .h-point {
     display: none;
   }
   .h-tache.fait .h-coche {
     display: block;
   }
-
-  .h-tache {
-    gap: 10px;
-    padding: 5px 14px 5px 5px;
-    border-radius: 999px;
-    color: var(--color-ink);
-    background: linear-gradient(
-      -120deg,
-      color-mix(in srgb, var(--color-white) 78%, transparent),
-      color-mix(in srgb, var(--color-white) 55%, transparent)
-    );
-    backdrop-filter: blur(14px) saturate(1.2);
-    -webkit-backdrop-filter: blur(14px) saturate(1.2);
-    box-shadow:
-      0 10px 28px color-mix(in srgb, var(--color-navy) 22%, transparent),
-      inset 0 1px 0 var(--color-white),
-      inset 0 0 0 1px color-mix(in srgb, var(--color-white) 70%, transparent);
+  @media (prefers-reduced-motion: reduce) {
+    .h-point {
+      animation: none;
+    }
   }
-  .h-avatar {
-    width: 28px;
-    height: 28px;
-    border-radius: 999px;
-    background: var(--color-white);
+  /* Narrow screens: the status shrinks to its dot or tick, the verb's tense already says running or
+     done, so the detail keeps the room. */
+  @media (max-width: 39.999rem) {
+    .h-statut {
+      width: 19px;
+      height: 19px;
+      padding: 0;
+      justify-content: center;
+    }
+    .h-statut .h-etat {
+      display: none;
+    }
   }
-  .h-statut {
-    padding: 4px 7px;
-    border-radius: 999px;
-    color: var(--color-orange-txt);
-    background: var(--color-orange-tint);
-  }
-  .fait .h-statut {
-    color: var(--color-soft);
-    background: color-mix(in srgb, var(--color-ink) 7%, transparent);
+  @media (min-width: 64rem) {
+    .h-tache {
+      gap: 13px;
+      padding: 10px 20px 10px 10px;
+    }
+    .h-avatar {
+      width: 40px;
+      height: 40px;
+    }
+    .h-titre {
+      font-size: 16px;
+    }
+    /* In the scene, the card stands on its shop: a small tail points down to the roof. */
+    .h-slot > div {
+      padding-bottom: 9px;
+    }
+    .h-tache::after {
+      content: '';
+      position: absolute;
+      left: var(--ax);
+      bottom: -6px;
+      width: 12px;
+      height: 12px;
+      border-radius: 0 0 3px 0;
+      background: var(--color-surface);
+      box-shadow: 1px 1px 0 0 var(--color-line);
+      transform: translateX(-50%) rotate(45deg);
+    }
   }
 
   .h-pause .h-point {

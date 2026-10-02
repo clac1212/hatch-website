@@ -9,16 +9,33 @@ tasks:
     running: In progress
     done: Done
   # The three agents drawn on the map first (Peep, Lark, Sparrow: the shop writes, the bird types its answer), then one agent off the map (Owl, answering in the team's language: Huesca, in Spanish), and the loop restarts.
+  # Each state reads at a glance, outcome first: `title` = the agent, what it does, for which BunBun site (the city of the shop under the card); `detail` = the request, then what was done. Short: one line each on mobile.
   events:
     - agent: peep
-      running: 'Question from the Dijon team'
-      done: 'Allergen sheet sent'
+      running:
+        title: 'Peep is answering BunBun Dijon'
+        detail: '“Where’s the allergen sheet?”'
+      done:
+        title: 'Peep answered BunBun Dijon'
+        detail: 'Allergen sheet sent · 2 min'
     - agent: lark
-      running: 'Strasbourg behind on revenue'
-      done: 'Follow-up scheduled tomorrow 9 am'
+      running:
+        title: 'Lark is reviewing BunBun Strasbourg'
+        detail: 'Revenue below target'
+      done:
+        title: 'Lark followed up with BunBun Strasbourg'
+        detail: 'Revenue check-in tomorrow 9 am'
     - agent: sparrow
-      running: 'Marseille opening · D-18'
-      done: 'Team training booked for Thursday'
+      running:
+        title: 'Sparrow is tracking BunBun Marseille'
+        detail: 'Site under construction · D-18'
+      done:
+        title: 'Sparrow booked training for BunBun Marseille'
+        detail: 'Thursday, whole team · D-18'
     - agent: owl
-      running: 'Huesca: “¿Cómo se limpia la freidora?”'
-      done: 'Answered in Spanish, out loud'
+      running:
+        title: 'Owl is answering BunBun Huesca'
+        detail: '“¿Cómo se limpia la freidora?”'
+      done:
+        title: 'Owl answered BunBun Huesca'
+        detail: 'Out loud, in Spanish'
