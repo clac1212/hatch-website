@@ -15,11 +15,13 @@ import jay from '../../assets/miseEnPlace/jay.png';
 import owl from '../../assets/miseEnPlace/owl.png';
 
 /**
- * "Mise en place" (v4 node REj0g): a pinned track with three app windows that cross-fade on scroll —
- * the sources connect one by one, the agents set themselves up, the teams use them.
+ * "Mise en place" (v4 node REj0g): a pinned track with three app windows that play by themselves, like
+ * the diorama's agent demos — the sources connect one by one, the agents set themselves up, the teams
+ * use them; scrolling pushes the play forward or back.
  * Two layouts share this markup:
  * - pinned (`.epingle`, set by src/scripts/miseEnPlace.ts from md up when motion is allowed): a fixed
- *   1000 × 980 stage scaled by the shared track engine, one window at a time;
+ *   1000 × 980 stage scaled by the shared track engine, one window at a time, driven by one GSAP
+ *   timeline;
  * - stacked (default: mobile, no JS, reduced motion): the three windows one below the other, each under
  *   its step title, in their final state.
  */
@@ -87,8 +89,7 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
   id="mise-en-place"
   class="piste mep overflow-x-clip bg-night"
   data-piste="mep"
-  data-longueurs="70,75,55"
-  data-cadence="900"
+  data-longueurs="200"
   aria-labelledby="mep-titre"
 >
   <div class="collant">
@@ -115,14 +116,13 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
 
       <!--
         Step indicator of the pinned layout (the stacked layout titles each window instead): one segment
-        per step, like the demo's chapters; its bar fills with the scroll inside that step.
+        per step, like the demo's chapters; its bar fills as the timeline plays that step.
       -->
       <ol class="mep-etapes hidden leading-[normal]" aria-hidden="true">
         {
           data.steps.map((step, i) => (
             <li
               class="pas flex min-w-0 flex-col gap-3"
-              style={`--i:${i}`}
               data-mep-pas={i}
               data-etat={i === 0 ? 'actif' : 'a-venir'}
             >
@@ -642,11 +642,14 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
   .jauge {
     background-color: var(--color-gray-800);
   }
-  /* Driven by the engine's --piste-avance on every scroll frame, so no transition (it would lag). */
+  /* Filled by the timeline (scaleX, every frame), so no transition (it would lag). */
   .jauge > span {
     background-color: var(--color-orange);
     transform-origin: left;
-    transform: scaleX(clamp(0, var(--piste-avance, 0) - var(--i), 1));
+    transform: scaleX(0);
+  }
+  .epingle .pas {
+    cursor: pointer;
   }
   /* Ink on the orange fill: white on orange is under 3:1. */
   .pas[data-etat='actif'] .num {
@@ -666,18 +669,13 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
     color: var(--color-gray-400);
   }
 
-  /* In-window animations (pinned only; JS adds .cache / .eteint, then removes them one by one) */
+  /*
+   * In-window animations (pinned only): the timeline tweens opacity, widths and `--y`, the entrance
+   * offset, kept on `translate` so it never fights the cards' hover transform. No CSS transitions on
+   * those properties: the timeline renders every frame, scrubbing included.
+   */
   .epingle .anim {
-    transition:
-      opacity 0.45s var(--ease-hatch),
-      transform 0.55s var(--ease-hatch);
-  }
-  .epingle .cache {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  .epingle .barre {
-    transition: width 1.3s var(--ease-hatch);
+    translate: 0 calc(var(--y, 0) * 1px);
   }
   .eteint .point {
     background-color: var(--color-stone);
@@ -685,19 +683,10 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
   .eteint .libelle {
     color: var(--color-gray-500);
   }
-  .pop {
-    animation: pop 0.45s var(--ease-hatch);
-  }
-  @keyframes pop {
-    40% {
-      transform: scale(1.35);
-    }
-  }
 
   /* Product cards react like a real interface: they lift, their rim turns orange, the icon grows. */
   .mep .carte-ui {
     transition:
-      opacity 0.45s var(--ease-hatch),
       transform 0.35s var(--ease-hatch),
       box-shadow 0.35s var(--ease-hatch),
       outline-color 0.35s;
