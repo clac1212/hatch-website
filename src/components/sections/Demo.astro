@@ -516,7 +516,7 @@ for (const l of lieux) {
   .d2-ecran:is(.tablette, .tableau) {
     width: min(700px, 47vw, 108svh);
   }
-  .d2-ecran.telephone {
+  .d2-ecran:is(.telephone, .formation) {
     width: min(330px, 24vw, 37svh);
   }
 
@@ -534,7 +534,7 @@ for (const l of lieux) {
     .d2-ecran:is(.tablette, .tableau) {
       width: 100%;
     }
-    .d2-ecran.telephone {
+    .d2-ecran:is(.telephone, .formation) {
       width: min(230px, 52vw, 50svh);
     }
     .d2-legende {

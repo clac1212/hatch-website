@@ -4,8 +4,9 @@ const texte = z.string().min(1);
 
 /**
  * Each agent demo plays on a device mock-up (DemoEcran.astro): Owl's voice app on an iPad
- * (`tablette`), a WhatsApp chat on an iPhone (`telephone`), or a head-office dashboard on an iPad
- * (`tableau`). Beats are derived from the copy in src/components/sections/demo-ecran.ts.
+ * (`tablette`), a WhatsApp chat on an iPhone (`telephone`), Hatch's training web app on an iPhone
+ * (`formation`), or a head-office dashboard on an iPad (`tableau`). Beats are derived from the copy
+ * in src/components/sections/demo-ecran.ts.
  */
 /** Clock in the device's status bar, e.g. "15:02". */
 const heure = z.string().regex(/^\d{1,2}:\d{2}$/);
@@ -56,6 +57,9 @@ const ecranTablette = z.strictObject({
   /** Caption of the audio pill: the answer is also spoken out loud. */
   pied: texte,
 });
+/** Notification next to the phone, what head office sees at the end. */
+const suivi = z.strictObject({ app: texte, quand: texte, titre: texte, texte: texte });
+
 const ecranTelephone = z.strictObject({
   appareil: z.literal('telephone'),
   heure,
@@ -66,33 +70,65 @@ const ecranTelephone = z.strictObject({
   jour: texte,
   saisie: texte,
   /**
-   * Conversation, in order: messages, a document the agent sends, a multiple-choice question.
-   * `equipe` is the phone's owner (right), `agent` the agent (left).
+   * Conversation, in order: messages and a document the agent sends. `equipe` is the phone's owner
+   * (right), `agent` the agent (left).
    */
   fil: z
     .array(
       z.union([
         z.strictObject({ de: z.enum(['agent', 'equipe']), texte: texte }),
         z.strictObject({ document: z.strictObject({ titre: texte, meta: texte }) }),
-        z.strictObject({
-          quiz: z
-            .strictObject({
-              question: texte,
-              /** Hint under the question, as in a WhatsApp poll. */
-              aide: texte,
-              options: z.array(texte).min(2).max(4),
-              /** Index of the right option. */
-              bonne: z.number().int().min(0),
-            })
-            .refine((q) => q.bonne < q.options.length, {
-              message: '`bonne` is past the last option',
-            }),
-        }),
       ]),
     )
     .min(2),
-  /** Notification next to the phone, what head office sees at the end. */
-  suivi: z.strictObject({ app: texte, quand: texte, titre: texte, texte: texte }),
+  suivi,
+});
+
+/**
+ * Hatch's training web app on an iPhone (Pecker, César 02/10: "the person reads something, answers
+ * a few questions and passes the training, that's all"): a short reading page, the quiz questions
+ * one page each, then the "passed" screen.
+ */
+const ecranFormation = z.strictObject({
+  appareil: z.literal('formation'),
+  heure,
+  /** Eyebrow of the reader's header: "Chapitre 1 · Ouverture du restaurant". */
+  chapitre: texte,
+  /** Page counter, with `{n}` (current page) and `{total}`. */
+  compteur: texte.refine((c) => c.includes('{n}') && c.includes('{total}'), {
+    message: '`compteur` needs {n} and {total}',
+  }),
+  /** The reading page: a title, a few short lines, and the key point to remember. */
+  lecture: z.strictObject({
+    titre: texte,
+    lignes: z.array(texte).min(1).max(3),
+    retenir: z.strictObject({ libelle: texte, texte }),
+  }),
+  questions: z
+    .array(
+      z
+        .strictObject({
+          question: texte,
+          options: z.array(texte).min(2).max(4),
+          /** Index of the right option. */
+          bonne: z.number().int().min(0),
+          /** One line under "Bonne réponse" once it is picked. */
+          retour: texte,
+        })
+        .refine((q) => q.bonne < q.options.length, {
+          message: '`bonne` is past the last option',
+        }),
+    )
+    .min(1)
+    .max(3),
+  /** Label of the feedback box. */
+  bonneReponse: texte,
+  /** The bottom bar's button: next page, then on the last question, pass the training. */
+  continuer: texte,
+  valider: texte,
+  /** The closing screen. */
+  fin: z.strictObject({ titre: texte, texte }),
+  suivi,
 });
 
 /** A number that counts up on screen, with what it counts. */
@@ -183,7 +219,12 @@ const demoAgent = z.strictObject({
   role: texte,
   /** What its demo shows, one sentence. */
   titre: texte,
-  ecran: z.discriminatedUnion('appareil', [ecranTablette, ecranTelephone, ecranTableau]),
+  ecran: z.discriminatedUnion('appareil', [
+    ecranTablette,
+    ecranTelephone,
+    ecranFormation,
+    ecranTableau,
+  ]),
 });
 
 const lieu = z.strictObject({
@@ -198,4 +239,5 @@ export const schema = z.strictObject({
 
 export type EcranTablette = z.infer<typeof ecranTablette>;
 export type EcranTelephone = z.infer<typeof ecranTelephone>;
+export type EcranFormation = z.infer<typeof ecranFormation>;
 export type EcranTableau = z.infer<typeof ecranTableau>;

@@ -151,28 +151,40 @@ lieux:
         role: trains the team during the break
         titre: Five minutes of training during the break, and head office knows who passed.
         ecran:
-          appareil: telephone
+          appareil: formation
           heure: '15:02'
-          contact: Pecker
-          statut: Training
-          ecrit: typing…
-          jour: Today
-          saisie: Message
-          fil:
-            - de: agent
-              texte: Hi Inès! Today's module, “Opening the restaurant”, 5 min. Shall we?
-            - de: equipe
-              texte: Let's go
-            - quiz:
-                question: At opening, the cold room reads 6 °C. What do you do?
-                aide: Select one answer.
-                options:
-                  - Open, it'll cool down
-                  - Tell the manager
-                  - Turn the thermostat down
-                bonne: 1
-            - de: agent
-              texte: Right, above 4 °C we alert and log it. Module passed! Next one tomorrow during the break.
+          chapitre: Chapter 1 · Opening the restaurant
+          compteur: '{n} / {total}'
+          lecture:
+            titre: Before you open the doors
+            lignes:
+              - Walk round the fridges and the cold room.
+              - Write down each temperature on today's log.
+              - Check that every tub carries its use-by label.
+            retenir:
+              libelle: Key point
+              texte: Above 4 °C, tell the manager and write the temperature down.
+          questions:
+            - question: At opening, the cold room reads 6 °C. What do you do?
+              options:
+                - Open, it'll cool down
+                - Tell the manager
+                - Turn the thermostat down
+              bonne: 1
+              retour: Well spotted. Above 4 °C, we alert and log it.
+            - question: A tub of burger sauce has no label. What do you do?
+              options:
+                - Keep it, it looks fine
+                - Label it with today's date
+                - Throw it away
+              bonne: 2
+              retour: Well spotted. No label means no use-by date, so the tub goes in the bin.
+          bonneReponse: Correct answer
+          continuer: Continue
+          valider: Complete the training
+          fin:
+            titre: Training complete
+            texte: Well done Inès, you finished “Opening the restaurant”.
           suivi:
             app: Hatch OS
             quand: now

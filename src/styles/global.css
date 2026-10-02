@@ -44,6 +44,10 @@
   --color-mail: #1466f2; /* Mail app icon / channel */
   --color-mail-light: #22c4ff;
   --color-success-txt: #0e7a3e; /* success as text on cream (AA) */
+  --color-success-tint: #ecfdf5; /* right answer picked (training app) */
+  --color-amber-tint: #fffbeb; /* "key point" box of the training app */
+  --color-amber-line: #fcd34d;
+  --color-amber-txt: #b45309; /* its label and icon, 4.8:1 on the tint */
   --color-navy: #1b3a60; /* cool shadows over the sea (hero map) */
   --color-scene: #ded4dc; /* backdrop of the voxel diorama renders */
   --color-gray-50: #fafafa;

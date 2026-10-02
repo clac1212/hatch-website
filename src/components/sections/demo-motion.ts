@@ -506,7 +506,7 @@ function tableau(ecr: HTMLElement, o: number) {
   return tl.add(b, o);
 }
 
-/** A WhatsApp chat (Peep, Pecker, Sparrow): typing, replies typed then sent, the poll voted, head office notified. */
+/** A WhatsApp chat (Peep, Sparrow): typing, replies typed then sent, head office notified. */
 function telephone(ecr: HTMLElement, o: number) {
   const tl = gsap.timeline();
   const b = gsap.timeline();
@@ -524,10 +524,6 @@ function telephone(ecr: HTMLElement, o: number) {
     .set(bulles, { autoAlpha: 0, scale: 0.92, y: 6 }, 0)
     .set(st, { opacity: 1 }, 0)
     .set(ecrit, { opacity: 0 }, 0)
-    .set($$(ecr, '.bonne .p-coche'), { autoAlpha: 0, scale: 0.4 }, 0)
-    .set($$(ecr, '.bonne .p-jauge span'), { scaleX: 0 }, 0)
-    .set($$(ecr, '.bonne .p-nb'), { opacity: 0 }, 0)
-    .set($$(ecr, '.p-doigt'), { autoAlpha: 0, scale: 1.5, xPercent: 120, yPercent: 140 }, 0)
     .set($$(ecr, '.p-brouillon'), { opacity: 0, clipPath: 'inset(0 100% 0 0)' }, 0)
     .set(indice, { opacity: 1 }, 0)
     .set(photo, { '--ouvert': 1 }, 0)
@@ -587,7 +583,7 @@ function telephone(ecr: HTMLElement, o: number) {
       .to(photo, { '--ouvert': 1, duration: 0.3, ease: EASE.doux }, envoi + 0.1);
   });
 
-  // Each message or poll: its line grows (pushing the thread up), the bubble pops from its tail.
+  // Each message: its line grows (pushing the thread up), the bubble pops from its tail.
   lignes.forEach((l, i) => {
     const t = temps(l);
     b.to(l, { height: 'auto', duration: 0.5, ease: EASE.entree }, t).to(
@@ -595,26 +591,160 @@ function telephone(ecr: HTMLElement, o: number) {
       { autoAlpha: 1, scale: 1, y: 0, duration: 0.45, ease: 'back.out(1.2)' },
       t + 0.05,
     );
-    if (!l.dataset.c) return;
-    // The poll: a fingertip comes in, taps the right option, its radio fills, its bar runs to 100 %.
-    const c = temps(l, 'c');
-    const bonne = $(l, 'li.bonne');
-    const doigt = $(bonne, '.p-doigt');
-    b.to(
-      doigt,
-      { autoAlpha: 1, scale: 1, xPercent: 0, yPercent: 0, duration: 0.6, ease: 'power3.out' },
-      c - 0.7,
-    )
+  });
+
+  // Head office's notification slides out from behind the phone.
+  b.to(suivi, { autoAlpha: 1, x: 0, scale: 1, duration: 0.9, ease: EASE.entree }, temps(suivi));
+  return tl.add(b, o);
+}
+
+/**
+ * Hatch's training app (Pecker, EcranFormation.astro): the reading page fills in, a fingertip taps
+ * "Continue"; each question slides in, the right option is tapped and turns green, its feedback
+ * opens; the last tap passes the training, the closing screen pops, head office is notified.
+ */
+function formation(ecr: HTMLElement, o: number) {
+  const tl = gsap.timeline();
+  const b = gsap.timeline();
+  const pages = $$(ecr, '.f-page');
+  const roue = $(ecr, '.f-roue');
+  const barre = $(ecr, '.f-progres span');
+  const cta = $(ecr, '.f-cta');
+  const [continuer, valider] = [$(ecr, '.f-continuer'), $(ecr, '.f-valider')];
+  const retenir = $(ecr, '.f-retenir');
+  const fin = $(ecr, '.f-fin');
+  const rond = $(fin, '.f-rond');
+  const finTextes = [$(fin, '.f-fin-titre'), $(fin, '.f-fin-texte')];
+  const suivi = $(ecr, '.p-suivi');
+  const taps = ecr.dataset.taps!.split(' ').map(Number);
+  /** Width of the progress bar on page n (1-based). */
+  const part = (n: number) => `${(100 * n) / pages.length}%`;
+
+  // Back to the start state (the markup is the final state): the reader open on its first page.
+  tl.set(pages, { autoAlpha: 0, x: 0 }, 0)
+    .set(pages[0], { autoAlpha: 1 }, 0)
+    .set($$(ecr, '.f-morceau'), { autoAlpha: 0, y: 8 }, 0)
+    .set(retenir, { autoAlpha: 0, y: 10, scale: 0.97 }, 0)
+    .set($$(ecr, '.f-opt.bonne'), { '--v': 0, scale: 1 }, 0)
+    .set($$(ecr, '.f-coche'), { autoAlpha: 0, scale: 0.4 }, 0)
+    .set($$(ecr, '.f-retour'), { height: 0, opacity: 0 }, 0)
+    .set($$(ecr, '.f-doigt'), { autoAlpha: 0 }, 0)
+    .set(roue, { yPercent: 0, y: 0 }, 0)
+    .set(barre, { width: part(1) }, 0)
+    .set(continuer, { autoAlpha: 1 }, 0)
+    .set(valider, { autoAlpha: 0 }, 0)
+    .set(cta, { scale: 1 }, 0)
+    .set(fin, { autoAlpha: 0 }, 0)
+    .set(rond, { autoAlpha: 0, scale: 0.5 }, 0)
+    .set($(rond, 'svg'), { scale: 0.4 }, 0)
+    .set(finTextes, { autoAlpha: 0, y: 10 }, 0)
+    .set(suivi, { autoAlpha: 0, x: 48, y: 0, scale: 0.96 }, 0);
+
+  /** A fingertip comes in from below right, presses at `at`, lifts off. */
+  const taper = (doigt: HTMLElement, at: number) =>
+    b
+      .fromTo(
+        doigt,
+        { autoAlpha: 0, scale: 1.5, xPercent: 120, yPercent: 140 },
+        {
+          autoAlpha: 1,
+          scale: 1,
+          xPercent: 0,
+          yPercent: 0,
+          duration: 0.5,
+          ease: 'power3.out',
+          immediateRender: false,
+        },
+        at - 0.6,
+      )
       .to(
         doigt,
         { scale: 0.8, duration: 0.12, ease: 'power1.inOut', yoyo: true, repeat: 1 },
-        c - 0.1,
+        at - 0.1,
       )
-      .to($(bonne, '.p-coche'), { autoAlpha: 1, scale: 1, duration: 0.4, ease: 'back.out(2)' }, c)
-      .to($(bonne, '.p-jauge span'), { scaleX: 1, duration: 0.7, ease: EASE.entree }, c + 0.1)
-      .to($(bonne, '.p-nb'), { opacity: 1, duration: 0.3 }, c + 0.3)
-      .to(doigt, { autoAlpha: 0, scale: 1.2, duration: 0.3, ease: EASE.sortie }, c + 0.35);
+      .to(doigt, { autoAlpha: 0, scale: 1.2, duration: 0.3, ease: EASE.sortie }, at + 0.3);
+
+  // Each page: its pieces land one after the other (title and lines, or question and options).
+  pages.forEach((page, i) => {
+    b.to(
+      $$(page, '.f-morceau'),
+      { autoAlpha: 1, y: 0, duration: 0.45, ease: EASE.entree, stagger: i === 0 ? 0.15 : 0.07 },
+      temps(page),
+    );
   });
+  // The key point box, a beat after the lines.
+  b.to(
+    retenir,
+    { autoAlpha: 1, y: 0, scale: 1, duration: 0.55, ease: EASE.entree },
+    temps(retenir),
+  );
+
+  // Questions: the right option is tapped, turns green, its check pops, the feedback opens.
+  pages.slice(1).forEach((page) => {
+    const c = temps(page, 'c');
+    const bonne = $(page, '.f-opt.bonne');
+    taper($(bonne, '.f-doigt'), c);
+    b.to(
+      bonne,
+      { scale: 0.98, duration: 0.1, ease: 'power1.inOut', yoyo: true, repeat: 1 },
+      c - 0.1,
+    )
+      .to(bonne, { '--v': 1, duration: 0.3, ease: EASE.doux }, c)
+      .to(
+        $(bonne, '.f-coche'),
+        { autoAlpha: 1, scale: 1, duration: 0.4, ease: 'back.out(2)' },
+        c + 0.05,
+      )
+      .to(
+        $(page, '.f-retour'),
+        { height: 'auto', opacity: 1, duration: 0.45, ease: EASE.entree },
+        temps(page, 'r'),
+      );
+  });
+
+  // "Continue" on each page: the button is tapped, the page slides out, the next one in; the
+  // counter rolls and the bar grows. On the last question the button reads "Pass the training".
+  taps.forEach((at, i) => {
+    taper($(cta, '.f-doigt'), at);
+    b.to(
+      cta,
+      { scale: 0.96, duration: 0.12, ease: 'power1.inOut', yoyo: true, repeat: 1 },
+      at - 0.05,
+    );
+    const suivante = pages[i + 1];
+    if (!suivante) return;
+    // One page, then the other: two pages overlapping in the same cell read as a blur.
+    b.to(pages[i], { autoAlpha: 0, x: -24, duration: 0.2, ease: EASE.sortie }, at + 0.05)
+      .fromTo(
+        suivante,
+        { autoAlpha: 0, x: 24 },
+        { autoAlpha: 1, x: 0, duration: 0.5, ease: EASE.entree, immediateRender: false },
+        temps(suivante),
+      )
+      .to(
+        roue,
+        { yPercent: (-100 * (i + 1)) / pages.length, duration: 0.5, ease: EASE.camera },
+        at + 0.1,
+      )
+      .to(barre, { width: part(i + 2), duration: 0.5, ease: EASE.doux }, at + 0.1);
+    if (i + 2 === pages.length)
+      b.to(continuer, { autoAlpha: 0, duration: 0.2 }, at + 0.15).to(
+        valider,
+        { autoAlpha: 1, duration: 0.3 },
+        at + 0.3,
+      );
+  });
+
+  // Passed: the closing screen covers the reader, its check pops, then the words.
+  const tFin = temps(fin);
+  b.to(fin, { autoAlpha: 1, duration: 0.35, ease: EASE.doux }, tFin)
+    .to(rond, { autoAlpha: 1, scale: 1, duration: 0.5, ease: 'back.out(1.8)' }, tFin + 0.15)
+    .to($(rond, 'svg'), { scale: 1, duration: 0.4, ease: 'back.out(2.5)' }, tFin + 0.35)
+    .to(
+      finTextes,
+      { autoAlpha: 1, y: 0, duration: 0.5, ease: EASE.entree, stagger: 0.1 },
+      tFin + 0.35,
+    );
 
   // Head office's notification slides out from behind the phone.
   b.to(suivi, { autoAlpha: 1, x: 0, scale: 1, duration: 0.9, ease: EASE.entree }, temps(suivi));
@@ -783,7 +913,9 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
           ? tablette(ecr, c)
           : ecr.classList.contains('tableau')
             ? tableau(ecr, c)
-            : telephone(ecr, c),
+            : ecr.classList.contains('formation')
+              ? formation(ecr, c)
+              : telephone(ecr, c),
         0,
       ).to(calque, { '--z': cam['--z'] * DERIVE, duration: duree, ease: 'sine.inOut' }, c);
       // 4. Exit, shorter than the entrance. A card beside the device (head office's notification)

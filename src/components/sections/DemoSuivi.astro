@@ -1,0 +1,91 @@
+---
+/**
+ * Head office's notification beside a phone demo (WhatsApp chat, training app): what head office
+ * sees once the agent is done. It sits beside the phone's top (clear of the agent); on phones, over
+ * its bottom edge. The phone screen's root must be positioned. demo-motion.ts slides it in on its
+ * beat (`data-t`) and takes it out before the device (`.p-suivi`).
+ */
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import type { EcranTelephone } from '../../content/schemas/demo';
+
+interface Props {
+  suivi: EcranTelephone['suivi'];
+  avatar: ImageMetadata;
+  /** Beat, in seconds from the start of the demo's content. */
+  t: number;
+}
+const { suivi, avatar, t } = Astro.props;
+---
+
+<div class="p-suivi" data-t={t.toFixed(2)}>
+  <Image src={avatar} alt="" width={40} height={40} densities={[1, 2]} class="p-icone" />
+  <span class="p-notif">
+    <span class="p-tete">
+      <b>{suivi.app}</b>
+      <span>{suivi.quand}</span>
+    </span>
+    <b>{suivi.titre}</b>
+    {suivi.texte}
+  </span>
+</div>
+
+<style>
+  .p-suivi {
+    position: absolute;
+    right: calc(100% + 14px);
+    top: 9%;
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    width: 300px;
+    padding: 12px 14px 13px 12px;
+    border-radius: 22px;
+    background: color-mix(in srgb, var(--color-surface) 82%, transparent);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--color-white) 60%, transparent),
+      var(--shadow-3);
+    font: 400 13px/1.35 var(--font-sans);
+    color: var(--color-ink);
+  }
+  .p-suivi :global(.p-icone) {
+    flex: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 9px;
+    background: var(--color-cream);
+    box-shadow: 0 0 0 1px var(--color-line);
+  }
+  .p-notif {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+  }
+  .p-notif > b {
+    font-weight: 600;
+  }
+  .p-tete {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2px;
+    font: 400 10px/1.4 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-soft);
+  }
+  .p-tete b {
+    font-weight: 400;
+    color: var(--color-orange-txt);
+  }
+  @media (max-width: 47.99rem) {
+    .p-suivi {
+      top: auto;
+      right: auto;
+      left: -14%;
+      bottom: 3%;
+      width: 250px;
+    }
+  }
+</style>

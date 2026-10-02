@@ -1,7 +1,8 @@
 ---
 /**
  * Device mock-up of an agent demo (César 01/10): an iPad running Owl's kitchen app, an iPhone 17 Pro
- * in a WhatsApp chat (Peep, Pecker, Sparrow), or a head-office dashboard (EcranTableau.astro).
+ * in a WhatsApp chat (Peep, Sparrow) or in Hatch's training app (Pecker, EcranFormation.astro), or a
+ * head-office dashboard (EcranTableau.astro).
  * Frames come from ui/Ipad and ui/Iphone (traced SVG); the screens are real HTML. Owl answers with
  * generated UI: a small app that shows each step (a keypad typed on, notes counted, a receipt
  * printed) while it speaks the answer.
@@ -11,14 +12,21 @@
  */
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
-import type { EcranTableau, EcranTablette, EcranTelephone } from '../../content/schemas/demo';
+import type {
+  EcranFormation,
+  EcranTableau,
+  EcranTablette,
+  EcranTelephone,
+} from '../../content/schemas/demo';
 import { chronoTablette, chronoTelephone } from './demo-ecran';
 import Ipad from '../ui/Ipad.astro';
 import Iphone from '../ui/Iphone.astro';
 import EcranTableau from './EcranTableau.astro';
+import EcranFormation from './EcranFormation.astro';
+import DemoSuivi from './DemoSuivi.astro';
 
 interface Props {
-  ecran: EcranTablette | EcranTelephone | EcranTableau;
+  ecran: EcranTablette | EcranTelephone | EcranFormation | EcranTableau;
   avatar: ImageMetadata;
 }
 const { ecran, avatar } = Astro.props;
@@ -59,12 +67,12 @@ const I = {
   photo:
     'M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4zM9 2 7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z',
   envoi: 'M2.01 21 23 12 2.01 3 2 10l15 2-15 2z',
-  liste: 'M3 5h2v2H3zm4 0h14v2H7zM3 11h2v2H3zm4 0h14v2H7zm-4 6h2v2H3zm4 0h14v2H7z',
   doc: 'M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z',
 };
 ---
 
 {ecran.appareil === 'tableau' && <EcranTableau ecran={ecran} avatar={avatar} />}
+{ecran.appareil === 'formation' && <EcranFormation ecran={ecran} avatar={avatar} />}
 
 {
   ecran.appareil === 'tablette' && tab && (
@@ -342,42 +350,6 @@ const I = {
                     <span class="p-meta">{ecran.heure}</span>
                   </div>
                 </div>
-              ) : 'quiz' in b.item ? (
-                <div class="p-ligne agent" data-t={s(b.t)} data-c={s(b.choix ?? b.t)}>
-                  <div class="p-msg p-sondage">
-                    <p class="p-question">{b.item.quiz.question}</p>
-                    <p class="p-aide">
-                      <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d={I.liste} />
-                      </svg>
-                      {b.item.quiz.aide}
-                    </p>
-                    <ul>
-                      {b.item.quiz.options.map((o, j) => (
-                        <li class:list={{ bonne: 'quiz' in b.item && j === b.item.quiz.bonne }}>
-                          <span class="p-radio" aria-hidden="true">
-                            <span class="p-coche">
-                              <svg viewBox="0 0 24 24">
-                                <path d={I.ok} />
-                              </svg>
-                            </span>
-                          </span>
-                          <span class="p-opt">{o}</span>
-                          <span class="p-nb" aria-hidden="true">
-                            {'quiz' in b.item && j === b.item.quiz.bonne ? 1 : 0}
-                          </span>
-                          <span class="p-jauge" aria-hidden="true">
-                            <span />
-                          </span>
-                          {'quiz' in b.item && j === b.item.quiz.bonne && (
-                            <span class="p-doigt" aria-hidden="true" />
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                    <span class="p-meta">{ecran.heure}</span>
-                  </div>
-                </div>
               ) : (
                 <>
                   {b.frappe !== undefined && (
@@ -441,17 +413,7 @@ const I = {
           <span class="p-accueil" aria-hidden="true" />
         </div>
       </Iphone>
-      <div class="p-suivi" data-t={s(tel.suivi)}>
-        <Image src={avatar} alt="" width={40} height={40} densities={[1, 2]} class="p-icone" />
-        <span class="p-notif">
-          <span class="p-tete">
-            <b>{ecran.suivi.app}</b>
-            <span>{ecran.suivi.quand}</span>
-          </span>
-          <b>{ecran.suivi.titre}</b>
-          {ecran.suivi.texte}
-        </span>
-      </div>
+      <DemoSuivi suivi={ecran.suivi} avatar={avatar} t={tel.suivi} />
     </div>
   )
 }
@@ -1071,7 +1033,7 @@ const I = {
     fill: var(--color-orange-txt);
   }
 
-  /* ================= Pecker's iPhone (WhatsApp) ================= */
+  /* ================= WhatsApp on the iPhone (Peep, Sparrow) ================= */
   .telephone {
     position: relative;
     width: 100%;
@@ -1278,98 +1240,6 @@ const I = {
     font-size: calc(13 * var(--pt));
     color: var(--color-muted);
   }
-  /* The quiz as a WhatsApp poll. Final state: the right option voted. */
-  .p-sondage {
-    width: 80%;
-  }
-  .p-question {
-    font-weight: 600;
-  }
-  .p-aide {
-    display: flex;
-    align-items: center;
-    gap: calc(4 * var(--pt));
-    margin-top: calc(3 * var(--pt));
-    font-size: calc(13 * var(--pt));
-    color: var(--color-muted);
-  }
-  .p-aide svg {
-    width: calc(14 * var(--pt));
-    fill: currentColor;
-  }
-  .p-sondage ul {
-    display: flex;
-    flex-direction: column;
-    gap: calc(12 * var(--pt));
-    margin: calc(12 * var(--pt)) 0 calc(4 * var(--pt));
-  }
-  .p-sondage li {
-    position: relative;
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    column-gap: calc(10 * var(--pt));
-    row-gap: calc(6 * var(--pt));
-    font-size: calc(15 * var(--pt));
-  }
-  .p-radio {
-    position: relative;
-    display: grid;
-    place-items: center;
-    width: calc(20 * var(--pt));
-    height: calc(20 * var(--pt));
-    border-radius: 999px;
-    box-shadow: inset 0 0 0 calc(1.5 * var(--pt)) var(--color-gray-400);
-  }
-  .p-coche {
-    display: none;
-  }
-  .bonne .p-coche {
-    position: absolute;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    border-radius: inherit;
-    background: var(--color-orange);
-  }
-  .p-coche svg {
-    width: calc(14 * var(--pt));
-    fill: var(--color-ink);
-  }
-  .p-nb {
-    font-size: calc(13 * var(--pt));
-    color: var(--color-muted);
-  }
-  .p-jauge {
-    grid-column: 2 / 4;
-    height: calc(5 * var(--pt));
-    border-radius: 999px;
-    background: var(--color-gray-100);
-  }
-  .p-jauge span {
-    display: block;
-    height: 100%;
-    border-radius: inherit;
-    background: var(--color-orange);
-    transform: scaleX(0);
-    transform-origin: left;
-  }
-  .bonne .p-jauge span {
-    transform: scaleX(1);
-  }
-  /* A fingertip, only seen during the tap. */
-  .p-doigt {
-    position: absolute;
-    left: calc(10 * var(--pt));
-    top: calc(10 * var(--pt));
-    width: calc(44 * var(--pt));
-    height: calc(44 * var(--pt));
-    margin: calc(-22 * var(--pt)) 0 0 calc(-22 * var(--pt));
-    border-radius: 999px;
-    background: color-mix(in srgb, var(--color-ink) 18%, transparent);
-    box-shadow: 0 0 0 calc(3 * var(--pt)) color-mix(in srgb, var(--color-white) 75%, transparent);
-    opacity: 0;
-  }
   /* Input bar: placeholder at rest; a reply is typed here, then sent. */
   .p-saisie {
     display: flex;
@@ -1447,65 +1317,5 @@ const I = {
     margin-left: calc(-67 * var(--pt));
     border-radius: 999px;
     background: var(--color-ink);
-  }
-
-  /* Head office's notification, beside the phone's top (clear of the agent); on phones, over its
-     bottom edge. */
-  .p-suivi {
-    position: absolute;
-    right: calc(100% + 14px);
-    top: 9%;
-    display: flex;
-    align-items: flex-start;
-    gap: 11px;
-    width: 300px;
-    padding: 12px 14px 13px 12px;
-    border-radius: 22px;
-    background: color-mix(in srgb, var(--color-surface) 82%, transparent);
-    backdrop-filter: blur(20px) saturate(1.4);
-    -webkit-backdrop-filter: blur(20px) saturate(1.4);
-    box-shadow:
-      0 0 0 1px color-mix(in srgb, var(--color-white) 60%, transparent),
-      var(--shadow-3);
-    font: 400 13px/1.35 var(--font-sans);
-    color: var(--color-ink);
-  }
-  .p-suivi :global(.p-icone) {
-    flex: none;
-    width: 38px;
-    height: 38px;
-    border-radius: 9px;
-    background: var(--color-cream);
-    box-shadow: 0 0 0 1px var(--color-line);
-  }
-  .p-notif {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-  }
-  .p-notif > b {
-    font-weight: 600;
-  }
-  .p-tete {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 2px;
-    font: 400 10px/1.4 var(--font-mono);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--color-soft);
-  }
-  .p-tete b {
-    font-weight: 400;
-    color: var(--color-orange-txt);
-  }
-  @media (max-width: 47.99rem) {
-    .p-suivi {
-      top: auto;
-      right: auto;
-      left: -14%;
-      bottom: 3%;
-      width: 250px;
-    }
   }
 </style>

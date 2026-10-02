@@ -1,4 +1,9 @@
-import type { EcranTableau, EcranTablette, EcranTelephone } from '../../content/schemas/demo';
+import type {
+  EcranFormation,
+  EcranTableau,
+  EcranTablette,
+  EcranTelephone,
+} from '../../content/schemas/demo';
 
 /**
  * Beats of the animated screens (seconds from the start of a demo's content), derived from the copy
@@ -43,17 +48,14 @@ export function chronoTablette(e: EcranTablette) {
 export function chronoTelephone(e: EcranTelephone) {
   /** Typing indicator shown before each agent message. */
   const frappe = 0.5;
-  /** Delay before the right option gets tapped, then before the next beat. */
-  const reflexion = 1.1;
   let t = 0.3;
   /**
-   * `choix` = when the right option is tapped (quiz); `frappe` = typing indicator (agent message);
-   * `brouillon` = the team member types the reply in the input bar before sending it.
+   * `frappe` = typing indicator (agent message); `brouillon` = the team member types the reply in
+   * the input bar before sending it.
    */
   type Beat = {
     item: EcranTelephone['fil'][number];
     t: number;
-    choix?: number;
     frappe?: number;
     brouillon?: number;
   };
@@ -62,11 +64,6 @@ export function chronoTelephone(e: EcranTelephone) {
       // The agent's attachment lands right after its message.
       const beat = { item, t: t - 0.2 };
       t += 0.9;
-      return beat;
-    }
-    if ('quiz' in item) {
-      const beat = { item, t, choix: t + reflexion };
-      t += reflexion + 0.8;
       return beat;
     }
     if (item.de === 'agent') {
@@ -81,6 +78,34 @@ export function chronoTelephone(e: EcranTelephone) {
     return beat;
   });
   return { fil, frappe, suivi: t, duree: t + 2.4 };
+}
+
+/**
+ * Hatch's training app (EcranFormation): the reading page fills in, a tap on "Continue"; each
+ * question slides in, the right option is tapped, its feedback opens, "Continue" again; the last tap
+ * passes the training. César 02/10: no dead time, just long enough to catch each line.
+ */
+export function chronoFormation(e: EcranFormation) {
+  /** From the finger touching the button (or an option) to the screen answering it. */
+  const reaction = 0.25;
+  /** Reading page: title, then each line, then the key point box. */
+  const lecture = 0.2;
+  const retenir = lecture + 0.15 * (e.lecture.lignes.length + 1) + 0.2;
+  // The visitor catches the title and the key point; the lines are scanned, not read.
+  let t = retenir + 0.9 + (e.lecture.titre.length + e.lecture.retenir.texte.length) / 70;
+  /** `taps[i]` = "Continue" tapped on page i (the last one passes the training). */
+  const taps = [t];
+  const questions = e.questions.map((q) => {
+    const debut = t + reaction;
+    const choix = debut + 0.7 + q.question.length / 60;
+    const retour = choix + reaction;
+    t = retour + 0.6 + q.retour.length / 60;
+    taps.push(t);
+    return { t: debut, choix, retour };
+  });
+  const fin = t + reaction;
+  const suivi = fin + 1.3;
+  return { lecture, retenir, taps, questions, fin, suivi, duree: suivi + 2.4 };
 }
 
 /**

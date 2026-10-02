@@ -151,28 +151,40 @@ lieux:
         role: forme l'équipe pendant la pause
         titre: Cinq minutes de formation pendant la pause, et le siège sait qui a validé.
         ecran:
-          appareil: telephone
+          appareil: formation
           heure: '15:02'
-          contact: Pecker
-          statut: Formation
-          ecrit: écrit…
-          jour: Aujourd'hui
-          saisie: Message
-          fil:
-            - de: agent
-              texte: Salut Inès ! Ton module du jour, « Ouverture du restaurant », 5 min. On y va ?
-            - de: equipe
-              texte: C'est parti
-            - quiz:
-                question: À l'ouverture, la chambre froide affiche 6 °C. Tu fais quoi ?
-                aide: Choisis une réponse.
-                options:
-                  - J'ouvre, ça va redescendre
-                  - Je préviens le manager
-                  - Je baisse le thermostat
-                bonne: 1
-            - de: agent
-              texte: Exact, au-dessus de 4 °C on alerte et on trace. Module validé ! Prochain module demain à la pause.
+          chapitre: Chapitre 1 · Ouverture du restaurant
+          compteur: '{n} / {total}'
+          lecture:
+            titre: Avant d'ouvrir les portes
+            lignes:
+              - Tu fais le tour des frigos et de la chambre froide.
+              - Tu notes chaque température sur le relevé du jour.
+              - Tu vérifies que chaque bac porte son étiquette DLC.
+            retenir:
+              libelle: À retenir
+              texte: Au-dessus de 4 °C, tu préviens le manager et tu notes la température.
+          questions:
+            - question: À l'ouverture, la chambre froide affiche 6 °C. Tu fais quoi ?
+              options:
+                - J'ouvre, ça va redescendre
+                - Je préviens le manager
+                - Je baisse le thermostat
+              bonne: 1
+              retour: Bien vu. Au-dessus de 4 °C, on alerte et on trace.
+            - question: Un bac de sauce burger n'a pas d'étiquette. Tu fais quoi ?
+              options:
+                - Je le garde, il a l'air bon
+                - Je l'étiquette à la date du jour
+                - Je le jette
+              bonne: 2
+              retour: Bien vu. Sans étiquette, pas de DLC, le bac part à la poubelle.
+          bonneReponse: Bonne réponse
+          continuer: Continuer
+          valider: Valider la formation
+          fin:
+            titre: Formation validée
+            texte: Bravo Inès, tu as terminé « Ouverture du restaurant ».
           suivi:
             app: Hatch OS
             quand: maintenant
