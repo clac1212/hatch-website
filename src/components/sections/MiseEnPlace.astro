@@ -87,7 +87,7 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
   id="mise-en-place"
   class="piste mep overflow-x-clip bg-night"
   data-piste="mep"
-  data-longueurs="130,130,130"
+  data-longueurs="70,75,55"
   data-cadence="900"
   aria-labelledby="mep-titre"
 >
@@ -113,21 +113,24 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
         {data.title}
       </h2>
 
-      <!-- Step indicator of the pinned layout (the stacked layout titles each window instead). -->
-      <ol
-        class="mep-etapes hidden items-center justify-center gap-5 leading-[normal]"
-        aria-hidden="true"
-      >
+      <!--
+        Step indicator of the pinned layout (the stacked layout titles each window instead): one segment
+        per step, like the demo's chapters; its bar fills with the scroll inside that step.
+      -->
+      <ol class="mep-etapes hidden leading-[normal]" aria-hidden="true">
         {
           data.steps.map((step, i) => (
             <li
-              class="pas flex items-center gap-5"
+              class="pas flex min-w-0 flex-col gap-3"
+              style={`--i:${i}`}
               data-mep-pas={i}
               data-etat={i === 0 ? 'actif' : 'a-venir'}
             >
-              {i > 0 && <span class="trait h-px w-14" />}
+              <span class="jauge block h-[3px] overflow-hidden rounded-full">
+                <span class="block h-full" />
+              </span>
               <span class="flex items-center gap-2.5">
-                <span class="num grid size-6 place-items-center rounded-full font-mono text-[12px]">
+                <span class="num grid size-6 shrink-0 place-items-center rounded-full font-mono text-[12px]">
                   {i + 1}
                 </span>
                 <span class="lib text-[15px] font-medium whitespace-nowrap">{step}</span>
@@ -610,17 +613,18 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
     white-space: nowrap;
   }
 
-  /* Step indicator */
+  /* Step indicator: three segments under the window, aligned with it. */
   .epingle .mep-etapes {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
     position: absolute;
-    top: 856px;
-    left: 0;
-    width: 100%;
+    top: 862px;
+    left: 120px;
+    width: 760px;
   }
   .num,
-  .lib,
-  .trait {
+  .lib {
     transition:
       background-color 0.8s var(--ease-hatch),
       color 0.8s var(--ease-hatch),
@@ -635,13 +639,20 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
   .lib {
     color: var(--color-gray-500);
   }
-  .trait {
+  .jauge {
     background-color: var(--color-gray-800);
   }
+  /* Driven by the engine's --piste-avance on every scroll frame, so no transition (it would lag). */
+  .jauge > span {
+    background-color: var(--color-orange);
+    transform-origin: left;
+    transform: scaleX(clamp(0, var(--piste-avance, 0) - var(--i), 1));
+  }
+  /* Ink on the orange fill: white on orange is under 3:1. */
   .pas[data-etat='actif'] .num {
     background-color: var(--color-orange);
     outline-color: var(--color-orange);
-    color: var(--color-white);
+    color: var(--color-ink);
   }
   .pas[data-etat='actif'] .lib {
     color: var(--color-white);
@@ -649,13 +660,10 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
   .pas[data-etat='fait'] .num {
     background-color: color-mix(in srgb, var(--color-orange) 12%, var(--color-night));
     outline-color: var(--color-orange);
-    color: var(--color-orange);
+    color: var(--color-peach);
   }
   .pas[data-etat='fait'] .lib {
     color: var(--color-gray-400);
-  }
-  .pas:is([data-etat='actif'], [data-etat='fait']) .trait {
-    background-color: var(--color-orange);
   }
 
   /* In-window animations (pinned only; JS adds .cache / .eteint, then removes them one by one) */

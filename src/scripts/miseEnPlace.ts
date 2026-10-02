@@ -6,7 +6,8 @@
  * other ("Time Machine": on each `etape` event of the shared engine, src/scripts/pistes.ts, the front
  * window flies towards the viewer and the next one comes forward), and each window plays its
  * animation — sources connecting one by one with a counter, then the conversation and the migration
- * bars, then the channels and the Inès → Owl exchange.
+ * bars, then the channels and the Inès → Owl exchange. The step indicator under the window keeps moving
+ * between those beats: each segment's bar fills with the engine's `--piste-avance` (pure CSS).
  *
  * Must run before the engine (it does: this module script sits before Base's in the document), so the
  * engine's first `etape` event is caught.
@@ -108,8 +109,8 @@ function init(section: HTMLElement) {
         ),
       );
     if (k === 1) {
-      bulles.forEach((b, i) => plus(() => b.classList.remove('cache'), 600 + i * 700));
-      const t0 = 600 + bulles.length * 700;
+      bulles.forEach((b, i) => plus(() => b.classList.remove('cache'), 600 + i * 550));
+      const t0 = 600 + bulles.length * 550;
       lignes.forEach((l, i) =>
         plus(
           () => {
@@ -125,13 +126,13 @@ function init(section: HTMLElement) {
             };
             pas();
           },
-          t0 + i * 350,
+          t0 + i * 300,
         ),
       );
     }
     if (k === 2) {
       canaux.forEach((c, i) => plus(() => c.classList.remove('cache'), 600 + i * 220));
-      fil.forEach((f, i) => plus(() => f.classList.remove('cache'), 1500 + i * 1400));
+      fil.forEach((f, i) => plus(() => f.classList.remove('cache'), 1300 + i * 1100));
     }
   }
 
@@ -154,7 +155,10 @@ function init(section: HTMLElement) {
   }
 
   function rejouer() {
-    if (!epingle || !visible) return;
+    if (!epingle) return;
+    // A fast scroll can land the queued step after the section has left the screen: show it complete
+    // (the observer replays it if the visitor comes back).
+    if (!visible) return final();
     remettre();
     jouer(k);
   }

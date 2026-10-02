@@ -13,6 +13,9 @@
  *   `data-cadence` ms (default 500), so a fast scroll chains the steps instead of skipping them.
  *   The wheel is never captured: scrolling stays the browser's.
  * - Each step change dispatches `etape` (CustomEvent<number>) on the `.piste` element.
+ * - On every scroll frame, `--piste-avance` on the `.piste` element holds the scroll position in steps
+ *   (0 → n+1): k + the fraction of step k's length already scrolled. It follows the scroll, not the
+ *   queue, so a progress bar can fill continuously (`clamp(0, var(--piste-avance) - i, 1)` for step i).
  * - Optional fixed-size stage: a `.cadre-piste` child with `data-largeur` / `data-hauteur` (design px)
  *   is scaled to fit the viewport and centred (used by the diorama demo).
  *
@@ -75,12 +78,14 @@ function annoncer(p: Piste, k: number) {
   p.el.dispatchEvent(new CustomEvent<number>('etape', { detail: k }));
 }
 
-function brute(p: Piste): number {
+/** Step under the scroll position (`e`) and the position itself in steps (`avance`, see the header). */
+function mesurer(p: Piste): { e: number; avance: number } {
   const r = p.el.getBoundingClientRect();
   const parcouru = (-r.top / p.col.getBoundingClientRect().height) * 100;
   let e = 0;
   while (e < p.n && parcouru >= p.cumul[e + 1]) e++;
-  return e;
+  const f = (parcouru - p.cumul[e]) / (p.cumul[e + 1] - p.cumul[e]);
+  return { e, avance: e + Math.min(1, Math.max(0, f)) };
 }
 
 function avancer(p: Piste) {
@@ -109,12 +114,16 @@ if (force) {
     cible.el.style.height = '100dvh';
     document.querySelectorAll('[data-rv]').forEach((el) => el.classList.add('vu'));
     cadrer(cible);
+    // Frozen capture: the step's progress bar half full, as if caught mid-scroll.
+    cible.el.style.setProperty('--piste-avance', String(Number(k) + 0.5));
     annoncer(cible, Number(k));
   }
 } else {
   const maj = () => {
     for (const p of pistes) {
-      p.cible = brute(p);
+      const { e, avance } = mesurer(p);
+      p.el.style.setProperty('--piste-avance', avance.toFixed(4));
+      p.cible = e;
       if (p.k < 0) annoncer(p, p.cible);
       else if (p.file === null) avancer(p);
     }
