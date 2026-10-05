@@ -7,9 +7,9 @@
  *
  * The pattern is computed at build time from a fixed seed (same edge on every build) and used as a
  * CSS mask: the colours stay design tokens (`color`, `shadow`), no image is downloaded. One tile is
- * 1440 px wide (no visible repeat on common screens) and repeats on wider ones. Cells are 8 px from
- * md, 6 px below (the whole tile is scaled with `mask-size`, so blocks stay square). Kept fine and
- * light on purpose (César 05/10: the 16 px first pass was too heavy).
+ * 1440 px wide (no visible repeat on common screens) and repeats on wider ones. Cells are 5 px from
+ * md, 4 px below (the whole tile is scaled with `mask-size`, so blocks stay square). Kept fine and
+ * light on purpose (César 05/10: 16 px, then 8 px, were still too heavy).
  */
 interface Props {
   /** The colour of the block below (a CSS value, e.g. `var(--color-white)`). */
@@ -25,11 +25,11 @@ const {
   class: className,
 } = Astro.props;
 
-const CELL = 8;
-const COLS = 180; // 1440 px
+const CELL = 5;
+const COLS = 288; // 1440 px
 const ROWS = 6;
-/** Shadow offset, in px of the tile: a quarter of a cell, like the light of the voxel renders. */
-const OMBRE = 2;
+/** Shadow offset, in px of the tile: a fifth of a cell, like the light of the voxel renders. */
+const OMBRE = 1;
 
 // mulberry32: small seeded PRNG, so the edge is stable from one build to the next.
 let seed = 0x4a7c15;
@@ -83,7 +83,7 @@ const masque = (d: string) =>
 
 <style>
   .lisiere {
-    --k: 0.75; /* 6 px cells below md */
+    --k: 0.8; /* 4 px cells below md */
     position: relative;
     height: calc(var(--h) * var(--k));
   }
