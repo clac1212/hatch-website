@@ -101,14 +101,9 @@ const tick =
   data-rv-groupe
 >
   <script is:inline>
-    // Variants on trial, set before the first paint so nothing shifts: the layout (?hero=2) and,
-    // for layout 1, where the CTAs sit (?cta=bord straddling the card's bottom edge, ?cta=dehors
-    // fully below it).
-    (function (hero, q) {
-      if (q.get('hero') === '2') hero.dataset.hero = '2';
-      var cta = q.get('cta');
-      if (cta === 'bord' || cta === 'dehors') hero.dataset.cta = cta;
-    })(document.currentScript.parentElement, new URLSearchParams(location.search));
+    // Layout on trial (?hero=2), set before the first paint so nothing shifts.
+    if (new URLSearchParams(location.search).get('hero') === '2')
+      document.currentScript.parentElement.dataset.hero = '2';
   </script>
 
   <div class="h-decor" aria-hidden="true">
@@ -679,35 +674,6 @@ const tick =
   /* The title card's glass is the shared `.vitre` pattern (global.css), the same as the nav's. */
   .lead {
     filter: drop-shadow(0 0 5px color-mix(in srgb, var(--color-white) 50%, transparent));
-  }
-
-  /* ---------- CTA placement on trial (layout 1, from lg) ----------
-     The card loses its row of buttons: `bord` sets them astride its bottom edge (half on the glass,
-     half on the map), `dehors` sets them fully below it. The card keeps a short bottom padding. */
-  @media (width >= 64rem) {
-    .hero[data-hero='1'][data-cta] .carte-hero {
-      padding-bottom: clamp(30px, 2.8vw, 40px);
-    }
-    .hero[data-hero='1'][data-cta='bord'] .carte-hero {
-      padding-bottom: clamp(52px, 4.4vw, 62px);
-      /* what sticks out below (half a button), reserved so card + buttons stay centred */
-      margin-bottom: 28px;
-    }
-    .hero[data-hero='1'][data-cta='dehors'] .carte-hero {
-      margin-bottom: 74px; /* a button (56) and its gap (18) */
-    }
-    .hero[data-hero='1'][data-cta] .h-ctas {
-      position: absolute;
-      left: clamp(36px, 3.334vw, 48px);
-      bottom: 0;
-    }
-    .hero[data-hero='1'][data-cta='bord'] .h-ctas {
-      translate: 0 50%;
-    }
-    .hero[data-hero='1'][data-cta='dehors'] .h-ctas {
-      left: 0;
-      translate: 0 calc(100% + 18px);
-    }
   }
 
   /* ---------- Layout 2 (?hero=2) ----------
