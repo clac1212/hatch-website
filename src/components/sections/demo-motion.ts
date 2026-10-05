@@ -767,7 +767,10 @@ export interface Pilote {
   suivre(q: number): void;
   /** A tab was clicked: play demo i (auto, mixte). */
   jouer(i: number): void;
-  /** The place is left: back to its wide shot (`remettre`), or frozen where it is. */
+  /**
+   * The place is left: back to its wide shot (`remettre`), or stopped where it is, after a scroll
+   * push still under way lands (leaving downwards, it is taking the place to its end).
+   */
   arreter(remettre?: boolean): void;
   /** Scroll mode: progress (0–1) where demo i starts, to scroll a tab click there. */
   position(i: number): number;
@@ -1033,6 +1036,9 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
       actif = true;
       q = p;
       if (!tl) return montrer(scroll ? indice(p) : 0);
+      // A landing left by the last exit (arreter) gives way to the new arrival.
+      cible = null;
+      gsap.killTweensOf(tl);
       if (scroll) return void tl.progress(p);
       tl.play(depart(p));
     },
@@ -1061,12 +1067,15 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
     },
     arreter(remettre = true) {
       actif = false;
-      cible = null;
       if (!tl) return scroll ? undefined : montrer(0);
-      gsap.killTweensOf(tl);
+      // Scroll mode: the playhead is the scroll, its catch-up tween takes it to the block's edge.
       if (scroll) return;
-      if (remettre) tl.pause(0);
-      else tl.pause();
+      if (remettre) {
+        cible = null;
+        gsap.killTweensOf(tl);
+        tl.pause(0);
+      } else if (cible === null) tl.pause();
+      // Otherwise the push lands (its onComplete no longer plays, the place being inactive).
     },
     position(i) {
       if (!tl) return (i + 0.5) / ecrans.length;

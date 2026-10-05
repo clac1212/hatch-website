@@ -2,13 +2,16 @@
 /**
  * 04 — Diorama demo (César, 01/10). Three places on scroll (head office, kitchen, build site), one
  * layout and one logic for all three: the scene is the setting, each agent's demo plays on a device
- * mock-up (DemoEcran.astro), one after the other. Where (place, 0n / 03) top left, what (agent, one
- * sentence) bottom left, the device on the right, a chapters bar at the bottom.
+ * mock-up (DemoEcran.astro), one after the other. What (agent, one sentence) bottom left, the device
+ * on the right, a chapters bar at the bottom.
+ * Each place is its own scroll block, its scene sticky inside (César 05/10): between two places the
+ * page simply scrolls, the first block leaving upwards while the next one comes in from below.
  * The motion (camera, focus, screens) is one GSAP timeline per place, demo-motion.ts, loaded when
  * the section comes near the viewport; time plays it and the scroll pushes it (mode `mixte`).
  *
  * Scroll rules (research: NN/g on scroll-jacking, Apple product pages):
- * - the scroll position picks the place DIRECTLY (no queue): a fast scroll lands on a clean state;
+ * - a place plays only while its block is pinned, and the scroll position inside the block drives it
+ *   directly (no queue): a fast scroll lands on a clean state;
  * - the wheel is never captured, and no snap point pulls the page (it would rewind the demo).
  * Without JS, the three places stack, each with its first demo in its final state.
  */
@@ -117,13 +120,17 @@ for (const l of lieux) {
 }
 ---
 
-<section class="d2" style={`--n:${lieux.length}`} aria-labelledby="d2-titre">
+<section class="d2" aria-labelledby="d2-titre">
   <h2 id="d2-titre" class="sr-only">{data.titre}</h2>
-  {lieux.map((_, i) => <div class="d2-ancre" style={`--i:${i}`} aria-hidden="true" />)}
-  <div class="d2-scene-fixe">
-    {
-      lieux.map((l, i) => (
-        <div class:list={['d2-lieu', { on: i === 0 }]} data-vue={camStyle(l.vue, VISEE)}>
+  {
+    lieux.map((l, i) => (
+      <div class="d2-bloc" role="group" aria-labelledby={`d2-lieu-${i}`}>
+        {/* The place's name: its accessible name only, the scene says where we are. */}
+        <h3 id={`d2-lieu-${i}`} class="sr-only">
+          {l.surtitre}
+        </h3>
+        <div class="d2-ancre" aria-hidden="true" />
+        <div class="d2-lieu" data-vue={camStyle(l.vue, VISEE)}>
           <div class="d2-plateau">
             <div class="d2-calque" style={camStyle(l.vue, VISEE)}>
               <Picture
@@ -152,13 +159,6 @@ for (const l of lieux) {
           </div>
 
           <div class="d2-ui">
-            {/* Where: the place, and where it sits in the section. Stays put for the whole place. */}
-            <p class="d2-ou">
-              <span>{l.surtitre}</span>
-              <span class="d2-num" aria-hidden="true">
-                {String(i + 1).padStart(2, '0')} / {String(lieux.length).padStart(2, '0')}
-              </span>
-            </p>
             {/* What: the agent on stage and what its demo shows. Fixed height, cross-fades. */}
             <div class="d2-legende">
               {l.agents.map((d, j) => (
@@ -176,7 +176,7 @@ for (const l of lieux) {
                       <b>{d.nom}</b> {d.role}
                     </span>
                   </p>
-                  <h3 class="d2-titre">{d.titre}</h3>
+                  <h4 class="d2-titre">{d.titre}</h4>
                 </div>
               ))}
             </div>
@@ -219,25 +219,30 @@ for (const l of lieux) {
             </div>
           </div>
         </div>
-      ))
-    }
-  </div>
+      </div>
+    ))
+  }
 </section>
 
 <style>
   .d2 {
     --pas: 90svh;
-    position: relative;
-    height: calc(var(--n) * var(--pas) + 100svh);
     background: var(--color-scene);
+  }
+  /* One scroll block per place: the scene stays pinned for --poids steps of scroll (set by the
+     script from the mode), then the block scrolls away like any section. */
+  .d2-bloc {
+    --poids: 1;
+    position: relative;
+    height: calc(var(--poids) * var(--pas) + 100svh);
   }
   .d2-ancre {
     position: absolute;
     left: 0;
     width: 1px;
     height: 1px;
-    /* Mid-range, not on the boundary between two places (where rounding picks either). */
-    top: calc((var(--i) + 0.5) * var(--pas));
+    /* Mid-way through the pinned stretch, not on its edge (where rounding picks either side). */
+    top: calc(0.5 * var(--poids) * var(--pas));
     scroll-snap-align: start;
   }
   /* Snap points only when time alone plays the demos (?auto=1). With the scroll in play, a snap
@@ -245,28 +250,12 @@ for (const l of lieux) {
   :global(html:has(.d2.js:not(.long))) {
     scroll-snap-type: y proximity;
   }
-  .d2-scene-fixe {
+  /* A place: its scene and its overlays, pinned while its block scrolls. */
+  .d2-lieu {
     position: sticky;
     top: 0;
     height: 100svh;
     overflow: hidden;
-  }
-
-  /* A place: its scene and its overlays. Hidden places leave the tab order (visibility). */
-  .d2-lieu {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-    opacity: 0;
-    visibility: hidden;
-    transition:
-      opacity 0.6s var(--ease-hatch),
-      visibility 0s 0.6s;
-  }
-  .d2-lieu.on {
-    opacity: 1;
-    visibility: visible;
-    transition-delay: 0s;
   }
 
   /* The scene: an image box covering the viewport; the camera moves it so the focus sits centred. */
@@ -306,30 +295,14 @@ for (const l of lieux) {
     height: auto;
   }
 
-  /* Overlay of a place: where, what, the device, the chapters. */
+  /* Overlay of a place: what, the device, the chapters. */
   .d2-ui {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    visibility: hidden;
-    transition: visibility 0s 0.5s;
   }
   .d2-ui > * {
-    opacity: 0;
-    translate: 0 14px;
     pointer-events: auto;
-    transition:
-      opacity 0.45s var(--ease-hatch),
-      translate 0.7s var(--ease-hatch);
-  }
-  .d2-lieu.on > .d2-ui {
-    visibility: visible;
-    transition-delay: 0s;
-  }
-  .d2-lieu.on > .d2-ui > * {
-    opacity: 1;
-    translate: 0 0;
-    transition-delay: 0.35s;
   }
 
   .d2-titre {
@@ -362,27 +335,8 @@ for (const l of lieux) {
     opacity: 0;
     pointer-events: none;
   }
-  /* One layout for every place (César 01/10): where (top left), what (bottom left), the proof
-     (the device, right), and the chapters bar (bottom), always at the same spot. */
-  .d2-ou {
-    position: absolute;
-    left: clamp(16px, 4vw, 64px);
-    top: clamp(88px, 12vh, 112px);
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    padding: 7px 12px;
-    border-radius: 999px;
-    background: rgb(255 255 255 / 0.86);
-    box-shadow: var(--shadow-1);
-    font: 400 12px/1.2 var(--font-mono);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--color-orange-txt);
-  }
-  .d2-num {
-    color: var(--color-soft);
-  }
+  /* One layout for every place (César 01/10): what (bottom left), the proof (the device, right),
+     and the chapters bar (bottom), always at the same spot. */
   .d2-legende {
     position: absolute;
     left: clamp(16px, 4vw, 64px);
@@ -491,7 +445,7 @@ for (const l of lieux) {
     transform-origin: left;
     transform: scaleX(0);
   }
-  /* Centred with the grid, not with translate: the overlay's entrance animates translate. */
+  /* Centred with the grid: GSAP animates the devices' transforms. */
   .d2-appareils {
     position: absolute;
     right: clamp(16px, 5vw, 96px);
@@ -543,30 +497,11 @@ for (const l of lieux) {
     .d2-leg {
       padding: 14px 16px 16px;
     }
-    .d2-ou {
-      top: 76px;
-    }
   }
 
-  /* Without JS: the three places stack, each with its first demo in its final state. */
-  .d2:not(.js) {
+  /* Without JS: the three places stack, one screen each, with their first demo in its final state. */
+  .d2:not(.js) .d2-bloc {
     height: auto;
-  }
-  .d2:not(.js) .d2-scene-fixe {
-    position: relative;
-    height: auto;
-  }
-  .d2:not(.js) .d2-lieu {
-    position: relative;
-    height: 100svh;
-    opacity: 1;
-    visibility: visible;
-  }
-  .d2:not(.js) .d2-ui,
-  .d2:not(.js) .d2-ui > * {
-    visibility: visible;
-    opacity: 1;
-    translate: none;
   }
   .d2:not(.js) .d2-barre {
     display: none;
@@ -585,14 +520,13 @@ for (const l of lieux) {
 <script>
   import type { Mode, Pilote } from './demo-motion';
   /**
-   * The scroll position picks the place directly (no queue, so a fast scroll never leaves a step
-   * pending); inside a place, its timeline (demo-motion.ts) plays the demos.
+   * One block per place: the scroll position inside a block drives its place directly (no queue,
+   * so a fast scroll never leaves a step pending); its timeline (demo-motion.ts) plays the demos.
    */
   const sec = document.querySelector<HTMLElement>('.d2')!;
-  const lieux = [...sec.querySelectorAll<HTMLElement>('.d2-lieu')];
+  const blocs = [...sec.querySelectorAll<HTMLElement>('.d2-bloc')];
+  const lieux = blocs.map((b) => b.querySelector<HTMLElement>('.d2-lieu')!);
   sec.classList.add('js');
-
-  let k = 0;
 
   /**
    * demo-motion.ts `Mode`: `mixte` by default, `?scroll=1` (scroll only) and `?auto=1` (time only)
@@ -602,80 +536,72 @@ for (const l of lieux) {
   const params = new URLSearchParams(location.search);
   const mode: Mode = params.has('scroll') ? 'scroll' : params.has('auto') ? 'auto' : 'mixte';
   const POIDS = { auto: 1, scroll: 5, mixte: 3 }[mode];
-  const poids = lieux.map(() => POIDS);
-  const debuts = poids.map((_, i) => poids.slice(0, i).reduce((a, b) => a + b, 0));
-  const total = poids.reduce((a, b) => a + b, 0);
-  if (POIDS > 1) {
-    sec.classList.add('long');
-    sec.style.setProperty('--n', String(total));
-  }
-  if (mode === 'scroll') sec.classList.add('scrub');
-  /** Where the scroll is: the place, and the position inside it (0–1). */
-  function ici() {
-    const r = sec.getBoundingClientRect();
-    const u = Math.min(Math.max(-r.top / (r.height - innerHeight), 0), 0.9999) * total;
-    const i = debuts.findLastIndex((d) => u >= d);
-    return { i, q: (u - debuts[i]) / poids[i] };
+  if (POIDS > 1) sec.classList.add('long');
+  blocs.forEach((b) => b.style.setProperty('--poids', String(POIDS)));
+
+  /**
+   * Where the scroll is in a block: `cote` 1 = the block is still below (its top under the screen's
+   * top), 0 = pinned, -1 = scrolled past; and the position inside it (0–1).
+   */
+  function ici(bloc: HTMLElement) {
+    const r = bloc.getBoundingClientRect();
+    const epingle = r.top <= 1 && r.bottom >= innerHeight - 1;
+    return {
+      cote: epingle ? 0 : r.top > 1 ? 1 : -1,
+      q: Math.min(Math.max(-r.top / (r.height - innerHeight), 0), 1),
+    };
   }
 
   /** The places' timelines: GSAP and the choreography load when the section comes near. */
-  const pilotes = new Map<HTMLElement, Pilote>();
+  const pilotes: Pilote[] = [];
   new IntersectionObserver(
     async (entrees, io) => {
       if (!entrees.some((e) => e.isIntersecting)) return;
       io.disconnect();
       const { piloter } = await import('./demo-motion');
-      lieux.forEach((l) => pilotes.set(l, piloter(l, mode)));
+      lieux.forEach((l) => pilotes.push(piloter(l, mode)));
       maj();
     },
     { rootMargin: '100% 0px' },
   ).observe(sec);
 
   /**
-   * A place plays only while the section is pinned (César 01/10: the head office's first demo had
-   * played out of sight, while the section was still scrolling in from below). Above it, the first
-   * place waits on its wide shot; past it, the last one freezes where it is.
+   * A place plays only while its block is pinned (César 01/10: the head office's first demo had
+   * played out of sight, while the section was still scrolling in from below). Leaving it, the
+   * playhead first lands on the block's edge: leaving upwards (block back below), its wide shot,
+   * ready for the next arrival; leaving downwards, its end (the wide shot), which scrolls away.
+   * A jump over a block (Home key, anchor) resets it the same way.
    */
-  let enJeu = false;
+  const cotes = blocs.map(() => 1);
   function maj() {
-    const r = sec.getBoundingClientRect();
-    const epingle = r.top <= 1 && r.bottom >= innerHeight - 1;
-    const { i: suivant, q } = ici();
-    if (suivant !== k) {
-      if (enJeu) pilotes.get(lieux[k])?.arreter();
-      enJeu = false;
-      k = suivant;
-      lieux.forEach((l, i) => l.classList.toggle('on', i === k));
-    }
-    const pilote = pilotes.get(lieux[k]);
-    if (!pilote) return;
-    if (!epingle) {
-      if (enJeu) pilote.arreter(r.top > 1);
-      enJeu = false;
-    } else if (!enJeu) {
-      pilote.entrer(q);
-      enJeu = true;
-    } else pilote.suivre(q);
+    if (!pilotes.length) return;
+    blocs.forEach((bloc, i) => {
+      const { cote, q } = ici(bloc);
+      const avant = cotes[i];
+      const pilote = pilotes[i];
+      cotes[i] = cote;
+      if (cote === 0) return avant === 0 ? pilote.suivre(q) : pilote.entrer(q);
+      if (cote === avant) return;
+      if (avant === 0) pilote.suivre(cote > 0 ? 0 : 1);
+      pilote.arreter(cote > 0);
+    });
   }
 
   sec.addEventListener('click', (ev) => {
     const t = ev.target as HTMLElement;
-    const lieu = t.closest<HTMLElement>('.d2-lieu');
-    if (!lieu) return;
     const onglet = t.closest<HTMLElement>('[data-onglet]');
-    const pilote = pilotes.get(lieu);
-    if (onglet && mode === 'scroll' && pilote) {
-      // Scroll mode: a tab scrolls to where its demo starts.
-      const i = lieux.indexOf(lieu);
-      const u = debuts[i] + poids[i] * pilote.position(Number(onglet.dataset.onglet));
-      const r = sec.getBoundingClientRect();
-      const top = scrollY + r.top + (u / total) * (r.height - innerHeight);
-      return scrollTo({
-        top,
-        behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
-      });
-    }
-    if (onglet) pilote?.jouer(Number(onglet.dataset.onglet));
+    const bloc = t.closest<HTMLElement>('.d2-bloc');
+    if (!onglet || !bloc) return;
+    const pilote = pilotes[blocs.indexOf(bloc)];
+    if (!pilote) return;
+    const i = Number(onglet.dataset.onglet);
+    if (mode !== 'scroll') return pilote.jouer(i);
+    // Scroll mode: a tab scrolls to where its demo starts, inside its own block.
+    const r = bloc.getBoundingClientRect();
+    scrollTo({
+      top: scrollY + r.top + pilote.position(i) * (r.height - innerHeight),
+      behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+    });
   });
 
   let raf = 0;
@@ -683,5 +609,4 @@ for (const l of lieux) {
     passive: true,
   });
   addEventListener('resize', maj);
-  maj();
 </script>
