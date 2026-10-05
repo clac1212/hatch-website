@@ -208,7 +208,7 @@ const tick =
     </div>
 
     <div
-      class="carte-hero relative z-2 flex flex-col items-start gap-[18px] rounded-[28px] px-5 pt-6 pb-6 sm:gap-6 sm:px-8 sm:pt-8 sm:pb-9 md:max-w-[600px] lg:w-[clamp(480px,45.56vw,656px)] lg:max-w-none lg:gap-[26px] lg:rounded-[36px] lg:px-[clamp(36px,3.334vw,48px)] lg:pt-[clamp(34px,3.195vw,46px)] lg:pb-[clamp(38px,3.473vw,50px)]"
+      class="carte-hero verre z-2 flex flex-col items-start gap-[18px] rounded-[28px] px-5 pt-6 pb-6 sm:gap-6 sm:px-8 sm:pt-8 sm:pb-9 md:max-w-[600px] lg:w-[clamp(480px,45.56vw,656px)] lg:max-w-none lg:gap-[26px] lg:rounded-[36px] lg:px-[clamp(36px,3.334vw,48px)] lg:pt-[clamp(34px,3.195vw,46px)] lg:pb-[clamp(38px,3.473vw,50px)]"
       data-rv
       style="--rd: 0.2s"
     >
@@ -671,42 +671,7 @@ const tick =
   }
 
   /* Liquid-glass title card; the gradient rim is a masked layer so it follows the radius. */
-  .carte-hero {
-    isolation: isolate;
-    background-image: linear-gradient(
-      -123deg,
-      color-mix(in srgb, var(--color-white) 55%, transparent) 14.6%,
-      color-mix(in srgb, var(--color-white) 20%, transparent) 53.5%,
-      color-mix(in srgb, var(--color-peach-2) 5%, transparent) 85.4%
-    );
-    box-shadow:
-      0 30px 70px color-mix(in srgb, var(--color-navy) 22%, transparent),
-      inset 0 2px 1px color-mix(in srgb, var(--color-white) 70%, transparent),
-      inset 0 -12px 30px color-mix(in srgb, var(--color-white) 20%, transparent);
-    backdrop-filter: blur(13px) saturate(1.15);
-    -webkit-backdrop-filter: blur(13px) saturate(1.15);
-  }
-  .carte-hero::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1.5px;
-    pointer-events: none;
-    background: linear-gradient(
-      -123deg,
-      var(--color-white) 14%,
-      color-mix(in srgb, var(--color-white) 15%, transparent) 50%,
-      color-mix(in srgb, var(--color-white) 60%, transparent) 85%
-    );
-    -webkit-mask:
-      linear-gradient(var(--color-black) 0 0) content-box,
-      linear-gradient(var(--color-black) 0 0);
-    -webkit-mask-composite: xor;
-    mask:
-      linear-gradient(var(--color-black) 0 0) content-box exclude,
-      linear-gradient(var(--color-black) 0 0);
-  }
+  /* The title card's glass is the shared `.verre` pattern (global.css), the same as the nav's. */
   .lead {
     filter: drop-shadow(0 0 5px color-mix(in srgb, var(--color-white) 50%, transparent));
   }
