@@ -1,7 +1,7 @@
 ---
 import Logo from './ui/Logo.astro';
 import Button from './ui/Button.astro';
-import { routes, otherLocale, useTranslations, type Locale, type Paths } from '../i18n/ui';
+import { appUrls, routes, otherLocale, useTranslations, type Locale, type Paths } from '../i18n/ui';
 
 /** v4 nav: liquid-glass pill, centred and fixed at the top; a drop shadow appears once the page scrolls. */
 interface Props {
@@ -38,7 +38,7 @@ const other = otherLocale(locale);
           <li>
             <a
               href={link.href}
-              class="block rounded-full px-3.5 py-2.5 text-[0.875rem] font-semibold transition-colors duration-300 hover:bg-orange/14 hover:text-orange-hover"
+              class="block rounded-full px-3.5 py-2.5 text-[0.875rem] font-semibold whitespace-nowrap transition-colors duration-300 hover:bg-orange/14 hover:text-orange-hover"
             >
               {link.label}
             </a>
@@ -57,8 +57,20 @@ const other = otherLocale(locale);
       </li>
     </ul>
 
-    <Button href={routes.demo[locale]} class="max-sm:px-4 max-sm:text-[0.8125rem]">
-      {t('cta.demo')}
+    <!-- Sign-in for customers, then the two CTAs: the demo (secondary) and try it (primary).
+         Below lg the menu carries sign-in and the demo, the pill keeps the primary only. -->
+    <a
+      href={appUrls.login}
+      class="hidden rounded-full px-3.5 py-2.5 text-[0.875rem] font-semibold whitespace-nowrap transition-colors duration-300 hover:bg-orange/14 hover:text-orange-hover lg:block"
+    >
+      {t('nav.login')}
+    </a>
+    <!-- The demo pill only from xl: between lg and xl the bar would wrap (César 05/10). -->
+    <span class="hidden xl:contents">
+      <Button href={routes.demo[locale]} variant="secondary">{t('cta.demo')}</Button>
+    </span>
+    <Button href={appUrls.signup} class="max-sm:px-4 max-sm:text-[0.8125rem]">
+      {t('nav.try')}
     </Button>
 
     <details class="group relative lg:hidden">
@@ -103,6 +115,22 @@ const other = otherLocale(locale);
               class="block rounded-btn px-3 py-2.5 font-semibold hover:bg-orange-tint"
             >
               {t('lang.switch')}
+            </a>
+          </li>
+          <li class="mt-1 border-t border-line pt-1">
+            <a
+              href={routes.demo[locale]}
+              class="block rounded-btn px-3 py-2.5 font-semibold hover:bg-orange-tint"
+            >
+              {t('cta.demo')}
+            </a>
+          </li>
+          <li>
+            <a
+              href={appUrls.login}
+              class="block rounded-btn px-3 py-2.5 font-semibold hover:bg-orange-tint"
+            >
+              {t('nav.login')}
             </a>
           </li>
         </ul>

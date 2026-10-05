@@ -2,7 +2,7 @@
 import { Image, Picture } from 'astro:assets';
 import Button from '../ui/Button.astro';
 import { section } from '../../content/section';
-import { routes, useTranslations, type Locale } from '../../i18n/ui';
+import { appUrls, routes, useTranslations, type Locale } from '../../i18n/ui';
 import carte from '../../assets/hero/carte-v5-1.jpg';
 import grain from '../../assets/hero/grain.png';
 import boutiques from './hero-boutiques.json';
@@ -38,8 +38,6 @@ interface Props {
 const { locale } = Astro.props;
 const data = await section('hero', locale);
 const t = useTranslations(locale);
-/** Self-serve signup of the app (no locale prefix there, same URL in FR and EN). */
-const SIGNUP = 'https://app.gethatch.io/auth?tab=signup';
 const { status, events } = data.tasks;
 
 const W = 1440;
@@ -208,7 +206,7 @@ const tick =
       </p>
       <!-- Two calls to action (César 02/10): try it (the app's self-serve signup) first, the demo next. -->
       <div class="flex flex-wrap gap-3">
-        <Button href={SIGNUP} variant="orange" size="lg">{t('cta.try')}</Button>
+        <Button href={appUrls.signup} variant="orange" size="lg">{t('cta.try')}</Button>
         <Button href={routes.demo[locale]} variant="secondary" size="lg">{t('cta.demoAsk')}</Button>
       </div>
     </div>

@@ -66,7 +66,7 @@ pnpm format:check
   - agents presented by job first, speaking in the first person;
   - every number carries a source;
   - no em dash inside a sentence, no « opérationnel en quelques minutes ».
-- Two calls to action (César 05/10): primary « Essayez maintenant » / « Try it now » (`Button variant="orange"`) → the app's self-serve signup `https://app.gethatch.io/auth?tab=signup` (same URL in both locales); secondary « Demandez une démo » / « Book a demo » (`variant="secondary"`) → `/demo` (Cal.com). Only the home hero carries both so far; the other CTAs (nav, pricing, footer, inner pages) still point to the demo alone.
+- Two calls to action (César 05/10): primary « Essayez maintenant » / « Try it now » (`Button variant="orange"`) → the app's self-serve signup `https://app.gethatch.io/auth?tab=signup` (same URL in both locales); secondary « Demandez une démo » / « Book a demo » (`variant="secondary"`) → `/demo` (Cal.com). The home hero and the nav carry both (the nav also has « Se connecter » → `appUrls.login`, and shows its demo pill from xl only); pricing, footer and inner pages still point to the demo alone. App URLs live in `appUrls` (src/i18n/ui.ts).
 
 ## Styling (DS Hatch OS v4)
 

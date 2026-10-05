@@ -6,6 +6,12 @@ export type Locale = (typeof locales)[number];
  * as `paths`, which derives the language switch and the hreflang alternates from it
  * (dynamic pages, e.g. a Sans Filtre edition, build their own `paths` object).
  */
+/** The Hatch OS app (no locale prefix there: same URLs in FR and EN). `/auth` opens on sign-in. */
+export const appUrls = {
+  signup: 'https://app.gethatch.io/auth?tab=signup',
+  login: 'https://app.gethatch.io/auth',
+};
+
 export const routes = {
   home: { fr: '/', en: '/en' },
   demo: { fr: '/demo', en: '/en/demo' },
@@ -36,6 +42,9 @@ const fr = {
   /** Hero: primary CTA to the app's self-serve signup, then the demo as the secondary one. */
   'cta.try': 'Essayez maintenant',
   'cta.demoAsk': 'Demandez une démo',
+  /** Nav: the same two CTAs in short, plus the sign-in link for existing customers. */
+  'nav.try': 'Essayer',
+  'nav.login': 'Se connecter',
   'lang.switch': 'English',
   'footer.product': 'Produit',
   'footer.company': 'Hatch OS',
@@ -65,6 +74,8 @@ const en: Record<keyof typeof fr, string> = {
   'cta.demo': 'Book a demo',
   'cta.try': 'Try it now',
   'cta.demoAsk': 'Book a demo',
+  'nav.try': 'Try it',
+  'nav.login': 'Log in',
   'lang.switch': 'Français',
   'footer.product': 'Product',
   'footer.company': 'Hatch OS',
