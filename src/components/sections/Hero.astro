@@ -34,8 +34,7 @@ import oiseauxPos from './hero-oiseaux.json';
  *
  * Second layout on trial (César, 05/10, after the Atlas / Sigma / Aside references), served with
  * `?hero=2`: an inline script sets `data-hero="2"` on the section before the first paint (default `1`,
- * the layout above). Same DOM, restyled at the end of the <style>: a calm cream band with a pixel badge,
- * the title, the lead and the two CTAs centred; under it the map, full bleed and at its own ratio (so the
+ * the layout above). Same DOM, restyled at the end of the <style>: a calm cream band with the title, the lead and the two CTAs centred; under it the map, full bleed and at its own ratio (so the
  * pings, bubbles and cards stay on their shops), rising out of the cream through a short fade and cut by
  * the fold like a product shot; the pixel edge still closes it into the clients band. No card around
  * the map: the image is a scene, not a screenshot.
@@ -213,7 +212,6 @@ const tick =
       data-rv
       style="--rd: 0.2s"
     >
-      <p class="h-badge">{data.badge}</p>
       <h1
         id="hero-titre"
         class="font-display text-[32px] leading-[1.08] font-semibold tracking-[-0.015em] text-ink sm:text-[38px] md:text-[42px] lg:text-[clamp(38px,3.195vw,46px)]"
@@ -712,10 +710,6 @@ const tick =
   .lead {
     filter: drop-shadow(0 0 5px color-mix(in srgb, var(--color-white) 50%, transparent));
   }
-  /* The pixel badge only belongs to layout 2. */
-  .h-badge {
-    display: none;
-  }
 
   /* ---------- Layout 2 (?hero=2) ----------
      Two rows of one grid: the text band, then the scene. The content wrapper dissolves (`contents`) so
@@ -738,7 +732,7 @@ const tick =
     display: contents;
   }
 
-  /* Text band: badge, title, lead and CTAs, centred on the cream. */
+  /* Text band: title, lead and CTAs, centred on the cream. */
   .hero[data-hero='2'] .carte-hero {
     grid-area: 1 / 1;
     justify-self: center;
@@ -757,32 +751,6 @@ const tick =
   }
   .hero[data-hero='2'] .carte-hero::before {
     display: none;
-  }
-  .hero[data-hero='2'] .h-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: clamp(18px, 2vw, 26px);
-    padding: 6px 12px;
-    border-radius: 999px;
-    background: var(--color-surface);
-    box-shadow:
-      0 0 0 1px var(--color-line),
-      var(--shadow-1);
-    font-family: var(--font-mono);
-    font-size: clamp(10px, 2.7vw, 12px);
-    letter-spacing: 0.05em;
-    white-space: nowrap;
-    text-transform: uppercase;
-    color: var(--color-soft);
-  }
-  .hero[data-hero='2'] .h-badge::before {
-    /* a single voxel, the brand's pixel */
-    content: '';
-    width: 7px;
-    height: 7px;
-    background: var(--color-orange);
-    box-shadow: 1.5px 1.5px 0 var(--color-orange-hover);
   }
   .hero[data-hero='2'] h1 {
     max-width: 21ch;

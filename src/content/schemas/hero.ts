@@ -11,8 +11,6 @@ import { z } from 'astro/zod';
 const line = z.strictObject({ title: z.string().min(1), detail: z.string().min(1) });
 
 export const schema = z.strictObject({
-  /** Pixel badge above the title (layout 2 on trial, `?hero=2`). */
-  badge: z.string().min(1),
   title: z.array(z.string().min(1)).min(1),
   lead: z.string().min(1),
   tasks: z.strictObject({
