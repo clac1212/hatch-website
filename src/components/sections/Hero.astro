@@ -31,6 +31,14 @@ import oiseauxPos from './hero-oiseaux.json';
  * Coordinates are in the image's frame (1440 × 804) and expressed in % of it, so they stay on their
  * shop whatever the screen: the shops' ground points are measured by the composition script
  * (hero-boutiques.json), only the choice of shops and the card anchors are made here.
+ *
+ * Second layout on trial (César, 05/10), served with `?hero=2` (the inline script at the top of the
+ * section sets `data-hero="2"` before the first paint; the default `1` is the layout above). Same DOM,
+ * restyled under `[data-hero='2']` at the end of the <style>: on white, the centred pixel H1, the lead and
+ * the two CTAs, then the whole map in a framed card (white rim, soft shadow, the image's ratio, so the
+ * pings and bubbles stay on their shops). The task cards become dark toasts pinned at the card's top
+ * right, overlapping its edge: the newest on top, the previous one faded below it. No pixel edge, and
+ * the section takes its content's height.
  */
 interface Props {
   locale: Locale;
@@ -89,9 +97,17 @@ const tick =
 
 <section
   class="hero relative h-dvh min-h-[640px] overflow-hidden bg-night [container-type:size]"
+  data-hero="1"
   aria-labelledby="hero-titre"
   data-rv-groupe
 >
+  <script is:inline>
+    // Layout under trial (?hero=2, else the current one), set before the first paint: nothing shifts.
+    (function (hero) {
+      if (new URLSearchParams(location.search).get('hero') === '2') hero.dataset.hero = '2';
+    })(document.currentScript.parentElement);
+  </script>
+
   <div class="h-decor" aria-hidden="true">
     <Picture
       src={carte}
@@ -138,12 +154,12 @@ const tick =
 
   <!-- Pixel edge into the clients band below (white): over the map and the grain, under the piles
        and the glass card. -->
-  <div class="absolute inset-x-0 bottom-0 z-0">
+  <div class="h-lisiere absolute inset-x-0 bottom-0 z-0">
     <LisierePixel color="var(--color-white)" />
   </div>
 
   <div
-    class="relative z-1 mx-auto flex h-full max-w-[1440px] flex-col justify-end gap-2 px-4 pt-24 pb-4 sm:px-6 sm:pb-6 lg:static lg:justify-center lg:gap-0 lg:px-14 lg:pt-16 lg:pb-[149px]"
+    class="h-contenu relative z-1 mx-auto flex h-full max-w-[1440px] flex-col justify-end gap-2 px-4 pt-24 pb-4 sm:px-6 sm:pb-6 lg:static lg:justify-center lg:gap-0 lg:px-14 lg:pt-16 lg:pb-[149px]"
   >
     <div class="h-piles" aria-hidden="true" data-pas={STEP}>
       {
@@ -212,7 +228,7 @@ const tick =
         {data.lead}
       </p>
       <!-- Two calls to action (César 02/10): try it (the app's self-serve signup) first, the demo next. -->
-      <div class="flex flex-wrap gap-3">
+      <div class="h-ctas flex flex-wrap gap-3">
         <Button href={appUrls.signup} variant="orange" size="lg">{t('cta.try')}</Button>
         <Button href={routes.demo[locale]} variant="secondary" size="lg">{t('cta.demoAsk')}</Button>
       </div>
@@ -236,6 +252,8 @@ const tick =
   const pings = [...hero.querySelectorAll<HTMLElement>('.h-ping')];
   const oiseaux = [...hero.querySelectorAll<HTMLElement>('.h-oiseau')];
   const CYCLE = STEP * piles.length;
+  /** Layout 2: the cards are a stack of toasts instead of standing on their shop (see the <style>). */
+  const toasts = hero.dataset.hero === '2';
   const ENTREE = 1.0;
   const BASCULE = 3.2;
   const SORTIE = 5.0;
@@ -261,10 +279,26 @@ const tick =
       const r = tc - i * STEP;
       const actif = r >= 0 && r < STEP;
       ping(pings[i], actif ? r / 1.4 : 1);
+      if (toasts) return toast(i, t);
       slots[i].classList.toggle('on', actif && r >= ENTREE);
       pile.classList.toggle('sort', actif && r >= SORTIE);
       taches[i].classList.toggle('fait', actif && r >= BASCULE);
     });
+  }
+
+  /**
+   * Layout 2. A toast enters when its card would (ENTREE) and stays the newest until the next one
+   * enters a STEP later; it is then the previous one for a STEP, leaves, and waits hidden for its next
+   * turn. Counted from the absolute time, so no toast shows before its first entrance.
+   */
+  function toast(i: number, t: number) {
+    const depuis = t - i * STEP - ENTREE;
+    const r = depuis % CYCLE;
+    const age = depuis < 0 ? -1 : Math.floor(r / STEP);
+    piles[i].classList.toggle('neuf', age === 0);
+    piles[i].classList.toggle('ancien', age === 1);
+    piles[i].classList.toggle('parti', age === 2);
+    taches[i].classList.toggle('fait', age > 0 || r >= BASCULE - ENTREE);
   }
 
   const fige = new URLSearchParams(location.search).get('t');
@@ -695,5 +729,271 @@ const tick =
   }
   .lead {
     filter: drop-shadow(0 0 5px color-mix(in srgb, var(--color-white) 50%, transparent));
+  }
+
+  /* ---------- Layout 2 (?hero=2, César 05/10) ----------
+     The section turns into a three-column grid (side margins, content up to 1600 px, side margins):
+     the text block in row 1, then the map card in row 2, where the image, the grain and the toasts
+     share one cell. The wrapper of the text and the toasts is dissolved so both become grid items. */
+  .hero[data-hero='2'] {
+    display: grid;
+    grid-template-columns: minmax(12px, 1fr) minmax(0, 1600px) minmax(12px, 1fr);
+    grid-template-areas: '. texte .' '. carte .';
+    height: auto;
+    min-height: 0;
+    padding: 112px 0 40px;
+    container-type: normal;
+    background: var(--color-white);
+  }
+  .hero[data-hero='2'] .h-contenu {
+    display: contents;
+  }
+  .hero[data-hero='2'] .h-lisiere {
+    display: none;
+  }
+
+  /* The text, centred, plain on white. */
+  .hero[data-hero='2'] .carte-hero {
+    grid-area: texte;
+    justify-self: center;
+    align-items: center;
+    width: auto;
+    max-width: 1100px;
+    gap: 24px;
+    padding: 0 4px;
+    border-radius: 0;
+    text-align: center;
+    background: none;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .hero[data-hero='2'] .carte-hero::before {
+    display: none;
+  }
+  .hero[data-hero='2'] h1 {
+    max-width: 28ch; /* three lines at 1440 in French */
+    font-family: var(--font-mono);
+    font-size: clamp(2rem, 1.25rem + 3vw, 3.625rem);
+    font-weight: 400;
+    line-height: 1.12;
+    letter-spacing: 0;
+    text-wrap: balance;
+  }
+  .hero[data-hero='2'] .lead {
+    max-width: var(--container-prose);
+    font-size: 17px;
+    line-height: 1.55;
+    color: var(--color-soft);
+    filter: none;
+  }
+  .hero[data-hero='2'] .h-ctas {
+    justify-content: center;
+    margin-top: 8px;
+  }
+
+  /* The map card: the whole frame at the image's ratio, so the % positions stay on their shops. The
+     white rim is a spread shadow (no layout), then a hairline and the soft shadow. */
+  .hero[data-hero='2'] .h-decor,
+  .hero[data-hero='2'] .h-grain {
+    grid-area: carte;
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1440 / 804;
+    border-radius: 14px;
+  }
+  .hero[data-hero='2'] .h-decor {
+    box-shadow:
+      0 0 0 8px var(--color-white),
+      0 0 0 9px var(--color-line),
+      var(--shadow-2);
+  }
+  .hero[data-hero='2'] .h-decor :global(img) {
+    border-radius: inherit;
+  }
+
+  /* Toasts: pinned at the card's top right, overlapping its edge. The stack is a zero-size anchor; the
+     toasts hang from its right edge, all in one place, and the loop gives each its rank. The previous
+     toast peeks out behind the newest one rather than below it: shown in full, it covered Lark's typing
+     bubble and the figures at the top of the map. One width for all, so the stack lines up.
+     The stack must end above Lark's bubble: its top sits at 7.05 % of the card's width (Lark's head,
+     the vertical margin in % reads the width) minus 24 px (the bubble). The toast (71 px), the peek
+     (10 px) and some air come off that, so on a narrower card the toasts rise further above its edge. */
+  .hero[data-hero='2'] .h-piles {
+    grid-area: carte;
+    justify-self: end;
+    align-self: start;
+    position: relative;
+    inset: auto;
+    z-index: 2;
+    width: 0;
+    height: 0;
+    margin: min(-28px, calc(7.05% - 112px)) 12px 0 0;
+  }
+  .hero[data-hero='2'] .h-pile {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: auto;
+    bottom: auto;
+    width: max-content;
+    max-width: calc(100vw - 48px);
+    transform: none;
+    display: block;
+  }
+  .hero[data-hero='2'] .h-pile.neuf {
+    z-index: 2;
+  }
+  .hero[data-hero='2'] .h-slot {
+    grid-template-rows: 1fr;
+    transition: none;
+  }
+  .hero[data-hero='2'] .h-slot > div {
+    padding: 0;
+  }
+  /* Dark translucent toast, white text: body /75 minimum, the caps label /60 (CLAUDE.md floors). */
+  .hero[data-hero='2'] .h-tache {
+    gap: 12px;
+    padding: 10px 18px 10px 10px;
+    border-radius: 20px;
+    color: var(--color-white);
+    background: color-mix(in srgb, var(--color-night) 80%, transparent);
+    box-shadow:
+      var(--shadow-2),
+      inset 0 0 0 1px color-mix(in srgb, var(--color-white) 10%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    /* waiting for its turn: hidden above its place, reset without a transition */
+    opacity: 0;
+    filter: none;
+    transform: translateY(-12px) scale(0.96);
+    transform-origin: 50% 100%;
+    transition: none;
+  }
+  .hero[data-hero='2'] .h-tache::after {
+    display: none;
+  }
+  .hero[data-hero='2'] .neuf .h-tache {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 0.45s var(--ease-doux),
+      transform 0.7s var(--ease-entree);
+  }
+  .hero[data-hero='2'] .ancien .h-tache {
+    opacity: 0.55;
+    transform: translateY(10px) scale(0.92);
+    transition:
+      opacity 0.45s var(--ease-doux),
+      transform 0.7s var(--ease-entree);
+  }
+  .hero[data-hero='2'] .parti .h-tache {
+    opacity: 0;
+    transform: translateY(20px) scale(0.84);
+    transition:
+      opacity 0.3s var(--ease-sortie),
+      transform 0.3s var(--ease-sortie);
+  }
+  .hero[data-hero='2'] .h-avatar {
+    width: 36px;
+    height: 36px;
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-white) 15%, transparent);
+  }
+  /* Three lines: the status in mono caps, the title, the detail. */
+  .hero[data-hero='2'] .h-corps {
+    gap: 3px;
+  }
+  .hero[data-hero='2'] .h-meta {
+    display: contents;
+  }
+  .hero[data-hero='2'] .h-statut {
+    order: -1;
+    width: auto;
+    height: auto;
+    justify-content: flex-start;
+    padding: 0;
+    font-size: 11px;
+    color: color-mix(in srgb, var(--color-white) 60%, transparent);
+    background: none;
+  }
+  .hero[data-hero='2'] .h-statut .h-etat {
+    display: inline;
+  }
+  .hero[data-hero='2'] .h-tache.fait .h-etat.lib-cours,
+  .hero[data-hero='2'] .h-tache:not(.fait) .h-etat.lib-fait {
+    display: none;
+  }
+  .hero[data-hero='2'] .h-titre {
+    font-size: 14px;
+  }
+  .hero[data-hero='2'] .h-detail {
+    color: color-mix(in srgb, var(--color-white) 75%, transparent);
+  }
+
+  /* Phones: one toast at a time, standing just above the card (over it, it hid Lark and its bubble on
+     so small a map); the row gap leaves it room under the CTAs. Its lines may wrap. */
+  @media (max-width: 39.999rem) {
+    .hero[data-hero='2'] {
+      row-gap: 124px;
+      padding: 104px 0 28px;
+    }
+    .hero[data-hero='2'] .lead {
+      font-size: 16px;
+    }
+    .hero[data-hero='2'] .h-ctas {
+      flex-direction: column;
+      align-self: stretch;
+    }
+    .hero[data-hero='2'] .h-ctas > :global(a) {
+      justify-content: center;
+    }
+    .hero[data-hero='2'] .h-decor,
+    .hero[data-hero='2'] .h-grain {
+      border-radius: 10px;
+    }
+    .hero[data-hero='2'] .h-decor {
+      box-shadow:
+        0 0 0 5px var(--color-white),
+        0 0 0 6px var(--color-line),
+        var(--shadow-2);
+    }
+    .hero[data-hero='2'] .h-piles {
+      margin: -12px 4px 0 0;
+    }
+    .hero[data-hero='2'] .h-pile {
+      top: auto;
+      bottom: 0;
+      max-width: calc(100vw - 32px);
+    }
+    .hero[data-hero='2'] .ancien .h-tache {
+      opacity: 0;
+    }
+  }
+  @media (min-width: 40rem) {
+    .hero[data-hero='2'] {
+      row-gap: 100px;
+    }
+    .hero[data-hero='2'] .h-pile {
+      width: 400px;
+    }
+    .hero[data-hero='2'] .h-titre,
+    .hero[data-hero='2'] .h-detail {
+      white-space: nowrap;
+    }
+  }
+  @media (min-width: 64rem) {
+    .hero[data-hero='2'] {
+      grid-template-columns: minmax(32px, 1fr) minmax(0, 1600px) minmax(32px, 1fr);
+      row-gap: 76px;
+      padding: 136px 0 56px;
+    }
+    .hero[data-hero='2'] .lead {
+      font-size: 19px;
+    }
+    .hero[data-hero='2'] .h-piles {
+      margin-right: 28px;
+    }
   }
 </style>
