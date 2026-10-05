@@ -1,5 +1,5 @@
 /**
- * Liquid glass refraction for `.verre` surfaces (César 05/10: get closer to Apple's Liquid Glass).
+ * Liquid glass refraction for `.vitre` surfaces (César 05/10: get closer to Apple's Liquid Glass).
  *
  * Same technique as the libraries that do it on the web (Hyalite, liquid-glass.js…), written here so
  * the site keeps zero UI dependency: for each surface, a displacement map is drawn for its exact shape
@@ -8,7 +8,7 @@
  * the flat centre only gets a light blur. The rim light and inner glow stay in CSS (global.css).
  *
  * SVG filters in `backdrop-filter` only render in Chromium (Chrome, Edge, Arc…); elsewhere the CSS
- * fallback of `.verre` (plain blur) stays, so this script only runs there. Maps are rebuilt when a
+ * fallback of `.vitre` (plain blur) stays, so this script only runs there. Maps are rebuilt when a
  * surface changes size (the nav folds): the first change right away, then at most every 100 ms.
  */
 
@@ -18,9 +18,12 @@ const chromium = (
 ).userAgentData?.brands.some((b) => b.brand === 'Chromium');
 
 const SVG = 'http://www.w3.org/2000/svg';
+/** Width of the refracting band along the edge, and how far it bends the backdrop (px). */
+const BISEAU = 20;
+const FORCE = 38;
 
 if (chromium && !matchMedia('(prefers-reduced-transparency: reduce)').matches) {
-  const surfaces = [...document.querySelectorAll<HTMLElement>('.verre')];
+  const surfaces = [...document.querySelectorAll<HTMLElement>('.vitre')];
   if (surfaces.length) installer(surfaces);
 }
 
@@ -32,7 +35,7 @@ function installer(surfaces: HTMLElement[]) {
   document.body.append(svg);
 
   surfaces.forEach((el, i) => {
-    const id = `verre-${i}`;
+    const id = `vitre-${i}`;
     const filtre = document.createElementNS(SVG, 'filter');
     filtre.id = id;
     filtre.setAttribute('color-interpolation-filters', 'sRGB');
@@ -54,13 +57,14 @@ function installer(surfaces: HTMLElement[]) {
       const h = Math.round(el.offsetHeight);
       if (!w || !h) return;
       const r = Math.min(parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0, h / 2, w / 2);
-      // Bevel: the refracting band along the edge, wider on big cards, a third of a pill's height.
-      const bevel = Math.min(28, Math.max(10, Math.min(w, h) * 0.32));
+      // One material for every surface (César 05/10): same bevel and same strength on the nav pill and
+      // the hero's title card, only clamped to a third of very short surfaces.
+      const bevel = Math.min(BISEAU, h / 3);
       image.setAttribute('href', carte(w, h, r, bevel));
       image.setAttribute('width', String(w));
       image.setAttribute('height', String(h));
-      deplacement.setAttribute('scale', String(Math.round(bevel * 1.9)));
-      el.style.setProperty('--verre-filtre', `url(#${id})`);
+      deplacement.setAttribute('scale', String(FORCE));
+      el.style.setProperty('--vitre-filtre', `url(#${id})`);
     };
     construire();
     new ResizeObserver(() => {

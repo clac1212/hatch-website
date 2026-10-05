@@ -7,7 +7,8 @@ import { appUrls, routes, otherLocale, useTranslations, type Locale, type Paths 
  * v4 nav: liquid-glass pill, centred and fixed at the top; a drop shadow appears once the page scrolls.
  * From lg it folds while the visitor scrolls down (César 05/10): only the logo, « Se connecter » and
  * the demo stay, the links, the language and « Essayer » slide shut; scrolling back up unfolds it.
- * A small dead zone (FOLD_DELTA) keeps it from flickering on tiny scroll jitters.
+ * Dead zones (FOLD_DELTA down, a longer UNFOLD_DELTA up) keep it from flickering or reopening on a
+ * small scroll back, and it unfolds a touch slower than it folds.
  */
 interface Props {
   locale: Locale;
@@ -30,7 +31,7 @@ const other = otherLocale(locale);
   <nav
     id="nav"
     aria-label={t('a11y.mainNav')}
-    class="verre pointer-events-auto flex w-full max-w-max items-center gap-1.5 rounded-full py-2 pr-2 pl-5 transition-[filter] duration-500 max-sm:justify-between md:pl-6 [&.defile]:drop-shadow-[0_10px_24px_rgb(20_10_0/0.18)]"
+    class="vitre pointer-events-auto flex w-full max-w-max items-center gap-1.5 rounded-full py-2 pr-2 pl-5 transition-[filter] duration-500 max-sm:justify-between md:pl-6 [&.defile]:drop-shadow-[0_10px_24px_rgb(20_10_0/0.18)]"
   >
     <a href={home} aria-label={t('a11y.home')} class="shrink-0">
       <Logo class="w-[80px] md:w-[92px]" />
@@ -173,6 +174,12 @@ const other = otherLocale(locale);
     .n-demo {
       --max: 16rem;
     }
+    /* Unfolding: slower and slightly delayed, so the bar eases back open. */
+    :global(#nav:not(.replie)) .n-liens,
+    :global(#nav:not(.replie)) .n-essai {
+      transition-duration: 0.7s, 0.45s, 0.7s;
+      transition-delay: 0.08s;
+    }
     :global(#nav.replie) .n-liens,
     :global(#nav.replie) .n-essai,
     :global(#nav:not(.replie)) .n-demo {
@@ -201,8 +208,12 @@ const other = otherLocale(locale);
   const plis = [...nav.querySelectorAll<HTMLElement>('.n-pli')];
   const large = matchMedia('(min-width: 64rem)');
   const xl = matchMedia('(min-width: 80rem)');
-  /** Scroll needed in one direction before the bar folds or unfolds, and the top zone kept open. */
+  /**
+   * Scroll needed in one direction before the bar folds (down) or unfolds (up), and the top zone kept
+   * open. Unfolding asks for a longer, deliberate move up (César 05/10: it reopened too soon).
+   */
   const FOLD_DELTA = 28;
+  const UNFOLD_DELTA = 160;
   const HAUT = 120;
   let dernier = scrollY;
   let cumul = 0;
@@ -229,7 +240,7 @@ const other = otherLocale(locale);
     // Accumulate in the current direction only: a reversal starts the count again.
     cumul = Math.sign(dy) === Math.sign(cumul) ? cumul + dy : dy;
     if (cumul > FOLD_DELTA) plier(true);
-    else if (cumul < -FOLD_DELTA) plier(false);
+    else if (cumul < -UNFOLD_DELTA) plier(false);
   };
   addEventListener('scroll', maj, { passive: true });
   large.addEventListener('change', () => plier(nav.classList.contains('replie')));
