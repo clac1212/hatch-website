@@ -7,8 +7,9 @@
  *
  * The pattern is computed at build time from a fixed seed (same edge on every build) and used as a
  * CSS mask: the colours stay design tokens (`color`, `shadow`), no image is downloaded. One tile is
- * 1440 px wide (no visible repeat on common screens) and repeats on wider ones. Cells are 16 px from
- * md, 10 px below (the whole tile is scaled with `mask-size`, so blocks stay square).
+ * 1440 px wide (no visible repeat on common screens) and repeats on wider ones. Cells are 8 px from
+ * md, 6 px below (the whole tile is scaled with `mask-size`, so blocks stay square). Kept fine and
+ * light on purpose (César 05/10: the 16 px first pass was too heavy).
  */
 interface Props {
   /** The colour of the block below (a CSS value, e.g. `var(--color-white)`). */
@@ -20,15 +21,15 @@ interface Props {
 
 const {
   color,
-  shadow = 'color-mix(in srgb, var(--color-ink) 22%, transparent)',
+  shadow = 'color-mix(in srgb, var(--color-ink) 12%, transparent)',
   class: className,
 } = Astro.props;
 
-const CELL = 16;
-const COLS = 90; // 1440 px
+const CELL = 8;
+const COLS = 180; // 1440 px
 const ROWS = 6;
-/** Shadow offset, in px of the tile: a third of a cell, like the light of the voxel renders. */
-const OMBRE = 5;
+/** Shadow offset, in px of the tile: a quarter of a cell, like the light of the voxel renders. */
+const OMBRE = 2;
 
 // mulberry32: small seeded PRNG, so the edge is stable from one build to the next.
 let seed = 0x4a7c15;
@@ -39,19 +40,19 @@ const hasard = () => {
   return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 };
 
-// Row 0 is the bottom one. Each column has a solid base 1 to 3 blocks high, its profile smoothed
+// Row 0 is the bottom one. Each column has a solid base 1 or 2 blocks high, its profile smoothed
 // over neighbours so the edge undulates instead of making a barcode; above it, single blocks break
 // loose and thin out towards the top, like the pixel art dissolving into the page.
 const brut = Array.from({ length: COLS }, () => hasard());
 const base = brut.map((_, x) => {
   const v = (brut[(x + COLS - 1) % COLS] + 2 * brut[x] + brut[(x + 1) % COLS]) / 4;
-  return 1 + Math.round(v * 2.4);
+  return 1 + Math.round(v * 1.2);
 });
 const plein: boolean[][] = Array.from({ length: ROWS }, (_, y) =>
   base.map((b) => {
     if (y < b) return true;
     const reste = (y - b) / (ROWS - b);
-    return hasard() < 0.34 * (1 - reste) ** 1.6;
+    return hasard() < 0.2 * (1 - reste) ** 1.8;
   }),
 );
 
@@ -82,7 +83,7 @@ const masque = (d: string) =>
 
 <style>
   .lisiere {
-    --k: 0.625; /* 10 px cells below md */
+    --k: 0.75; /* 6 px cells below md */
     position: relative;
     height: calc(var(--h) * var(--k));
   }
