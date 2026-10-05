@@ -76,6 +76,8 @@ export default defineConfig({
     optimizeDeps: { include: ['gsap'] },
     // Dev twin of the vercel.json rewrites: PostHog through our own `/relais` path (assets first).
     server: {
+      // Dev only: lets a bb connect share link (<host>--<port>.getbb.app) reach the dev server.
+      allowedHosts: ['.getbb.app'],
       proxy: {
         '/relais/static': {
           target: 'https://eu-assets.i.posthog.com',
