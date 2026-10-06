@@ -1,0 +1,21 @@
+title: Ils pilotent déjà leur réseau avec Hatch OS
+figures:
+  - { prefix: '', value: 14, suffix: '', label: réseaux clients }
+  - { prefix: '', value: 250, suffix: '+', label: établissements }
+  - { prefix: '', value: 10000, suffix: '+', label: questions traitées }
+  - { prefix: '< ', value: 10, suffix: ' s', label: par réponse }
+band:
+  label: Nos réseaux clients
+clients:
+  - { id: nobinobi, name: Nobinobi }
+  - { id: pny, name: PNY }
+  - { id: la-meulerie, name: La Meulerie }
+  - { id: crousty-one, name: Crousty One }
+  - { id: nemesis, name: Nemesis }
+  - { id: afrik-n-fusion, name: "Afrik'N'Fusion" }
+  - { id: new-school-tacos, name: New School Tacos }
+  - { id: burger-and-fries, name: Burger & Fries }
+  - { id: dkr, name: DKR }
+  - { id: chopstix, name: Chopstix }
+  - { id: ponzu, name: Ponzu }
+  - { id: bomaye, name: Bomaye }

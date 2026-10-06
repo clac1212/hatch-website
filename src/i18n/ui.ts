@@ -1,58 +1,99 @@
-/**
- * Short structural UI strings used outside of Markdown content collections.
- * Marketing copy lives in `src/content/landing/{fr,en}.md`.
- */
-
 export const locales = ['fr', 'en'] as const;
 export type Locale = (typeof locales)[number];
 
-export const defaultLocale: Locale = 'fr';
+/**
+ * Every static page of the site, with its URL in each locale. Pages pass `routes.<key>` to <Base>
+ * as `paths`, which derives the language switch and the hreflang alternates from it
+ * (dynamic pages, e.g. a Sans Filtre edition, build their own `paths` object).
+ */
+/** The Hatch OS app (no locale prefix there: same URLs in FR and EN). `/auth` opens on sign-in. */
+export const appUrls = {
+  signup: 'https://app.gethatch.io/auth?tab=signup',
+  login: 'https://app.gethatch.io/auth',
+};
 
-export function demoUrl(locale: Locale): string {
-  return locale === 'en' ? '/en/demo' : '/demo';
+export const routes = {
+  home: { fr: '/', en: '/en' },
+  demo: { fr: '/demo', en: '/en/demo' },
+  security: { fr: '/securite', en: '/en/security' },
+  terms: { fr: '/conditions', en: '/en/terms' },
+  sales: { fr: '/conditions-de-vente', en: '/en/terms-of-sale' },
+  privacy: { fr: '/confidentialite', en: '/en/privacy' },
+  mentions: { fr: '/mentions-legales', en: '/en/legal-notice' },
+  sansFiltre: { fr: '/sans-filtre', en: '/en/unfiltered' },
+} as const satisfies Record<string, Record<Locale, string>>;
+export type Paths = Record<Locale, string>;
+
+/** Pages generated per entry: an agent (`src/content/agents`). */
+export const entryRoutes = {
+  agents: (slug: string): Paths => ({ fr: `/agents/${slug}`, en: `/en/agents/${slug}` }),
+};
+
+/** Short UI strings (nav, footer, buttons, accessibility labels). Marketing copy lives in src/content/. */
+const fr = {
+  'a11y.skip': 'Aller au contenu',
+  'a11y.home': 'Hatch OS, accueil',
+  'a11y.menu': 'Menu',
+  'a11y.mainNav': 'Navigation principale',
+  'nav.agents': 'Les agents',
+  'nav.cases': 'Cas clients',
+  'nav.pricing': 'Tarifs',
+  'nav.security': 'Sécurité',
+  'cta.demo': 'Réserver une démo',
+  /** Secondary CTA of the hero: the app's signup, for a newcomer (the demo is the primary). */
+  'cta.try': 'Essayer Hatch OS',
+  /** Nav: sign-in to the app (its /auth page also lets a newcomer sign up). */
+  'nav.login': 'Se connecter',
+  'lang.switch': 'English',
+  'footer.product': 'Produit',
+  'footer.company': 'Hatch OS',
+  /** Describes public/og-image.jpg, the default share image. */
+  'seo.ogImageAlt':
+    'Hatch OS : recrutez des agents IA pour piloter et développer votre réseau. Carte de France en voxels avec le siège, un restaurant et un chantier.',
+  /** The 404 page: one file served for every unknown URL, French first then English. */
+  '404.seoTitle': 'Page introuvable · Hatch OS',
+  '404.seoDescription':
+    "Cette adresse ne correspond à aucune page du site Hatch OS. Retrouvez les sept agents IA des réseaux de franchise depuis l'accueil, ou réservez une démo.",
+  '404.kicker': 'Erreur 404',
+  '404.title': "Cette page n'existe pas.",
+  '404.text':
+    "L'adresse demandée ne correspond à aucune page du site. Elle a peut-être changé, ou contient une faute de frappe.",
+  '404.home': "Retour à l'accueil",
+} as const;
+
+const en: Record<keyof typeof fr, string> = {
+  'a11y.skip': 'Skip to content',
+  'a11y.home': 'Hatch OS, home',
+  'a11y.menu': 'Menu',
+  'a11y.mainNav': 'Main navigation',
+  'nav.agents': 'Agents',
+  'nav.cases': 'Customers',
+  'nav.pricing': 'Pricing',
+  'nav.security': 'Security',
+  'cta.demo': 'Book a demo',
+  'cta.try': 'Try Hatch OS',
+  'nav.login': 'Log in',
+  'lang.switch': 'Français',
+  'footer.product': 'Product',
+  'footer.company': 'Hatch OS',
+  'seo.ogImageAlt':
+    'Hatch OS: hire AI agents to run and grow your network. A voxel map of France with the head office, a restaurant and a building site.',
+  '404.seoTitle': 'Page not found · Hatch OS',
+  '404.seoDescription':
+    'This address matches no page of the Hatch OS website. Meet the seven AI agents for franchise networks from the home page, or book a demo.',
+  '404.kicker': 'Error 404',
+  '404.title': 'This page does not exist.',
+  '404.text':
+    'The address you requested matches no page of this website. It may have moved, or contain a typo.',
+  '404.home': 'Back to the home page',
+};
+
+const ui = { fr, en } satisfies Record<Locale, Record<keyof typeof fr, string>>;
+
+export function useTranslations(locale: Locale) {
+  return (key: keyof typeof fr): string => ui[locale][key];
 }
 
-export const ui = {
-  fr: {
-    nav: {
-      demo: 'Demander une démo',
-    },
-    languageSwitcher: {
-      fr: 'FR',
-      en: 'EN',
-      ariaLabel: 'Changer de langue',
-    },
-    ariaLabels: {
-      primaryNav: 'Navigation principale',
-      faq: 'Questions fréquentes',
-    },
-  },
-  en: {
-    nav: {
-      demo: 'Request a demo',
-    },
-    languageSwitcher: {
-      fr: 'FR',
-      en: 'EN',
-      ariaLabel: 'Switch language',
-    },
-    ariaLabels: {
-      primaryNav: 'Primary navigation',
-      faq: 'Frequently asked questions',
-    },
-  },
-} satisfies Record<Locale, unknown>;
-
-/**
- * Returns the URL to switch to a given locale from the current path.
- * Examples:
- *   localeUrl('en', '/')       → '/en/'
- *   localeUrl('en', '/en/')    → '/en/'   (already EN)
- *   localeUrl('fr', '/en/')    → '/'
- *   localeUrl('fr', '/')       → '/'      (already FR)
- */
-export function localeUrl(target: Locale, currentPath: string): string {
-  if (target === 'fr') return '/';
-  if (target === 'en') return '/en/';
-  return '/';
+export function otherLocale(locale: Locale): Locale {
+  return locale === 'fr' ? 'en' : 'fr';
 }

@@ -1,0 +1,21 @@
+{
+  "_doc": "Box of each bird drawn on the hero map (frame 1440 x 804), written by hero-v5-duos/oiseaux5.py with the image. Anchors the typing bubbles. Do not edit by hand.",
+  "lark": {
+    "left": 1069.8,
+    "top": 101.51,
+    "width": 73.78,
+    "height": 75.09
+  },
+  "peep": {
+    "left": 888.49,
+    "top": 324.94,
+    "width": 71.16,
+    "height": 81.63
+  },
+  "sparrow": {
+    "left": 877.5,
+    "top": 510.17,
+    "width": 68.81,
+    "height": 76.66
+  }
+}

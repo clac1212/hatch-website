@@ -1,0 +1,10 @@
+seo:
+  title: 'Réserver une démo — Hatch OS'
+  description: 'Réservez une démo de Hatch OS avec Patrick, co-fondateur : on vous montre la plateforme sur les cas de votre réseau de franchise. Créneau en ligne.'
+title: 'Vos équipes méritent mieux.'
+titleAccent: 'Voyez comment.'
+lead: 'Choisissez un créneau ci-dessous, renseignez vos informations et confirmez votre rendez-vous directement. On vous montre Hatch OS sur les cas de votre réseau.'
+agendaTitle: 'Réservez votre créneau avec Patrick'
+agendaHint: 'Horaires affichés dans votre fuseau horaire.'
+agendaFallback: "L'agenda se charge…"
+agendaFallbackLink: "Ouvrir l'agenda dans un nouvel onglet"

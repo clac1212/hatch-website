@@ -23,3 +23,6 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 .vercel
+
+# pnpm store created by sandboxed installs
+.pnpm-store/

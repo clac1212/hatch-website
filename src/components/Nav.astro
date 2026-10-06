@@ -1,141 +1,218 @@
 ---
-import { ui, demoUrl, type Locale } from '../i18n/ui';
-import type { CollectionEntry } from 'astro:content';
+import Logo from './ui/Logo.astro';
+import Button from './ui/Button.astro';
+import { appUrls, routes, otherLocale, useTranslations, type Locale, type Paths } from '../i18n/ui';
 
+/**
+ * v4 nav: liquid-glass pill, centred and fixed at the top; a drop shadow appears once the page scrolls.
+ * From lg it folds while the visitor scrolls down (César 05/10): only the logo, « Se connecter » and
+ * the demo stay, the links and the language slide shut; scrolling back up unfolds it.
+ * Dead zones (FOLD_DELTA down, a longer UNFOLD_DELTA up) keep it from flickering or reopening on a
+ * small scroll back, and it unfolds a touch slower than it folds.
+ */
 interface Props {
   locale: Locale;
-  data: CollectionEntry<'landing'>['data']['nav'];
+  paths: Paths;
 }
 
-const { locale, data } = Astro.props;
-const t = ui[locale];
-const otherLocale: Locale = locale === 'fr' ? 'en' : 'fr';
-const otherLocaleUrl = otherLocale === 'fr' ? '/' : '/en/';
-const securityUrl = locale === 'en' ? '/en/security' : '/security';
-const sansFiltreUrl = locale === 'en' ? '/en/unfiltered' : '/sans-filtre';
-const sfEyebrow = locale === 'en' ? 'Monthly' : 'Mensuel';
-// Anchor links (#pourquoi, #agents, …) only resolve on the homepage.
-// From any other page (e.g. /security), prefix with the home URL so they
-// navigate home first, then jump to the section.
-const homeUrl = locale === 'en' ? '/en/' : '/';
-const anchor = (id: string) => `${homeUrl}#${id}`;
+const { locale, paths } = Astro.props;
+const t = useTranslations(locale);
+const home = routes.home[locale];
+const links = [
+  { href: `${home}#agents`, label: t('nav.agents') },
+  { href: `${home}#cas-clients`, label: t('nav.cases') },
+  { href: `${home}#tarifs`, label: t('nav.pricing') },
+  { href: routes.security[locale], label: t('nav.security') },
+];
+const other = otherLocale(locale);
 ---
 
-<nav>
-  <div class="nav-inner mx-auto flex h-16 max-w-[1120px] items-center justify-between px-8 md:px-8">
-    <a href={locale === 'fr' ? '/' : '/en/'} class="logo flex items-center" aria-label="Hatch OS">
-      <img class="logo-img block h-7 w-auto" src="/logos/hatch-os.png" alt="Hatch OS" />
+<header class="pointer-events-none fixed inset-x-0 top-3 z-60 flex justify-center px-3 md:top-5">
+  <nav
+    id="nav"
+    aria-label={t('a11y.mainNav')}
+    class="vitre pointer-events-auto flex w-full max-w-max items-center gap-1.5 rounded-full py-2 pr-2 pl-5 transition-[filter] duration-500 max-sm:justify-between md:pl-6 [&.defile]:drop-shadow-[0_10px_24px_rgb(20_10_0/0.18)]"
+  >
+    <a href={home} aria-label={t('a11y.home')} class="shrink-0">
+      <Logo class="w-[80px] md:w-[92px]" />
     </a>
+    <div class="n-pli n-liens hidden items-center lg:flex" data-pli>
+      <span class="mx-2 h-[22px] w-px shrink-0 bg-ink/15" aria-hidden="true"></span>
 
-    <ul class="nav-links hidden gap-8 md:flex" aria-label={t.ariaLabels.primaryNav}>
-      <li>
-        <a class="nav-link text-sm font-medium transition" href={anchor('pourquoi')}>{data.why}</a>
-      </li>
-      <li>
-        <a class="nav-link text-sm font-medium transition" href={anchor('agents')}>{data.product}</a
-        >
-      </li>
-      <li>
-        <a class="nav-link text-sm font-medium transition" href={anchor('pricing')}
-          >{data.pricing}</a
-        >
-      </li>
-      <li>
-        <a class="nav-link text-sm font-medium transition" href={anchor('faq')}>{data.faq}</a>
-      </li>
-      <li>
-        <a class="nav-link text-sm font-medium transition" href={securityUrl}>{data.security}</a>
-      </li>
-      <li class="flex items-center">
-        <a
-          class="sf-navlink inline-flex -translate-y-[3px] -rotate-3 flex-col items-start leading-none transition hover:scale-[1.06]"
-          href={sansFiltreUrl}
-        >
-          <span class="-rotate-2 text-[8px] font-bold uppercase tracking-[0.18em] text-hatch-accent"
-            >{sfEyebrow}</span
-          >
-          <span class="whitespace-nowrap text-[13px] font-semibold text-hatch-accent"
-            >{data.sansFiltre}</span
-          >
-        </a>
-      </li>
-    </ul>
-
-    <div class="nav-right flex items-center gap-2.5">
-      <div
-        class="lang-switcher flex items-center gap-[3px] rounded-lg p-[3px] transition"
-        role="group"
-        aria-label={t.languageSwitcher.ariaLabel}
-      >
-        <a
-          href="/"
-          class:list={[
-            'lang-btn rounded-md border-none px-2.5 py-1 text-[11px] font-bold tracking-[0.08em] transition',
-            locale === 'fr' && 'active shadow-[0_1px_4px_rgba(0,0,0,0.12)]',
-          ]}
-        >
-          {t.languageSwitcher.fr}
-        </a>
-        <a
-          href="/en/"
-          class:list={[
-            'lang-btn rounded-md border-none px-2.5 py-1 text-[11px] font-bold tracking-[0.08em] transition',
-            locale === 'en' && 'active shadow-[0_1px_4px_rgba(0,0,0,0.12)]',
-          ]}
-        >
-          {t.languageSwitcher.en}
-        </a>
-      </div>
-      <a
-        href={demoUrl(locale)}
-        id="nav-btn-demo"
-        class="btn-primary hidden items-center gap-[7px] whitespace-nowrap rounded-[9px] bg-hatch-cta px-5 py-2.5 text-sm font-semibold text-hatch-text transition hover:-translate-y-px hover:bg-hatch-cta-hover hover:shadow-[0_6px_22px_rgba(255,244,164,0.28)] sm:inline-flex"
-      >
-        {t.nav.demo}
-      </a>
-    </div>
-  </div>
-</nav>
-
-<script is:inline>
-  // Sticky nav: adds .scrolled past 60px, uses getBoundingClientRect on
-  // actual sections to decide dark/light theme — avoids hitting nav itself.
-  const DARK_SECTIONS = ['hero', 'agents', 'agents-section'];
-
-  const navEl = document.querySelector('nav');
-  if (navEl) {
-    const updateNavTheme = () => {
-      if (!navEl.classList.contains('scrolled')) {
-        navEl.classList.remove('nav-on-light');
-        return;
-      }
-      const probeY = 32;
-      const sections = document.querySelectorAll('section');
-      for (const section of sections) {
-        const rect = section.getBoundingClientRect();
-        if (rect.top <= probeY && rect.bottom > probeY) {
-          const id = section.id || '';
-          const cls = section.className || '';
-          const isDark = DARK_SECTIONS.includes(id) || DARK_SECTIONS.some((d) => cls.includes(d));
-          navEl.classList.toggle('nav-on-light', !isDark);
-          return;
+      <ul class="flex items-center gap-0.5">
+        {
+          links.map((link) => (
+            <li>
+              <a
+                href={link.href}
+                class="block rounded-full px-3.5 py-2.5 text-[0.875rem] font-semibold whitespace-nowrap transition-colors duration-300 hover:bg-orange/14 hover:text-orange-hover"
+              >
+                {link.label}
+              </a>
+            </li>
+          ))
         }
-      }
-      navEl.classList.remove('nav-on-light');
-    };
+        <li>
+          <a
+            href={paths[other]}
+            hreflang={other}
+            lang={other}
+            class="block rounded-full px-3 py-2.5 text-[0.875rem] font-semibold text-soft uppercase transition-colors duration-300 hover:bg-orange/14 hover:text-orange-hover"
+          >
+            {other}<span class="sr-only"> · {t('lang.switch')}</span>
+          </a>
+        </li>
+      </ul>
+    </div>
 
-    const onScroll = () => {
-      if (window.scrollY > 60) {
-        navEl.classList.add('scrolled');
-      } else {
-        navEl.classList.remove('scrolled');
-        navEl.classList.remove('nav-on-light');
-      }
-      updateNavTheme();
-    };
+    <!-- Two calls to action, the classic SaaS pair (César 06/10): sign-in, a text link (the app's
+         /auth page also lets a newcomer create an account), and the demo, the one filled button.
+         Below lg the menu carries sign-in; the pill keeps the demo. -->
+    <a
+      href={appUrls.login}
+      class="hidden rounded-full px-3.5 py-2.5 text-[0.875rem] font-semibold whitespace-nowrap transition-colors duration-300 hover:bg-orange/14 hover:text-orange-hover lg:block"
+    >
+      {t('nav.login')}
+    </a>
+    <Button href={routes.demo[locale]} class="max-sm:px-4 max-sm:text-[0.8125rem]">
+      {t('cta.demo')}
+    </Button>
 
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('load', onScroll);
-    onScroll();
+    <details class="group relative lg:hidden">
+      <summary
+        class="flex size-10 cursor-pointer list-none items-center justify-center rounded-full text-ink hover:bg-orange/14 [&::-webkit-details-marker]:hidden"
+      >
+        <span class="sr-only">{t('a11y.menu')}</span>
+        <svg
+          viewBox="0 0 24 24"
+          class="size-5"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          aria-hidden="true"
+        >
+          <path d="M4 7h16M4 12h16M4 17h16" class="group-open:hidden"></path>
+          <path d="M6 6l12 12M18 6L6 18" class="hidden group-open:block"></path>
+        </svg>
+      </summary>
+      <div
+        class="absolute top-full right-0 mt-3 w-64 rounded-card border border-line bg-surface p-2 shadow-3"
+      >
+        <ul class="flex flex-col">
+          {
+            links.map((link) => (
+              <li>
+                <a
+                  href={link.href}
+                  class="block rounded-btn px-3 py-2.5 font-semibold hover:bg-orange-tint"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
+          <li>
+            <a
+              href={paths[other]}
+              hreflang={other}
+              lang={other}
+              class="block rounded-btn px-3 py-2.5 font-semibold hover:bg-orange-tint"
+            >
+              {t('lang.switch')}
+            </a>
+          </li>
+          <li class="mt-1 border-t border-line pt-1">
+            <a
+              href={appUrls.login}
+              class="block rounded-btn px-3 py-2.5 font-semibold hover:bg-orange-tint"
+            >
+              {t('nav.login')}
+            </a>
+          </li>
+        </ul>
+      </div>
+    </details>
+  </nav>
+</header>
+
+<style>
+  /* Folding part: its width slides to 0 (the pill follows), it fades, and the gap it leaves is taken
+     back by a negative margin. Only from lg; below, the menu carries the links. */
+  @media (width >= 64rem) {
+    .n-pli {
+      overflow: clip;
+      overflow-clip-margin: 18px;
+      white-space: nowrap;
+      max-width: 44rem;
+      transition:
+        max-width 0.55s var(--ease-hatch),
+        opacity 0.35s var(--ease-hatch),
+        margin 0.55s var(--ease-hatch);
+    }
+    /* Unfolding: slower and slightly delayed, so the bar eases back open. */
+    :global(#nav:not(.replie)) .n-pli {
+      transition-duration: 0.7s, 0.45s, 0.7s;
+      transition-delay: 0.08s;
+    }
+    :global(#nav.replie) .n-pli {
+      max-width: 0;
+      opacity: 0;
+      margin-inline-start: -0.375rem;
+    }
   }
+  @media (prefers-reduced-motion: reduce) {
+    .n-pli {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  // Rendered by this component, so it always exists.
+  const nav = document.getElementById('nav')!;
+  const plis = [...nav.querySelectorAll<HTMLElement>('.n-pli')];
+  const large = matchMedia('(min-width: 64rem)');
+  /**
+   * Scroll needed in one direction before the bar folds (down) or unfolds (up), and the top zone kept
+   * open. Unfolding asks for a longer, deliberate move up (César 05/10: it reopened too soon).
+   */
+  const FOLD_DELTA = 28;
+  const UNFOLD_DELTA = 160;
+  const HAUT = 120;
+  let dernier = scrollY;
+  let cumul = 0;
+
+  function plier(replie: boolean) {
+    nav.classList.toggle('replie', replie && large.matches);
+    // Folded links leave the tab order.
+    const plie = nav.classList.contains('replie');
+    for (const el of plis) el.inert = plie;
+  }
+
+  const maj = () => {
+    const y = scrollY;
+    nav.classList.toggle('defile', y > 20);
+    const dy = y - dernier;
+    dernier = y;
+    if (y < HAUT) {
+      cumul = 0;
+      return plier(false);
+    }
+    // Accumulate in the current direction only: a reversal starts the count again.
+    cumul = Math.sign(dy) === Math.sign(cumul) ? cumul + dy : dy;
+    if (cumul > FOLD_DELTA) plier(true);
+    else if (cumul < -UNFOLD_DELTA) plier(false);
+  };
+  addEventListener('scroll', maj, { passive: true });
+  large.addEventListener('change', () => plier(nav.classList.contains('replie')));
+  // Keyboard: tabbing into the bar opens it.
+  nav.addEventListener('focusin', () => plier(false));
+  maj();
+  // Close the mobile menu once a link is followed (same-page anchors don't reload the page).
+  document
+    .querySelectorAll<HTMLAnchorElement>('#nav details a')
+    .forEach((a) =>
+      a.addEventListener('click', () => a.closest('details')!.removeAttribute('open')),
+    );
 </script>

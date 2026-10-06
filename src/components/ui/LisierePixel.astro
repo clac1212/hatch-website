@@ -1,0 +1,110 @@
+---
+/**
+ * Pixel edge between two blocks (cofounder's references: cofounder.co, General Intelligence Company;
+ * César 05/10: only under the hero, with visible pixels / voxels). Blocks of the next section's
+ * colour rise from the bottom edge in an uneven solid band, then break loose and scatter upwards over
+ * the image; each one casts a short shadow down-right, so they read as voxels rather than as noise.
+ *
+ * The pattern is computed at build time from a fixed seed (same edge on every build) and used as a
+ * CSS mask: the colours stay design tokens (`color`, `shadow`), no image is downloaded. One tile is
+ * 1440 px wide (no visible repeat on common screens) and repeats on wider ones. Cells are 5 px from
+ * md, 4 px below (the whole tile is scaled with `mask-size`, so blocks stay square). Kept fine and
+ * light on purpose (César 05/10: 16 px, then 8 px, were still too heavy).
+ */
+interface Props {
+  /** The colour of the block below (a CSS value, e.g. `var(--color-white)`). */
+  color: string;
+  /** Shadow cast by each block on the image above. */
+  shadow?: string;
+  class?: string;
+}
+
+const {
+  color,
+  shadow = 'color-mix(in srgb, var(--color-ink) 12%, transparent)',
+  class: className,
+} = Astro.props;
+
+const CELL = 5;
+const COLS = 288; // 1440 px
+const ROWS = 6;
+/** Shadow offset, in px of the tile: a fifth of a cell, like the light of the voxel renders. */
+const OMBRE = 1;
+
+// mulberry32: small seeded PRNG, so the edge is stable from one build to the next.
+let seed = 0x4a7c15;
+const hasard = () => {
+  seed = (seed + 0x6d2b79f5) | 0;
+  let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+};
+
+// Row 0 is the bottom one. Each column has a solid base 1 or 2 blocks high, its profile smoothed
+// over neighbours so the edge undulates instead of making a barcode; above it, single blocks break
+// loose and thin out towards the top, like the pixel art dissolving into the page.
+const brut = Array.from({ length: COLS }, () => hasard());
+const base = brut.map((_, x) => {
+  const v = (brut[(x + COLS - 1) % COLS] + 2 * brut[x] + brut[(x + 1) % COLS]) / 4;
+  return 1 + Math.round(v * 1.2);
+});
+const plein: boolean[][] = Array.from({ length: ROWS }, (_, y) =>
+  base.map((b) => {
+    if (y < b) return true;
+    const reste = (y - b) / (ROWS - b);
+    return hasard() < 0.2 * (1 - reste) ** 1.8;
+  }),
+);
+
+const H = ROWS * CELL;
+const W = COLS * CELL;
+const carres = (dx: number, dy: number) =>
+  plein
+    .flatMap((ligne, y) =>
+      ligne.map((on, x) =>
+        on ? `M${x * CELL + dx} ${H - (y + 1) * CELL + dy}h${CELL}v${CELL}h-${CELL}z` : '',
+      ),
+    )
+    .join('');
+const masque = (d: string) =>
+  `url("data:image/svg+xml,${encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><path d="${d}"/></svg>`,
+  )}")`;
+---
+
+<div
+  class:list={['lisiere pointer-events-none', className]}
+  style={`--m-blocs:${masque(carres(0, 0))};--m-ombre:${masque(carres(OMBRE, OMBRE))};--c:${color};--o:${shadow};--h:${H}px;--w:${W}px`}
+  aria-hidden="true"
+>
+  <span class="ombre"></span>
+  <span class="blocs"></span>
+</div>
+
+<style>
+  .lisiere {
+    --k: 0.8; /* 4 px cells below md */
+    position: relative;
+    height: calc(var(--h) * var(--k));
+  }
+  @media (width >= 48rem) {
+    .lisiere {
+      --k: 1;
+    }
+  }
+  .lisiere > span {
+    position: absolute;
+    inset: 0;
+    mask-repeat: repeat-x;
+    mask-position: left bottom;
+    mask-size: calc(var(--w) * var(--k)) calc(var(--h) * var(--k));
+  }
+  .ombre {
+    background-color: var(--o);
+    mask-image: var(--m-ombre);
+  }
+  .blocs {
+    background-color: var(--c);
+    mask-image: var(--m-blocs);
+  }
+</style>

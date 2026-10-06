@@ -1,0 +1,33 @@
+# Testimonials from customer interviews (NOBI NOBI: written answers of 05/10/2026; PNY: interview of
+# 29/09/2026). Quotes, names, titles and figures validated by both customers (06/10/2026).
+title: They rolled it out across their network
+label: Customer stories
+with: With
+readCase: Read the story
+sites: sites
+open: 'Show the {client} story'
+cases:
+  - id: nobinobi
+    client: NOBI NOBI
+    agent: jay
+    visualAlt: The storefront of a NOBI NOBI restaurant.
+    quote: “For me, the biggest time saver is the AI finding the exact file in a drive of more than 4,000 documents.”
+    author: Benjamin Schmit · President, NOBI NOBI
+    figures:
+      - value: '13'
+        label: restaurants equipped
+      - value: 4,000+
+        label: documents in the indexed drive
+    href: null
+  - id: pny
+    client: PNY
+    agent: peep
+    visualAlt: The storefront of a PNY restaurant.
+    quote: “Our teams used to call us with every question. Now they write on WhatsApp and get their answer. It saves us so much time.”
+    author: Hannah · Head of operations, PNY
+    figures:
+      - value: '13'
+        label: restaurants equipped
+      - value: 5 min
+        label: to create a training course
+    href: null

@@ -1,0 +1,22 @@
+seo:
+  title: 'Hatch OS Unfiltered · The changelog journal'
+  description: 'Every month, what we actually shipped at Hatch OS, the OS for restaurant networks. No teasing, no phantom roadmap. Unfiltered.'
+titleSuffix: 'Hatch OS Unfiltered'
+homeLabel: 'Hatch OS Unfiltered, latest edition'
+monthly: 'Monthly'
+tag: 'UNFILTERED'
+sub: 'New features'
+subEnd: 'Every month'
+editionLabel: 'Issue No.'
+updatesLabel: 'Updates'
+featured: 'Featured'
+online: '● online'
+agentRole: 'WhatsApp agent · Network development'
+shippedBy: 'shipped by'
+more: 'A few more updates'
+pastTitle: 'Past editions'
+pastHint: 'Past editions will show up here.'
+authorRoles:
+  César: 'CPTO'
+  Patrick: 'Co-founder'
+quotes: ['“', '”']

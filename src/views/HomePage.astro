@@ -1,0 +1,83 @@
+---
+import { getEntry } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Hero from '../components/sections/Hero.astro';
+import Clients from '../components/sections/Clients.astro';
+import Probleme from '../components/sections/Probleme.astro';
+import Demo from '../components/sections/Demo.astro';
+import Equipe from '../components/sections/Equipe.astro';
+import Cas from '../components/sections/Cas.astro';
+import MiseEnPlace from '../components/sections/MiseEnPlace.astro';
+import Securite from '../components/sections/Securite.astro';
+import Tarifs from '../components/sections/Tarifs.astro';
+import { section } from '../content/section';
+import { routes, type Locale } from '../i18n/ui';
+import { BRAND, languageTag, organizationId, webSite } from '../seo/jsonld';
+
+/** The home page, shared by src/pages/index.astro (FR) and src/pages/en/index.astro (EN). Order = v4 prototype. */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const home = await getEntry('home', locale);
+if (!home) throw new Error(`Missing src/content/home/${locale}.yaml`);
+const { seo } = home.data;
+
+// Structured data: the site, and the product with the real prices of the Tarifs section
+// (euros excl. VAT, per location and per month, monthly and annual billing).
+const site = Astro.site!;
+const tarifs = await section('tarifs', locale);
+const homeUrl = new URL(routes.home[locale], site).href;
+const price = (name: string, amount: number) => ({
+  '@type': 'UnitPriceSpecification',
+  name,
+  price: amount,
+  priceCurrency: 'EUR',
+  valueAddedTaxIncluded: false,
+  unitText: tarifs.unite.replace(/^\/\s*/, ''),
+});
+const jsonLd = [
+  webSite(site, locale, routes.home[locale], seo.description),
+  {
+    '@type': 'SoftwareApplication',
+    '@id': `${homeUrl}#software`,
+    name: BRAND,
+    description: seo.description,
+    url: homeUrl,
+    inLanguage: languageTag[locale],
+    applicationCategory: 'BusinessApplication',
+    operatingSystem: 'Web',
+    publisher: { '@id': organizationId(site) },
+    offers: tarifs.offres.map((o) => ({
+      '@type': 'Offer',
+      name: o.nom.replace(/\s*\n\s*/g, ' '),
+      description: o.type,
+      price: o.prix.mensuel,
+      priceCurrency: 'EUR',
+      priceSpecification: [
+        price(tarifs.formule.mensuel, o.prix.mensuel),
+        price(tarifs.formule.annuel, o.prix.annuel),
+      ],
+    })),
+  },
+];
+---
+
+<Base
+  locale={locale}
+  paths={routes.home}
+  title={seo.title}
+  description={seo.description}
+  jsonLd={jsonLd}
+>
+  <Hero locale={locale} />
+  <Clients locale={locale} />
+  <Probleme locale={locale} />
+  <Demo locale={locale} />
+  <Equipe locale={locale} />
+  <Cas locale={locale} />
+  <MiseEnPlace locale={locale} />
+  <Securite locale={locale} />
+  <Tarifs locale={locale} />
+</Base>

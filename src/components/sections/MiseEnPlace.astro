@@ -1,0 +1,709 @@
+---
+import { Image } from 'astro:assets';
+import { section } from '../../content/section';
+import { routes, useTranslations, type Locale } from '../../i18n/ui';
+import Button from '../ui/Button.astro';
+import Logo from '../ui/Logo.astro';
+import srcGoogleDrive from '../../assets/miseEnPlace/src-google-drive.png';
+import srcNotion from '../../assets/miseEnPlace/src-notion.png';
+import srcWord from '../../assets/miseEnPlace/src-word.png';
+import srcPdf from '../../assets/miseEnPlace/src-pdf.jpg';
+import srcExcel from '../../assets/miseEnPlace/src-excel.png';
+import srcOnedrive from '../../assets/miseEnPlace/src-onedrive.png';
+import sparrow from '../../assets/miseEnPlace/sparrow.png';
+import jay from '../../assets/miseEnPlace/jay.png';
+import owl from '../../assets/miseEnPlace/owl.png';
+
+/**
+ * "Mise en place" (v4 node REj0g): three app windows played as a product tour — the sources connect
+ * one by one, the agents set themselves up, the teams use them. A normal section: nothing is pinned or
+ * scroll-linked (the diorama above already is, César + cofounder 02/10).
+ * Two layouts share this markup:
+ * - tabs (`.onglets`, set by src/scripts/miseEnPlace.ts from md up): one window at a time in a "Time
+ *   Machine" stack, the three steps as tabs under it; with motion allowed, one GSAP timeline plays the
+ *   tour while the section is in view, each tab's bar filling with time;
+ * - stacked (default: mobile, no JS): the three windows one below the other, each under its step
+ *   title, in their final state.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const data = await section('miseEnPlace', locale);
+const { sources, agents, channels } = data;
+
+const logos = {
+  'google-drive': srcGoogleDrive,
+  notion: srcNotion,
+  word: srcWord,
+  pdf: srcPdf,
+  excel: srcExcel,
+  onedrive: srcOnedrive,
+};
+const birds = { sparrow, jay, owl };
+
+/** Pixel icons of the mockup (pixelarticons, 24 × 24; WhatsApp is Phosphor, 256 × 256). */
+const icons = {
+  euro: 'M19 20H9v-2h10v2ZM9 9h7v2H9v2h7v2H9v3H7v-3H5v-2h2v-2H5V9h2V6h2v3Zm10-3H9V4h10v2Z',
+  calendar:
+    'M5 4h14v2H5zm0 16h14v2H5zM3 10h2v10H3zm0-4h2v2H3zm16 0h2v2h-2zm0 4h2v10h-2zM3 8h18v2H3zm12-6h2v2h-2zM7 2h2v2H7z',
+  shield:
+    'M4 2h16v2H4zM2 4h2v10H2zm18 0h2v10h-2zM4 14h2v2H4zm2 2h2v2H6zm4 4h4v2h-4zm10-6h-2v2h2zm-2 2h-2v2h2zm-2 2h-2v2h2zm-6 0H8v2h2z',
+  users:
+    'M5 2h6v2H5zm10 0h4v2h-4zM5 10h6v2H5zm10 0h4v2h-4zm4-6h2v6h-2zm-8 0h2v6h-2zM3 4h2v6H3zM0 18h2v4H0zm14 0h2v4h-2zm8 0h2v4h-2zM4 14h8v2H4zm12 0h4v2h-4zM2 16h2v2H2zm10 0h2v2h-2zm8 0h2v2h-2z',
+  check:
+    'M10 18H8v-2h2v2Zm-2-2H6v-2h2v2Zm4-2v2h-2v-2h2Zm-6 0H4v-2h2v2Zm8 0h-2v-2h2v2Zm2-2h-2v-2h2v2Zm2-2h-2V8h2v2Zm2-2h-2V6h2v2Z',
+  clock: 'M5 3h14v2H5zm0 16h14v2H5zM3 5h2v14H3zm16 0h2v14h-2zm-8 2h2v6h-2zm2 6h4v2h-4z',
+  mail: 'M6 8h2v2H6zm2 2h2v2H8zm10-2h-2v2h2zm-2 2h-2v2h2zm-6 2h4v2h-4zM2 6h2v12H2zm18 0h2v12h-2zM4 4h16v2H4zm0 14h16v2H4z',
+  tablet: 'M5 2h14v2H5zm0 18h14v2H5zM3 4h2v16H3zm16 0h2v16h-2zm-8 12h2v2h-2z',
+  arrow:
+    'M4 11v2h16v-2zm12 2v2h2v-2zm-2 2v2h2v-2zm-2 2v2h2v-2zm4-6V9h2v2zM14 15V7h2v8zm-2 2V5h2v12z',
+  close:
+    'M7 19H5V17H7V19ZM19 19H17V17H19V19ZM9 15V17H7V15H9ZM17 17H15V15H17V17ZM11 15H9V13H11V15ZM15 15H13V13H15V15ZM13 13H11V11H13V13ZM11 11H9V9H11V11ZM15 11H13V9H15V11ZM9 9H7V7H9V9ZM17 9H15V7H17V9ZM7 7H5V5H7V7ZM19 7H17V5H19V7Z',
+};
+const whatsapp =
+  'M187.3,159.06A36.09,36.09,0,0,1,152,188a84.09,84.09,0,0,1-84-84A36.09,36.09,0,0,1,96.94,68.7,12,12,0,0,1,110,75.1l11.48,23a12,12,0,0,1-.75,12l-8.52,12.78a44.56,44.56,0,0,0,20.91,20.91l12.78-8.52a12,12,0,0,1,12-.75l23,11.48A12,12,0,0,1,187.3,159.06ZM236,128A108,108,0,0,1,78.77,224.15L46.34,235A20,20,0,0,1,21,209.66l10.81-32.43A108,108,0,1,1,236,128Zm-24,0A84,84,0,1,0,55.27,170.06a12,12,0,0,1,1,9.81l-9.93,29.79,29.79-9.93a12.1,12.1,0,0,1,3.8-.62,12,12,0,0,1,6,1.62A84,84,0,0,0,212,128Z';
+/** Channel tiles: WhatsApp green and Mail blue have no token yet (see the report), closest tokens used. */
+const channelTile = { whatsapp: 'bg-whatsapp-brand', mail: 'bg-mail', tablet: 'bg-night' };
+
+const connectedCount = sources.documents.items.filter((s) => s.connected).length;
+const plural = new Intl.PluralRules(locale).select(connectedCount) === 'one' ? 'one' : 'other';
+const counterText = sources.counter[plural].replace('{n}', String(connectedCount));
+
+/** Light trails of the night background, in % of the 1440 × 980 v4 mockup so they follow any box. */
+const trails = [
+  { l: 5.56, t: 19.39, w: 69.44, h: 6, r: 8, o: 0.55, c: 'bg-orange' },
+  { l: 36.11, t: 42.86, w: 62.5, h: 4, r: -6, o: 0.45, c: 'bg-orange' },
+  { l: -4.17, t: 73.47, w: 83.33, h: 5, r: 5, o: 0.4, c: 'bg-peach' },
+  { l: 48.61, t: 94.9, w: 55.56, h: 3, r: -9, o: 0.5, c: 'bg-orange' },
+];
+
+const label = 'font-mono text-[13px] tracking-[0.4px] text-gray-500 md:text-[12px]';
+const avatar = 'relative shrink-0 overflow-hidden rounded-full bg-peach-2';
+const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowrap';
+---
+
+<section
+  id="mise-en-place"
+  class="mep relative overflow-x-clip bg-night"
+  aria-labelledby="mep-titre"
+>
+  <div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+    {
+      trails.map((tr) => (
+        <span
+          class:list={['trainee', tr.c]}
+          style={`left:${tr.l}%;top:${tr.t}%;width:${tr.w}%;height:${tr.h}px;opacity:${tr.o};rotate:${tr.r}deg`}
+        />
+      ))
+    }
+  </div>
+
+  <div class="relative px-4 py-20 md:px-8 md:py-24">
+    <div class="halo" aria-hidden="true"></div>
+
+    <h2
+      id="mep-titre"
+      class="relative text-center font-sans text-[clamp(2.125rem,1.4rem+3vw,3.75rem)] leading-[1.08] font-semibold tracking-[-0.033em] text-balance text-white"
+    >
+      {data.title}
+    </h2>
+
+    <div class="mep-scene mx-auto mt-12 max-w-[760px] md:mt-16">
+      <div class="mep-etats relative flex flex-col gap-14 md:gap-20">
+        {
+          [sources.title, agents.title, channels.title].map((windowTitle, i) => (
+            <div class="mep-etat" id={`mep-etat-${i}`} data-mep-etat={i} data-d={i}>
+              <h3 class="mep-etat-titre mb-4 flex items-center gap-2.5 text-[15px] font-medium text-white">
+                <span class="grid size-6 shrink-0 place-items-center rounded-full bg-orange font-mono text-[13px] text-ink">
+                  {i + 1}
+                </span>
+                {data.steps[i]}
+              </h3>
+
+              <div class="fenetre w-full overflow-hidden leading-[normal] rounded-[10px] bg-white font-sans text-ink">
+                <div class="flex items-center gap-3 px-4 py-4 md:px-7 md:py-5">
+                  <div class="flex flex-1 items-center gap-3">
+                    <Logo class="w-16 shrink-0" />
+                    <p class="text-[16px] font-semibold md:text-[18px]">{windowTitle}</p>
+                  </div>
+                  <svg
+                    viewBox="0 0 24 24"
+                    class="size-[18px] shrink-0 text-gray-500"
+                    aria-hidden="true"
+                  >
+                    <path d={icons.close} fill="currentColor" />
+                  </svg>
+                </div>
+
+                <div class="corps flex flex-col gap-[18px] px-4 pt-1 pb-6 md:px-7">
+                  {i === 0 && (
+                    <>
+                      <div
+                        class="flex items-center gap-2.5 rounded-lg bg-gray-100/70 px-3.5 py-[11px] text-[14px] text-gray-500"
+                        aria-hidden="true"
+                      >
+                        <svg
+                          viewBox="0 0 24 24"
+                          class="size-4 shrink-0"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                        >
+                          <circle cx="11" cy="11" r="7" />
+                          <path d="m20 20-3.5-3.5" />
+                        </svg>
+                        {sources.search}
+                      </div>
+
+                      <div class="flex flex-col gap-2.5">
+                        <p class={label}>{sources.documents.label}</p>
+                        <ul class="grid grid-cols-3 gap-2 md:flex md:gap-3">
+                          {sources.documents.items.map((src) => (
+                            <li
+                              class:list={[
+                                'carte-ui flex min-w-0 flex-1 flex-col gap-2.5 rounded-lg bg-white p-3 outline-1 -outline-offset-1 md:p-3.5',
+                                src.connected ? 'outline-peach' : 'outline-gray-100',
+                              ]}
+                              data-source={src.connected ? 'connecte' : undefined}
+                            >
+                              <Image
+                                src={logos[src.logo]}
+                                alt=""
+                                width={28}
+                                densities={[1, 2]}
+                                class="size-7 object-contain"
+                              />
+                              <p class="text-[13px] font-semibold">{src.name}</p>
+                              <p class="flex items-center gap-1.5 text-[13px] md:text-[12px]">
+                                <span
+                                  class:list={[
+                                    'point size-[7px] shrink-0 rounded-full',
+                                    src.connected ? 'bg-success' : 'bg-stone',
+                                  ]}
+                                />
+                                <span
+                                  class:list={['libelle', !src.connected && 'text-gray-500']}
+                                  data-on={sources.documents.connected}
+                                  data-off={sources.documents.connect}
+                                >
+                                  {src.connected
+                                    ? sources.documents.connected
+                                    : sources.documents.connect}
+                                </span>
+                              </p>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <div class="flex flex-col gap-2.5">
+                        <p class={label}>{sources.tools.label}</p>
+                        <ul class="grid grid-cols-2 gap-2 md:flex md:gap-3">
+                          {sources.tools.items.map((tool) => (
+                            <li class="carte-ui flex min-w-0 flex-1 flex-col gap-2.5 rounded-lg bg-white p-3 outline-1 -outline-offset-1 outline-peach md:p-3.5">
+                              <span class="grid size-7 place-items-center rounded-md bg-peach-2 text-orange">
+                                <svg viewBox="0 0 24 24" class="size-4" aria-hidden="true">
+                                  <path d={icons[tool.icon]} fill="currentColor" />
+                                </svg>
+                              </span>
+                              <p class="text-[13px] font-semibold">{tool.name}</p>
+                              <p class="flex items-center gap-1.5 text-[13px] md:text-[12px]">
+                                <span class="size-[7px] shrink-0 rounded-full bg-orange" />
+                                {sources.tools.state}
+                              </p>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </>
+                  )}
+
+                  {i === 1 && (
+                    <>
+                      <div class="flex flex-col gap-2.5">
+                        <p class={label}>{agents.conversation.label}</p>
+                        <ul class="flex flex-col gap-2.5">
+                          {agents.conversation.messages.map((m) =>
+                            m.from === 'agent' ? (
+                              <li class="anim flex items-end gap-2.5" data-bulle>
+                                <span class:list={[avatar, 'size-8']}>
+                                  <Image
+                                    src={birds[m.bird]}
+                                    alt=""
+                                    width={29}
+                                    densities={[1, 2]}
+                                    class="absolute top-0 left-0 size-[28.16px] object-contain"
+                                  />
+                                </span>
+                                <p
+                                  class:list={[
+                                    bubble,
+                                    'rounded-[14px_14px_14px_4px] bg-gray-100/80',
+                                  ]}
+                                >
+                                  {m.text}
+                                </p>
+                              </li>
+                            ) : (
+                              <li class="anim flex justify-end" data-bulle>
+                                <p
+                                  class:list={[
+                                    bubble,
+                                    'rounded-[14px_14px_4px_14px] bg-orange text-ink',
+                                  ]}
+                                >
+                                  {m.text}
+                                </p>
+                              </li>
+                            ),
+                          )}
+                        </ul>
+                      </div>
+
+                      <div class="flex flex-col gap-2.5">
+                        <p class={label}>{agents.migration.label}</p>
+                        <ul class="flex flex-col">
+                          {agents.migration.rows.map((row) => {
+                            const complete = row.done === row.total;
+                            return (
+                              <li
+                                class="flex flex-wrap items-center gap-x-3.5 gap-y-2 border-b border-gray-100 py-2.5 last:border-b-0 md:flex-nowrap"
+                                data-ligne
+                                data-fait={row.done}
+                                data-total={row.total}
+                              >
+                                <span class:list={[avatar, 'size-7']}>
+                                  <Image
+                                    src={birds[row.bird]}
+                                    alt=""
+                                    width={25}
+                                    densities={[1, 2]}
+                                    class="absolute top-0 left-0 size-[24.64px] object-contain"
+                                  />
+                                </span>
+                                <p class="min-w-0 flex-1 text-[14px] font-semibold md:w-[170px] md:flex-none">
+                                  {row.name}
+                                </p>
+                                <span class="relative order-last h-1 basis-full rounded-[2px] bg-gray-100 md:order-none md:flex-1 md:basis-auto">
+                                  <span
+                                    class:list={[
+                                      'barre absolute inset-y-0 left-0 rounded-[2px]',
+                                      complete ? 'bg-success' : 'bg-orange',
+                                    ]}
+                                    style={`width:${(row.done / row.total) * 100}%`}
+                                    data-barre
+                                  />
+                                </span>
+                                <p
+                                  class="font-mono text-[13px] whitespace-nowrap text-gray-700 md:w-20 md:text-right"
+                                  data-valeur
+                                >
+                                  {row.done} / {row.total}
+                                </p>
+                                <span
+                                  class:list={[
+                                    'anim grid size-[22px] shrink-0 place-items-center rounded-full',
+                                    complete
+                                      ? 'bg-success/10 text-success'
+                                      : 'bg-peach-2 text-orange',
+                                  ]}
+                                  data-etat-ligne
+                                >
+                                  <svg viewBox="0 0 24 24" class="size-[13px]" aria-hidden="true">
+                                    <path
+                                      d={complete ? icons.check : icons.clock}
+                                      fill="currentColor"
+                                    />
+                                  </svg>
+                                </span>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </div>
+                    </>
+                  )}
+
+                  {i === 2 && (
+                    <>
+                      <div class="flex flex-col gap-2.5">
+                        <p class={label}>{channels.label}</p>
+                        <ul class="grid gap-2 sm:grid-cols-3 md:flex md:gap-3">
+                          {channels.items.map((ch) => (
+                            <li
+                              class="anim carte-ui flex min-w-0 flex-1 items-center gap-3 rounded-lg bg-white p-3.5 outline-1 -outline-offset-1 outline-peach"
+                              data-canal
+                            >
+                              <span
+                                class:list={[
+                                  'grid size-8 shrink-0 place-items-center rounded-lg text-white',
+                                  channelTile[ch.icon],
+                                ]}
+                              >
+                                {ch.icon === 'whatsapp' ? (
+                                  <svg viewBox="0 0 256 256" class="size-[19px]" aria-hidden="true">
+                                    <path d={whatsapp} fill="currentColor" />
+                                  </svg>
+                                ) : (
+                                  <svg viewBox="0 0 24 24" class="size-[17px]" aria-hidden="true">
+                                    <path d={icons[ch.icon]} fill="currentColor" />
+                                  </svg>
+                                )}
+                              </span>
+                              <span class="flex flex-col gap-1">
+                                <span class="text-[14px] font-semibold">{ch.name}</span>
+                                <span class="flex items-center gap-1.5 text-[13px] md:text-[12px]">
+                                  <span class="size-[7px] shrink-0 rounded-full bg-success" />
+                                  {channels.active}
+                                </span>
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <div class="flex flex-col gap-2.5">
+                        <p class={label}>{channels.thread.label}</p>
+                        <div class="flex flex-col gap-3 rounded-lg bg-paper p-4 md:p-[18px]">
+                          <div class="anim flex items-start gap-2.5" data-fil>
+                            <span class="grid size-8 shrink-0 place-items-center rounded-full bg-stone text-[13px] font-semibold text-ink md:text-[12px]">
+                              {channels.thread.question.initials}
+                            </span>
+                            <div class="flex min-w-0 flex-col gap-1">
+                              <p class="text-[13px] font-semibold text-soft md:text-[12px]">
+                                {channels.thread.question.who}
+                              </p>
+                              <p class="rounded-[4px_14px_14px_14px] bg-white px-[13px] py-[9px] text-[14px] max-md:leading-snug md:whitespace-nowrap">
+                                {channels.thread.question.text}
+                              </p>
+                            </div>
+                          </div>
+                          <div class="anim flex items-start gap-2.5" data-fil>
+                            <span class:list={[avatar, 'size-8']}>
+                              <Image
+                                src={birds[channels.thread.answer.bird]}
+                                alt=""
+                                width={29}
+                                densities={[1, 2]}
+                                class="absolute top-[3.84px] left-[1.92px] size-[28.16px] object-contain"
+                              />
+                            </span>
+                            <div class="flex min-w-0 flex-col gap-1">
+                              <p class="text-[13px] font-semibold text-orange-txt md:text-[12px]">
+                                {channels.thread.answer.who}
+                              </p>
+                              <p class="rounded-[4px_14px_14px_14px] bg-white px-[13px] py-[9px] text-[14px] max-md:leading-snug md:whitespace-nowrap">
+                                {channels.thread.answer.text}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                <div class="flex flex-wrap items-center gap-3 border-t border-gray-100 bg-gray-50 px-4 py-4 md:px-7">
+                  <p
+                    class="flex-1 text-[14px] text-gray-700"
+                    data-compteur={i === 0 ? '' : undefined}
+                    data-one={i === 0 ? sources.counter.one : undefined}
+                    data-other={i === 0 ? sources.counter.other : undefined}
+                  >
+                    {i === 0 ? counterText : i === 1 ? agents.footer : channels.footer}
+                  </p>
+                  {i < 2 ? (
+                    <button
+                      type="button"
+                      class="btn-vif inline-flex cursor-pointer items-center gap-2 rounded-[4px] bg-orange px-[18px] py-2.5 text-[14px] font-semibold text-ink"
+                      data-mep-suivant={i}
+                    >
+                      {data.next}
+                      <svg viewBox="0 0 24 24" class="size-4" aria-hidden="true">
+                        <path d={icons.arrow} fill="currentColor" />
+                      </svg>
+                    </button>
+                  ) : (
+                    <Button href={routes.demo[locale]} variant="orange" size="sm" data-mep-cta>
+                      {t('cta.demo')}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+
+      <!--
+        Tabs of the tabs layout (the stacked layout titles each window instead): one segment per step,
+        like the demo's chapters, under the window; its bar fills as the timeline plays that step.
+        Named by the section title; src/scripts/miseEnPlace.ts turns the windows into their tabpanels.
+      -->
+      <div class="mep-etapes hidden leading-[normal]" role="tablist" aria-labelledby="mep-titre">
+        {
+          data.steps.map((step, i) => (
+            <button
+              type="button"
+              role="tab"
+              id={`mep-onglet-${i}`}
+              aria-controls={`mep-etat-${i}`}
+              aria-selected={i === 0 ? 'true' : 'false'}
+              tabindex={i === 0 ? 0 : -1}
+              class="pas flex min-w-0 cursor-pointer flex-col gap-3 rounded-btn pb-1 text-left"
+              data-mep-pas={i}
+              data-etat={i === 0 ? 'actif' : 'a-venir'}
+            >
+              <span
+                class="jauge block h-[3px] w-full overflow-hidden rounded-full"
+                aria-hidden="true"
+              >
+                <span class="block h-full" />
+              </span>
+              <span class="flex items-start gap-2.5">
+                <span
+                  class="num grid size-6 shrink-0 place-items-center rounded-full font-mono text-[12px]"
+                  aria-hidden="true"
+                >
+                  {i + 1}
+                </span>
+                <span class="lib pt-0.5 text-[15px] font-medium text-balance">{step}</span>
+              </span>
+            </button>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import '../../scripts/miseEnPlace';
+</script>
+
+<style>
+  /* ---------- Night background ---------- */
+  .trainee {
+    position: absolute;
+    filter: blur(20px);
+    transform-origin: top left;
+  }
+  .halo {
+    position: absolute;
+    left: 50%;
+    top: 20px;
+    width: 600px;
+    height: 300px;
+    translate: -50% 0;
+    border-radius: 50%;
+    background: radial-gradient(
+      ellipse 50% 50% at 50% 50%,
+      color-mix(in srgb, var(--color-orange) 20%, transparent),
+      transparent
+    );
+    pointer-events: none;
+  }
+  .fenetre {
+    box-shadow:
+      0 0 90px color-mix(in srgb, var(--color-orange) 25%, transparent),
+      0 8px 24px color-mix(in srgb, var(--color-black) 4%, transparent);
+  }
+
+  /*
+   * ---------- Tabs layout: the three windows share one grid cell, so the stage is as tall as the
+   * tallest one and every window gets that height (no sheet sticks out under the front one). ----------
+   */
+  .onglets .mep-etats {
+    display: grid;
+    gap: 0;
+  }
+  .onglets .mep-etat {
+    grid-area: 1 / 1;
+  }
+  .onglets .fenetre {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .onglets .corps {
+    flex: 1;
+  }
+  /*
+   * "Time Machine" stack (data-d = distance from the current step, set by the script). Only the front
+   * window shows content; the next ones are blank sheets peeking a few pixels above it, so the sequence
+   * reads without adding noise (the tabs below already name the steps). A finished window lifts
+   * towards the viewer and dissolves; the next sheet glides forward, then its content fades in. Going
+   * back (a tab clicked, the tour looping), the same moves play in reverse.
+   */
+  .onglets .mep-etat {
+    --courbe-apple: cubic-bezier(0.32, 0.72, 0, 1);
+    position: relative;
+    transform-origin: 50% 0;
+    pointer-events: none;
+    transition:
+      transform 0.95s var(--courbe-apple),
+      opacity 0.7s var(--courbe-apple),
+      filter 0.7s var(--courbe-apple);
+  }
+  .onglets .mep-etat .fenetre {
+    position: relative;
+  }
+  /* Blank sheet: a white veil over the window's content, lifted once the window is in front. */
+  .onglets .mep-etat .fenetre::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--color-white);
+    pointer-events: none;
+    transition:
+      opacity 0.45s ease-out 0.3s,
+      background-color 0.6s var(--courbe-apple);
+  }
+  .onglets .mep-etat[data-d='0'] {
+    z-index: 3;
+    pointer-events: auto;
+  }
+  .onglets .mep-etat:is([data-d='0'], [data-d='-1'], [data-d='-2']) .fenetre::after {
+    opacity: 0;
+  }
+  .onglets .mep-etat:not([data-d='0']) .fenetre {
+    box-shadow: none;
+  }
+  /* Sheets are opaque (no see-through between them): a solid tint, darker with depth. */
+  .onglets .mep-etat[data-d='1'] {
+    z-index: 2;
+    transform: translateY(-14px) scale(0.95);
+  }
+  .onglets .mep-etat[data-d='1'] .fenetre::after {
+    background-color: color-mix(in srgb, var(--color-white) 34%, var(--color-night));
+  }
+  .onglets .mep-etat[data-d='2'] {
+    z-index: 1;
+    transform: translateY(-27px) scale(0.9);
+  }
+  .onglets .mep-etat[data-d='2'] .fenetre::after {
+    background-color: color-mix(in srgb, var(--color-white) 17%, var(--color-night));
+  }
+  .onglets .mep-etat:is([data-d='1'], [data-d='2']) .fenetre::after {
+    transition-delay: 0s;
+  }
+  .onglets .mep-etat:is([data-d='-1'], [data-d='-2']) {
+    z-index: 4;
+    opacity: 0;
+    transform: translateY(18px) scale(1.04);
+    filter: blur(6px);
+    transition-duration: 0.7s, 0.5s, 0.5s;
+  }
+  .onglets .mep-etat-titre {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* Tabs: three segments under the window, aligned with it. */
+  .onglets .mep-etapes {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 40px;
+  }
+  .num,
+  .lib {
+    transition:
+      background-color 0.8s var(--ease-hatch),
+      color 0.8s var(--ease-hatch),
+      outline-color 0.8s var(--ease-hatch);
+  }
+  .num {
+    background-color: var(--color-night-2);
+    outline: 1px solid var(--color-gray-800);
+    outline-offset: -1px;
+    color: var(--color-gray-500);
+  }
+  .lib {
+    color: var(--color-gray-500);
+  }
+  .jauge {
+    background-color: var(--color-gray-800);
+  }
+  /*
+   * Without the timeline (reduced motion, GSAP not loaded yet), the bars say where the tour is: full up
+   * to the current step. The timeline overrides this inline, every frame, so no transition (it would lag).
+   */
+  .jauge > span {
+    background-color: var(--color-orange);
+    transform-origin: left;
+    transform: scaleX(0);
+  }
+  .pas:is([data-etat='fait'], [data-etat='actif']) .jauge > span {
+    transform: scaleX(1);
+  }
+  /* Ink on the orange fill: white on orange is under 3:1. */
+  .pas[data-etat='actif'] .num {
+    background-color: var(--color-orange);
+    outline-color: var(--color-orange);
+    color: var(--color-ink);
+  }
+  .pas[data-etat='actif'] .lib {
+    color: var(--color-white);
+  }
+  .pas[data-etat='fait'] .num {
+    background-color: color-mix(in srgb, var(--color-orange) 12%, var(--color-night));
+    outline-color: var(--color-orange);
+    color: var(--color-peach);
+  }
+  .pas[data-etat='fait'] .lib {
+    color: var(--color-gray-400);
+  }
+  /* A tab under the pointer lights up like the current one. */
+  .pas:hover .lib {
+    color: var(--color-white);
+  }
+  .pas:hover .num {
+    outline-color: var(--color-orange);
+  }
+
+  /*
+   * In-window animations (tabs layout with motion): the timeline tweens opacity, widths and `--y`, the
+   * entrance offset, kept on `translate` so it never fights the cards' hover transform. No CSS
+   * transitions on those properties: the timeline renders every frame, jumps included.
+   */
+  .onglets .anim {
+    translate: 0 calc(var(--y, 0) * 1px);
+  }
+  .eteint .point {
+    background-color: var(--color-stone);
+  }
+  .eteint .libelle {
+    color: var(--color-gray-500);
+  }
+
+  /* Product cards react like a real interface: they lift, their rim turns orange, the icon grows. */
+  .mep .carte-ui {
+    transition:
+      transform 0.35s var(--ease-hatch),
+      box-shadow 0.35s var(--ease-hatch),
+      outline-color 0.35s;
+  }
+  .mep .carte-ui:hover {
+    transform: translateY(-3px);
+    outline-color: var(--color-orange);
+    box-shadow: 0 10px 22px color-mix(in srgb, var(--color-shadow) 12%, transparent);
+  }
+  .mep .carte-ui:active {
+    transform: translateY(-1px) scale(0.98);
+  }
+  .carte-ui > :first-child {
+    transition: scale 0.35s var(--ease-hatch);
+  }
+  .carte-ui:hover > :first-child {
+    scale: 1.1;
+  }
+</style>

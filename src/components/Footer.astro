@@ -1,99 +1,177 @@
 ---
-import type { CollectionEntry } from 'astro:content';
-import type { Locale } from '../i18n/ui';
-import HatchLogo from './HatchLogo.astro';
+import { Image, Picture } from 'astro:assets';
+import Button from './ui/Button.astro';
+import { section } from '../content/section';
+import { routes, otherLocale, useTranslations, type Locale, type Paths } from '../i18n/ui';
+import { socialLinks } from '../seo/jsonld';
+import logo from '../assets/brand/hatch-os-night.png';
+import immeuble from '../assets/footer/immeuble.jpg';
 
+/**
+ * Site-wide footer — v4 node DbMpt ("Footer D · L'immeuble voxel"): brand + links on the left,
+ * the voxel building (one agent per floor) on the right. Stacked, building first, below 1280 px.
+ */
 interface Props {
-  data: CollectionEntry<'landing'>['data']['footer'];
   locale: Locale;
+  paths: Paths;
 }
 
-const { data, locale } = Astro.props;
-const securityUrl = locale === 'en' ? '/en/security' : '/security';
-const privacyUrl = locale === 'en' ? '/en/privacy' : '/privacy';
-const termsUrl = locale === 'en' ? '/en/terms' : '/terms';
-const sansFiltreUrl = locale === 'en' ? '/en/unfiltered' : '/sans-filtre';
-const securityLabel = locale === 'en' ? 'Security' : 'Sécurité';
-const privacyLabel = locale === 'en' ? 'Privacy' : 'Confidentialité';
-const termsLabel = locale === 'en' ? 'Terms' : 'CGU';
-const sansFiltreLabel = locale === 'en' ? 'Unfiltered' : 'Sans Filtre';
+const { locale, paths } = Astro.props;
+const t = useTranslations(locale);
+const data = await section('piedDePage', locale);
+const home = routes.home[locale];
+const other = otherLocale(locale);
+const produit = [
+  { href: `${home}#agents`, label: t('nav.agents') },
+  { href: `${home}#cas-clients`, label: t('nav.cases') },
+  { href: `${home}#tarifs`, label: t('nav.pricing') },
+  { href: routes.security[locale], label: t('nav.security') },
+];
+const legal = [
+  { href: routes.terms[locale], label: data.legal.conditions },
+  { href: routes.sales[locale], label: data.legal.vente },
+  { href: routes.privacy[locale], label: data.legal.confidentialite },
+  { href: routes.mentions[locale], label: data.legal.mentions },
+];
+const annee = new Date().getFullYear();
+const titre = 'font-mono text-[11px] leading-[14px] tracking-[0.16em] text-muted uppercase';
+const lien = 'lien-pied block w-fit text-[14.5px] leading-[normal] text-paper';
 ---
 
-<footer class="px-0 py-8 pb-12" style="background: var(--footer-gradient);">
-  <div
-    class="footer-inner container-site flex flex-wrap items-end justify-between gap-5 md:flex-row"
-  >
-    <div class="flex flex-col gap-2">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="280 270 520 560"
-        width="36"
-        height="36"
-        style="display:block;border-radius:8px;"
-        aria-hidden="true"
-      >
-        <rect fill="#ea580c" x="0" y="0" width="1080" height="1080" rx="80"></rect>
-        <path
-          fill="#fff4a4"
-          d="M518.89,659.49V607.25l-38.18,11.3-39.32-27.47v68.41c0,16.44-19.17,17.25-19.17,31.21,0,12.72,11.75,14.36,26.12,14.36h63.15c14.82,0,26.57-1.64,26.57-14.36C538.06,676.74,518.89,675.93,518.89,659.49Z"
-        ></path>
-        <path
-          fill="#fff4a4"
-          d="M656.06,659.49V587.67c0-7.23-.27-14.14-.9-20.69L578,589.79c.1,2.23.14,4.52.14,6.93v62.77c0,16.44-19.17,17.25-19.17,31.62,0,12.31,12.19,13.95,26.57,13.95h63.15c14.37,0,26.57-1.64,26.57-13.95C675.24,676.74,656.06,675.93,656.06,659.49Z"
-        ></path>
-        <path
-          fill="#fff4a4"
-          d="M575.43,469.79c-33,2.2-54.49,20.63-66.44,44.57l-2.18.14L499,396.32c-1-15.64-6.26-22.29-21.49-21.28-22.57,1.5-73.67,20.6-72.69,35.39.66,10,7.78,12.14,16.44,17.68,5.9,3.53,11.09,9.3,12.07,24.06l8.93,115.63,39.16,28,36.47-13.4-.19-3c-1.79-26.93,7.76-47.79,29-49.21,16.38-1.09,25.46,9.35,29.66,29.86l75-29.09C642.27,490.47,620.26,466.82,575.43,469.79Z"
-        ></path>
-      </svg>
-      <div class="footer-tagline text-xs text-white/55">{data.tagline}</div>
-      <div class="mt-1 flex items-center gap-3.5">
-        <a
-          href="https://www.linkedin.com/company/gethatchos/"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="LinkedIn"
-          class="text-white/45 transition-colors hover:text-white/80"
-        >
-          <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true">
-            <path
-              d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.07 2.07 0 1 1 0-4.13 2.07 2.07 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.22.79 24 1.77 24h20.45c.98 0 1.78-.78 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"
-            ></path>
-          </svg>
-        </a>
-        <a
-          href="https://www.instagram.com/get_hatch.os/"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Instagram"
-          class="text-white/45 transition-colors hover:text-white/80"
-        >
-          <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true">
-            <path
-              d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.43-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16zm0 1.62c-3.15 0-3.5.01-4.74.07-1.14.05-1.76.24-2.17.4-.55.21-.94.47-1.35.88-.41.41-.67.8-.88 1.35-.16.41-.35 1.03-.4 2.17-.06 1.24-.07 1.59-.07 4.74s.01 3.5.07 4.74c.05 1.14.24 1.76.4 2.17.21.55.47.94.88 1.35.41.41.8.67 1.35.88.41.16 1.03.35 2.17.4 1.24.06 1.59.07 4.74.07s3.5-.01 4.74-.07c1.14-.05 1.76-.24 2.17-.4.55-.21.94-.47 1.35-.88.41-.41.67-.8.88-1.35.16-.41.35-1.03.4-2.17.06-1.24.07-1.59.07-4.74s-.01-3.5-.07-4.74c-.05-1.14-.24-1.76-.4-2.17a3.6 3.6 0 0 0-.88-1.35 3.6 3.6 0 0 0-1.35-.88c-.41-.16-1.03-.35-2.17-.4-1.24-.06-1.59-.07-4.74-.07zm0 2.76a5.46 5.46 0 1 1 0 10.92 5.46 5.46 0 0 1 0-10.92zm0 9a3.54 3.54 0 1 0 0-7.08 3.54 3.54 0 0 0 0 7.08zm6.95-9.22a1.28 1.28 0 1 1-2.55 0 1.28 1.28 0 0 1 2.55 0z"
-            ></path>
-          </svg>
-        </a>
-      </div>
+<footer data-rv-groupe class="bg-black text-paper">
+  <div class="mx-auto flex max-w-[1920px] flex-col lg:flex-row xl:h-[900px]">
+    <div
+      data-rv
+      class="order-1 flex justify-center lg:order-2 lg:w-[40%] lg:shrink-0 xl:w-[min(720px,42%)]"
+    >
+      <Picture
+        pictureAttributes={{ class: 'block w-full max-w-[460px] lg:h-full lg:max-w-none' }}
+        src={immeuble}
+        alt={data.immeubleAlt}
+        widths={[480, 720, 1080, 1440]}
+        sizes="(min-width: 1280px) 720px, (min-width: 1024px) 40vw, (min-width: 768px) 460px, 100vw"
+        formats={['avif', 'webp']}
+        class="block h-auto w-full lg:h-full lg:object-contain lg:object-bottom xl:object-cover"
+      />
     </div>
-    <div class="flex flex-col items-end gap-2">
-      <div class="flex items-center gap-5">
-        <a
-          href={sansFiltreUrl}
-          class="text-xs text-hatch-accent-soft transition-colors hover:text-hatch-accent"
-          >{sansFiltreLabel}</a
-        >
-        <a href={securityUrl} class="text-xs text-white/35 transition-colors hover:text-white/65"
-          >{securityLabel}</a
-        >
-        <a href={privacyUrl} class="text-xs text-white/35 transition-colors hover:text-white/65"
-          >{privacyLabel}</a
-        >
-        <a href={termsUrl} class="text-xs text-white/35 transition-colors hover:text-white/65"
-          >{termsLabel}</a
-        >
+
+    <div
+      class="order-2 flex min-w-0 flex-1 flex-col justify-between gap-14 px-6 pt-4 pb-10 md:px-12 lg:order-1 lg:gap-10 lg:pt-20 lg:pr-8 xl:pt-[88px] xl:pr-12 xl:pl-24"
+    >
+      <div data-rv class="flex max-w-[420px] flex-col items-start gap-[18px]">
+        <a href={home} aria-label={t('a11y.home')}>
+          <Image src={logo} alt="" width={130} densities={[1, 2]} class="h-auto w-[130px]" />
+        </a>
+        <p class="text-[15px] leading-[23px] text-white/70">{data.signature}</p>
+        <Button href={routes.demo[locale]} variant="cream">{data.cta}</Button>
       </div>
-      <div class="footer-copy text-xs text-white/35">{data.copyright}</div>
+
+      <div
+        data-rv
+        class="grid grid-cols-2 gap-x-6 gap-y-10 md:flex md:flex-wrap md:gap-x-11 lg:flex-nowrap lg:gap-x-8 xl:gap-x-11"
+      >
+        <nav aria-labelledby="pied-produit" class="flex flex-col gap-3">
+          <h2 id="pied-produit" class={titre}>{t('footer.product')}</h2>
+          <ul class="flex flex-col gap-3">
+            {
+              produit.map((l) => (
+                <li>
+                  <a href={l.href} class={lien}>
+                    {l.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+
+        <nav aria-labelledby="pied-agents" class="order-last col-span-2 md:order-none">
+          <h2 id="pied-agents" class={titre}>{data.agents.titre}</h2>
+          <ul class="mt-3">
+            {
+              data.agents.residents.map((r) => (
+                <li>
+                  <a
+                    href={`${home}#agents`}
+                    class="lien-pied flex w-fit items-center gap-3 py-1.5 leading-[normal]"
+                  >
+                    <span class="w-[58px] shrink-0 font-mono text-[11px] tracking-[0.8px] text-orange">
+                      {r.etage}
+                    </span>
+                    <span class="text-[14.5px] whitespace-nowrap">{r.libelle}</span>
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+
+        <div class="flex flex-col gap-8">
+          <nav aria-labelledby="pied-hatch" class="flex flex-col gap-3">
+            <h2 id="pied-hatch" class={titre}>{t('footer.company')}</h2>
+            <ul class="flex flex-col gap-3">
+              {
+                socialLinks.map((l) => (
+                  <li>
+                    <a href={l.href} rel="noopener" class={lien}>
+                      {l.label}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </nav>
+          <nav aria-labelledby="pied-legal" class="flex flex-col gap-3">
+            <h2 id="pied-legal" class={titre}>{data.legal.titre}</h2>
+            <ul class="flex flex-col gap-3">
+              {
+                legal.map((l) => (
+                  <li>
+                    <a href={l.href} class={lien}>
+                      {l.label}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </nav>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-[18px] border-t border-white/12 pt-[18px]">
+        <div
+          class="flex flex-col gap-2 font-mono text-[11px] leading-[14px] tracking-[0.14em] text-stone uppercase sm:flex-row sm:justify-between"
+        >
+          {/* The language switch sits with the page's fine print, not among the social links. */}
+          <p class="flex flex-wrap gap-x-6 gap-y-2">
+            <span>
+              {annee}
+              {data.copyright}
+            </span>
+            <a
+              href={paths[other]}
+              hreflang={other}
+              lang={other}
+              class="text-paper transition-colors duration-300 hover:text-orange"
+            >
+              {t('lang.switch')}
+            </a>
+          </p>
+          <p>{data.mention}</p>
+        </div>
+      </div>
     </div>
   </div>
 </footer>
+
+<style>
+  .lien-pied {
+    transition:
+      color 0.3s,
+      transform 0.3s var(--ease-hatch);
+  }
+  .lien-pied:hover {
+    color: var(--color-orange);
+    transform: translateX(3px);
+  }
+</style>

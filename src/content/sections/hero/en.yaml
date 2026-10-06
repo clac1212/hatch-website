@@ -1,0 +1,41 @@
+# The title, as fragments joined with spaces: the browser wraps the lines (Fraunces, balanced).
+title:
+  - Hire AI agents
+  - to run and grow
+  - your network
+lead: 'They answer your teams, train new hires, audit your sites and follow your openings, while you stay in control.'
+tasks:
+  status:
+    running: In progress
+    done: Done
+  # The three agents drawn on the map first (Peep, Lark, Sparrow: the shop writes, the bird types its answer), then one agent off the map (Owl, answering in the team's language: Huesca, in Spanish), and the loop restarts.
+  # Each state reads at a glance, outcome first: `title` = the agent, what it does, for which BunBun site (the city of the shop under the card); `detail` = the request, then what was done. Short: one line each on mobile.
+  events:
+    - agent: peep
+      running:
+        title: 'Peep is answering BunBun Dijon'
+        detail: '“Where’s the allergen sheet?”'
+      done:
+        title: 'Peep answered BunBun Dijon'
+        detail: 'Allergen sheet sent · 2 min'
+    - agent: lark
+      running:
+        title: 'Lark is reviewing BunBun Strasbourg'
+        detail: 'Revenue below target'
+      done:
+        title: 'Lark followed up with BunBun Strasbourg'
+        detail: 'Revenue check-in tomorrow 9 am'
+    - agent: sparrow
+      running:
+        title: 'Sparrow is tracking BunBun Marseille'
+        detail: 'Site under construction · D-18'
+      done:
+        title: 'Sparrow booked training for BunBun Marseille'
+        detail: 'Thursday, whole team · D-18'
+    - agent: owl
+      running:
+        title: 'Owl is answering BunBun Huesca'
+        detail: '“¿Cómo se limpia la freidora?”'
+      done:
+        title: 'Owl answered BunBun Huesca'
+        detail: 'Out loud, in Spanish'

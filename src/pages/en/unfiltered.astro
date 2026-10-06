@@ -1,21 +1,5 @@
 ---
-import { getCollection } from 'astro:content';
-import SansFiltreLayout from '../../components/SansFiltreLayout.astro';
-import SansFiltreEdition from '../../components/SansFiltreEdition.astro';
-
-// Newest edition first — see the FR page for the ordering rationale. Every
-// edition also gets its own page at /en/unfiltered/<edition>.
-const editions = (await getCollection('sansFiltre')).sort((a, b) =>
-  b.data.date.localeCompare(a.data.date),
-);
-const latest = editions[0];
+import SansFiltrePage from '../../views/SansFiltrePage.astro';
 ---
 
-<SansFiltreLayout
-  locale="en"
-  navLabel="Hatch OS Unfiltered"
-  title="Hatch OS Unfiltered · The changelog journal"
-  description="Every month, what we actually shipped at Hatch OS, the OS for restaurant networks. No teasing, no phantom roadmap. Unfiltered."
->
-  <SansFiltreEdition entry={latest} locale="en" editions={editions} />
-</SansFiltreLayout>
+<SansFiltrePage locale="en" />

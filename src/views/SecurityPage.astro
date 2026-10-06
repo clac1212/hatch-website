@@ -1,0 +1,511 @@
+---
+import { getEntry } from 'astro:content';
+import { Picture, getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Base from '../layouts/Base.astro';
+import Button from '../components/ui/Button.astro';
+import Ipad from '../components/ui/Ipad.astro';
+import fond from '../assets/securite/fond-orange-grain.jpg';
+import jay from '../assets/securite/jay.png';
+import owl from '../assets/securite/owl.png';
+import finch from '../assets/securite/finch.png';
+import { routes, useTranslations, type Locale } from '../i18n/ui';
+
+/**
+ * Security page (César 01/10), shared by /securite and /en/security. The content of the current site
+ * (v1), in the landing's patterns:
+ * - the hero is the home's security band, enlarged (orange grain, night text), its promises linking
+ *   down to the theme that backs each one;
+ * - each theme is a two-panel block, like the agent and pricing cards: the guardian agent large on a
+ *   tint (Jay: sharing and hosting in Europe, Owl: no AI training, Finch: compliance), the text and
+ *   its three points as ruled rows; sides alternate;
+ * - access control is shown as product, on an iPad in a night section (who sees what in the BunBun
+ *   network, role by role); then the site's single call to action.
+ * The H1 is in Fraunces, not the pixel font (César 01/10: exception to the H1 rule, like the home).
+ * The access screen cycles through the roles while in view (not under reduced motion); a click on a
+ * role takes over and stops the cycle. Without JS it shows the head office's view.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const entry = await getEntry('securityPage', locale);
+if (!entry) throw new Error(`Missing src/content/pages/security/${locale}.yaml`);
+const { seo, hero, sections, screen, contact } = entry.data;
+const wrap = 'mx-auto w-full max-w-site px-6 md:px-12';
+const bg = await getImage({ src: fond, format: 'webp', width: 1600, quality: 70 });
+const AGENTS: Record<'jay' | 'owl' | 'finch', ImageMetadata> = { jay, owl, finch };
+/** Tint behind each agent, from the warm side of the palette (as the agent cards of the home). */
+const TEINTES = { jay: 'bg-sand', owl: 'bg-stone', finch: 'bg-peach' };
+const ancre = (i: number) => `theme-${i + 1}`;
+const num = (i: number) => String(i + 1).padStart(2, '0');
+---
+
+<Base locale={locale} paths={routes.security} title={seo.title} description={seo.description}>
+  <header
+    class="bg-orange bg-cover bg-center pt-32 pb-16 md:pt-40 md:pb-20"
+    style={`background-image:url(${bg.src})`}
+  >
+    <div class:list={[wrap, 'flex flex-col items-start gap-6']} data-rv-groupe>
+      <p class="font-mono text-kicker text-night uppercase" data-rv>{hero.kicker}</p>
+      <h1 class="max-w-[16ch] font-display text-h1 font-bold tracking-[-0.02em] text-night" data-rv>
+        {hero.title}
+      </h1>
+      <p class="max-w-[36rem] text-body text-night" data-rv>{hero.lead}</p>
+      <ul
+        class="mt-4 grid w-full gap-px overflow-hidden rounded-card bg-night/15 sm:grid-cols-2 lg:grid-cols-4"
+        data-rv
+      >
+        {
+          hero.proofs.map((p) => (
+            <li>
+              <a href={`#${ancre(p.section)}`} class="ancre">
+                <span class="font-mono text-kicker text-night/70 uppercase">{num(p.section)}</span>
+                <span class="flex items-center justify-between gap-3 font-display text-card font-bold text-night">
+                  {p.label}
+                  <svg
+                    viewBox="0 0 24 24"
+                    class="size-4 shrink-0 rotate-90"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path d="M4 11v2h16v-2zm12 2v2h2v-2zm-2 2v2h2v-2zm-2 2v2h2v-2zm4-6V9h2v2zm-2 4V7h2v8zm-2 2V5h2v12z" />
+                  </svg>
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </header>
+
+  {
+    sections.map((sec, i) =>
+      sec.visual === 'ecran' ? (
+        <section
+          id={ancre(i)}
+          aria-labelledby={`secu-${i}`}
+          class="scroll-mt-24 bg-night py-20 text-white md:py-28"
+        >
+          <div
+            class:list={[wrap, 'grid items-center gap-12 md:grid-cols-[0.9fr_1.1fr]']}
+            data-rv-groupe
+          >
+            <div class="flex flex-col items-start gap-5">
+              <p class="font-mono text-kicker text-white/60 uppercase" data-rv>
+                {num(i)} · {sec.kicker}
+              </p>
+              <h2 id={`secu-${i}`} class="font-display text-section font-bold" data-rv>
+                {sec.title}
+              </h2>
+              <p class="text-body text-white/75" data-rv>
+                {sec.subtitle}
+              </p>
+              <ol class="points points-nuit flex w-full flex-col" data-rv>
+                {sec.items.map((it, j) => (
+                  <li>
+                    <span class="rang">{num(j)}</span>
+                    <span>
+                      <b>{it.title}</b>
+                      {it.text}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+            <div data-rv>
+              <Ipad>
+                <div class="ac" data-acces data-role="0">
+                  <header class="ac-barre">
+                    <b>{screen.app}</b>
+                    <span class="ac-vu">{screen.viewing}</span>
+                    <div class="ac-roles" role="group" aria-label={screen.viewing}>
+                      <span class="ac-curseur" aria-hidden="true" />
+                      {screen.roles.map((r, j) => (
+                        <button type="button" data-r={j} aria-pressed={j === 0 ? 'true' : 'false'}>
+                          {r}
+                        </button>
+                      ))}
+                    </div>
+                  </header>
+                  <ul class="ac-lignes">
+                    {screen.rows.map((row, j) => (
+                      <li style={`--i:${j}`} class:list={{ 'non-partage': !row.access }}>
+                        <span class="ac-txt">
+                          <b>{row.label}</b>
+                          <span>{row.meta}</span>
+                        </span>
+                        {row.access ? (
+                          <span class="ac-etats">
+                            {row.access.map((etat, r) => (
+                              <span class:list={['ac-etat', etat]} data-r={r}>
+                                {screen.states[etat]}
+                              </span>
+                            ))}
+                          </span>
+                        ) : (
+                          <span class="ac-etats">
+                            <span class="ac-etat np">{screen.states.nonPartage}</span>
+                          </span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </Ipad>
+            </div>
+          </div>
+        </section>
+      ) : (
+        <section
+          id={ancre(i)}
+          aria-labelledby={`secu-${i}`}
+          class:list={[wrap, 'scroll-mt-24 py-10 md:py-14', i === 0 && 'pt-20 md:pt-24']}
+          data-rv-groupe
+        >
+          <div
+            class:list={[
+              'bloc grid overflow-hidden rounded-card bg-surface md:grid-cols-2',
+              i % 2 === 1 && 'inverse',
+            ]}
+            data-rv
+          >
+            <div class:list={['tuile grid place-items-center', TEINTES[sec.visual]]}>
+              <Picture
+                src={AGENTS[sec.visual]}
+                alt={hero.alts[sec.visual]}
+                height={400}
+                densities={[1, 2]}
+                formats={['avif', 'webp']}
+                loading="lazy"
+              />
+            </div>
+            <div class="flex flex-col items-start gap-4 p-8 md:p-12">
+              <p class="font-mono text-kicker text-orange-txt uppercase">
+                {num(i)} · {sec.kicker}
+              </p>
+              <h2 id={`secu-${i}`} class="font-display text-section font-bold text-ink">
+                {sec.title}
+              </h2>
+              <p class="text-body text-soft">{sec.subtitle}</p>
+              <ol class="points mt-2 flex w-full flex-col">
+                {sec.items.map((it, j) => (
+                  <li>
+                    <span class="rang">{num(j)}</span>
+                    <span>
+                      <b>{it.title}</b>
+                      {it.text}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </div>
+        </section>
+      ),
+    )
+  }
+
+  <section aria-labelledby="secu-contact" class="py-20 md:py-28" data-rv-groupe>
+    <div class:list={[wrap, 'flex flex-col items-start gap-5 md:items-center md:text-center']}>
+      <h2 id="secu-contact" class="font-display text-section font-bold text-ink" data-rv>
+        {contact.title}
+      </h2>
+      <p class="max-w-[36rem] text-body text-soft" data-rv>{contact.text}</p>
+      <div data-rv>
+        <Button href={routes.demo[locale]} size="lg">{t('cta.demo')}</Button>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* Hero promises: a ruled strip of links to the themes (the home band's labels, enlarged). */
+  .ancre {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: 100%;
+    padding: 20px 22px 22px;
+    background: color-mix(in srgb, var(--color-white) 72%, transparent);
+    transition: background-color 0.3s var(--ease-doux);
+  }
+  .ancre:hover {
+    background: var(--color-white);
+  }
+  .ancre svg {
+    transition: translate 0.35s var(--ease-entree);
+  }
+  .ancre:hover svg {
+    translate: 0 3px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ancre,
+    .ancre svg {
+      transition: none;
+    }
+  }
+  .ancre:focus-visible {
+    outline: 2px solid var(--color-night);
+    outline-offset: -2px;
+  }
+
+  /* A theme: the agent on its tint, the text beside; every other block puts the agent right. */
+  .bloc {
+    box-shadow: inset 0 0 0 1px var(--color-line);
+  }
+  .tuile {
+    min-height: 320px;
+    padding: 40px;
+  }
+  /* The guardian agent large in its panel (César 06/10: they were too small); all three share one
+     height, and the widest (Finch) is held to 85 % of its panel so it doesn't outweigh the others. */
+  .tuile :global(img) {
+    height: clamp(220px, 28vw, 400px);
+    width: auto;
+    max-width: 85%;
+    object-fit: contain;
+    filter: drop-shadow(0 22px 26px color-mix(in srgb, var(--color-shadow) 22%, transparent));
+  }
+  @media (min-width: 48rem) {
+    .bloc.inverse .tuile {
+      order: 2;
+    }
+  }
+
+  /* Points: index in the pixel font, a bold title then its line, rows separated by rules. */
+  .points li {
+    display: grid;
+    grid-template-columns: 2.4rem 1fr;
+    padding: 16px 0;
+    border-top: 1px solid var(--color-line);
+    font: 400 16px/1.5 var(--font-sans);
+    color: var(--color-soft);
+  }
+  .points li b {
+    display: block;
+    margin-bottom: 2px;
+    font: 700 17px/1.3 var(--font-sans);
+    color: var(--color-ink);
+  }
+  .rang {
+    padding-top: 2px;
+    font: 400 13px/1.3 var(--font-mono);
+    letter-spacing: 0.06em;
+    color: var(--color-orange-txt);
+  }
+  .points-nuit li {
+    border-color: var(--color-line-night);
+    color: color-mix(in srgb, var(--color-white) 78%, transparent);
+  }
+  .points-nuit li b {
+    color: var(--color-white);
+  }
+  .points-nuit .rang {
+    color: color-mix(in srgb, var(--color-white) 60%, transparent);
+  }
+
+  /* ---------- The access screen (iPad), sized in cqw of the screen ---------- */
+  .ac {
+    position: absolute;
+    inset: 0;
+    container-type: inline-size;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-cream);
+    font: 500 2.1cqw/1.35 var(--font-sans);
+    color: var(--color-ink);
+  }
+  .ac-barre {
+    display: flex;
+    align-items: center;
+    gap: 2cqw;
+    padding: 3cqw 3.4cqw 2.4cqw;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .ac-barre b {
+    font: 700 2.8cqw/1 var(--font-display);
+  }
+  .ac-vu {
+    margin-left: auto;
+    font: 400 1.5cqw/1 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-soft);
+  }
+  /* Segmented control: a cursor slides under the selected role. */
+  .ac-roles {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    padding: 0.5cqw;
+    border-radius: 999px;
+    background: var(--color-cream-2);
+    box-shadow: inset 0 0 0 1px var(--color-line);
+  }
+  .ac-curseur {
+    position: absolute;
+    top: 0.5cqw;
+    bottom: 0.5cqw;
+    left: 0.5cqw;
+    width: calc((100% - 1cqw) / 3);
+    border-radius: 999px;
+    background: var(--color-surface);
+    box-shadow: var(--shadow-1);
+    transition: translate 0.5s var(--ease-entree);
+  }
+  .ac[data-role='1'] .ac-curseur {
+    translate: 100% 0;
+  }
+  .ac[data-role='2'] .ac-curseur {
+    translate: 200% 0;
+  }
+  .ac-roles button {
+    position: relative;
+    padding: 1cqw 2cqw;
+    border-radius: 999px;
+    font: 600 1.7cqw/1 var(--font-sans);
+    color: var(--color-soft);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color 0.3s var(--ease-doux);
+  }
+  .ac-roles button[aria-pressed='true'] {
+    color: var(--color-ink);
+  }
+  .ac-roles button:focus-visible {
+    outline: 2px solid var(--color-orange-txt);
+    outline-offset: 1px;
+  }
+  .ac-lignes {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4cqw;
+    padding: 2.8cqw 3.4cqw;
+  }
+  .ac-lignes li {
+    display: flex;
+    align-items: center;
+    gap: 2cqw;
+    padding: 2cqw 2.4cqw;
+    border-radius: 1.6cqw;
+    background: var(--color-surface);
+    box-shadow: 0 0 0 1px var(--color-line);
+  }
+  .ac-txt {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.4cqw;
+    min-width: 0;
+  }
+  .ac-txt b {
+    font-size: 2.2cqw;
+  }
+  .ac-txt span {
+    font-size: 1.6cqw;
+    color: var(--color-soft);
+  }
+  /* One state per role in the same cell; the selected role's shows. */
+  .ac-etats {
+    display: grid;
+    justify-items: end;
+  }
+  .ac-etat {
+    grid-area: 1 / 1;
+    padding: 0.7cqw 1.5cqw;
+    border-radius: 999px;
+    font: 600 1.6cqw/1.2 var(--font-sans);
+    white-space: nowrap;
+    opacity: 0;
+    translate: 0 0.6cqw;
+    transition:
+      opacity 0.25s var(--ease-sortie),
+      translate 0.25s var(--ease-sortie);
+  }
+  .ac[data-role='0'] .ac-etat[data-r='0'],
+  .ac[data-role='1'] .ac-etat[data-r='1'],
+  .ac[data-role='2'] .ac-etat[data-r='2'],
+  .ac-etat.np {
+    opacity: 1;
+    translate: 0 0;
+    transition:
+      opacity 0.45s var(--ease-doux) calc(0.15s + var(--i) * 0.06s),
+      translate 0.6s var(--ease-entree) calc(0.15s + var(--i) * 0.06s);
+  }
+  .ac-etat.visible {
+    background: var(--color-orange-tint);
+    color: var(--color-orange-txt);
+  }
+  .ac-etat.perimetre {
+    background: var(--color-sand);
+    color: var(--color-ink);
+  }
+  .ac-etat.masque {
+    background: var(--color-cream-2);
+    color: var(--color-muted);
+  }
+  .ac-etat.np {
+    background: transparent;
+    box-shadow: inset 0 0 0 1px var(--color-stone);
+    color: var(--color-soft);
+  }
+  /* A source not shared with Hatch stays greyed for every role. */
+  .ac-lignes li.non-partage {
+    background: transparent;
+    box-shadow: 0 0 0 1px var(--color-line);
+  }
+  .ac-lignes li.non-partage .ac-txt b {
+    color: var(--color-soft);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ac-curseur,
+    .ac-etat {
+      transition: none !important;
+    }
+  }
+</style>
+
+<script>
+  /**
+   * The access screen goes through the roles on its own while it is in view (reduced motion: never);
+   * clicking a role shows that view and hands control to the visitor (the cycle stops).
+   */
+  const ecran = document.querySelector<HTMLElement>('[data-acces]');
+  if (ecran) {
+    const boutons = [...ecran.querySelectorAll<HTMLButtonElement>('.ac-roles button')];
+    const montrer = (r: number) => {
+      ecran.dataset.role = String(r);
+      boutons.forEach((b, i) => b.setAttribute('aria-pressed', String(i === r)));
+    };
+    let minuterie: number | null = null;
+    const arreter = () => {
+      if (minuterie !== null) clearInterval(minuterie);
+      minuterie = null;
+    };
+    boutons.forEach((b, i) =>
+      b.addEventListener('click', () => {
+        arreter();
+        cycle = false;
+        montrer(i);
+      }),
+    );
+    let cycle = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+    new IntersectionObserver(
+      ([e]) => {
+        if (!cycle) return;
+        if (e.isIntersecting && minuterie === null)
+          minuterie = window.setInterval(
+            () => montrer((Number(ecran.dataset.role) + 1) % boutons.length),
+            2800,
+          );
+        else if (!e.isIntersecting) arreter();
+      },
+      { threshold: 0.5 },
+    ).observe(ecran);
+  }
+</script>

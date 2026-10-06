@@ -1,0 +1,33 @@
+# Témoignages tirés des entretiens clients (NOBI NOBI : réponses écrites du 05/10/2026 ; PNY : entretien
+# du 29/09/2026). Citations, noms, titres et chiffres validés par les deux clients (06/10/2026).
+title: Ils l’ont déployé dans leur réseau
+label: Cas clients
+with: Avec
+readCase: Lire le cas
+sites: sites
+open: 'Afficher le cas {client}'
+cases:
+  - id: nobinobi
+    client: NOBI NOBI
+    agent: jay
+    visualAlt: La devanture d’un restaurant NOBI NOBI.
+    quote: « Pour moi, le plus gros gain de temps, c’est l’IA qui retrouve le fichier exact dans un drive de plus de 4 000 documents. »
+    author: Benjamin Schmit · Président, NOBI NOBI
+    figures:
+      - value: '13'
+        label: restaurants équipés
+      - value: 4 000+
+        label: documents dans le drive indexé
+    href: null
+  - id: pny
+    client: PNY
+    agent: peep
+    visualAlt: La devanture d’un restaurant PNY.
+    quote: « Avant, à chaque question, les équipes nous appelaient. Aujourd’hui, elles écrivent sur WhatsApp et ont leur réponse. Ça nous fait gagner un temps fou. »
+    author: Hannah · Directrice des opérations, PNY
+    figures:
+      - value: '13'
+        label: restaurants équipés
+      - value: 5 min
+        label: pour créer une formation
+    href: null

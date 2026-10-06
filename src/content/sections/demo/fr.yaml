@@ -1,0 +1,260 @@
+# Démo diorama : trois lieux au scroll ; dans chaque lieu, les démos des agents se jouent sur des appareils.
+titre: Vos agents au travail
+
+lieux:
+  - surtitre: Au siège
+    agents:
+      - cle: peep
+        nom: Peep
+        role: répond aux questions du terrain
+        titre: Le terrain écrit, Peep répond.
+        ecran:
+          appareil: telephone
+          heure: '11:48'
+          contact: Peep
+          statut: Assistant du réseau
+          ecrit: écrit…
+          jour: Aujourd'hui
+          saisie: Message
+          fil:
+            - de: equipe
+              texte: Où est la fiche allergènes du nouveau burger ?
+            - de: agent
+              texte: La voici, c'est la version à jour.
+            - document:
+                titre: Allergènes · carte été v3
+                meta: PDF · 2 pages
+            - de: equipe
+              texte: Merci, je l'affiche en cuisine
+          suivi:
+            app: Hatch OS
+            quand: maintenant
+            titre: Siège · questions du terrain
+            texte: Peep a répondu à BunBun Lille
+      - cle: lark
+        nom: Lark
+        role: prépare votre point du matin
+        titre: L'état du réseau, chaque matin.
+        ecran:
+          appareil: tableau
+          heure: '8:00'
+          entete: Lark · Point du matin
+          statut: Lundi 8 h
+          intro: Bonjour Claire, voici l'état du réseau ce matin.
+          titre: Réseau BunBun · semaine 40
+          source: Données Hatch · 7 derniers jours
+          blocs:
+            - type: chiffres
+              items:
+                - valeur: 312
+                  libelle: réponses de Peep
+                - valeur: 28
+                  libelle: sites actifs
+                - valeur: 1
+                  libelle: audit en retard
+            - type: alerte
+              texte: BunBun Lyon Part-Dieu · audit en retard de 3 jours
+              bouton: Relancer
+      - cle: jay
+        nom: Jay
+        role: tient le manuel à jour
+        titre: Le manuel toujours à jour.
+        ecran:
+          appareil: tableau
+          heure: '10:15'
+          entete: Jay · Manuel
+          statut: Mise à jour
+          demande:
+            qui: Claire · siège
+            texte: "Jay, mets à jour la fiche friteuse : à Lille l'huile est saturée en fin de semaine, on passe à tous les trois jours."
+          intro: Je m'en occupe, je mets la fiche à jour.
+          titre: Nettoyage friteuse
+          source: Manuel BunBun · fiche Hygiène
+          blocs:
+            - type: edition
+              version:
+                avant: v3
+                apres: v4
+              etat:
+                enCours: Modification en cours
+                publiee: Publiée
+              lignes:
+                - Couper la friteuse, laisser refroidir 30 min
+                - Vidanger l'huile une fois par semaine
+                - Nettoyer la cuve au dégraissant
+              modifiee: 1
+              apres: Vidanger l'huile tous les trois jours
+              note: 'Pourquoi : huile saturée en fin de semaine, retour de BunBun Lille'
+      - cle: finch
+        nom: Finch
+        role: transforme les audits en actions
+        titre: Des audits qui deviennent des plans d'action.
+        ecran:
+          appareil: tableau
+          heure: '17:30'
+          entete: Finch · Audits
+          statut: Audit terminé
+          intro: Audit de BunBun Lille terminé, deux écarts à traiter.
+          titre: Audit qualité · BunBun Lille
+          source: Grille d'audit BunBun 2026
+          blocs:
+            - type: score
+              valeur: 92
+              sur: 100
+              libelle: Score global
+            - type: plan
+              reflexion: Je rédige le plan d'action…
+              titre: Plan d'action · BunBun Lille
+              actions:
+                - ecart: Températures du frigo non relevées
+                  action: Relever les températures du frigo matin et soir
+                  echeance: Dès demain
+                - ecart: Étiquette DLC manquante
+                  action: Étiqueter chaque bac à l'ouverture
+                  echeance: Avant vendredi
+
+  - surtitre: En cuisine
+    agents:
+      - cle: owl
+        nom: Owl
+        role: répond à voix haute
+        titre: Une question à voix haute, la procédure lue étape par étape.
+        ecran:
+          appareil: tablette
+          heure: '15:02'
+          entete: Owl · Tablette cuisine
+          ecoute: Je vous écoute
+          prepare: Je prépare la fiche
+          lit: Je lis la fiche
+          question: Owl, comment on ouvre la caisse ?
+          fiche: Ouverture de caisse
+          source: Manuel BunBun · fiche Caisse v4
+          etapes:
+            - visuel: code
+              texte: Saisis ton code manager sur l'écran
+              libelle: Code manager
+            - visuel: caisse
+              texte: Compte le fond de caisse, 150 €
+              libelle: Fond de caisse
+              billets: [50, 50, 20, 20, 10]
+            - visuel: ticket
+              texte: Valide l'ouverture, le ticket sort
+              bouton: Valider l'ouverture
+              lignes:
+                - BunBun · Caisse 1
+                - Ouverture 15:02
+                - Fond 150,00 €
+          compteur: Étape {n} sur {total}
+          pied: Lu à voix haute, étape par étape
+      - cle: pecker
+        nom: Pecker
+        role: forme l'équipe pendant la pause
+        titre: Cinq minutes de formation pendant la pause, et le siège sait qui a validé.
+        ecran:
+          appareil: formation
+          heure: '15:02'
+          chapitre: Chapitre 1 · Ouverture du restaurant
+          compteur: '{n} / {total}'
+          lecture:
+            titre: Avant d'ouvrir les portes
+            lignes:
+              - Tu fais le tour des frigos et de la chambre froide.
+              - Tu notes chaque température sur le relevé du jour.
+              - Tu vérifies que chaque bac porte son étiquette DLC.
+            retenir:
+              libelle: À retenir
+              texte: Au-dessus de 4 °C, tu préviens le manager et tu notes la température.
+          questions:
+            - question: À l'ouverture, la chambre froide affiche 6 °C. Tu fais quoi ?
+              options:
+                - J'ouvre, ça va redescendre
+                - Je préviens le manager
+                - Je baisse le thermostat
+              bonne: 1
+              retour: Bien vu. Au-dessus de 4 °C, on alerte et on trace.
+            - question: Un bac de sauce burger n'a pas d'étiquette. Tu fais quoi ?
+              options:
+                - Je le garde, il a l'air bon
+                - Je l'étiquette à la date du jour
+                - Je le jette
+              bonne: 2
+              retour: Bien vu. Sans étiquette, pas de DLC, le bac part à la poubelle.
+          bonneReponse: Bonne réponse
+          continuer: Continuer
+          valider: Valider la formation
+          fin:
+            titre: Formation validée
+            texte: Bravo Inès, tu as terminé « Ouverture du restaurant ».
+          suivi:
+            app: Hatch OS
+            quand: maintenant
+            titre: Siège · suivi des formations
+            texte: Inès a validé « Ouverture du restaurant »
+
+  - surtitre: Sur le chantier
+    agents:
+      - cle: sparrow-candidats
+        nom: Sparrow · Candidats
+        role: qualifie vos candidats franchisés
+        titre: Chaque candidat qualifié, sans attendre.
+        ecran:
+          appareil: telephone
+          heure: '21:12'
+          contact: Sparrow
+          statut: Recrutement BunBun
+          ecrit: écrit…
+          jour: Aujourd'hui
+          saisie: Message
+          fil:
+            - de: equipe
+              texte: Bonsoir, j'ai vu BunBun sur Toute la Franchise. Le concept m'intéresse pour Rennes.
+            - de: agent
+              texte: "Bonsoir Julien, merci pour votre intérêt ! Je suis l'assistant commercial de BunBun. Pour bien vous orienter : quel est votre parcours, et seriez-vous dans le restaurant au quotidien ?"
+            - de: equipe
+              texte: 12 ans en grande distribution, manager de rayon. Oui, je veux exploiter moi-même.
+            - de: agent
+              texte: Un vrai profil terrain, c'est ce qu'on cherche. Côté financement, quel apport personnel envisagez-vous ? Chez BunBun, il faut compter 80 k€ minimum.
+            - de: equipe
+              texte: J'ai 95 k€, et ma banque suit pour le reste.
+            - de: agent
+              texte: Votre projet coche nos critères. Voici la présentation du concept, et je vous propose un appel découverte jeudi à 18 h.
+            - document:
+                titre: BunBun · présentation du concept
+                meta: PDF · 14 pages
+            - de: equipe
+              texte: Jeudi 18 h, c'est noté !
+          suivi:
+            app: Hatch OS
+            quand: maintenant
+            titre: CRM · candidat qualifié
+            texte: Julien Morel · Rennes · apport 95 k€ · appel découverte jeudi 18 h
+      - cle: sparrow-ouverture
+        nom: Sparrow · Ouverture
+        role: suit chaque ouverture jusqu'au jour J
+        titre: Chaque ouverture suivie jusqu'au jour J.
+        ecran:
+          appareil: telephone
+          heure: '9:05'
+          contact: Sparrow
+          statut: Ouverture BunBun Angers
+          ecrit: écrit…
+          jour: Aujourd'hui
+          saisie: Message
+          fil:
+            - de: agent
+              texte: Bonjour Sophie ! La hotte d'extraction devait être posée hier. C'est bon de ton côté ?
+            - de: equipe
+              texte: Non… le fournisseur a décalé la livraison au 4 novembre.
+            - de: agent
+              texte: Compris. Sans hotte, pas de mise en service de la cuisine, donc pas de formation en conditions réelles le 6.
+            - de: agent
+              texte: "Je te propose : pose le 4, formation de l'équipe le 8, ouverture le 15 novembre au lieu du 9. Ça te va ?"
+            - de: equipe
+              texte: Oui, parfait. Tu préviens le siège ?
+            - de: agent
+              texte: C'est fait. J'ai aussi relancé le fournisseur pour une pose le 4 au matin.
+          suivi:
+            app: Hatch OS
+            quand: maintenant
+            titre: BunBun Angers · ouverture décalée
+            texte: Ouverture le 15/11 · formation de l'équipe le 08/11

@@ -1,0 +1,26 @@
+# Labels shared by the agent pages (/en/agents/<slug>). {name} = agent name, {client} = customer name, {date} = date.
+breadcrumb:
+  label: Breadcrumb
+  home: Home
+  agents: Agents
+problem:
+  kicker: The problem
+  answer: '{name} answers'
+actions:
+  kicker: What I do
+scenario:
+  kicker: A customer story
+tools:
+  kicker: Tools
+  title: The tools I work with
+faq:
+  kicker: FAQ
+  title: Your questions about {name}
+related:
+  kicker: Teamwork
+  title: The agents I work with
+allCases: See customer stories
+cta:
+  title: See {name} at work, on your own documents
+  text: "We show you Hatch OS with your network's procedures, and what {name} does with them."
+updated: Updated on {date}

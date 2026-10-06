@@ -1,0 +1,28 @@
+signature: L'OS des réseaux de franchise. Sept agents qui renforcent vos équipes, du siège au terrain.
+cta: Réserver une démo
+agents:
+  titre: Les agents
+  residents:
+    - etage: COMBLES
+      libelle: Établissement — Owl
+    - etage: 3e D
+      libelle: Direction — Lark
+    - etage: 2e G
+      libelle: Formation — Pecker
+    - etage: 2e G
+      libelle: Développement — Sparrow
+    - etage: 2e D
+      libelle: Qualité — Finch
+    - etage: 1er G
+      libelle: Vie de réseau — Peep
+    - etage: 1er D
+      libelle: Documentation — Jay
+legal:
+  titre: Légal
+  conditions: Conditions d'utilisation
+  vente: Conditions de vente
+  confidentialite: Confidentialité
+  mentions: Mentions légales
+copyright: Hatch OS · Paris
+mention: Données hébergées en Europe · Conforme RGPD
+immeubleAlt: Un immeuble parisien en voxels, vu en coupe, où chaque agent Hatch OS occupe son étage

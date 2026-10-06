@@ -1,22 +1,5 @@
 ---
-import { getCollection } from 'astro:content';
-import SansFiltreLayout from '../components/SansFiltreLayout.astro';
-import SansFiltreEdition from '../components/SansFiltreEdition.astro';
-
-// Newest edition first — the most recent renders full-page here; every edition
-// (including past ones) also gets its own page at /sans-filtre/<edition>.
-// Adding an edition = drop a Markdown file, nothing here changes.
-const editions = (await getCollection('sansFiltre')).sort((a, b) =>
-  b.data.date.localeCompare(a.data.date),
-);
-const latest = editions[0];
+import SansFiltrePage from '../views/SansFiltrePage.astro';
 ---
 
-<SansFiltreLayout
-  locale="fr"
-  navLabel="Hatch OS Sans Filtre"
-  title="Hatch OS Sans Filtre · Le journal des nouveautés"
-  description="Chaque mois, ce qu'on a réellement livré chez Hatch OS, l'OS des réseaux de restauration. Sans teasing, sans roadmap fantôme. Sans filtre."
->
-  <SansFiltreEdition entry={latest} locale="fr" editions={editions} />
-</SansFiltreLayout>
+<SansFiltrePage locale="fr" />

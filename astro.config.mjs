@@ -1,17 +1,28 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
+import { defineConfig, envField, fontProviders } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 import vercel from '@astrojs/vercel';
-import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
+import { sitemapOptions } from './src/seo/sitemap.ts';
 
 // https://astro.build/config
 export default defineConfig({
   site: 'https://www.gethatch.io',
+  // One URL form: no trailing slash (`/conditions`, `/en`), except the root. Canonicals, hreflang,
+  // internal links and the sitemap all use it, and the canonical consolidates a stray `/x/`.
+  // Not `'never'`: that makes the adapter redirect every `/x/` (308) and the dev server 404 it, which
+  // breaks the PostHog proxy (`/relais/i/v0/e/`, `/relais/flags/`: posthog-js always ends its paths
+  // with a slash). Pages are built as `x/index.html`, which Vercel serves at `/x`.
+  trailingSlash: 'ignore',
 
-  // Native i18n routing — see https://docs.astro.build/en/guides/internationalization/
-  // FR is the default locale → served at "/" (no prefix).
-  // EN is served at "/en/...".
+  // PostHog project key (public, but kept out of the repo): Vercel env + local `.env`.
+  env: {
+    schema: {
+      PUBLIC_POSTHOG_KEY: envField.string({ context: 'client', access: 'public', optional: true }),
+    },
+  },
+
+  // FR is the default locale, served at "/" (no prefix). EN is served at "/en/...".
   i18n: {
     defaultLocale: 'fr',
     locales: ['fr', 'en'],
@@ -20,24 +31,75 @@ export default defineConfig({
     },
   },
 
+  // Self-hosted at build time. Weights limited to what the v4 mockups use.
+  fonts: [
+    {
+      name: 'Fraunces',
+      cssVariable: '--font-fraunces',
+      provider: fontProviders.fontsource(),
+      weights: [400, 600, 700],
+      styles: ['normal', 'italic'],
+      subsets: ['latin', 'latin-ext'],
+      fallbacks: ['Georgia', 'serif'],
+    },
+    {
+      name: 'Inter',
+      cssVariable: '--font-inter',
+      provider: fontProviders.fontsource(),
+      weights: [400, 500, 600, 700],
+      styles: ['normal'],
+      subsets: ['latin', 'latin-ext'],
+      fallbacks: ['system-ui', 'sans-serif'],
+    },
+    {
+      name: 'Departure Mono',
+      cssVariable: '--font-departure',
+      provider: fontProviders.local(),
+      fallbacks: ['ui-monospace', 'monospace'],
+      options: {
+        variants: [
+          {
+            src: ['./src/assets/fonts/DepartureMono-Regular.woff2'],
+            weight: 400,
+            style: 'normal',
+          },
+        ],
+      },
+    },
+  ],
+
   vite: {
     plugins: [tailwindcss()],
+    // GSAP is only reached through a dynamic import (the demo section loads it when it comes near).
+    // Pre-bundle it at dev start, or Vite discovers it late, re-optimises, and the page's request for
+    // the old bundle fails with "504 Outdated Optimize Dep".
+    optimizeDeps: { include: ['gsap'] },
+    // Dev twin of the vercel.json rewrites: PostHog through our own `/relais` path (assets first).
+    server: {
+      // Dev only: lets a bb connect share link (<host>--<port>.getbb.app) reach the dev server.
+      allowedHosts: ['.getbb.app'],
+      proxy: {
+        '/relais/static': {
+          target: 'https://eu-assets.i.posthog.com',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/relais/, ''),
+        },
+        '/relais': {
+          target: 'https://eu.i.posthog.com',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/relais/, ''),
+        },
+      },
+    },
   },
 
-  // Web Analytics is injected automatically by the Vercel adapter at deploy time.
-  // Speed Insights is now handled by the @vercel/speed-insights package.
-  // Only active in production deployments (Preview + Production), not local dev.
+  // Web Analytics is injected by the Vercel adapter at deploy time (Preview + Production only).
   adapter: vercel({
     webAnalytics: { enabled: true },
   }),
 
   integrations: [
-    react(),
-    sitemap({
-      i18n: {
-        defaultLocale: 'fr',
-        locales: { fr: 'fr-FR', en: 'en-US' },
-      },
-    }),
+    // hreflang alternates (incl. pages whose slugs differ per locale) and git-based lastmod.
+    sitemap(sitemapOptions()),
   ],
 });

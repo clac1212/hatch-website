@@ -1,0 +1,260 @@
+# Diorama demo: three places on scroll; in each place, the visitor opens an agent's demo.
+titre: Your agents at work
+
+lieux:
+  - surtitre: At head office
+    agents:
+      - cle: peep
+        nom: Peep
+        role: answers questions from the field
+        titre: The field asks, Peep answers.
+        ecran:
+          appareil: telephone
+          heure: '11:48'
+          contact: Peep
+          statut: Network assistant
+          ecrit: typing…
+          jour: Today
+          saisie: Message
+          fil:
+            - de: equipe
+              texte: Where's the allergen sheet for the new burger?
+            - de: agent
+              texte: Here it is, the latest version.
+            - document:
+                titre: Allergens · summer menu v3
+                meta: PDF · 2 pages
+            - de: equipe
+              texte: Thanks, I'll put it up in the kitchen
+          suivi:
+            app: Hatch OS
+            quand: now
+            titre: Head office · field questions
+            texte: Peep answered BunBun Lille
+      - cle: lark
+        nom: Lark
+        role: prepares your morning briefing
+        titre: The state of your network, every morning.
+        ecran:
+          appareil: tableau
+          heure: '8:00'
+          entete: Lark · Morning briefing
+          statut: Monday 8 am
+          intro: Good morning Claire, here's the state of the network this morning.
+          titre: BunBun network · week 40
+          source: Hatch data · last 7 days
+          blocs:
+            - type: chiffres
+              items:
+                - valeur: 312
+                  libelle: answers from Peep
+                - valeur: 28
+                  libelle: active sites
+                - valeur: 1
+                  libelle: overdue audit
+            - type: alerte
+              texte: BunBun Lyon Part-Dieu · audit 3 days overdue
+              bouton: Follow up
+      - cle: jay
+        nom: Jay
+        role: keeps the manual up to date
+        titre: The manual always up to date.
+        ecran:
+          appareil: tableau
+          heure: '10:15'
+          entete: Jay · Manual
+          statut: Updated
+          demande:
+            qui: Claire · head office
+            texte: "Jay, please update the fryer sheet: in Lille the oil is saturated by the end of the week, let's switch to every three days."
+          intro: On it, updating the sheet.
+          titre: Fryer cleaning
+          source: BunBun manual · Hygiene sheet
+          blocs:
+            - type: edition
+              version:
+                avant: v3
+                apres: v4
+              etat:
+                enCours: Editing
+                publiee: Published
+              lignes:
+                - Switch off the fryer, let it cool for 30 min
+                - Drain the oil once a week
+                - Clean the tank with degreaser
+              modifiee: 1
+              apres: Drain the oil every three days
+              note: 'Why: oil saturated by the end of the week, feedback from BunBun Lille'
+      - cle: finch
+        nom: Finch
+        role: turns audits into actions
+        titre: Audits that become action plans.
+        ecran:
+          appareil: tableau
+          heure: '17:30'
+          entete: Finch · Audits
+          statut: Audit done
+          intro: BunBun Lille audit done, two gaps to fix.
+          titre: Quality audit · BunBun Lille
+          source: BunBun audit grid 2026
+          blocs:
+            - type: score
+              valeur: 92
+              sur: 100
+              libelle: Overall score
+            - type: plan
+              reflexion: Writing the action plan…
+              titre: Action plan · BunBun Lille
+              actions:
+                - ecart: Fridge temperatures not logged
+                  action: Log fridge temperatures morning and evening
+                  echeance: From tomorrow
+                - ecart: Missing use-by label
+                  action: Label every tub at opening
+                  echeance: By Friday
+
+  - surtitre: In the kitchen
+    agents:
+      - cle: owl
+        nom: Owl
+        role: answers out loud
+        titre: A question out loud, the procedure read step by step.
+        ecran:
+          appareil: tablette
+          heure: '15:02'
+          entete: Owl · Kitchen tablet
+          ecoute: Listening
+          prepare: Preparing the sheet
+          lit: Reading the sheet
+          question: Owl, how do we open the till?
+          fiche: Opening the till
+          source: BunBun manual · Till sheet v4
+          etapes:
+            - visuel: code
+              texte: Enter your manager code on the screen
+              libelle: Manager code
+            - visuel: caisse
+              texte: Count the cash float, €150
+              libelle: Cash float
+              billets: [50, 50, 20, 20, 10]
+            - visuel: ticket
+              texte: Confirm the opening, the receipt prints
+              bouton: Confirm opening
+              lignes:
+                - BunBun · Till 1
+                - Opened 15:02
+                - Float €150.00
+          compteur: Step {n} of {total}
+          pied: Read out loud, step by step
+      - cle: pecker
+        nom: Pecker
+        role: trains the team during the break
+        titre: Five minutes of training during the break, and head office knows who passed.
+        ecran:
+          appareil: formation
+          heure: '15:02'
+          chapitre: Chapter 1 · Opening the restaurant
+          compteur: '{n} / {total}'
+          lecture:
+            titre: Before you open the doors
+            lignes:
+              - Walk round the fridges and the cold room.
+              - Write down each temperature on today's log.
+              - Check that every tub carries its use-by label.
+            retenir:
+              libelle: Key point
+              texte: Above 4 °C, tell the manager and write the temperature down.
+          questions:
+            - question: At opening, the cold room reads 6 °C. What do you do?
+              options:
+                - Open, it'll cool down
+                - Tell the manager
+                - Turn the thermostat down
+              bonne: 1
+              retour: Well spotted. Above 4 °C, we alert and log it.
+            - question: A tub of burger sauce has no label. What do you do?
+              options:
+                - Keep it, it looks fine
+                - Label it with today's date
+                - Throw it away
+              bonne: 2
+              retour: Well spotted. No label means no use-by date, so the tub goes in the bin.
+          bonneReponse: Correct answer
+          continuer: Continue
+          valider: Complete the training
+          fin:
+            titre: Training complete
+            texte: Well done Inès, you finished “Opening the restaurant”.
+          suivi:
+            app: Hatch OS
+            quand: now
+            titre: Head office · training tracker
+            texte: Inès passed “Opening the restaurant”
+
+  - surtitre: On the build site
+    agents:
+      - cle: sparrow-candidats
+        nom: Sparrow · Candidates
+        role: qualifies your franchise candidates
+        titre: Every candidate qualified, without waiting.
+        ecran:
+          appareil: telephone
+          heure: '21:12'
+          contact: Sparrow
+          statut: BunBun recruitment
+          ecrit: typing…
+          jour: Today
+          saisie: Message
+          fil:
+            - de: equipe
+              texte: Hi, I saw BunBun on a franchise directory. I'm interested in the concept for Rennes.
+            - de: agent
+              texte: "Hi Julien, thanks for your interest! I'm BunBun's sales assistant. To guide you well: what's your background, and would you run the restaurant day to day?"
+            - de: equipe
+              texte: 12 years in retail, as a department manager. Yes, I want to run it myself.
+            - de: agent
+              texte: A real hands-on profile, that's what we look for. On financing, how much personal capital do you plan to put in? BunBun asks for €80k minimum.
+            - de: equipe
+              texte: I have €95k, and my bank will cover the rest.
+            - de: agent
+              texte: Your project meets our criteria. Here's the concept presentation, and how about a discovery call on Thursday at 6 pm?
+            - document:
+                titre: BunBun · concept presentation
+                meta: PDF · 14 pages
+            - de: equipe
+              texte: Thursday 6 pm, noted!
+          suivi:
+            app: Hatch OS
+            quand: now
+            titre: CRM · qualified candidate
+            texte: Julien Morel · Rennes · €95k capital · discovery call Thursday 6 pm
+      - cle: sparrow-ouverture
+        nom: Sparrow · Opening
+        role: follows every opening until day one
+        titre: Every opening followed until day one.
+        ecran:
+          appareil: telephone
+          heure: '9:05'
+          contact: Sparrow
+          statut: BunBun Angers opening
+          ecrit: typing…
+          jour: Today
+          saisie: Message
+          fil:
+            - de: agent
+              texte: Morning Sophie! The extraction hood was due to be installed yesterday. All good on your side?
+            - de: equipe
+              texte: No… the supplier pushed the delivery to November 4.
+            - de: agent
+              texte: Got it. No hood means the kitchen can't be commissioned, so no hands-on training on the 6th.
+            - de: agent
+              texte: "Here's my proposal: install on the 4th, team training on the 8th, opening on November 15 instead of the 9th. Does that work?"
+            - de: equipe
+              texte: Yes, perfect. Will you let head office know?
+            - de: agent
+              texte: Done. I also chased the supplier for an install on the morning of the 4th.
+          suivi:
+            app: Hatch OS
+            quand: now
+            titre: BunBun Angers · opening moved
+            texte: Opening on 11/15 · team training on 11/08

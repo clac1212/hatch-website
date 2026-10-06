@@ -1,0 +1,42 @@
+---
+import Base from '../layouts/Base.astro';
+import Button from '../components/ui/Button.astro';
+import { routes, useTranslations } from '../i18n/ui';
+
+/**
+ * The 404 page. Vercel serves this single file, with a 404 status, for every unknown URL of both
+ * locales: French first (the default locale), then the same message in English.
+ */
+const fr = useTranslations('fr');
+const en = useTranslations('en');
+const lien =
+  'text-body font-semibold text-orange-txt underline decoration-1 underline-offset-4 hover:text-orange-hover';
+---
+
+<Base
+  locale="fr"
+  paths={routes.home}
+  title={fr('404.seoTitle')}
+  description={fr('404.seoDescription')}
+  noindex
+>
+  <section class="mx-auto flex max-w-prose flex-col gap-6 px-6 pt-36 pb-24 md:pt-44 md:pb-32">
+    <p class="font-mono text-kicker text-orange-txt uppercase">{fr('404.kicker')}</p>
+    <h1 class="font-mono text-h1 text-ink">{fr('404.title')}</h1>
+    <p class="text-body text-soft">{fr('404.text')}</p>
+    <div class="flex flex-wrap items-center gap-x-8 gap-y-4">
+      <Button href={routes.demo.fr} size="lg">{fr('cta.demo')}</Button>
+      <a href={routes.home.fr} class={lien}>{fr('404.home')}</a>
+    </div>
+
+    <div lang="en" class="mt-10 flex flex-col gap-4 border-t border-line pt-8">
+      <p class="font-mono text-kicker text-soft uppercase">{en('404.kicker')}</p>
+      <p class="font-display text-card text-ink">{en('404.title')}</p>
+      <p class="text-body text-soft">{en('404.text')}</p>
+      <p class="flex flex-wrap gap-x-8 gap-y-2">
+        <a href={routes.home.en} class={lien}>{en('404.home')}</a>
+        <a href={routes.demo.en} class={lien}>{en('cta.demo')}</a>
+      </p>
+    </div>
+  </section>
+</Base>

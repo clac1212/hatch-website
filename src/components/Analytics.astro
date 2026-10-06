@@ -1,0 +1,23 @@
+---
+import { PUBLIC_POSTHOG_KEY } from 'astro:env/client';
+import snippet from '../scripts/posthog-snippet.js?raw';
+
+/**
+ * PostHog (project "hatch website", EU cloud), official async snippet. Cookieless: no cookie, no
+ * storage, so no consent banner; the project has "cookieless server hash mode" on and drops IPs.
+ * Requests go through `/relais`, our own path rewritten to PostHog (vercel.json in production,
+ * the Vite proxy in dev), so tracker blockers don't drop them.
+ * The key is public but stays out of the repo: Vercel env and local `.env`. Without it, nothing loads.
+ */
+const options = {
+  api_host: '/relais',
+  ui_host: 'https://eu.posthog.com',
+  defaults: '2026-05-30',
+  cookieless_mode: 'always',
+};
+const script =
+  PUBLIC_POSTHOG_KEY &&
+  `${snippet.replace(/^\/\/.*\n/gm, '')}posthog.init(${JSON.stringify(PUBLIC_POSTHOG_KEY)}, ${JSON.stringify(options)});`;
+---
+
+{script && <script is:inline set:html={script} />}

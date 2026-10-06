@@ -1,0 +1,95 @@
+seo:
+  title: 'Security & privacy — Hatch OS'
+  description: 'You stay in control of your data with Hatch OS: hosted in Europe, never used to train an AI, and accessible only to the people you choose.'
+hero:
+  kicker: 'Security & privacy'
+  title: 'Your data, secure from day one.'
+  lead: "You stay in control of what you share, where it's hosted, and who can access it."
+  proofs:
+    - label: 'Data hosted in Europe'
+      section: 0
+    - label: 'No AI training'
+      section: 1
+    - label: 'Role-based access'
+      section: 2
+    - label: 'GDPR compliant'
+      section: 3
+  alts:
+    jay: 'Jay, the voxel bird, standing on two servers with a European flag'
+    owl: 'Owl in front of a safe closed with a padlock'
+    finch: 'Finch stamping a file as approved'
+sections:
+  - kicker: 'Sharing & hosting'
+    visual: jay
+    title: 'You decide what you share'
+    subtitle: 'You choose exactly which data Hatch OS uses.'
+    items:
+      - title: 'Source-level selection'
+        text: 'Choose exactly what Hatch OS uses, source by source.'
+      - title: 'Data hosted in Europe'
+        text: 'Your data and its backups are hosted in Europe.'
+      - title: 'Encryption in transit and at rest'
+        text: 'TLS for data in transit, AES-256 for stored data.'
+  - kicker: 'Artificial intelligence'
+    visual: owl
+    title: 'Your data never trains AI'
+    subtitle: 'Your content is used to serve you, never to train models.'
+    items:
+      - title: 'No training'
+        text: 'Your data is never used to train an AI model.'
+      - title: 'Zero retention by models'
+        text: 'You keep your data; our model providers retain none of it.'
+      - title: 'Isolated per customer'
+        text: "The assistant draws only on your documents, isolated from other customers'."
+  - kicker: 'Access control'
+    visual: ecran
+    title: 'Granular access control, at every level'
+    subtitle: 'Everyone in your network only accesses what concerns them.'
+    items:
+      - title: 'Enterprise SSO'
+        text: 'Your teams sign in via your SSO (SAML).'
+      - title: 'Role-based access'
+        text: 'Distinct rights for the franchisor and franchisees.'
+      - title: 'Fine-grained permissions'
+        text: 'You choose who accesses which documents across your teams.'
+  - kicker: 'Compliance'
+    visual: finch
+    title: 'Compliance'
+    subtitle: 'The European framework, minus the jargon.'
+    items:
+      - title: 'GDPR'
+        text: 'Access, export and deletion of your data whenever you want.'
+      - title: 'EU AI Act'
+        text: 'No AI evaluates, scores or ranks a person.'
+      - title: 'Documentation'
+        text: 'DPA and detailed security measures available on request.'
+screen:
+  app: 'Hatch · Access'
+  viewing: 'Seen by'
+  roles:
+    - 'Head office'
+    - 'BunBun Lille'
+    - 'Crew member'
+  states:
+    visible: 'Visible'
+    perimetre: 'Own scope'
+    masque: 'Hidden'
+    nonPartage: 'Not shared with Hatch'
+  rows:
+    - label: 'BunBun manual'
+      meta: 'All sheets'
+      access: [visible, visible, visible]
+    - label: 'Quality audits'
+      meta: 'All sites'
+      access: [visible, perimetre, masque]
+    - label: 'Rotas'
+      meta: 'Site teams'
+      access: [visible, perimetre, perimetre]
+    - label: 'Network figures'
+      meta: 'Revenue, footfall'
+      access: [visible, masque, masque]
+    - label: 'Recipes in testing'
+      meta: 'R&D folder'
+contact:
+  title: 'A question about security?'
+  text: 'Our team answers your security questionnaires and shares our detailed documentation on request.'

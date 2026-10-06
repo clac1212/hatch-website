@@ -1,449 +1,294 @@
 @import 'tailwindcss';
 
-/* ───────────────────────────────────────────────────────────────────────────
- * Hatch design tokens — extracted from _reference/hatch_landing_page.html.
- * Tailwind v4 reads custom properties under @theme to generate utilities.
- * Do NOT add raw hex values in components — extend tokens here instead.
- * ─────────────────────────────────────────────────────────────────────────── */
+/*
+ * Design tokens — Hatch OS design system v4 (source: pencil-new.pen, frames "01 — Couleurs" → "07 — Règles").
+ * The default Tailwind palette is wiped: only these colors exist, so a raw or off-brand color can't slip in.
+ */
 @theme {
-  /* ── Brand greens ── */
-  --color-hatch-bg: #051309;
-  --color-hatch-bg-2: #0a1a0c;
-  --color-hatch-bg-3: #060e07;
-  --color-hatch-text: #0f1f10;
-  --color-hatch-primary: #386641;
-  --color-hatch-primary-soft: #4a6350;
-  --color-hatch-primary-bright: #5aad6e;
-  --color-hatch-nav: #1a2e1c;
-  --color-hatch-surface: #f6f9f6;
-  --color-hatch-pill-bg: rgba(56, 102, 65, 0.08);
-  --color-hatch-pill-bg-strong: rgba(56, 102, 65, 0.18);
+  --color-*: initial;
 
-  /* ── CTA yellow ── */
-  --color-hatch-cta: #fff4a4;
-  --color-hatch-cta-hover: #f0e882;
+  /* Surfaces */
+  --color-cream: #fdf8ee; /* page background */
+  --color-cream-2: #f7edd9; /* section variation */
+  --color-surface: #ffffff; /* card */
+  --color-surface-2: #fbf6ea; /* secondary card */
+  --color-sand: #f0dfc0; /* highlighted panel */
+  --color-night: #0b0b0d; /* night section, footer */
+  --color-night-2: #1a1a18; /* card on night */
+  --color-line-night: #2a2a27; /* rule on night */
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-paper: #f7f4ee; /* light card variant used in the v4 mockups */
+  --color-stone: #d9d3c7; /* muted rule / chip on cream */
+  --color-muted: #8a847a; /* tertiary text, metadata */
+  --color-peach: #ffd2b8; /* orange-tinted fills in mockups */
+  --color-peach-2: #fff1e8;
+  --color-shadow: #2a1003; /* warm shadow tint, use with an alpha (/10, /20…) */
 
-  /* ── Accent orange ── */
-  --color-hatch-accent: #ea580c;
-  --color-hatch-accent-soft: #e07b2a;
-  --color-hatch-accent-deep: #c2410c;
-  --color-hatch-accent-bg: rgba(234, 88, 12, 0.08);
-  --color-hatch-accent-bg-strong: rgba(234, 88, 12, 0.18);
+  /* Text and rules */
+  --color-ink: #12120f; /* 17.7:1 on cream */
+  --color-soft: #5d5a52; /* 6.5:1 on cream */
+  --color-line: #e4dcc9;
 
-  /* ── WhatsApp greens (mockup) ── */
-  --color-wa-green: #25d366;
-  --color-wa-dark: #075e54;
-  --color-wa-bubble: #dcf8c6;
-  --color-wa-bg: #ece5dd;
-  --color-wa-dark-bg: #0b141a;
-  --color-wa-dark-bubble: #202c33;
-  --color-wa-dark-sent: #005c4b;
+  /* Orange — #F87A01 is for flat fills only, never under or as text (2.7:1). */
+  --color-orange: #f87a01;
+  --color-orange-txt: #a34f00; /* orange text, button background */
+  --color-orange-hover: #8a4300;
+  --color-orange-tint: #fdeadb;
+  --color-copper: #c98a4b; /* secondary chart series */
 
-  /* ── Typography ── */
-  --font-display: 'Fraunces', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Courier New', ui-monospace, Menlo, Monaco, monospace;
+  /* Customer brand colours: the slices of the customer cases shelf (Cas.astro), white text on them. */
+  --color-client-meulerie: #1414e6;
+  --color-client-nobinobi: #121212;
+  --color-client-pny: #17804a;
 
-  /* ── Layout ── */
-  --container-site: 1120px;
+  /* Product UI mockups only (phones, chat threads, app windows) — never for site chrome. */
+  --color-success: #16a34a;
+  --color-whatsapp: #d9fdd3; /* outgoing chat bubble */
+  --color-whatsapp-brand: #25d366; /* WhatsApp app icon / channel */
+  --color-mail: #1466f2; /* Mail app icon / channel */
+  --color-mail-light: #22c4ff;
+  --color-success-txt: #0e7a3e; /* success as text on cream (AA) */
+  --color-success-tint: #ecfdf5; /* right answer picked (training app) */
+  --color-amber-tint: #fffbeb; /* "key point" box of the training app */
+  --color-amber-line: #fcd34d;
+  --color-amber-txt: #b45309; /* its label and icon, 4.8:1 on the tint */
+  --color-navy: #1b3a60; /* cool shadows over the sea (hero map) */
+  --color-scene: #ded4dc; /* backdrop of the voxel diorama renders */
+  --color-gray-50: #fafafa;
+  --color-gray-100: #eeeeee;
+  --color-gray-400: #bbbbbb;
+  --color-gray-500: #888888;
+  --color-gray-700: #555555;
+  --color-gray-800: #333333;
+  /* Device mock-ups (demo section): titanium and aluminium edges, black glass, WhatsApp chat. */
+  --color-metal: #c8c6c1; /* silver edge */
+  --color-metal-light: #f2f1ee;
+  --color-metal-dark: #8f8c86;
+  --color-glass: #050506;
+  --color-whatsapp-wall: #efeae2; /* chat background */
+  --color-whatsapp-tick: #53bdeb; /* read receipts */
 
-  /* ── Shadows ── */
-  --shadow-cta-hover: 0 6px 22px rgba(255, 244, 164, 0.28);
-  --shadow-card-hover: 0 16px 40px rgba(0, 0, 0, 0.09);
-  --shadow-card-hover-strong: 0 20px 44px rgba(0, 0, 0, 0.1);
-  --shadow-phone:
-    0 50px 120px rgba(0, 0, 0, 0.22), 0 0 0 1px rgba(255, 255, 255, 0.07), inset 0 0 0 2px #1e293b;
-  --shadow-pq-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 20px 48px -12px rgba(0, 0, 0, 0.14);
-  --shadow-hub-src:
-    0 1px 2px rgba(15, 23, 42, 0.04), 0 16px 36px -12px rgba(15, 23, 42, 0.18),
-    0 6px 14px -4px rgba(15, 23, 42, 0.08);
-  --shadow-hub-center:
-    0 0 0 1px rgba(234, 88, 12, 0.08), 0 1px 2px rgba(234, 88, 12, 0.06),
-    0 28px 70px -12px rgba(234, 88, 12, 0.36), 0 10px 28px -6px rgba(234, 88, 12, 0.22);
-  --shadow-hiw-card: 0 16px 56px rgba(251, 191, 36, 0.18), 0 2px 8px rgba(0, 0, 0, 0.04);
-  --shadow-hiw-card-hover: 0 28px 72px rgba(251, 191, 36, 0.28), 0 4px 16px rgba(0, 0, 0, 0.06);
+  /* Type scale — fluid between mobile and the 1440 px desktop mockups */
+  --text-h1: clamp(2.25rem, 1.4rem + 3.4vw, 4rem);
+  --text-h1--line-height: 1.1;
+  --text-section: clamp(1.875rem, 1.5rem + 1.5vw, 2.5rem);
+  --text-section--line-height: 1.12;
+  --text-section--letter-spacing: -0.0125em;
+  --text-card: 1.375rem;
+  --text-card--line-height: 1.25;
+  --text-card--letter-spacing: -0.014em;
+  --text-stat: clamp(2.5rem, 2rem + 2vw, 3.5rem);
+  --text-stat--line-height: 1;
+  --text-stat--letter-spacing: -0.027em;
+  --text-punch: 1.1875rem;
+  --text-punch--line-height: 1.4;
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.55;
+  --text-caption: 0.875rem;
+  --text-caption--line-height: 1.5;
+  --text-kicker: 0.8125rem;
+  --text-kicker--line-height: 1.3;
+  --text-kicker--letter-spacing: 0.13em;
+  --text-source: 0.6875rem;
+  --text-source--line-height: 1.4;
+  --text-source--letter-spacing: 0.12em;
 
-  /* ── Hero radial gradients (for ::before overlay) ── */
-  --hero-glow:
-    radial-gradient(ellipse 90% 55% at 50% -5%, rgba(56, 102, 65, 0.4) 0%, transparent 62%),
-    radial-gradient(ellipse 35% 40% at 10% 90%, rgba(56, 102, 65, 0.1) 0%, transparent 55%),
-    radial-gradient(ellipse 35% 40% at 90% 85%, rgba(56, 102, 65, 0.08) 0%, transparent 55%);
+  /* Shapes — relief comes from the border, not the shadow. Four depth levels max (0–3). */
+  --radius-btn: 8px;
+  --radius-card: 16px;
+  --radius-glass: 18px;
+  --shadow-1: 0 4px 14px #22190c0a;
+  --shadow-2: 0 6px 26px #140f231f;
+  --shadow-3: 0 22px 60px #08061457;
 
-  /* ── Hub diagram gradient (orange wash) ── */
-  --hub-gradient: linear-gradient(135deg, #fff7ed 0%, #fef3e2 50%, #fff7ed 100%);
+  --container-site: 82rem; /* 1312 px = 1440 mockup − 2 × 64 px gutters */
+  --container-prose: 47.5rem; /* 760 px, max body text width */
 
-  /* ── Footer gradient ── */
-  --footer-gradient: linear-gradient(to bottom, #051309 0%, #060e07 100%);
+  --ease-hatch: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Motion tokens shared by the CSS animations and the GSAP timelines of the demo (demo-motion.ts keeps
+     GSAP's native names: expo.out, power2.in, power3.inOut, power2.out, back.out). Durations: entrance
+     0.6-0.9 s, exit 0.25-0.4 s (always shorter than the entrance), camera 1.1 s. */
+  --ease-entree: cubic-bezier(0.16, 1, 0.3, 1); /* expo.out: something arrives, no overshoot */
+  --ease-sortie: cubic-bezier(0.11, 0, 0.5, 0); /* power2.in: something leaves */
+  --ease-camera: cubic-bezier(0.65, 0, 0.35, 1); /* power3.inOut: camera, large blocks moving */
+  --ease-doux: cubic-bezier(0.5, 1, 0.89, 1); /* power2.out: fades, small state changes */
+  --ease-pop: cubic-bezier(
+    0.34,
+    1.56,
+    0.64,
+    1
+  ); /* back.out: small items only (tick, badge, bubble) */
 }
 
-/* ───────────────────────────────────────────────────────────────────────────
- * Global reset / base — wrapped in @layer base so any per-component
- * Tailwind utility (e.g. `text-hatch-text` on the demo CTA) wins over these
- * defaults. Without the layer, an element selector like `nav { color: #fff }`
- * would override every utility class on its descendants.
- * ─────────────────────────────────────────────────────────────────────────── */
+/* Font families point at the variables injected by Astro's <Font /> (see astro.config.mjs). */
+@theme inline {
+  --font-display: var(--font-fraunces);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-departure);
+}
+
+/*
+ * Element-wide defaults MUST stay inside @layer base: an unlayered rule outranks utilities
+ * in Tailwind v4 and silently breaks them.
+ */
 @layer base {
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-  }
-
   html {
-    scroll-behavior: smooth;
-    background: #051309;
-  }
-
-  body {
+    background-color: var(--color-cream);
+    color: var(--color-ink);
     font-family: var(--font-sans);
-    background: #fff;
-    color: #0f172a;
-    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-orange-txt);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background-color: var(--color-orange-tint);
+    color: var(--color-ink);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ---------- Shared behaviours (ported from the v4 prototype) ---------- */
+@layer components {
+  /*
+   * Glass (César 05/10: one pattern for every glass surface, in the spirit of Apple's Liquid Glass):
+   * the same translucent white fill and blur everywhere (nav pill, hero title card), a specular rim
+   * lit from the top left, a faint inner glow at the bottom edge and one soft drop shadow. Radius and
+   * padding stay with each component. In Chromium the edge also refracts the backdrop like a lens
+   * (src/scripts/vitre.ts).
+   */
+  .vitre {
+    position: relative;
+    isolation: isolate;
+    background-color: color-mix(in srgb, var(--color-white) 44%, transparent);
+    /* Chromium gets the refracting filter of src/scripts/vitre.ts; elsewhere, a plain blur. The
+       prefixed line first: Chromium aliases it, so the last declaration must be the unprefixed one. */
+    -webkit-backdrop-filter: blur(12px) saturate(1.6);
+    backdrop-filter: var(--vitre-filtre, blur(12px) saturate(1.6));
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, var(--color-white) 85%, transparent),
+      inset 0 -1px 2px color-mix(in srgb, var(--color-white) 30%, transparent),
+      0 14px 36px color-mix(in srgb, var(--color-shadow) 16%, transparent);
+  }
+  /* The rim: a 1.5 px gradient ring (a masked border), bright top left, quieter in the middle. */
+  .vitre::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.5px;
+    pointer-events: none;
+    background: linear-gradient(
+      -123deg,
+      var(--color-white) 12%,
+      color-mix(in srgb, var(--color-white) 18%, transparent) 50%,
+      color-mix(in srgb, var(--color-white) 65%, transparent) 88%
+    );
+    -webkit-mask:
+      linear-gradient(var(--color-black) 0 0) content-box,
+      linear-gradient(var(--color-black) 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(var(--color-black) 0 0) content-box exclude,
+      linear-gradient(var(--color-black) 0 0);
+  }
+
+  /* "Bouton vif": lifts on hover, arrow slides, a light sweep crosses it. */
+  .btn-vif {
+    position: relative;
+    overflow: hidden;
+    transition:
+      transform 0.35s var(--ease-hatch),
+      box-shadow 0.35s var(--ease-hatch),
+      background-color 0.35s;
+  }
+  .btn-vif:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgb(248 122 1 / 0.32);
+  }
+  .btn-vif:active {
+    transform: translateY(0) scale(0.98);
+  }
+  .btn-vif svg {
+    transition: transform 0.35s var(--ease-hatch);
+  }
+  .btn-vif:hover svg {
+    transform: translateX(4px);
+  }
+  .btn-vif::after {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    width: 40%;
+    left: -60%;
+    background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.35), transparent);
+    transform: skewX(-18deg);
+    transition: left 0.7s var(--ease-hatch);
+    pointer-events: none;
+  }
+  .btn-vif:hover::after {
+    left: 130%;
+  }
+
+  /* Reveal on scroll: elements marked [data-rv] fade up once their section enters (src/scripts/reveal.ts). */
+  [data-rv] {
+    opacity: 0;
+    translate: 0 22px;
+    transition:
+      opacity 0.8s var(--ease-hatch),
+      translate 0.9s var(--ease-hatch);
+    transition-delay: var(--rd, 0s);
+  }
+  [data-rv].vu,
+  .no-js [data-rv] {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  /* Vertical rhythm of the content sections: 88 px on mobile → ~120 px at 1440, 136 px max. */
+  .section-y {
+    padding-block: clamp(5.5rem, 4rem + 4vw, 8.5rem);
+  }
+
+  /* Pinned tracks (src/scripts/pistes.ts): the section sticks while its track scrolls. */
+  .piste {
     position: relative;
   }
-
-  a {
-    text-decoration: none;
-    color: inherit;
-  }
-
-  h1,
-  h2,
-  h3 {
-    font-family: var(--font-display);
-    font-weight: 700;
-  }
-}
-
-/* ───────────────────────────────────────────────────────────────────────────
- * Component utilities reused across .astro components.
- * Tailwind utilities cover most cases; these handle markup that's hard to
- * express purely via classes (animations, complex selectors, inline-rich-text).
- * ─────────────────────────────────────────────────────────────────────────── */
-
-/* Container width helper */
-.container-site {
-  max-width: var(--container-site);
-  margin-inline: auto;
-  padding-inline: 32px;
-}
-@media (max-width: 640px) {
-  .container-site {
-    padding-inline: 20px;
-  }
-}
-
-/* ── Inline badges (Hatch + WhatsApp icons inside hero subtitle) ── */
-.inline-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  vertical-align: middle;
-  margin: 0 5px;
-  flex-shrink: 0;
-  position: relative;
-  top: -2px;
-  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.5)) drop-shadow(0 1px 3px rgba(0, 0, 0, 0.25));
-}
-.inline-badge.badge-hatch {
-  transform: rotate(-10deg);
-}
-.inline-badge.badge-whatsapp {
-  transform: rotate(8deg);
-}
-.inline-badge svg {
-  display: block;
-}
-
-/* ── Pulsing dot (used in eyebrows, pills, status indicators) ── */
-@keyframes pulse-dot {
-  0%,
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.5;
-    transform: scale(0.75);
-  }
-}
-.pulse-dot {
-  animation: pulse-dot 2.4s ease-in-out infinite;
-}
-
-/* ── Hero trust logo carousel (infinite ticker) ── */
-@keyframes ticker {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-.ticker-track {
-  display: flex;
-  align-items: center;
-  gap: 44px;
-  width: max-content;
-  animation: ticker 10s linear infinite;
-}
-.ticker-track:hover {
-  animation-play-state: paused;
-}
-
-/* ── Pourquoi floating cards (3 cards floating with subtle Y movement) ── */
-@keyframes pqFloat1 {
-  0%,
-  100% {
-    transform: rotate(-2deg) translateY(0px);
-  }
-  50% {
-    transform: rotate(-2deg) translateY(-7px);
-  }
-}
-@keyframes pqFloat2 {
-  0%,
-  100% {
-    transform: rotate(2deg) translateY(0px);
-  }
-  50% {
-    transform: rotate(2deg) translateY(-8px);
-  }
-}
-@keyframes pqFloat3 {
-  0%,
-  100% {
-    transform: rotate(1deg) translateY(0px);
-  }
-  50% {
-    transform: rotate(1deg) translateY(-6px);
-  }
-}
-
-/* ── Hub center pulse rings ── */
-@keyframes hubRingPulse {
-  0% {
-    width: 100px;
-    height: 100px;
-    opacity: 0.7;
-    border-radius: 22px;
-  }
-  100% {
-    width: 180px;
-    height: 180px;
-    opacity: 0;
-    border-radius: 36px;
-  }
-}
-
-/* ── Status live blinker ── */
-@keyframes blink {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-/* ── Paw trail (decorative bird trail SVG) ── */
-/* The trail sits at z-index 1 on top of section backgrounds, while each
- * section's text content lifts itself to z-index 2 via the global rule below.
- * This matches the watermark-like effect from the reference HTML where paws
- * appear "between" section bg and section text. */
-#bird-trail {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  pointer-events: none;
-  z-index: 1;
-  overflow: visible;
-}
-/* Section content (anything wrapped in .container-site) renders above the
- * paw trail. Section backgrounds remain below, so paws read as a watermark.
- * If a card has a semi-transparent background and you want to hide the
- * watermark inside it, give that card an opaque background color. */
-.container-site {
-  position: relative;
-  z-index: 2;
-}
-.paw-step {
-  opacity: 0;
-}
-@keyframes pawPulse {
-  0%,
-  100% {
-    opacity: 0;
-  }
-  35%,
-  65% {
-    opacity: var(--paw-op, 0.25);
-  }
-}
-.paw-step.pulsing {
-  animation: pawPulse var(--paw-dur, 2.8s) ease-in-out infinite;
-  animation-delay: var(--paw-delay, 0s);
-}
-@media (max-width: 640px) {
-  #bird-trail {
-    display: none;
-  }
-}
-
-/* ── FAQ accordion (max-height transition + arrow rotation) ── */
-.faq-item .faq-a {
-  max-height: 0;
-  overflow: hidden;
-  transition:
-    max-height 0.3s ease,
-    padding 0.3s ease;
-  padding: 0 4px;
-}
-.faq-item.open .faq-a {
-  max-height: 200px;
-  padding: 0 4px 20px;
-}
-.faq-item .faq-arrow {
-  transition: transform 0.25s;
-}
-.faq-item.open .faq-arrow {
-  transform: rotate(45deg);
-  color: var(--color-hatch-primary);
-}
-
-/* ── Agent panel: coming-soon overlay ── */
-.panel-coming-overlay {
-  display: none;
-}
-.panel-coming-overlay.visible {
-  display: flex;
-}
-
-/* ── Pricing toggle: hide/show grid ── */
-.price-grids {
-  display: none;
-}
-.price-grids.show {
-  display: block;
-}
-
-/* ── Problem sticky-scroll states (legacy CSS — kept harmless if section returns) ── */
-.prob-step {
-  opacity: 0;
-  transform: translateY(22px);
-  transition:
-    opacity 0.5s ease,
-    transform 0.5s ease;
-  pointer-events: none;
-}
-.prob-step.active {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-.prob-visual {
-  opacity: 0;
-  transition: opacity 0.5s ease;
-}
-.prob-visual.active {
-  opacity: 1;
-}
-
-/* ── WhyHatch h2 em (orange italic accent) ── */
-.pourquoi-left h2 em {
-  color: #ea580c;
-  font-style: italic;
-}
-
-/* ── WhyHatch feature bold labels ── */
-.pq-feature strong {
-  color: #0f172a;
-  font-weight: 600;
-}
-
-/* ── Nav: sticky on top, glassmorphism kicks in once scrolled ──
- * Wrapped in @layer base so Tailwind utility classes on nav children
- * (e.g. text-hatch-text on the demo CTA, text-white/85 on links) win.
- * Default color: #fff serves as a fallback for any unstyled child. */
-@layer base {
-  nav {
-    position: fixed;
+  .collant {
+    position: sticky;
     top: 0;
+    height: 100dvh;
+    overflow: hidden;
+  }
+  /* A fixed-size stage (design px) scaled to fit the viewport, centred. */
+  .cadre-piste {
+    position: absolute;
     left: 0;
-    right: 0;
-    z-index: 100;
-    background: rgba(5, 19, 9, 0);
-    backdrop-filter: blur(0);
-    border-bottom: 1px solid transparent;
-    color: #fff;
-    transition:
-      background 0.3s,
-      border-color 0.3s,
-      backdrop-filter 0.3s;
+    top: 0;
+    transform-origin: 0 0;
   }
 }
-/* Nav default link/button colors (no Tailwind utility competition) */
-nav .nav-link {
-  color: rgba(255, 255, 255, 0.65);
-}
-nav .nav-link:hover {
-  color: #fff;
-}
-nav .btn-ghost {
-  color: rgba(255, 255, 255, 0.7);
-  border-color: rgba(255, 255, 255, 0.2);
-}
-nav .btn-ghost:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.4);
-  color: #fff;
-}
-nav .lang-switcher {
-  background: rgba(255, 255, 255, 0.1);
-}
-nav .lang-btn {
-  color: rgba(255, 255, 255, 0.5);
-}
-nav .lang-btn.active {
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
-}
-nav.scrolled {
-  background: rgba(5, 19, 9, 0.75);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-}
-nav.scrolled.nav-on-light {
-  background: rgba(255, 255, 255, 0.85);
-  border-bottom-color: rgba(0, 0, 0, 0.08);
-}
-nav.scrolled.nav-on-light .nav-link {
-  color: var(--color-hatch-nav);
-}
-nav.scrolled.nav-on-light .nav-link:hover {
-  color: var(--color-hatch-primary);
-}
-nav.scrolled.nav-on-light .lang-switcher {
-  background: rgba(0, 0, 0, 0.06);
-}
-nav.scrolled.nav-on-light .lang-btn {
-  color: var(--color-hatch-primary-soft);
-}
-nav.scrolled.nav-on-light .lang-btn.active {
-  background: #fff;
-  color: var(--color-hatch-nav);
-}
-nav.scrolled.nav-on-light .btn-ghost {
-  color: var(--color-hatch-nav);
-  border-color: rgba(0, 0, 0, 0.22);
-}
-nav.scrolled.nav-on-light .btn-ghost:hover {
-  background: rgba(0, 0, 0, 0.05);
+
+@media (prefers-reduced-motion: reduce) {
+  [data-rv] {
+    opacity: 1;
+    translate: none;
+  }
 }

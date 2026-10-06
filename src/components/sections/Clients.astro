@@ -1,0 +1,309 @@
+---
+import type { ImageMetadata } from 'astro';
+import { Picture } from 'astro:assets';
+import { section } from '../../content/section';
+import type { ClientId } from '../../content/schemas/clients';
+import { formatFigure } from '../../scripts/clients';
+import type { Locale } from '../../i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const data = await section('clients', locale);
+
+/**
+ * Drawn size of each client in the v4 band, in desktop px: storefront box, logo box, top offset and
+ * storefront→logo gap. Images are `contain`ed in their box, so the boxes also set the spacing.
+ * La Meulerie is the mockup's "hover" state: drawn bigger, shrunk to 0.82 at rest (`zoom`).
+ * Logos in colour at rest (cofounder's feedback 02/10: in grey they were lost under the storefronts),
+ * at their v4 size (César 02/10: bigger was too much).
+ */
+type Dims = {
+  dev: [number, number];
+  logo: [number, number];
+  top?: number;
+  gap?: number;
+  zoom?: true;
+};
+const DIMS: Record<ClientId, Dims> = {
+  nobinobi: { dev: [146, 118], logo: [72, 25] },
+  pny: { dev: [153, 118], logo: [64, 28] },
+  'la-meulerie': { dev: [176, 148], logo: [132, 16], top: 2, gap: 12, zoom: true },
+  'crousty-one': { dev: [200, 118], logo: [34, 34] },
+  nemesis: { dev: [156, 118], logo: [110, 15] },
+  'afrik-n-fusion': { dev: [150, 118], logo: [73, 25] },
+  'new-school-tacos': { dev: [150, 118], logo: [50, 34] },
+  'burger-and-fries': { dev: [181, 118], logo: [68, 26] },
+  dkr: { dev: [211, 118], logo: [53, 34] },
+  chopstix: { dev: [151, 118], logo: [77, 23] },
+  ponzu: { dev: [158, 118], logo: [92, 19] },
+  bomaye: { dev: [143, 118], logo: [34, 34] },
+};
+
+const devantures = import.meta.glob<ImageMetadata>('../../assets/clients/devantures/*.png', {
+  eager: true,
+  import: 'default',
+});
+const logos = import.meta.glob<ImageMetadata>('../../assets/clients/logos/*.png', {
+  eager: true,
+  import: 'default',
+});
+const asset = (map: Record<string, ImageMetadata>, dir: string, file: string) => {
+  const img = map[`../../assets/clients/${dir}/${file}.png`];
+  if (!img) throw new Error(`Missing src/assets/clients/${dir}/${file}.png`);
+  return img;
+};
+
+/** Image size once `contain`ed in its box, plus srcset widths for the mobile band (0.6×), desktop and 2×. */
+const fit = (img: ImageMetadata, [bw, bh]: [number, number]) => {
+  const s = Math.min(bw / img.width, bh / img.height);
+  const w = Math.round(img.width * s);
+  const h = Math.round(img.height * s);
+  const widths = [...new Set([Math.round(w * 0.6), w, w * 2].map((x) => Math.min(x, img.width)))];
+  return { w, h, widths, sizes: `(min-width: 768px) ${w}px, ${Math.round(w * 0.6)}px` };
+};
+
+const clients = data.clients.map(({ id, name }) => {
+  const d = DIMS[id];
+  const dev = asset(devantures, 'devantures', id);
+  const couleur = asset(logos, 'logos', `${id}-couleur`);
+  return {
+    name,
+    zoom: d.zoom === true,
+    style: `--dw:${d.dev[0]};--dh:${d.dev[1]};--lw:${d.logo[0]};--lh:${d.logo[1]};--top:${d.top ?? 32};--gap:${d.gap ?? 10}`,
+    dev: { src: dev, ...fit(dev, d.dev) },
+    logo: { src: couleur, ...fit(couleur, d.logo) },
+  };
+});
+const formats: ('avif' | 'webp')[] = ['avif', 'webp'];
+---
+
+<section
+  aria-labelledby="clients-titre"
+  data-rv-groupe
+  data-clients
+  data-locale={locale}
+  class="flex flex-col gap-10 overflow-hidden bg-white pt-14 pb-10 md:gap-[60px]"
+>
+  <div
+    class="mx-auto flex w-full max-w-[1440px] flex-col gap-8 px-6 md:px-12 lg:flex-row lg:items-end lg:justify-between xl:px-24"
+  >
+    <h2
+      id="clients-titre"
+      data-rv
+      class="max-w-[380px] font-display text-[30px] leading-[33px] font-bold tracking-[-0.6px] text-ink lg:w-[380px]"
+    >
+      {data.title}
+    </h2>
+    <ul
+      class="grid grid-cols-2 gap-x-6 gap-y-6 md:flex md:shrink-0 md:items-end md:gap-11 lg:gap-8 xl:gap-11"
+    >
+      {
+        data.figures.map((f) => (
+          <li data-rv class="flex flex-col gap-1">
+            <span class="font-display text-[40px] leading-10 font-normal tracking-[-1.2px] whitespace-nowrap text-ink">
+              <span
+                aria-hidden="true"
+                class="inline-block"
+                data-compteur={f.value}
+                data-prefix={f.prefix}
+                data-suffix={f.suffix}
+              >
+                {formatFigure(f.value, f.prefix, f.suffix, locale)}
+              </span>
+              <span class="sr-only">{formatFigure(f.value, f.prefix, f.suffix, locale)}</span>
+            </span>
+            <span class="text-[13.5px] whitespace-nowrap text-soft">{f.label}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <div data-rv class="bande relative w-full">
+    <div class="bande-fenetre" role="region" aria-label={data.band.label} tabindex="0">
+      <div class="bande-piste">
+        {
+          [false, true].map((clone) => (
+            <ul class="bande-liste" aria-hidden={clone ? 'true' : undefined}>
+              {clients.map((c) => (
+                <li class:list={['bande-item', { 'est-zoom': c.zoom }]} style={c.style}>
+                  <div class="devanture">
+                    <Picture
+                      src={c.dev.src}
+                      alt=""
+                      width={c.dev.w}
+                      height={c.dev.h}
+                      widths={c.dev.widths}
+                      sizes={c.dev.sizes}
+                      formats={formats}
+                      loading="lazy"
+                    />
+                  </div>
+                  <div class="logo">
+                    <Picture
+                      src={c.logo.src}
+                      alt={clone ? '' : c.name}
+                      width={c.logo.w}
+                      height={c.logo.h}
+                      widths={c.logo.widths}
+                      sizes={c.logo.sizes}
+                      formats={formats}
+                      loading="lazy"
+                    />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Band scale: storefronts at 60 % on phones, the v4 size from 768 px. Sizes below are v4 px × --k. */
+  .bande {
+    --k: 0.6;
+    height: calc(200px * var(--k));
+  }
+  @media (min-width: 768px) {
+    .bande {
+      --k: 1;
+    }
+  }
+  .bande-fenetre {
+    height: 100%;
+    overflow: hidden;
+  }
+  .bande-fenetre:focus-visible {
+    outline-offset: -2px;
+  }
+
+  /* Two identical lists side by side; sliding by -50 % lands the clone exactly where the original was. */
+  .bande-piste {
+    display: flex;
+    width: max-content;
+    height: 100%;
+    margin-left: calc(-20px * var(--k));
+    animation: bande 30s linear infinite;
+  }
+  @keyframes bande {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  /* No pause button (César 01/10): the band stops while hovered or focused, and not at all under
+     reduced motion. */
+  .bande:hover .bande-piste,
+  .bande:focus-within .bande-piste {
+    animation-play-state: paused;
+  }
+  .bande-liste {
+    display: flex;
+    align-items: flex-start;
+    gap: calc(46px * var(--k));
+    padding-right: calc(46px * var(--k));
+  }
+
+  .bande-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: calc(var(--gap) * var(--k) * 1px);
+    margin-top: calc(var(--top) * var(--k) * 1px);
+    transform-origin: 50% 100%;
+    transition: transform 0.5s var(--ease-hatch);
+  }
+  .bande-item:hover {
+    transform: scale(1.1);
+  }
+  .bande-item.est-zoom {
+    transform: scale(0.82);
+  }
+  .bande-item.est-zoom:hover {
+    transform: scale(1);
+  }
+
+  .devanture,
+  .logo {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .devanture {
+    width: calc(var(--dw) * var(--k) * 1px);
+    height: calc(var(--dh) * var(--k) * 1px);
+  }
+  .logo {
+    width: calc(var(--lw) * var(--k) * 1px);
+    height: calc(var(--lh) * var(--k) * 1px);
+  }
+  .bande-item :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .bande-item :global(picture) {
+    display: contents;
+  }
+  /* Reduced motion: no scrolling, a static band the visitor scrolls sideways; the clone goes. */
+  @media (prefers-reduced-motion: reduce) {
+    .bande {
+      height: auto;
+    }
+    .bande-fenetre {
+      overflow-x: auto;
+      padding-bottom: calc(24px * var(--k));
+    }
+    .bande-piste {
+      animation: none;
+      margin-left: 0;
+      padding-left: 24px;
+    }
+    .bande-liste[aria-hidden='true'] {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  import { formatFigure } from '../../scripts/clients';
+  import type { Locale } from '../../i18n/ui';
+
+  const reduit = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll<HTMLElement>('[data-clients]').forEach((section) => {
+    const locale = section.dataset.locale as Locale;
+
+    // Counters: the page renders the final value (no JS, reduced motion); here they restart from 0
+    // and count up on first sight, 1.4 s, cubic ease-out — as in v4.
+    if (reduit) return;
+    const compteurs = [...section.querySelectorAll<HTMLElement>('[data-compteur]')].map((el) => {
+      const cible = Number(el.dataset.compteur);
+      const fmt = (v: number) => formatFigure(v, el.dataset.prefix!, el.dataset.suffix!, locale);
+      el.style.minWidth = `${el.offsetWidth}px`; // no reflow of the row while digits grow
+      el.textContent = fmt(0);
+      return { el, cible, fmt };
+    });
+    section.addEventListener(
+      'apparition',
+      () => {
+        const t0 = performance.now();
+        const pas = () => {
+          const p = Math.min(1, (performance.now() - t0) / 1400);
+          const e = 1 - Math.pow(1 - p, 3);
+          compteurs.forEach(({ el, cible, fmt }) => (el.textContent = fmt(Math.round(cible * e))));
+          if (p < 1) requestAnimationFrame(pas);
+        };
+        requestAnimationFrame(pas);
+      },
+      { once: true },
+    );
+  });
+</script>

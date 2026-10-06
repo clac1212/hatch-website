@@ -1,0 +1,42 @@
+# Le titre, en fragments joints par des espaces : le navigateur répartit les lignes (Fraunces, équilibré).
+title:
+  - Recrutez des agents IA
+  - pour piloter et
+  - développer votre
+  - réseau
+lead: 'Ils répondent aux équipes, forment les recrues, auditent les sites et suivent les ouvertures, pendant que vous gardez la main.'
+tasks:
+  status:
+    running: En cours
+    done: Terminé
+  # Les trois agents visibles sur la carte d'abord (Peep, Lark, Sparrow : la boutique écrit, l'oiseau tape sa réponse), puis un agent hors carte (Owl, qui répond dans la langue de l'équipe : Huesca, en espagnol), et la boucle repart (César, 01/10).
+  # Chaque état se lit en un coup d'œil, résultat d'abord : `title` = l'agent, ce qu'il fait, pour quel site BunBun (la ville de la boutique sous la carte) ; `detail` = la demande, puis ce qui a été fait. Court : une ligne chacun sur mobile.
+  events:
+    - agent: peep
+      running:
+        title: 'Peep répond à BunBun Dijon'
+        detail: '« Où est la fiche allergènes ? »'
+      done:
+        title: 'Peep a répondu à BunBun Dijon'
+        detail: 'Fiche allergènes envoyée · 2 min'
+    - agent: lark
+      running:
+        title: 'Lark analyse BunBun Strasbourg'
+        detail: "CA sous l'objectif"
+      done:
+        title: 'Lark a relancé BunBun Strasbourg'
+        detail: 'Point CA demain 9 h'
+    - agent: sparrow
+      running:
+        title: 'Sparrow suit BunBun Marseille'
+        detail: 'Chantier en cours · J-18'
+      done:
+        title: 'Sparrow a calé la formation de BunBun Marseille'
+        detail: "Jeudi, toute l'équipe · J-18"
+    - agent: owl
+      running:
+        title: 'Owl répond à BunBun Huesca'
+        detail: '« ¿Cómo se limpia la freidora? »'
+      done:
+        title: 'Owl a répondu à BunBun Huesca'
+        detail: 'À voix haute, en espagnol'
