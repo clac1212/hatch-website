@@ -16,7 +16,7 @@ import { cadrage } from './equipe-cadrage';
 /**
  * 05 — "Rencontrez vos nouveaux collègues" (v4 node W8OOQW): a 3-column mosaic of the seven agents.
  * The agents fill the mosaic slots by `order` (column 1: title + 2 tiles, column 2: 3 tiles, column 3: 2 tiles).
- * A tile links to /agents/<slug> once the agent has its `page` (its page's copy).
+ * A tile links to /agents/<slug>, with its arrow, once the agent has a published `page`.
  * Below lg, the columns dissolve into a 2-column grid; tall tiles span both columns.
  * Hover (v4 "tuiles"): photo zooms, label rises, arrow turns orange, orange border — the border is an
  * ::after overlay, since an inset outline would be painted under the positioned photo.
@@ -140,14 +140,17 @@ const pageHref = (slug: string) => entryRoutes.agents(slug)[locale];
                           {agent.job}
                         </p>
                       </div>
-                      <span
-                        aria-hidden="true"
-                        class="flex size-8 shrink-0 items-center justify-center rounded-full bg-ink transition-[background-color,translate] duration-[350ms] ease-hatch group-hover:translate-x-[3px] group-hover:bg-orange group-focus-visible:translate-x-[3px] group-focus-visible:bg-orange md:size-9"
-                      >
-                        <svg viewBox="0 0 24 24" class="size-4 fill-white">
-                          <path d="M4 11v2h16v-2zm12 2v2h2v-2zm-2 2v2h2v-2zm-2 2v2h2v-2zm4-6V9h2v2zm-2 4V7h2v8zm-2 2V5h2v12z" />
-                        </svg>
-                      </span>
+                      {/* The arrow promises a page: only shown once the agent has one (César 06/10). */}
+                      {publiee && (
+                        <span
+                          aria-hidden="true"
+                          class="flex size-8 shrink-0 items-center justify-center rounded-full bg-ink transition-[background-color,translate] duration-[350ms] ease-hatch group-hover:translate-x-[3px] group-hover:bg-orange group-focus-visible:translate-x-[3px] group-focus-visible:bg-orange md:size-9"
+                        >
+                          <svg viewBox="0 0 24 24" class="size-4 fill-white">
+                            <path d="M4 11v2h16v-2zm12 2v2h2v-2zm-2 2v2h2v-2zm-2 2v2h2v-2zm4-6V9h2v2zm-2 4V7h2v8zm-2 2V5h2v12z" />
+                          </svg>
+                        </span>
+                      )}
                     </div>
                   </Tag>
                 </div>
