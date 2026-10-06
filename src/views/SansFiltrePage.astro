@@ -47,7 +47,7 @@ const image: OgImage =
     { src: d.featured.image, alt: d.featured.title },
     ...d.updates.map((u) => ({ src: u.image, alt: u.title })),
   ].flatMap(({ src, alt }) => (src && isOgSized(src) ? [{ src, alt }] : []))[0] ??
-  defaultOgImage(t('seo.ogImageAlt'));
+  defaultOgImage(locale, t('seo.ogImageAlt'));
 
 // An edition page is an article signed by a co-founder, dated by the edition (no later revision
 // date is recorded, so it is also its modification date).

@@ -1,5 +1,6 @@
 import { getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
+import type { Locale } from '../i18n/ui';
 
 /** Open Graph / Twitter card size (summary_large_image). */
 export const OG_WIDTH = 1200;
@@ -20,9 +21,12 @@ export interface ResolvedOgImage {
   alt: string;
 }
 
-/** public/og-image.png, the site's share image when a page has none of its own. */
-export const defaultOgImage = (alt: string): OgImage => ({
-  src: '/og-image.png',
+/**
+ * The site's share image when a page has none of its own: public/og-image.jpg (FR) and
+ * public/og-image-en.jpg (EN), one layout, only the text changes.
+ */
+export const defaultOgImage = (locale: Locale, alt: string): OgImage => ({
+  src: locale === 'en' ? '/og-image-en.jpg' : '/og-image.jpg',
   width: OG_WIDTH,
   height: OG_HEIGHT,
   alt,
