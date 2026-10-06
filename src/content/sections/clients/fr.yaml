@@ -1,7 +1,7 @@
 title: Ils pilotent déjà leur réseau avec Hatch OS
 figures:
-  - { prefix: '', value: 12, suffix: '', label: réseaux clients }
-  - { prefix: '', value: 144, suffix: '+', label: établissements }
+  - { prefix: '', value: 13, suffix: '', label: réseaux clients }
+  - { prefix: '', value: 244, suffix: '+', label: établissements }
   - { prefix: '', value: 10000, suffix: '+', label: questions traitées }
   - { prefix: '< ', value: 10, suffix: ' s', label: par réponse }
 band:
