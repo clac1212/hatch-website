@@ -177,7 +177,7 @@ const num = (i: number) => String(i + 1).padStart(2, '0');
               <Picture
                 src={AGENTS[sec.visual]}
                 alt={hero.alts[sec.visual]}
-                width={360}
+                height={400}
                 densities={[1, 2]}
                 formats={['avif', 'webp']}
                 loading="lazy"
@@ -261,9 +261,13 @@ const num = (i: number) => String(i + 1).padStart(2, '0');
     min-height: 320px;
     padding: 40px;
   }
+  /* The guardian agent large in its panel (César 06/10: they were too small); all three share one
+     height, and the widest (Finch) is held to 85 % of its panel so it doesn't outweigh the others. */
   .tuile :global(img) {
-    width: min(78%, 360px);
-    height: auto;
+    height: clamp(220px, 28vw, 400px);
+    width: auto;
+    max-width: 85%;
+    object-fit: contain;
     filter: drop-shadow(0 22px 26px color-mix(in srgb, var(--color-shadow) 22%, transparent));
   }
   @media (min-width: 48rem) {
