@@ -4,11 +4,11 @@ titre:
 formule:
   legende: Formule de facturation
   mensuel: Mensuel
-  annuel: Annuel · −15 %
+  annuel: Annuel · jusqu’à −15 %
 unite: / établissement / mois
 factureMensuel: par établissement et par mois, en formule mensuelle
 factureAnnuel: par établissement et par mois, en formule annuelle
-cta: Demander une démo
+cta: Réserver une démo
 offres:
   - nom: Kiosques & comptoirs
     type: 1 à 2 employés par point de vente

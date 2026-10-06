@@ -17,13 +17,13 @@ cases:
       - value: '13'
         label: restaurants equipped
       - value: 4,000+
-        label: documents found on request
+        label: documents in the indexed drive
     href: null
   - id: pny
     client: PNY
     agent: peep
     visualAlt: The storefront of a PNY restaurant.
-    quote: “It’s a huge time saver… a real right hand.”
+    quote: “It’s a huge time saver… a real right-hand.”
     author: Anna · Head of operations, PNY
     figures:
       - value: '13'

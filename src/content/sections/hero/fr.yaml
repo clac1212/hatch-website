@@ -15,7 +15,7 @@ tasks:
     - agent: peep
       running:
         title: 'Peep répond à BunBun Dijon'
-        detail: '« Où est la fiche allergènes ? »'
+        detail: '« Où est la fiche allergènes ? »'
       done:
         title: 'Peep a répondu à BunBun Dijon'
         detail: 'Fiche allergènes envoyée · 2 min'

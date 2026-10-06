@@ -4,7 +4,7 @@ titre:
 formule:
   legende: Billing plan
   mensuel: Monthly
-  annuel: Yearly · −15%
+  annuel: Yearly · up to −15%
 unite: / location / month
 factureMensuel: per location per month, billed monthly
 factureAnnuel: per location per month, billed yearly

@@ -3,7 +3,7 @@ seo:
   title: 'Mentions légales · Hatch OS'
   description: 'Mentions légales du site gethatch.io : éditeur Hatch OS SAS, siège à Paris, RCS Paris 103 890 893, directeur de la publication et hébergeur Vercel.'
 title: 'Mentions légales'
-meta: 'Mise à jour : 1er octobre 2026'
+meta: 'Mise à jour : 1er octobre 2026'
 ---
 
 ## Éditeur du site

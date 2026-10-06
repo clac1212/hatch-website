@@ -36,7 +36,7 @@ agents:
   conversation:
     label: Conversation
     messages:
-      - { from: agent, bird: sparrow, text: 'Comment recrutez-vous vos franchisés ?' }
+      - { from: agent, bird: sparrow, text: 'Comment recrutez-vous vos franchisés ?' }
       - { from: you, text: 'Appel, visite, dossier, signature.' }
       - { from: agent, bird: sparrow, text: "C'est noté. Je reprends vos 23 candidats." }
   migration:
@@ -60,7 +60,7 @@ channels:
     question:
       initials: IM
       who: Inès · équipière
-      text: Le poulet, c'est combien de minutes à la friteuse ?
+      text: Le poulet, c'est combien de minutes à la friteuse ?
     answer:
       who: Owl
       bird: owl

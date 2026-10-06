@@ -11,19 +11,19 @@ cases:
     client: NOBI NOBI
     agent: jay
     visualAlt: La devanture d’un restaurant NOBI NOBI.
-    quote: « Pour moi, le plus gros gain de temps, c’est l’IA qui retrouve le fichier exact dans un drive de plus de 4 000 documents. »
+    quote: « Pour moi, le plus gros gain de temps, c’est l’IA qui retrouve le fichier exact dans un drive de plus de 4 000 documents. »
     author: Benjamin Schmit · Président, NOBI NOBI
     figures:
       - value: '13'
         label: restaurants équipés
       - value: 4 000+
-        label: documents retrouvés à la demande
+        label: documents dans le drive indexé
     href: null
   - id: pny
     client: PNY
     agent: peep
     visualAlt: La devanture d’un restaurant PNY.
-    quote: « C’est un énorme gain de temps… un bon bras droit. »
+    quote: « C’est un énorme gain de temps… un bon bras droit. »
     author: Anna · Directrice des opérations, PNY
     figures:
       - value: '13'

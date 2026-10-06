@@ -31,13 +31,6 @@ import oiseauxPos from './hero-oiseaux.json';
  * Coordinates are in the image's frame (1440 × 804) and expressed in % of it, so they stay on their
  * shop whatever the screen: the shops' ground points are measured by the composition script
  * (hero-boutiques.json), only the choice of shops and the card anchors are made here.
- *
- * Second layout on trial (César, 05/10, after the Atlas / Sigma / Aside references), served with
- * `?hero=2`: an inline script sets `data-hero="2"` on the section before the first paint (default `1`,
- * the layout above). Same DOM, restyled at the end of the <style>: a calm cream band with the title, the lead and the two CTAs centred; under it the map, full bleed and at its own ratio (so the
- * pings, bubbles and cards stay on their shops), rising out of the cream through a short fade and cut by
- * the fold like a product shot; the pixel edge still closes it into the clients band. No card around
- * the map: the image is a scene, not a screenshot.
  */
 interface Props {
   locale: Locale;
@@ -96,16 +89,9 @@ const tick =
 
 <section
   class="hero relative h-dvh min-h-[640px] overflow-hidden bg-night [container-type:size]"
-  data-hero="1"
   aria-labelledby="hero-titre"
   data-rv-groupe
 >
-  <script is:inline>
-    // Layout on trial (?hero=2), set before the first paint so nothing shifts.
-    if (new URLSearchParams(location.search).get('hero') === '2')
-      document.currentScript.parentElement.dataset.hero = '2';
-  </script>
-
   <div class="h-decor" aria-hidden="true">
     <Picture
       src={carte}
@@ -152,12 +138,12 @@ const tick =
 
   <!-- Pixel edge into the clients band below (white): over the map and the grain, under the piles
        and the glass card. -->
-  <div class="h-lisiere absolute inset-x-0 bottom-0 z-0">
+  <div class="absolute inset-x-0 bottom-0 z-0">
     <LisierePixel color="var(--color-white)" />
   </div>
 
   <div
-    class="h-contenu relative z-1 mx-auto flex h-full max-w-[1440px] flex-col justify-end gap-2 px-4 pt-24 pb-4 sm:px-6 sm:pb-6 lg:static lg:justify-center lg:gap-0 lg:px-14 lg:py-24"
+    class="relative z-1 mx-auto flex h-full max-w-[1440px] flex-col justify-end gap-2 px-4 pt-24 pb-4 sm:px-6 sm:pb-6 lg:static lg:justify-center lg:gap-0 lg:px-14 lg:py-24"
   >
     <div class="h-piles" aria-hidden="true" data-pas={STEP}>
       {
@@ -226,7 +212,7 @@ const tick =
         {data.lead}
       </p>
       <!-- Two calls to action (César 06/10): the demo first, then trying the platform (its signup). -->
-      <div class="h-ctas flex flex-wrap gap-3">
+      <div class="flex flex-wrap gap-3">
         <Button href={routes.demo[locale]} variant="orange" size="lg">{t('cta.demo')}</Button>
         <Button href={appUrls.signup} variant="secondary" size="lg">{t('cta.try')}</Button>
       </div>
@@ -674,127 +660,5 @@ const tick =
   /* The title card's glass is the shared `.vitre` pattern (global.css), the same as the nav's. */
   .lead {
     filter: drop-shadow(0 0 5px color-mix(in srgb, var(--color-white) 50%, transparent));
-  }
-
-  /* ---------- Layout 2 (?hero=2) ----------
-     Two rows of one grid: the text band, then the scene. The content wrapper dissolves (`contents`) so
-     the title card, the task stacks and the map layers all become cells of the section's grid. */
-  .hero[data-hero='2'] {
-    height: auto;
-    min-height: 0;
-    display: grid;
-    grid-template-columns: 100%;
-    grid-template-rows: auto auto;
-    background: var(--color-cream);
-    container-type: inline-size;
-    /* The scene: full width at the image's ratio, never narrower than 640 px (phones see its right
-       part, where the agents are). */
-    --sw: max(100cqw, 640px);
-    --sh: calc(var(--sw) * 804 / 1440);
-    --fx: 0.72;
-  }
-  .hero[data-hero='2'] .h-contenu {
-    display: contents;
-  }
-
-  /* Text band: title, lead and CTAs, centred on the cream. */
-  .hero[data-hero='2'] .carte-hero {
-    grid-area: 1 / 1;
-    justify-self: center;
-    align-items: center;
-    width: auto;
-    max-width: 64rem;
-    margin: 0;
-    padding: calc(88px + clamp(20px, 3vw, 44px)) 20px clamp(28px, 3vw, 44px);
-    gap: 0;
-    text-align: center;
-    background: none;
-    box-shadow: none;
-    border-radius: 0;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-  }
-  .hero[data-hero='2'] .carte-hero::before {
-    display: none;
-  }
-  .hero[data-hero='2'] h1 {
-    max-width: 21ch;
-    font-size: clamp(34px, 4.2vw, 60px);
-    line-height: 1.02;
-    font-weight: 600;
-    letter-spacing: -0.03em;
-    text-wrap: balance;
-  }
-  .hero[data-hero='2'] .lead {
-    max-width: 36rem;
-    margin-top: clamp(16px, 1.6vw, 22px);
-    font-size: clamp(16px, 1.3vw, 19px);
-    line-height: 1.55;
-    color: var(--color-soft);
-    filter: none;
-    text-wrap: pretty;
-  }
-  .hero[data-hero='2'] .h-ctas {
-    justify-content: center;
-    margin-top: clamp(24px, 2.4vw, 34px);
-  }
-
-  /* Scene: map, grain, task stacks and pixel edge stacked in the second row, all at the scene's box.
-     The map rises out of the cream through a short fade at its top edge. */
-  .hero[data-hero='2'] :is(.h-decor, .h-piles, .h-grain) {
-    grid-area: 2 / 1;
-    position: relative;
-    inset: auto;
-    width: var(--sw);
-    height: var(--sh);
-    margin-left: calc((100cqw - var(--sw)) * var(--fx));
-  }
-  .hero[data-hero='2'] :is(.h-decor, .h-grain) {
-    mask-image: linear-gradient(to bottom, transparent, var(--color-black) 16%);
-  }
-  .hero[data-hero='2'] .h-piles {
-    z-index: 1;
-  }
-  .hero[data-hero='2'] .h-pile {
-    left: var(--x);
-    top: var(--y);
-    bottom: auto;
-    max-width: none;
-    transform: translate(var(--dx), -100%);
-  }
-  .hero[data-hero='2'] .h-lisiere {
-    grid-area: 2 / 1;
-    position: relative;
-    inset: auto;
-    align-self: end;
-    z-index: 0;
-  }
-  @media (width < 40rem) {
-    /* Phones: the two CTAs stacked at one width; the cards leave their shop for one slot at the top of
-       the scene (on a 640 px map the shops near the right edge would push them off screen). */
-    .hero[data-hero='2'] .h-ctas {
-      flex-direction: column;
-      align-self: stretch;
-      align-items: stretch;
-      max-width: 20rem;
-      margin-inline: auto;
-      width: 100%;
-    }
-    .hero[data-hero='2'] .h-ctas > :global(a) {
-      justify-content: center;
-    }
-    .hero[data-hero='2'] .h-piles {
-      width: 100%;
-      height: 80px;
-      margin: 12px 0 0;
-      align-self: start;
-    }
-    .hero[data-hero='2'] .h-pile {
-      left: 50%;
-      top: auto;
-      bottom: 0;
-      max-width: calc(100% - 24px);
-      transform: translateX(-50%);
-    }
   }
 </style>
