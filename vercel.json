@@ -1,5 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    { "source": "/privacy", "destination": "/confidentialite", "permanent": true },
+    { "source": "/terms", "destination": "/conditions", "permanent": true },
+    { "source": "/security", "destination": "/securite", "permanent": true }
+  ],
   "rewrites": [
     {
       "source": "/relais/static/:path(.*)",
