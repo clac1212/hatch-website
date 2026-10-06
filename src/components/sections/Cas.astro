@@ -144,8 +144,8 @@ const fill = (s: string, vars: Record<string, string>) =>
                   src={c.front}
                   alt={c.visualAlt}
                   formats={['avif', 'webp']}
-                  widths={[340, 680]}
-                  sizes="340px"
+                  widths={[440, 880]}
+                  sizes="(min-width: 64rem) 440px, 80vw"
                   loading="lazy"
                   class="size-full object-contain object-bottom"
                 />
@@ -330,8 +330,8 @@ const fill = (s: string, vars: Record<string, string>) =>
       right: 22px;
     }
     .devanture {
-      height: 220px;
-      padding-inline: 12%;
+      height: 260px;
+      padding-inline: 10%;
     }
     .agent {
       top: 18px;
@@ -345,7 +345,7 @@ const fill = (s: string, vars: Record<string, string>) =>
       container-type: inline-size;
       display: flex;
       gap: 12px;
-      height: 420px;
+      height: 460px;
     }
     .tranche {
       flex: 0 0 112px;
@@ -386,7 +386,9 @@ const fill = (s: string, vars: Record<string, string>) =>
       inset: 0 auto 0 0;
       width: calc(100cqw - (var(--n) - 1) * 124px);
       display: grid;
-      grid-template-columns: minmax(0, 1fr) clamp(220px, 36%, 340px);
+      grid-template-columns: minmax(0, 1fr) clamp(240px, 40%, 440px);
+      /* One row the height of the slice: the storefront stands on its bottom edge, never below it. */
+      grid-template-rows: 100%;
       column-gap: 26px;
       opacity: 0;
       transition: opacity 0.2s var(--ease-hatch);
@@ -406,8 +408,8 @@ const fill = (s: string, vars: Record<string, string>) =>
     }
     .devanture {
       align-self: end;
-      height: 285px;
-      margin-right: 26px;
+      height: 340px;
+      margin-right: 40px;
     }
     .agent {
       top: 32px;
