@@ -8,7 +8,7 @@ meta: 'Mise à jour : 22 avril 2026 · Entrée en vigueur : 22 avril 2026'
 
 ## 1. Préambule et éditeur
 
-La plateforme Hatch OS est éditée par Hatch OS, société par actions simplifiée au capital de 1 000 €, dont le siège social est situé au 104 rue de la Folie-Méricourt, 75011 Paris, France (RCS Paris&nbsp;: 930 893). Président&nbsp;: Patrick Rakotondrajao. Contact&nbsp;: [cesar@gethatch.io](mailto:cesar@gethatch.io).
+La plateforme Hatch OS est éditée par Hatch OS, société par actions simplifiée au capital de 1 000 €, dont le siège social est situé au 104 rue de la Folie-Méricourt, 75011 Paris, France (RCS Paris&nbsp;: 103 890 893). Président&nbsp;: Patrick Rakotondrajao. Contact&nbsp;: [cesar@gethatch.io](mailto:cesar@gethatch.io).
 
 Les présentes Conditions Générales d'Utilisation (CGU) régissent l'accès à la solution disponible sur gethatch.io et ses sous-domaines. Leur acceptation pleine et entière est requise pour utiliser la plateforme.
 

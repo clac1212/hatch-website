@@ -8,7 +8,7 @@ meta: 'Last updated: April 22, 2026 · Effective date: April 22, 2026'
 
 ## 1. Data Controller Identity
 
-Hatch OS, a simplified joint-stock company (SAS) with a capital of €1,000, headquartered at 104 rue de la Folie-Méricourt, 75011 Paris, France (Paris Commercial Registry: 930 893). President: Patrick Rakotondrajao. Data Protection Officer (DPO): [cesar@gethatch.io](mailto:cesar@gethatch.io).
+Hatch OS, a simplified joint-stock company (SAS) with a capital of €1,000, headquartered at 104 rue de la Folie-Méricourt, 75011 Paris, France (Paris Commercial Registry: 103 890 893). President: Patrick Rakotondrajao. Data Protection Officer (DPO): [cesar@gethatch.io](mailto:cesar@gethatch.io).
 
 The company publishes and operates a SaaS platform accessible via gethatch.io and its subdomains, designed for franchise networks and their teams.
 

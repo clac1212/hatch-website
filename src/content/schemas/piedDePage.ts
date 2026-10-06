@@ -17,6 +17,7 @@ export const schema = z.strictObject({
     titre: z.string(),
     conditions: z.string(),
     confidentialite: z.string(),
+    mentions: z.string(),
   }),
   /** Printed after the current year. */
   copyright: z.string(),

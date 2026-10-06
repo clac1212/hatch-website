@@ -8,7 +8,7 @@ meta: 'Mise à jour : 22 avril 2026 · Entrée en vigueur : 22 avril 2026'
 
 ## 1. Identité du responsable de traitement
 
-Hatch OS, société par actions simplifiée au capital de 1 000 €, dont le siège social est situé au 104 rue de la Folie-Méricourt, 75011 Paris, France (RCS Paris&nbsp;: 930 893). Président&nbsp;: Patrick Rakotondrajao. Délégué à la Protection des Données (DPO)&nbsp;: [cesar@gethatch.io](mailto:cesar@gethatch.io).
+Hatch OS, société par actions simplifiée au capital de 1 000 €, dont le siège social est situé au 104 rue de la Folie-Méricourt, 75011 Paris, France (RCS Paris&nbsp;: 103 890 893). Président&nbsp;: Patrick Rakotondrajao. Délégué à la Protection des Données (DPO)&nbsp;: [cesar@gethatch.io](mailto:cesar@gethatch.io).
 
 La société publie et exploite une plateforme SaaS accessible via gethatch.io et ses sous-domaines, conçue pour les réseaux de franchises et leurs collaborateurs.
 

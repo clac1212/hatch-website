@@ -18,6 +18,7 @@ export const routes = {
   security: { fr: '/securite', en: '/en/security' },
   terms: { fr: '/conditions', en: '/en/terms' },
   privacy: { fr: '/confidentialite', en: '/en/privacy' },
+  mentions: { fr: '/mentions-legales', en: '/en/legal-notice' },
   sansFiltre: { fr: '/sans-filtre', en: '/en/unfiltered' },
 } as const satisfies Record<string, Record<Locale, string>>;
 export type Paths = Record<Locale, string>;
