@@ -779,6 +779,29 @@ export interface Pilote {
 /** Agents whose demo has played on this page, so a replay isn't counted twice (analytics). */
 const vus = new Set<string>();
 
+/**
+ * Phones (César 06/10): no place, no camera. Each agent has its own card (Demo.astro `.d2m`) and its
+ * screen plays its demo once, from an empty screen, when the card comes on screen. Returns the
+ * paused timeline, rewound to its first frame, so the card shows the empty screen until then.
+ */
+export function ecranSeul(ecr: HTMLElement) {
+  const jouer = ecr.classList.contains('tablette')
+    ? tablette
+    : ecr.classList.contains('tableau')
+      ? tableau
+      : ecr.classList.contains('formation')
+        ? formation
+        : telephone;
+  return jouer(ecr, 0.3).pause(0);
+}
+
+/** Counts an agent's demo as seen, once per page (shared by the places and the phone cards). */
+export function compterVu(agent: string) {
+  if (vus.has(agent)) return;
+  vus.add(agent);
+  suivre('diorama_agent_vu', { agent });
+}
+
 /** Mixte: share of the scroll that moves the playhead (the rest is left to time). */
 const POUSSEE = 0.7;
 
@@ -813,13 +836,10 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
     titres.forEach((t, j) => t.classList.toggle('on', j === i));
     // `actif`: only while the place is on screen, not when a reset rewinds it to its first demo.
     const agent = onglets[i].dataset.agent!;
-    if (actif && !vus.has(agent)) {
-      vus.add(agent);
-      suivre('diorama_agent_vu', { agent });
-    }
+    if (actif) compterVu(agent);
   }
 
-  function construire(mobile: boolean) {
+  function construire() {
     const { appareil, contenu } = T;
     const m = gsap.timeline({
       paused: true,
@@ -867,11 +887,11 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
         },
         0,
       );
-      // 2. Its device enters from its side (left of the device on desktop, above on phones), tilted
-      //    in 3D like a keynote product shot, settles flat, and a glare sweeps its glass once.
+      // 2. Its device enters from its left, tilted in 3D like a keynote product shot, settles flat,
+      //    and a glare sweeps its glass once.
       s.fromTo(
         e,
-        { autoAlpha: 0, x: mobile ? 0 : -56, y: mobile ? -24 : 0, scale: 0.96 },
+        { autoAlpha: 0, x: -56, y: 0, scale: 0.96 },
         {
           autoAlpha: 1,
           x: 0,
@@ -886,9 +906,9 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
         .fromTo(
           ecr,
           {
-            rotationY: mobile ? 0 : 26,
-            rotationX: mobile ? 22 : 9,
-            rotationZ: mobile ? 0 : -2,
+            rotationY: 26,
+            rotationX: 9,
+            rotationZ: -2,
             transformPerspective: 1600,
             transformOrigin: '50% 60%',
           },
@@ -934,8 +954,7 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
         e,
         {
           autoAlpha: 0,
-          y: mobile ? -12 : 0,
-          x: mobile ? 0 : 24,
+          x: 24,
           duration: T.sortie,
           ease: EASE.sortie,
         },
@@ -987,19 +1006,18 @@ export function piloter(lieu: HTMLElement, mode: Mode = 'mixte'): Pilote {
   /** Reduced motion: no playhead; in scroll mode the demos split the place's scroll evenly. */
   const indice = (p: number) => Math.min(ecrans.length - 1, Math.floor(p * ecrans.length));
 
-  // gsap.matchMedia runs the handler only while one condition matches: `mobile` and `large` cover
-  // every width, so it always runs, and runs again (reverting the last timeline) when one flips.
+  // gsap.matchMedia runs the handler only while one condition matches: `anime` and `reduit` cover
+  // every case, so it always runs, and runs again (reverting the last timeline) when one flips.
   const mm = gsap.matchMedia();
   mm.add(
     {
-      mobile: '(max-width: 47.99rem)',
-      large: '(min-width: 48rem)',
+      anime: '(prefers-reduced-motion: no-preference)',
       reduit: '(prefers-reduced-motion: reduce)',
     },
     (ctx) => {
-      const { mobile, reduit } = ctx.conditions!;
+      const { reduit } = ctx.conditions!;
       courant = -1;
-      tl = reduit ? null : construire(!!mobile);
+      tl = reduit ? null : construire();
       if (!tl) montrer(scroll ? indice(q) : 0);
       else if (scroll) tl.progress(q);
       else if (actif) tl.play(depart(q));

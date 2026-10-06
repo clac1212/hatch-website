@@ -14,6 +14,10 @@
  *   directly (no queue): a fast scroll lands on a clean state;
  * - the wheel is never captured, and no snap point pulls the page (it would rewind the demo).
  * Without JS, the three places stack, each with its first demo in its final state.
+ *
+ * Phones (< 48rem, César 06/10: the pinned places held the scroll and their overlays collided): no
+ * place, no camera. One card per agent, grouped by place (`.d2m`): who, what, and its device on a
+ * still crop of its scene. The screen plays its demo once when the card comes on screen.
  */
 import { Image, Picture } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
@@ -222,6 +226,55 @@ for (const l of lieux) {
       </div>
     ))
   }
+
+  <div class="d2m">
+    {
+      lieux.map((l, i) => (
+        <div class="d2m-lieu" role="group" aria-labelledby={`d2m-lieu-${i}`}>
+          <h3 id={`d2m-lieu-${i}`} class="d2m-sur">
+            {l.surtitre}
+          </h3>
+          {l.agents.map((d) => {
+            const [fx, fy] = DEMOS[d.cle].cam;
+            const visee = `${fx * 100}% ${fy * 100}%`;
+            return (
+              <article class="d2m-carte" data-agent={d.cle}>
+                <p class="d2-qui">
+                  <Image
+                    src={DEMOS[d.cle].avatar}
+                    alt=""
+                    width={28}
+                    height={28}
+                    densities={[1, 2]}
+                    class="d2-av"
+                  />
+                  <span>
+                    <b>{d.nom}</b> {d.role}
+                  </span>
+                </p>
+                <h4 class="d2-titre">{d.titre}</h4>
+                <div class="d2m-scene">
+                  <Picture
+                    src={l.fond}
+                    formats={['avif', 'webp']}
+                    widths={[800, 1600]}
+                    sizes="200vw"
+                    alt=""
+                    loading="lazy"
+                    class="d2m-fond"
+                    style={`object-position:${visee};transform-origin:${visee}`}
+                  />
+                  <div class:list={['d2m-appareil', d.ecran.appareil]}>
+                    <DemoEcran ecran={d.ecran} avatar={DEMOS[d.cle].avatar} />
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      ))
+    }
+  </div>
 </section>
 
 <style>
@@ -474,29 +527,74 @@ for (const l of lieux) {
     width: min(330px, 24vw, 37svh);
   }
 
+  /* ---------- Phones: one card per agent instead of the places ---------- */
+  .d2m {
+    display: none;
+  }
   @media (max-width: 47.99rem) {
-    .d2-plateau {
-      --ox: 0.5;
-      --oy: 0.25;
+    .d2-bloc {
+      display: none;
     }
-    .d2-appareils {
-      left: 16px;
-      right: 16px;
-      top: 116px;
-      bottom: auto;
+    .d2m {
+      display: flex;
+      flex-direction: column;
+      gap: 48px;
+      padding: 72px 16px 88px;
     }
-    .d2-ecran:is(.tablette, .tableau) {
-      width: 100%;
-    }
-    .d2-ecran:is(.telephone, .formation) {
-      width: min(230px, 52vw, 50svh);
-    }
-    .d2-legende {
-      bottom: calc(clamp(24px, 4vh, 40px) + 64px);
-    }
-    .d2-leg {
-      padding: 14px 16px 16px;
-    }
+  }
+  .d2m-lieu {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .d2m-sur {
+    font: 400 13px/1.3 var(--font-mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+  }
+  .d2m-carte {
+    padding: 18px 16px 16px;
+    border-radius: var(--radius-card);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-2);
+  }
+  .d2m-carte .d2-titre {
+    margin-top: 10px;
+    font-size: 24px;
+  }
+  /* The device on a still crop of its agent's scene, dimmed like the places' focus. */
+  .d2m-scene {
+    position: relative;
+    display: grid;
+    place-items: center;
+    margin-top: 16px;
+    padding: 28px 16px;
+    overflow: hidden;
+    border-radius: 12px;
+    background: var(--color-scene);
+  }
+  .d2m-scene::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: color-mix(in srgb, var(--color-night) 35%, transparent);
+  }
+  .d2m-scene :global(.d2m-fond) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.5);
+  }
+  .d2m-appareil {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+  }
+  .d2m-appareil:is(.telephone, .formation) {
+    width: min(250px, 66vw);
   }
 
   /* Without JS: the three places stack, one screen each, with their first demo in its final state. */
@@ -603,6 +701,36 @@ for (const l of lieux) {
       behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
     });
   });
+
+  /**
+   * Phones: each card's screen starts empty and plays its demo once when the card is on screen.
+   * Reduced motion: the screens keep their final state (the markup).
+   */
+  const cartes = [...sec.querySelectorAll<HTMLElement>('.d2m-carte')];
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    new IntersectionObserver(
+      async (entrees, io) => {
+        if (!entrees.some((e) => e.isIntersecting)) return;
+        io.disconnect();
+        const { ecranSeul, compterVu } = await import('./demo-motion');
+        const films = new Map(cartes.map((c) => [c, ecranSeul(c.querySelector('.ecr')!)]));
+        const lecture = new IntersectionObserver(
+          (vues) => {
+            for (const v of vues) {
+              if (!v.isIntersecting) continue;
+              const carte = v.target as HTMLElement;
+              lecture.unobserve(carte);
+              films.get(carte)!.play();
+              compterVu(carte.dataset.agent!);
+            }
+          },
+          { threshold: 0.55 },
+        );
+        cartes.forEach((c) => lecture.observe(c));
+      },
+      { rootMargin: '100% 0px' },
+    ).observe(sec);
+  }
 
   let raf = 0;
   addEventListener('scroll', () => (raf ||= requestAnimationFrame(() => ((raf = 0), maj()))), {

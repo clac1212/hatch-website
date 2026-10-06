@@ -10,8 +10,11 @@
  * Inside a step, time plays the animation: an internal counter walks the prototype's 16 states
  * (0 empty · 1-7 arrivals · 8-14 answers · 15 summary) one at a time.
  *
+ * Phones (César 06/10: a held scroll felt stuck): no track. The section is a plain block, framed by
+ * this script, and the three beats play once in a row when it comes on screen, like a video.
+ *
  * Runs before the engine (Base.astro imports it last), so it can drop the track under reduced motion
- * and size the portrait stage before the engine's first framing.
+ * or on phones, and size the portrait stage before the engine's first framing.
  */
 const section = document.querySelector<HTMLElement>('.piste[data-piste="probleme"]');
 
@@ -45,6 +48,12 @@ function animer(section: HTMLElement) {
   // Most recent first: card k is notification 6 - k.
   const cartes = [...section.querySelectorAll<HTMLElement>('.notif')];
   const ages = cartes.map((c) => c.querySelector<HTMLElement>('.f-notif .quand')!);
+  const film = matchMedia('(max-width: 47.99rem)').matches;
+  if (film) {
+    // The engine ignores a section without `data-piste`: nothing pins, the scroll stays free.
+    delete section.dataset.piste;
+    section.classList.add('film');
+  }
 
   // Portrait stage: 440 design px wide and as tall as the screen allows, so a 390 px phone shows it
   // at ~0.87 (cards ≥ 13 px). The phone runs off the bottom edge: its notification stack is lifted
@@ -52,10 +61,12 @@ function animer(section: HTMLElement) {
   const portrait = matchMedia('(max-aspect-ratio: 1/1), (max-width: 639.98px)');
   const HAUT_TELEPHONE = 88 + 160 + 12; // padding-top + .texte + margin-top
   const FONDU = 40;
+  /** Film: a fixed design height, the block being as tall as the scaled stage (not the screen). */
+  const HAUTEUR_FILM = 960;
   const dimensionner = () => {
     if (portrait.matches) {
       const h = (collant.clientHeight * 440) / collant.clientWidth;
-      const hauteur = Math.round(Math.max(880, Math.min(h, 1100)));
+      const hauteur = film ? HAUTEUR_FILM : Math.round(Math.max(880, Math.min(h, 1100)));
       const visible = hauteur - HAUT_TELEPHONE - FONDU; // phone px above the fade
       cadre.dataset.largeur = '440';
       cadre.dataset.hauteur = String(hauteur);
@@ -64,6 +75,14 @@ function animer(section: HTMLElement) {
     } else {
       cadre.dataset.largeur = '1240';
       cadre.dataset.hauteur = '980';
+    }
+    if (film) {
+      // The engine's framing, at the block's width: the block takes the stage's scaled height.
+      const s = collant.clientWidth / 440;
+      cadre.style.width = '440px';
+      cadre.style.height = `${HAUTEUR_FILM}px`;
+      cadre.style.transform = `scale(${s})`;
+      collant.style.height = `${Math.round(HAUTEUR_FILM * s)}px`;
     }
   };
   dimensionner();
@@ -118,6 +137,8 @@ function animer(section: HTMLElement) {
   // Internal state reached at the end of each scroll step, and the pace of each kind of change.
   const FIN_ETAPE = [7, 14, 15];
   const delai = (vers: number) => (vers <= 7 ? 450 : vers <= 14 ? 230 : 500);
+  /** Film: the holds the scroll steps used to give, between the avalanche, the answers, the summary. */
+  const PAUSE: Record<number, number> = film ? { 8: 1500, 15: 1800 } : {};
   const RETOUR = 60; // scrolling back up rewinds fast
   let interne = 0;
   let cible = 0;
@@ -131,11 +152,15 @@ function animer(section: HTMLElement) {
     interne += Math.sign(cible - interne);
     rendre(interne);
     if (interne !== cible)
-      minuterie = window.setTimeout(pas, cible > interne ? delai(interne + 1) : RETOUR);
+      minuterie = window.setTimeout(
+        pas,
+        cible > interne ? (PAUSE[interne + 1] ?? delai(interne + 1)) : RETOUR,
+      );
   };
   const viser = () => {
     // The avalanche waits until the section is actually seen (the engine announces step 0 at load).
-    cible = etapeScroll === 0 && !vue ? 0 : FIN_ETAPE[etapeScroll];
+    // Film: seen once is enough, the whole story plays to its summary.
+    cible = film ? (vue ? 15 : 0) : etapeScroll === 0 && !vue ? 0 : FIN_ETAPE[etapeScroll];
     if (minuterie === null) minuterie = window.setTimeout(pas, cible > interne ? 250 : RETOUR);
   };
 
@@ -159,21 +184,25 @@ function animer(section: HTMLElement) {
     rendre(0);
   };
   new IntersectionObserver(
-    (entrees) => {
+    (entrees, io) => {
       if (!entrees.some((e) => e.isIntersecting)) return;
       vue = true;
       viser();
+      // Film: played once per visit.
+      if (film) io.disconnect();
     },
     // Once the pinned stage fills the screen (the section has reached the top), not while it is
     // still scrolling in: at half visible the 7 notifications used to drop before being seen.
-    { threshold: 0.95 },
+    // Film: the block is taller than the screen; most of the phone in view is enough.
+    { threshold: film ? 0.6 : 0.95 },
   ).observe(collant);
-  new IntersectionObserver((entrees) => {
-    const e = entrees[entrees.length - 1]!;
-    // Fully below the screen again (the visitor went back up the page): the next visit replays
-    // the avalanche from an empty screen (cofounder's feedback 02/10). Leaving it downwards keeps
-    // its state, so scrolling back up into it rewinds as usual.
-    if (!e.isIntersecting && e.boundingClientRect.top > 0) remettre();
-  }).observe(section);
+  if (!film)
+    new IntersectionObserver((entrees) => {
+      const e = entrees[entrees.length - 1]!;
+      // Fully below the screen again (the visitor went back up the page): the next visit replays
+      // the avalanche from an empty screen (cofounder's feedback 02/10). Leaving it downwards keeps
+      // its state, so scrolling back up into it rewinds as usual.
+      if (!e.isIntersecting && e.boundingClientRect.top > 0) remettre();
+    }).observe(section);
   rendre(0);
 }

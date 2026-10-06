@@ -17,7 +17,8 @@ import sparrow from '../../assets/probleme/sparrow.png';
 /**
  * 03 — Problème (v4 node hnwZk): pinned track. Saturday night, the head office's phone fills up
  * with seven notifications, then each one is taken over by a Hatch agent. Steps are driven by the
- * shared engine (src/scripts/pistes.ts) and rendered by src/scripts/probleme.ts.
+ * shared engine (src/scripts/pistes.ts) and rendered by src/scripts/probleme.ts. On phones, no
+ * track: the block plays its three beats once, on its own (`film`).
  * Without JS or with reduced motion, the final state is shown as a plain list instead of the track.
  */
 interface Props {
@@ -341,6 +342,10 @@ const textes = JSON.stringify({ quand: tel.quand, horloge: tel.horloge });
       height: auto;
       overflow: visible;
     }
+  }
+  /* Phones (probleme.ts `film`): not pinned, the block is as tall as its scaled stage. */
+  .pb.film .collant {
+    position: relative;
   }
   .pb .ios {
     font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
