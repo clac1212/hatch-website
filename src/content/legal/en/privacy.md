@@ -3,7 +3,7 @@ seo:
   title: 'Privacy Policy — Hatch OS'
   description: 'Hatch OS privacy policy: the data we collect and why, our GDPR legal basis, subprocessors, retention periods, cookies and your rights over your data.'
 title: 'Privacy Policy'
-meta: 'Last updated: April 22, 2026 · Effective date: April 22, 2026'
+meta: 'Last updated: October 6, 2026 · Effective date: April 22, 2026'
 ---
 
 ## 1. Data Controller Identity
@@ -38,6 +38,11 @@ When you connect your Google Drive account, Hatch OS requests access to the foll
 - Connection and platform usage logs
 - Technical and session cookies
 
+### 2.4 Visitors of the gethatch.io Website
+
+- **Audience measurement.** The website measures its traffic with PostHog (servers in the European Union, in Germany) and Vercel Web Analytics: pages viewed, clicks on call-to-action buttons, traffic source, device and browser type, page load speed. This measurement works **without any cookie or storage in your browser**: visits are grouped by an anonymous identifier computed on the server and renewed every day, and the IP address is not kept. It is only used to produce statistics about how the website is used and does not track you on other websites.
+- **Demo requests.** Booking a meeting on the demo page goes through Cal.com, embedded in the page. You provide your name, your email address and, where applicable, your company and your answers to the booking form. This data is used to organize the meeting and to get back to you.
+
 ## 3. Processing Purposes
 
 Your data is processed for the following purposes:
@@ -48,6 +53,8 @@ Your data is processed for the following purposes:
 - **Service improvement:** aggregated and anonymized analysis
 - **Security:** fraud and abuse detection
 - **Legal obligations:** billing, accounting and regulatory compliance
+- **Website audience measurement:** traffic statistics for gethatch.io
+- **Demo meetings:** organizing the meeting and sales follow-up
 
 ## 4. Google Data Usage & Limited Use Policy
 
@@ -59,13 +66,15 @@ Hatch OS complies with the Google API Services User Data Policy. In particular:
 
 ## 5. GDPR Legal Basis
 
-| Purpose                 | Legal basis          |
-| ----------------------- | -------------------- |
-| Service delivery        | Contract performance |
-| Google OAuth connection | Explicit consent     |
-| Customer support        | Contract performance |
-| Billing                 | Legal obligation     |
-| Analytics and security  | Legitimate interest  |
+| Purpose                      | Legal basis                                 |
+| ---------------------------- | ------------------------------------------- |
+| Service delivery             | Contract performance                        |
+| Google OAuth connection      | Explicit consent                            |
+| Customer support             | Contract performance                        |
+| Billing                      | Legal obligation                            |
+| Analytics and security       | Legitimate interest                         |
+| Website audience measurement | Legitimate interest (cookieless)            |
+| Demo meetings                | Pre-contractual steps taken at your request |
 
 You may withdraw your consent at any time via your Hatch OS account settings or directly at [myaccount.google.com/permissions](https://myaccount.google.com/permissions).
 
@@ -73,13 +82,16 @@ You may withdraw your consent at any time via your Hatch OS account settings or 
 
 Your data may be shared with the following sub-processors, strictly for service delivery purposes:
 
-| Sub-processor   | Role             | Location           |
-| --------------- | ---------------- | ------------------ |
-| Supabase Inc.   | Database         | EU                 |
-| Vercel Inc.     | Hosting          | EU / United States |
-| Google LLC      | OAuth, AI models | United States      |
-| Anthropic PBC   | Claude models    | United States      |
-| Meta / WhatsApp | Messaging        | EU / United States |
+| Sub-processor   | Role                         | Location           |
+| --------------- | ---------------------------- | ------------------ |
+| Supabase Inc.   | Database                     | EU                 |
+| Vercel Inc.     | Hosting                      | EU / United States |
+| Google LLC      | OAuth, AI models             | United States      |
+| Anthropic PBC   | Claude models                | United States      |
+| Meta / WhatsApp | Messaging                    | EU / United States |
+| PostHog Inc.    | Website audience measurement | EU (Germany)       |
+| Vercel Inc.     | Website visit statistics     | EU / United States |
+| Cal.com Inc.    | Demo meeting booking         | United States      |
 
 We never sell your personal data. International data transfers outside the European Union are governed by Standard Contractual Clauses.
 
@@ -89,6 +101,7 @@ We never sell your personal data. International data transfers outside the Europ
 - Indexed Google Drive documents: until Google account disconnection, then deleted within 30 days
 - Technical logs: 12 months
 - Billing data: 10 years (legal requirement)
+- Demo requests: 3 years after the last contact
 
 ## 8. User Rights (GDPR)
 
@@ -101,6 +114,8 @@ You can revoke Hatch OS access to your Google account at any time, either throug
 ## 9. Cookies
 
 The platform uses only strictly necessary cookies for its operation. No advertising cookies or third-party tracking tools are used without your explicit consent.
+
+On the gethatch.io website, audience measurement sets no cookie and writes nothing to your browser (see 2.4): this is why no consent banner is shown. The Cal.com calendar embedded on the demo page may set the cookies it needs to work when you use it.
 
 ## 10. Security
 

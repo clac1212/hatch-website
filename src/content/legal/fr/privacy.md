@@ -3,7 +3,7 @@ seo:
   title: 'Politique de Confidentialité — Hatch OS'
   description: 'Politique de confidentialité de Hatch OS : données collectées, finalités, base légale RGPD, sous-traitants, durées de conservation, cookies et vos droits.'
 title: 'Politique de Confidentialité'
-meta: 'Mise à jour : 22 avril 2026 · Entrée en vigueur : 22 avril 2026'
+meta: 'Mise à jour : 6 octobre 2026 · Entrée en vigueur : 22 avril 2026'
 ---
 
 ## 1. Identité du responsable de traitement
@@ -38,6 +38,11 @@ Lorsque vous connectez votre compte Google Drive, Hatch OS accède aux périmèt
 - Journaux de connexion et d'utilisation de la plateforme
 - Cookies techniques et de session
 
+### 2.4 Visiteurs du site gethatch.io
+
+- **Mesure d'audience.** Le site mesure sa fréquentation avec PostHog (serveurs dans l'Union européenne, en Allemagne) et Vercel Web Analytics&nbsp;: pages consultées, clics sur les boutons d'action, provenance de la visite, type d'appareil et de navigateur, vitesse d'affichage des pages. Cette mesure fonctionne **sans cookie ni stockage dans votre navigateur**&nbsp;: les visites sont regroupées par un identifiant anonyme calculé côté serveur et renouvelé chaque jour, et l'adresse IP n'est pas conservée. Elle ne sert qu'à produire des statistiques sur l'usage du site et ne permet pas de vous suivre sur d'autres sites.
+- **Demande de démonstration.** La réservation d'un rendez-vous sur la page démo passe par Cal.com, intégré à la page. Vous y indiquez votre nom, votre adresse e-mail et, le cas échéant, votre entreprise et vos réponses au formulaire de réservation. Ces données servent à organiser le rendez-vous et à vous recontacter.
+
 ## 3. Finalités du traitement
 
 Les données sont traitées pour les finalités suivantes&nbsp;:
@@ -48,6 +53,8 @@ Les données sont traitées pour les finalités suivantes&nbsp;:
 - **Amélioration du service&nbsp;:** analyses agrégées et anonymisées
 - **Sécurité&nbsp;:** détection de fraude et d'abus
 - **Obligations légales&nbsp;:** facturation, comptabilité et conformité réglementaire
+- **Mesure d'audience du site&nbsp;:** statistiques de fréquentation de gethatch.io
+- **Rendez-vous de démonstration&nbsp;:** organisation du rendez-vous et suivi commercial
 
 ## 4. Utilisation des données Google et politique de conformité
 
@@ -59,13 +66,15 @@ Hatch OS respecte la politique d'utilisation des données des services Google AP
 
 ## 5. Base légale RGPD
 
-| Finalité                 | Base légale            |
-| ------------------------ | ---------------------- |
-| Fourniture du service    | Exécution du contrat   |
-| Connexion Google OAuth   | Consentement explicite |
-| Support client           | Exécution du contrat   |
-| Facturation              | Obligation légale      |
-| Statistiques et sécurité | Intérêt légitime       |
+| Finalité                     | Base légale                                      |
+| ---------------------------- | ------------------------------------------------ |
+| Fourniture du service        | Exécution du contrat                             |
+| Connexion Google OAuth       | Consentement explicite                           |
+| Support client               | Exécution du contrat                             |
+| Facturation                  | Obligation légale                                |
+| Statistiques et sécurité     | Intérêt légitime                                 |
+| Mesure d'audience du site    | Intérêt légitime (sans cookie)                   |
+| Rendez-vous de démonstration | Mesures précontractuelles prises à votre demande |
 
 Vous pouvez retirer votre consentement à tout moment via les paramètres de votre compte Hatch OS ou directement sur [myaccount.google.com/permissions](https://myaccount.google.com/permissions).
 
@@ -73,13 +82,16 @@ Vous pouvez retirer votre consentement à tout moment via les paramètres de vot
 
 Vos données peuvent être transmises aux sous-traitants suivants, dans le cadre strict de la fourniture du service&nbsp;:
 
-| Sous-traitant   | Rôle              | Localisation    |
-| --------------- | ----------------- | --------------- |
-| Supabase Inc.   | Base de données   | UE              |
-| Vercel Inc.     | Hébergement       | UE / États-Unis |
-| Google LLC      | OAuth, modèles IA | États-Unis      |
-| Anthropic PBC   | Modèles Claude    | États-Unis      |
-| Meta / WhatsApp | Messagerie        | UE / États-Unis |
+| Sous-traitant   | Rôle                                  | Localisation    |
+| --------------- | ------------------------------------- | --------------- |
+| Supabase Inc.   | Base de données                       | UE              |
+| Vercel Inc.     | Hébergement                           | UE / États-Unis |
+| Google LLC      | OAuth, modèles IA                     | États-Unis      |
+| Anthropic PBC   | Modèles Claude                        | États-Unis      |
+| Meta / WhatsApp | Messagerie                            | UE / États-Unis |
+| PostHog Inc.    | Mesure d'audience du site             | UE (Allemagne)  |
+| Vercel Inc.     | Statistiques de visite du site        | UE / États-Unis |
+| Cal.com Inc.    | Prise de rendez-vous de démonstration | États-Unis      |
 
 Nous ne vendons jamais vos données personnelles. Les transferts de données hors Union européenne sont encadrés par des clauses contractuelles types.
 
@@ -89,6 +101,7 @@ Nous ne vendons jamais vos données personnelles. Les transferts de données hor
 - Documents Google Drive indexés&nbsp;: jusqu'à la déconnexion du compte Google, puis supprimés sous 30 jours
 - Journaux techniques&nbsp;: 12 mois
 - Données de facturation&nbsp;: 10 ans (obligation légale)
+- Demandes de démonstration&nbsp;: 3 ans après le dernier contact
 
 ## 8. Droits des utilisateurs (RGPD)
 
@@ -101,6 +114,8 @@ Vous pouvez révoquer l'accès de Hatch OS à votre compte Google à tout moment
 ## 9. Cookies
 
 La plateforme utilise uniquement des cookies strictement nécessaires à son fonctionnement. Aucun cookie publicitaire ni outil de traçage tiers n'est utilisé sans votre consentement explicite.
+
+Sur le site gethatch.io, la mesure d'audience ne dépose aucun cookie et n'écrit rien dans votre navigateur (voir 2.4)&nbsp;: c'est pourquoi aucun bandeau de consentement ne s'affiche. L'agenda Cal.com intégré à la page démo peut déposer les cookies nécessaires à son fonctionnement lorsque vous l'utilisez.
 
 ## 10. Sécurité
 
