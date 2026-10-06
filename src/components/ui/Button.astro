@@ -9,6 +9,7 @@ import type { HTMLAttributes } from 'astro/types';
  *   the hero map (frosted, white rim) as well as on cream (hairline ring);
  * - `ink`: dark block button of the pricing cards, turns orange on hover;
  * - `cream`: its counterpart on night backgrounds (footer, dark pricing card).
+ * Text on orange is always ink (6.8:1), never white (2.7:1, fails AA; César 06/10).
  * All are "vif": they lift on hover, the arrow slides and a light sweep crosses them.
  */
 interface Props extends HTMLAttributes<'a'> {
@@ -34,7 +35,7 @@ const {
     'btn-vif inline-flex items-center whitespace-nowrap',
     block && 'w-full justify-center',
     variant === 'orange' && [
-      'rounded-full bg-orange font-bold text-white',
+      'rounded-full bg-orange font-bold text-ink',
       size === 'sm'
         ? 'gap-2 px-5 py-3 text-[0.875rem] shadow-[0_6px_16px_rgb(248_122_1/0.35)]'
         : 'gap-2.5 px-6 py-4 text-base shadow-[0_10px_24px_rgb(248_122_1/0.4)]',
@@ -44,7 +45,7 @@ const {
       size === 'sm' ? 'gap-2 px-5 py-3 text-[0.875rem]' : 'gap-2.5 px-6 py-4 text-base',
     ],
     variant === 'ink' &&
-      'gap-2.5 rounded-btn bg-ink px-5.5 py-3.5 text-[0.9375rem] font-semibold text-white hover:bg-orange',
+      'gap-2.5 rounded-btn bg-ink px-5.5 py-3.5 text-[0.9375rem] font-semibold text-white hover:bg-orange hover:text-ink',
     variant === 'cream' &&
       'gap-2.5 rounded-btn bg-cream px-5.5 py-3.5 text-[0.9375rem] font-semibold text-ink',
     className,
