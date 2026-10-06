@@ -17,6 +17,7 @@ export const routes = {
   demo: { fr: '/demo', en: '/en/demo' },
   security: { fr: '/securite', en: '/en/security' },
   terms: { fr: '/conditions', en: '/en/terms' },
+  sales: { fr: '/conditions-de-vente', en: '/en/terms-of-sale' },
   privacy: { fr: '/confidentialite', en: '/en/privacy' },
   mentions: { fr: '/mentions-legales', en: '/en/legal-notice' },
   sansFiltre: { fr: '/sans-filtre', en: '/en/unfiltered' },

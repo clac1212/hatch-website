@@ -16,6 +16,7 @@ export const schema = z.strictObject({
   legal: z.strictObject({
     titre: z.string(),
     conditions: z.string(),
+    vente: z.string(),
     confidentialite: z.string(),
     mentions: z.string(),
   }),

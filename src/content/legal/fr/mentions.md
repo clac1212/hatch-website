@@ -23,7 +23,7 @@ Patrick Rakotondrajao, Président de Hatch OS.
 
 Le site est hébergé par **Vercel Inc.**, 440 N Barranca Avenue #4133, Covina, CA 91723, États-Unis ([vercel.com](https://vercel.com)).
 
-Les données de la plateforme Hatch OS sont stockées dans l'Union européenne. Le détail des sous-traitants figure dans la politique de confidentialité et dans les Conditions Générales de Vente.
+Les données de la plateforme Hatch OS sont stockées dans l'Union européenne. Le détail des sous-traitants figure dans la [politique de confidentialité](/confidentialite) et dans les [Conditions Générales de Vente](/conditions-de-vente).
 
 ## Propriété intellectuelle
 
@@ -35,4 +35,4 @@ Le traitement des données personnelles et l'usage des cookies sont décrits dan
 
 ## Conditions applicables
 
-L'abonnement à la plateforme est régi par les Conditions Générales de Vente, accessibles sur le site.
+L'abonnement à la plateforme est régi par les [Conditions Générales de Vente](/conditions-de-vente), accessibles sur le site.

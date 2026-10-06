@@ -20,6 +20,7 @@ agents:
 legal:
   titre: Légal
   conditions: Conditions d'utilisation
+  vente: Conditions de vente
   confidentialite: Confidentialité
   mentions: Mentions légales
 copyright: Hatch OS · Paris

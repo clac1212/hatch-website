@@ -34,6 +34,7 @@ const SOURCES: Partial<Record<RouteKey, (l: Locale) => string[]>> = {
   demo: (l) => ['src/views/DemoPage.astro', `src/content/pages/demo/${l}.yaml`],
   security: (l) => ['src/views/SecurityPage.astro', `src/content/pages/security/${l}.yaml`],
   terms: (l) => [`src/content/legal/${l}/terms.md`],
+  sales: (l) => [`src/content/legal/${l}/sales.md`],
   privacy: (l) => [`src/content/legal/${l}/privacy.md`],
   mentions: (l) => [`src/content/legal/${l}/mentions.md`],
   sansFiltre: (l) => [

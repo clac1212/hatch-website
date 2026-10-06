@@ -3,10 +3,10 @@ import { getEntry, render } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import { routes, type Locale } from '../i18n/ui';
 
-/** Legal pages (terms, privacy, legal notice), shared by FR and EN: `src/content/legal/<locale>/<page>.md`. */
+/** Legal pages (terms of use, terms of sale, privacy, legal notice), shared by FR and EN: `src/content/legal/<locale>/<page>.md`. */
 interface Props {
   locale: Locale;
-  page: 'terms' | 'privacy' | 'mentions';
+  page: 'terms' | 'sales' | 'privacy' | 'mentions';
 }
 
 const { locale, page } = Astro.props;

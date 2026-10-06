@@ -3,133 +3,188 @@ seo:
   title: 'Privacy Policy — Hatch OS'
   description: 'Hatch OS privacy policy: the data we collect and why, our GDPR legal basis, subprocessors, retention periods, cookies and your rights over your data.'
 title: 'Privacy Policy'
-meta: 'Last updated: October 6, 2026 · Effective date: April 22, 2026'
+meta: 'Version 2026-10 · Last updated: October 6, 2026 · Effective date: September 25, 2026'
 ---
 
-## 1. Data Controller Identity
+_This English version is provided for convenience. In case of discrepancy, the French version prevails._
 
-Hatch OS, a simplified joint-stock company (SAS) with a capital of €1,000, headquartered at 104 rue de la Folie-Méricourt, 75011 Paris, France (Paris Commercial Registry: 103 890 893). President: Patrick Rakotondrajao. Data Protection Officer (DPO): [cesar@gethatch.io](mailto:cesar@gethatch.io).
+## 1. Identity of the Data Controller
 
-The company publishes and operates a SaaS platform accessible via gethatch.io and its subdomains, designed for franchise networks and their teams.
+This Privacy Policy is published by:
+
+**Hatch OS**, a simplified joint-stock company (société par actions simplifiée, SAS) with a share capital of €1,000<br />
+Registered office: 104 rue de la Folie-Méricourt, 75011 Paris, France<br />
+Registered with the Paris Trade and Companies Register (Registre du Commerce et des Sociétés) under number 103 890 893<br />
+President: Patrick Rakotondrajao<br />
+DPO contact: [cesar@gethatch.io](mailto:cesar@gethatch.io)
+
+Hatch OS (hereinafter "Hatch OS", "we" or "our") publishes and operates the SaaS platform accessible from the `gethatch.io` domain and its subdomains (hereinafter the "Solution"), designed for franchise networks and their staff.
+
+**Roles under the GDPR.** Hatch OS acts as **data controller** for the data required to manage its relationship with its customers: account requests, administrator accounts, billing, proof of acceptance of the terms, security of the Solution. For the data that its customers integrate into the Solution and the data of their users and staff, Hatch OS acts as **processor** on behalf of the customer, who is the data controller for such data, under the conditions set out in the [Terms of Sale](/en/terms-of-sale) or in the subscription agreement signed with the customer.
 
 ## 2. Personal Data Collected
 
-### 2.1 User-Provided Data
+We collect and process the following categories of data:
 
-- Full name and professional email address
-- Phone number (optional)
-- Company or franchise details (name, role, location)
-- Content created on the platform (messages, templates, uploaded documents)
+### 2.1 Data provided directly by the User
 
-### 2.2 Data Collected via Google OAuth
+- Last name, first name, professional email address
+- Phone number (mandatory when requesting an account, optional afterwards)
+- Company / franchise data (name of the concept, number of locations, role, location)
+- Proof of acceptance of the Terms of Use and the Terms of Sale: document and version accepted, date and time, email address and name of the concept at the date of acceptance
+- Content created in the platform (messages, templates, uploaded documents)
 
-When you connect your Google Drive account, Hatch OS requests access to the following scopes:
+### 2.2 Data collected via Google OAuth
 
-| Scope                     | Data accessed                          |
-| ------------------------- | -------------------------------------- |
-| `email`                   | Primary Google account email address   |
-| `profile`                 | First name, last name, profile photo   |
-| `drive.readonly`          | Selected Google Drive files            |
-| `drive.metadata.readonly` | File names, types, dates and structure |
+When you connect your Google account to Hatch OS, we request the following permissions ("scopes"):
 
-### 2.3 Technical Data
+| Google scope                                              | Data accessed                                            | Purpose                                                   |
+| --------------------------------------------------------- | -------------------------------------------------------- | --------------------------------------------------------- |
+| `https://www.googleapis.com/auth/userinfo.email`          | Primary email address of your Google account             | Creation and authentication of your Hatch OS account      |
+| `https://www.googleapis.com/auth/userinfo.profile`        | Last name, first name, profile photo                     | Personalization of your user profile                      |
+| `https://www.googleapis.com/auth/drive.readonly`          | Google Drive files you choose to connect                 | Reading the selected documents to feed the AI agent (RAG) |
+| `https://www.googleapis.com/auth/drive.metadata.readonly` | Drive file metadata (name, type, date, folder structure) | Display of the file picker in the Hatch OS interface      |
+
+### 2.3 Technical data
 
 - IP address, browser type, operating system
+- When requesting an account: bot verification (Cloudflare Turnstile), which processes the IP address and technical signals from the browser
 - Connection and platform usage logs
-- Technical and session cookies
+- Technical and session cookies (see section 9)
 
-### 2.4 Visitors of the gethatch.io Website
+### 2.4 Billing data
 
-- **Audience measurement.** The website measures its traffic with PostHog (servers in the European Union, in Germany) and Vercel Web Analytics: pages viewed, clicks on call-to-action buttons, traffic source, device and browser type, page load speed. This measurement works **without any cookie or storage in your browser**: visits are grouped by an anonymous identifier computed on the server and renewed every day, and the IP address is not kept. It is only used to produce statistics about how the website is used and does not track you on other websites.
-- **Demo requests.** Booking a meeting on the demo page goes through Cal.com, embedded in the page. You provide your name, your email address and, where applicable, your company and your answers to the booking form. This data is used to organize the meeting and to get back to you.
+When the customer subscribes to a plan, we transmit to our payment provider Stripe the name, email address, billing address and, where applicable, the VAT number of the account administrator. Payment card data is entered directly on Stripe's pages and processed by Stripe alone: Hatch OS has no access to it and does not store it. We retain the subscription status, the number of locations billed and the billing due dates.
 
-## 3. Processing Purposes
+### 2.5 Visitors of the gethatch.io website
 
-Your data is processed for the following purposes:
+- **Audience measurement.** The website measures its traffic with PostHog (servers in the European Union, in Germany) and Vercel Web Analytics: pages viewed, clicks on call-to-action buttons, traffic source, device and browser type, page load speed. This measurement works **without any cookie or storage in your browser**: visits are grouped by an anonymous identifier computed on the server side and renewed every day, and the IP address is not retained. It is used only to produce statistics on the use of the website and does not allow you to be tracked on other websites.
+- **Demo request.** Booking a meeting on the demo page goes through Cal.com, embedded in the page. You provide your name, your email address and, where applicable, your company and your answers to the booking form. This data is used to organize the meeting and to contact you again.
 
-- **Service delivery:** account creation, authentication, access to features
-- **AI agent:** indexing documents for assistant responses (RAG)
-- **Customer support**
-- **Service improvement:** aggregated and anonymized analysis
-- **Security:** fraud and abuse detection
-- **Legal obligations:** billing, accounting and regulatory compliance
-- **Website audience measurement:** traffic statistics for gethatch.io
-- **Demo meetings:** organizing the meeting and sales follow-up
+## 3. Purposes of Processing
 
-## 4. Google Data Usage & Limited Use Policy
+We process your personal data for the following purposes:
 
-Hatch OS complies with the Google API Services User Data Policy. In particular:
+1. **Providing the service**: account creation, authentication, access to the platform's features
+2. **Reviewing account requests**: verification of the information provided and fraud prevention before an account is activated
+3. **Feeding the AI agent (RAG)**: indexing the documents you choose to connect (Google Drive, direct uploads) so that the AI assistant can answer your staff's questions based on your content
+4. **Customer support**: responding to your support requests
+5. **Service improvement**: aggregated and anonymized statistical analyses. Our customers' data and content are never used to train or fine-tune artificial intelligence models, and our AI model providers are contractually bound not to use them to train their own
+6. **Security**: detection of fraud, abuse and security incidents, bot protection of the account request form
+7. **Billing and payment**: management of the subscription, payments and invoices
+8. **Proof**: retention of proof of acceptance of the Terms of Use and Terms of Sale
+9. **Legal obligations**: invoicing, accounting, regulatory compliance
+10. **Website audience measurement**: traffic statistics for gethatch.io
+11. **Demo meetings**: organization of the meeting and sales follow-up
 
-- Google Drive files are used **exclusively** to power your AI agent (RAG) and are not shared with any third party except where required by law
-- Google data is never used for advertising purposes
-- Google data is never used to train general or third-party AI models
+## 4. Use of Google Data: Limited Disclosure (Google API Services Limited Use)
 
-## 5. GDPR Legal Basis
+Hatch OS's use of information received from Google APIs, and its transfer to any other application, adheres to the **[Google API Services User Data Policy](https://developers.google.com/terms/api-services-user-data-policy)**, including the **Limited Use** requirements.
 
-| Purpose                      | Legal basis                                 |
-| ---------------------------- | ------------------------------------------- |
-| Service delivery             | Contract performance                        |
-| Google OAuth connection      | Explicit consent                            |
-| Customer support             | Contract performance                        |
-| Billing                      | Legal obligation                            |
-| Analytics and security       | Legitimate interest                         |
-| Website audience measurement | Legitimate interest (cookieless)            |
-| Demo meetings                | Pre-contractual steps taken at your request |
+In practice, this means that:
 
-You may withdraw your consent at any time via your Hatch OS account settings or directly at [myaccount.google.com/permissions](https://myaccount.google.com/permissions).
+- The Google Drive files we access are used **solely** to feed your AI agent (RAG) in order to answer your users' questions within the Hatch OS platform
+- We **never** transfer your Google data to third parties, except where strictly necessary to provide or improve user-facing features (subprocessors listed in section 6), to comply with the law, or as part of a merger, acquisition or sale of assets, with your consent
+- We **never** use your Google data for advertising purposes
+- We **never** use your Google data to train, fine-tune or improve generalized artificial intelligence models or third-party models
 
-## 6. Recipients and Sub-processors
+## 5. Legal Basis for Processing (GDPR)
 
-Your data may be shared with the following sub-processors, strictly for service delivery purposes:
+| Purpose                                                   | Legal basis                                                        |
+| --------------------------------------------------------- | ------------------------------------------------------------------ |
+| Providing the service, creating and managing your account | Performance of the contract (Art. 6(1)(b) GDPR)                    |
+| Reviewing an account request                              | Pre-contractual measures (Art. 6(1)(b) GDPR)                       |
+| Payment and subscription management                       | Performance of the contract (Art. 6(1)(b) GDPR)                    |
+| Bot protection, proof of acceptance of the terms          | Legitimate interest (Art. 6(1)(f) GDPR)                            |
+| Google OAuth connection and Drive access                  | Explicit consent (Art. 6(1)(a) GDPR)                               |
+| Support and service communications                        | Performance of the contract                                        |
+| Invoicing, accounting                                     | Legal obligation (Art. 6(1)(c) GDPR)                               |
+| Statistical analyses, security                            | Legitimate interest (Art. 6(1)(f) GDPR)                            |
+| Audience measurement of the gethatch.io website           | Legitimate interest, cookieless (Art. 6(1)(f) GDPR)                |
+| Demo meetings                                             | Pre-contractual measures taken at your request (Art. 6(1)(b) GDPR) |
 
-| Sub-processor   | Role                         | Location           |
-| --------------- | ---------------------------- | ------------------ |
-| Supabase Inc.   | Database                     | EU                 |
-| Vercel Inc.     | Hosting                      | EU / United States |
-| Google LLC      | OAuth, AI models             | United States      |
-| Anthropic PBC   | Claude models                | United States      |
-| Meta / WhatsApp | Messaging                    | EU / United States |
-| PostHog Inc.    | Website audience measurement | EU (Germany)       |
-| Vercel Inc.     | Website visit statistics     | EU / United States |
-| Cal.com Inc.    | Demo meeting booking         | United States      |
+You may withdraw your consent to the Google connection at any time from your Hatch OS account or from your Google account settings (`https://myaccount.google.com/permissions`).
 
-We never sell your personal data. International data transfers outside the European Union are governed by Standard Contractual Clauses.
+## 6. Recipients and Subprocessors
 
-## 7. Data Retention
+Your data is hosted and processed by the following subprocessors, chosen for their level of security:
 
-- Account data: contract duration + 3 years after termination
-- Indexed Google Drive documents: until Google account disconnection, then deleted within 30 days
-- Technical logs: 12 months
-- Billing data: 10 years (legal requirement)
-- Demo requests: 3 years after the last contact
+| Subprocessor   | Service                                                                                                                              | Location                               | Transfer mechanism |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------- | ------------------ |
+| Supabase       | Database hosting, authentication, storage                                                                                            | EU (France)                            | Not applicable     |
+| Google         | Generation of responses by artificial intelligence (Gemini) and Google Drive connection                                              | United States                          | DPF + SCC          |
+| Twilio         | Message routing                                                                                                                      | United States                          | DPF + SCC          |
+| Meta Platforms | Delivery of WhatsApp messages                                                                                                        | Outside the EU (global infrastructure) | DPF + SCC          |
+| Vercel         | Hosting of the interface (ephemeral processing, without persistent storage), hosting and visit statistics of the gethatch.io website | EU (France)                            | Not applicable     |
+| Railway        | Content synchronization processing                                                                                                   | EU (Netherlands)                       | Not applicable     |
+| Hostinger      | Hosting of a technical orchestration component                                                                                       | EU (France)                            | Not applicable     |
+| Resend         | Sending of transactional emails                                                                                                      | United States                          | DPF + SCC          |
+| PostHog        | Product audience measurement (pseudonymized) and gethatch.io website audience measurement (cookieless)                               | EU (Germany)                           | Not applicable     |
+| ElevenLabs     | Transcription of voice messages                                                                                                      | United States                          | SCC                |
+| Stripe         | Subscription payment and billing                                                                                                     | United States / EU (Ireland)           | DPF + SCC          |
+| Cloudflare     | Bot protection of the account request form (Turnstile)                                                                               | United States                          | DPF + SCC          |
+| Cal.com        | Booking of demo meetings from the gethatch.io website                                                                                | United States                          | SCC                |
 
-## 8. User Rights (GDPR)
+Data is stored and backed up within the European Union or the European Economic Area. Certain ancillary processing operations (artificial intelligence generation, message routing, email sending, payment) involve subprocessors established outside the European Economic Area. These transfers are governed by an adequacy decision (Data Privacy Framework, "DPF"), by **Standard Contractual Clauses** ("SCC") approved by the European Commission, or by any other GDPR-compliant mechanism.
 
-In accordance with GDPR, you have the following rights: access, rectification, erasure, restriction of processing, portability, objection and withdrawal of consent. To exercise these rights, contact our DPO at: [cesar@gethatch.io](mailto:cesar@gethatch.io). We are committed to responding within one month.
+**We never sell your personal data.**
 
-### 8.1 Revoking Google Access
+## 7. Retention Period
 
-You can revoke Hatch OS access to your Google account at any time, either through your Hatch OS account settings or directly on the Google permissions page: [myaccount.google.com/permissions](https://myaccount.google.com/permissions).
+- **Account data**: duration of the contract + 3 years after termination (commercial statute of limitations)
+- **Indexed Google Drive documents (RAG)**: for as long as you maintain the Google connection; deleted within 30 days after disconnection or upon request
+- **Technical logs**: 12 months
+- **Billing data**: 10 years (legal accounting obligation)
+- **Proof of acceptance of the Terms**: retained, including after the account is deleted, for the period necessary to prove the contractual relationship
+- **Customer data processed as processor**: returned upon request within 30 days following the end of the subscription, then deleted, subject to legal obligations and backup purge cycles
+- **Demo requests**: 3 years after the last contact
+
+## 8. Your Rights (GDPR)
+
+In accordance with Regulation (EU) 2016/679 (GDPR), you have the following rights:
+
+- **Right of access** to your personal data
+- **Right to rectification** of inaccurate data
+- **Right to erasure** ("right to be forgotten")
+- **Right to restriction** of processing
+- **Right to portability** of your data
+- **Right to object** to processing
+- **Right to withdraw your consent** at any time
+- **Right to lodge a complaint** with the CNIL, the French data protection authority ([www.cnil.fr](http://www.cnil.fr))
+
+To exercise these rights, contact our DPO: **[cesar@gethatch.io](mailto:cesar@gethatch.io)**. We respond within a maximum of **one month** from receipt of your request.
+
+### 8.1 How to revoke Google access
+
+You can revoke Hatch OS's access to your Google account at any time:
+
+1. From Hatch OS: `Paramètres → Intégrations → Google → Déconnecter`
+2. From Google: `https://myaccount.google.com/permissions`
+
+After revocation, the documents indexed from Drive are deleted from our systems within 30 days.
 
 ## 9. Cookies
 
-The platform uses only strictly necessary cookies for its operation. No advertising cookies or third-party tracking tools are used without your explicit consent.
+The Solution uses only cookies that are **strictly necessary** for its operation (session, authentication, preferences). No advertising or third-party tracking cookie is set without your explicit consent.
 
-On the gethatch.io website, audience measurement sets no cookie and writes nothing to your browser (see 2.4): this is why no consent banner is shown. The Cal.com calendar embedded on the demo page may set the cookies it needs to work when you use it.
+On the gethatch.io website, audience measurement sets no cookie and writes nothing to your browser (see 2.5): this is why no consent banner is displayed. The Cal.com calendar embedded in the demo page may set the cookies necessary for its operation when you use it.
 
 ## 10. Security
 
-Hatch OS implements appropriate technical and organizational measures, including: TLS 1.2+ encryption, strict access controls, access logging, regular backups and the least-privilege principle.
+We implement appropriate technical and organizational measures to protect your data: encryption in transit (TLS 1.2+) and at rest, access controls, logging, regular backups, security testing, and the principle of least privilege for internal access.
 
 ## 11. Minors
 
-The service is designed for professional use and is not intended for persons under 16 years of age. We do not knowingly collect data relating to minors.
+The Solution is not intended for minors under the age of 16. We do not knowingly collect data from minors.
 
-## 12. Modifications
+## 12. Changes
 
-Any substantial changes to this policy will be notified to you by email at least 30 days before they take effect.
+We may update this Privacy Policy. Any substantial change will be notified to users by email and by a visible notice in the Solution at least 30 days before it takes effect.
 
 ## 13. Contact
 
-DPO: [cesar@gethatch.io](mailto:cesar@gethatch.io)<br />
-Postal address: 104 rue de la Folie-Méricourt, 75011 Paris, France
+For any question regarding this policy or your personal data:
+
+**Hatch OS, Data Protection Officer**<br />
+Email: [cesar@gethatch.io](mailto:cesar@gethatch.io)<br />
+Address: 104 rue de la Folie-Méricourt, 75011 Paris, France
