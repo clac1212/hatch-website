@@ -6,7 +6,7 @@ hero:
   title: 'Vos données, en sécurité dès le premier jour.'
   lead: "Vous gardez le contrôle de ce que vous partagez, de l'endroit où c'est hébergé et de qui y accède."
   proofs:
-    - label: 'Hébergé en Europe'
+    - label: 'Données hébergées en Europe'
       section: 0
     - label: 'Aucun entraînement IA'
       section: 1
@@ -26,10 +26,10 @@ sections:
     items:
       - title: 'Sélection à la source'
         text: 'Choisissez exactement ce que Hatch OS utilise, source par source.'
-      - title: 'Hébergé en Europe'
-        text: 'Vos données et leurs sauvegardes restent en Europe.'
-      - title: 'Chiffrement de bout en bout'
-        text: 'Chiffrées en transit et au repos (TLS, AES-256).'
+      - title: 'Données hébergées en Europe'
+        text: 'Vos données et leurs sauvegardes sont hébergées en Europe.'
+      - title: 'Chiffrement en transit et au repos'
+        text: 'TLS pendant les échanges, AES-256 pour les données stockées.'
   - kicker: 'Intelligence artificielle'
     visual: owl
     title: "Vos données n'entraînent aucune IA"

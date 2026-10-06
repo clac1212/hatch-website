@@ -39,7 +39,10 @@ const lien = 'lien-pied block w-fit text-[14.5px] leading-[normal] text-paper';
 
 <footer data-rv-groupe class="bg-black text-paper">
   <div class="mx-auto flex max-w-[1920px] flex-col lg:flex-row xl:h-[900px]">
-    <div data-rv class="order-1 flex justify-center lg:order-2 lg:w-[40%] lg:shrink-0 xl:w-[720px]">
+    <div
+      data-rv
+      class="order-1 flex justify-center lg:order-2 lg:w-[40%] lg:shrink-0 xl:w-[min(720px,42%)]"
+    >
       <Picture
         pictureAttributes={{ class: 'block w-full max-w-[460px] lg:h-full lg:max-w-none' }}
         src={immeuble}
@@ -52,7 +55,7 @@ const lien = 'lien-pied block w-fit text-[14.5px] leading-[normal] text-paper';
     </div>
 
     <div
-      class="order-2 flex flex-1 flex-col justify-between gap-14 px-6 pt-4 pb-10 md:px-12 lg:order-1 lg:gap-10 lg:pt-20 lg:pr-8 xl:pt-[88px] xl:pr-12 xl:pl-24"
+      class="order-2 flex min-w-0 flex-1 flex-col justify-between gap-14 px-6 pt-4 pb-10 md:px-12 lg:order-1 lg:gap-10 lg:pt-20 lg:pr-8 xl:pt-[88px] xl:pr-12 xl:pl-24"
     >
       <div data-rv class="flex max-w-[420px] flex-col items-start gap-[18px]">
         <a href={home} aria-label={t('a11y.home')}>

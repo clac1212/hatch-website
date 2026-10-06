@@ -6,7 +6,7 @@ hero:
   title: 'Your data, secure from day one.'
   lead: "You stay in control of what you share, where it's hosted, and who can access it."
   proofs:
-    - label: 'Hosted in Europe'
+    - label: 'Data hosted in Europe'
       section: 0
     - label: 'No AI training'
       section: 1
@@ -26,10 +26,10 @@ sections:
     items:
       - title: 'Source-level selection'
         text: 'Choose exactly what Hatch OS uses, source by source.'
-      - title: 'Hosted in Europe'
-        text: 'Your data and its backups stay in Europe.'
-      - title: 'End-to-end encryption'
-        text: 'Encrypted in transit and at rest (TLS, AES-256).'
+      - title: 'Data hosted in Europe'
+        text: 'Your data and its backups are hosted in Europe.'
+      - title: 'Encryption in transit and at rest'
+        text: 'TLS for data in transit, AES-256 for stored data.'
   - kicker: 'Artificial intelligence'
     visual: owl
     title: 'Your data never trains AI'

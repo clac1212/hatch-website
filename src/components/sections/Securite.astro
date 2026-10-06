@@ -70,10 +70,7 @@ const RATIO = Math.min(...oiseaux.map((o) => o.height / o.width));
               style={`--ratio:${RATIO}`}
               class="oiseau w-auto object-contain"
             />
-            <a
-              href={href}
-              class="lien-secu text-[17px] font-bold text-night sm:text-center lg:whitespace-nowrap"
-            >
+            <a href={href} class="lien-secu text-[17px] font-bold text-night sm:text-center">
               {g.titre.slice(0, g.titre.lastIndexOf(' ') + 1)}
               {/* The arrow is glued to the last word, so a wrapped label never leaves it alone. */}
               <span class="whitespace-nowrap">
