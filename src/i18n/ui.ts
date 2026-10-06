@@ -38,11 +38,9 @@ const fr = {
   'nav.pricing': 'Tarifs',
   'nav.security': 'Sécurité',
   'cta.demo': 'Réserver une démo',
-  /** Hero: primary CTA to the app's self-serve signup, then the demo as the secondary one. */
-  'cta.try': 'Essayez maintenant',
-  'cta.demoAsk': 'Demandez une démo',
-  /** Nav: the same two CTAs in short, plus the sign-in link for existing customers. */
-  'nav.try': 'Essayer',
+  /** Secondary CTA of the hero: the app's signup, for a newcomer (the demo is the primary). */
+  'cta.try': 'Essayer Hatch OS',
+  /** Nav: sign-in to the app (its /auth page also lets a newcomer sign up). */
   'nav.login': 'Se connecter',
   'lang.switch': 'English',
   'footer.product': 'Produit',
@@ -71,9 +69,7 @@ const en: Record<keyof typeof fr, string> = {
   'nav.pricing': 'Pricing',
   'nav.security': 'Security',
   'cta.demo': 'Book a demo',
-  'cta.try': 'Try it now',
-  'cta.demoAsk': 'Book a demo',
-  'nav.try': 'Try it',
+  'cta.try': 'Try Hatch OS',
   'nav.login': 'Log in',
   'lang.switch': 'Français',
   'footer.product': 'Product',

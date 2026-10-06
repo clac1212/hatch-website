@@ -6,7 +6,7 @@ import { appUrls, routes, otherLocale, useTranslations, type Locale, type Paths 
 /**
  * v4 nav: liquid-glass pill, centred and fixed at the top; a drop shadow appears once the page scrolls.
  * From lg it folds while the visitor scrolls down (César 05/10): only the logo, « Se connecter » and
- * the demo stay, the links, the language and « Essayer » slide shut; scrolling back up unfolds it.
+ * the demo stay, the links and the language slide shut; scrolling back up unfolds it.
  * Dead zones (FOLD_DELTA down, a longer UNFOLD_DELTA up) keep it from flickering or reopening on a
  * small scroll back, and it unfolds a touch slower than it folds.
  */
@@ -65,24 +65,18 @@ const other = otherLocale(locale);
       </ul>
     </div>
 
-    <!-- Sign-in for customers, then the two CTAs: the demo (secondary) and try it (primary).
-         Below lg the menu carries sign-in and the demo, the pill keeps the primary only. -->
+    <!-- Two calls to action, the classic SaaS pair (César 06/10): sign-in, a text link (the app's
+         /auth page also lets a newcomer create an account), and the demo, the one filled button.
+         Below lg the menu carries sign-in; the pill keeps the demo. -->
     <a
       href={appUrls.login}
       class="hidden rounded-full px-3.5 py-2.5 text-[0.875rem] font-semibold whitespace-nowrap transition-colors duration-300 hover:bg-orange/14 hover:text-orange-hover lg:block"
     >
       {t('nav.login')}
     </a>
-    <!-- The demo pill: from xl always; between lg and xl only while folded, the unfolded bar would
-         wrap there (César 05/10). -->
-    <span class="n-pli n-demo hidden lg:flex">
-      <Button href={routes.demo[locale]} variant="secondary">{t('cta.demo')}</Button>
-    </span>
-    <span class="n-pli n-essai flex" data-pli>
-      <Button href={appUrls.signup} class="max-sm:px-4 max-sm:text-[0.8125rem]">
-        {t('nav.try')}
-      </Button>
-    </span>
+    <Button href={routes.demo[locale]} class="max-sm:px-4 max-sm:text-[0.8125rem]">
+      {t('cta.demo')}
+    </Button>
 
     <details class="group relative lg:hidden">
       <summary
@@ -130,14 +124,6 @@ const other = otherLocale(locale);
           </li>
           <li class="mt-1 border-t border-line pt-1">
             <a
-              href={routes.demo[locale]}
-              class="block rounded-btn px-3 py-2.5 font-semibold hover:bg-orange-tint"
-            >
-              {t('cta.demo')}
-            </a>
-          </li>
-          <li>
-            <a
               href={appUrls.login}
               class="block rounded-btn px-3 py-2.5 font-semibold hover:bg-orange-tint"
             >
@@ -151,48 +137,28 @@ const other = otherLocale(locale);
 </header>
 
 <style>
-  /* Folding parts: their width slides to 0 (the pill follows), they fade, and the gap they leave is
-     taken back by a negative margin. Only from lg; below, the menu carries everything. */
+  /* Folding part: its width slides to 0 (the pill follows), it fades, and the gap it leaves is taken
+     back by a negative margin. Only from lg; below, the menu carries the links. */
   @media (width >= 64rem) {
     .n-pli {
-      /* clip, with a margin so the orange pill's shadow and focus rings aren't cut while open */
       overflow: clip;
       overflow-clip-margin: 18px;
       white-space: nowrap;
-      max-width: var(--max);
+      max-width: 44rem;
       transition:
         max-width 0.55s var(--ease-hatch),
         opacity 0.35s var(--ease-hatch),
         margin 0.55s var(--ease-hatch);
     }
-    .n-liens {
-      --max: 44rem;
-    }
-    .n-essai {
-      --max: 12rem;
-    }
-    .n-demo {
-      --max: 16rem;
-    }
     /* Unfolding: slower and slightly delayed, so the bar eases back open. */
-    :global(#nav:not(.replie)) .n-liens,
-    :global(#nav:not(.replie)) .n-essai {
+    :global(#nav:not(.replie)) .n-pli {
       transition-duration: 0.7s, 0.45s, 0.7s;
       transition-delay: 0.08s;
     }
-    :global(#nav.replie) .n-liens,
-    :global(#nav.replie) .n-essai,
-    :global(#nav:not(.replie)) .n-demo {
+    :global(#nav.replie) .n-pli {
       max-width: 0;
       opacity: 0;
       margin-inline-start: -0.375rem;
-    }
-  }
-  @media (width >= 80rem) {
-    :global(#nav:not(.replie)) .n-demo {
-      max-width: var(--max);
-      opacity: 1;
-      margin-inline-start: 0;
     }
   }
   @media (prefers-reduced-motion: reduce) {
@@ -207,7 +173,6 @@ const other = otherLocale(locale);
   const nav = document.getElementById('nav')!;
   const plis = [...nav.querySelectorAll<HTMLElement>('.n-pli')];
   const large = matchMedia('(min-width: 64rem)');
-  const xl = matchMedia('(min-width: 80rem)');
   /**
    * Scroll needed in one direction before the bar folds (down) or unfolds (up), and the top zone kept
    * open. Unfolding asks for a longer, deliberate move up (César 05/10: it reopened too soon).
@@ -220,12 +185,9 @@ const other = otherLocale(locale);
 
   function plier(replie: boolean) {
     nav.classList.toggle('replie', replie && large.matches);
-    // Hidden parts leave the tab order; the demo is shown folded, or always from xl.
+    // Folded links leave the tab order.
     const plie = nav.classList.contains('replie');
-    for (const el of plis) {
-      const cache = el.classList.contains('n-demo') ? !plie && !xl.matches : plie;
-      el.inert = large.matches && cache;
-    }
+    for (const el of plis) el.inert = plie;
   }
 
   const maj = () => {
@@ -244,7 +206,6 @@ const other = otherLocale(locale);
   };
   addEventListener('scroll', maj, { passive: true });
   large.addEventListener('change', () => plier(nav.classList.contains('replie')));
-  xl.addEventListener('change', () => plier(nav.classList.contains('replie')));
   // Keyboard: tabbing into the bar opens it.
   nav.addEventListener('focusin', () => plier(false));
   maj();

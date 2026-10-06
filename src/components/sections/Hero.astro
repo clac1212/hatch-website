@@ -225,10 +225,10 @@ const tick =
       >
         {data.lead}
       </p>
-      <!-- Two calls to action (César 02/10): try it (the app's self-serve signup) first, the demo next. -->
+      <!-- Two calls to action (César 06/10): the demo first, then trying the platform (its signup). -->
       <div class="h-ctas flex flex-wrap gap-3">
-        <Button href={appUrls.signup} variant="orange" size="lg">{t('cta.try')}</Button>
-        <Button href={routes.demo[locale]} variant="secondary" size="lg">{t('cta.demoAsk')}</Button>
+        <Button href={routes.demo[locale]} variant="orange" size="lg">{t('cta.demo')}</Button>
+        <Button href={appUrls.signup} variant="secondary" size="lg">{t('cta.try')}</Button>
       </div>
     </div>
   </div>
