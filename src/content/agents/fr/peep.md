@@ -30,7 +30,6 @@ page:
   scenario:
     title: 'Chez Nobinobi'
     text: "[Brouillon à valider avec Nobinobi] Les équipes des 12 sites posent leurs questions à Peep sur WhatsApp au lieu d'appeler le fondateur, qui ne garde que les vrais sujets."
-    case: nobinobi
   tools:
     text: 'Je parle à vos équipes là où elles sont déjà, et je lis vos documents là où ils sont rangés.'
     items:

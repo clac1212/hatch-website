@@ -10,7 +10,6 @@ actions:
   kicker: Ce que je fais
 scenario:
   kicker: Un cas client
-  readCase: Lire le cas {client}
 tools:
   kicker: Outils
   title: Avec quels outils je travaille

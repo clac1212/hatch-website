@@ -174,36 +174,11 @@ export const agentPage = z.strictObject({
   breadcrumb: z.strictObject({ label: z.string(), home: z.string(), agents: z.string() }),
   problem: z.strictObject({ kicker: z.string(), answer: z.string() }),
   actions: z.strictObject({ kicker: z.string() }),
-  scenario: z.strictObject({ kicker: z.string(), readCase: z.string() }),
+  scenario: z.strictObject({ kicker: z.string() }),
   tools: kickerTitle,
   faq: kickerTitle,
   related: kickerTitle,
   allCases: z.string(),
   cta: z.strictObject({ title: z.string(), text: z.string() }),
   updated: z.string(),
-});
-
-/** Chrome of the customer case pages (`/clients/<id>`, src/views/CasePage.astro). */
-export const casePage = z.strictObject({
-  breadcrumb: z.strictObject({ label: z.string(), home: z.string(), cases: z.string() }),
-  kicker: z.string(),
-  /** Agent badge prefix: "Avec" + agent name. */
-  with: z.string(),
-  published: z.string(),
-  updated: z.string(),
-  by: z.string(),
-  authors: z.strictObject({
-    patrick: z.strictObject({ name: z.string(), role: z.string() }),
-    cesar: z.strictObject({ name: z.string(), role: z.string() }),
-    sebastien: z.strictObject({ name: z.string(), role: z.string() }),
-  }),
-  figures: z.strictObject({
-    kicker: z.string(),
-    title: z.string(),
-    before: z.string(),
-    after: z.string(),
-  }),
-  story: z.strictObject({ kicker: z.string() }),
-  agents: kickerTitle,
-  cta: z.strictObject({ title: z.string(), text: z.string() }),
 });

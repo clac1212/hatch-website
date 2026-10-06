@@ -12,14 +12,12 @@ import { schema as securite } from './content/schemas/securite';
 import { schema as tarifs } from './content/schemas/tarifs';
 import { schema as piedDePage } from './content/schemas/piedDePage';
 import { schema as agent } from './content/schemas/agents';
-import { schema as customerCase } from './content/schemas/cases';
 import {
   demoPage,
   securityPage,
   sansFiltrePage,
   sansFiltreEdition,
   agentPage,
-  casePage,
 } from './content/pages/schemas';
 
 /**
@@ -48,12 +46,6 @@ const home = defineCollection({
 const agents = defineCollection({
   loader: glob({ pattern: '*/*.md', base: './src/content/agents' }),
   schema: agent,
-});
-
-/** Customer case pages, one YAML file per case and per locale (`fr/nobinobi.yaml`). */
-const cases = defineCollection({
-  loader: glob({ pattern: '*/*.yaml', base: './src/content/cases' }),
-  schema: customerCase,
 });
 
 /**
@@ -90,10 +82,8 @@ export const collections = {
   securityPage: pageCollection('security', securityPage),
   sansFiltrePage: pageCollection('sansFiltre', sansFiltrePage),
   agentPage: pageCollection('agent', agentPage),
-  casePage: pageCollection('case', casePage),
   home,
   agents,
-  cases,
   hero: sectionCollection('hero', hero),
   clients: sectionCollection('clients', clients),
   probleme: sectionCollection('probleme', probleme),

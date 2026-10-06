@@ -21,7 +21,6 @@ type RouteKey = keyof typeof routes;
 /** Sources of the per-entry pages (`entryRoutes` of src/i18n/ui.ts), by their first segment. */
 const ENTRY_SOURCES: Record<string, (id: string, l: Locale) => string[]> = {
   agents: (slug, l) => [`src/content/agents/${l}/${slug}.md`, 'src/views/AgentPage.astro'],
-  clients: (id, l) => [`src/content/cases/${l}/${id}.yaml`, 'src/views/CasePage.astro'],
 };
 
 /** Sources of each route's page, per locale. A route without an entry gets no lastmod. */
@@ -89,7 +88,7 @@ export function counterpart(path: string): string {
 }
 
 /**
- * Draft entry pages (`brouillon: true` in their content file: agent page block or case) are served
+ * Draft entry pages (`brouillon: true` in their content file: agent page block) are served
  * `noindex` by their view and left out of the sitemap until the copy is validated.
  */
 function isDraft(path: string): boolean {

@@ -18,7 +18,11 @@ const cards = await Promise.all(
   slugs.map(async (slug) => {
     const e = await getEntry('agents', `${locale}/${slug}`);
     if (!e) throw new Error(`Missing src/content/agents/${locale}/${slug}.md`);
-    return { slug, ...e.data, href: e.data.page ? entryRoutes.agents(slug)[locale] : undefined };
+    return {
+      slug,
+      ...e.data,
+      href: e.data.page && !e.data.page.brouillon ? entryRoutes.agents(slug)[locale] : undefined,
+    };
   }),
 );
 ---

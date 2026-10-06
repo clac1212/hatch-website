@@ -28,7 +28,7 @@ export const schema = z.strictObject({
         agent: z.enum(caseAgents),
         /** Alt text of the storefront illustration. */
         visualAlt: z.string(),
-        /** Customer quote, and who says it. Bracketed placeholders until the customer validates. */
+        /** Customer quote, and who says it, from the customer interview (wording validated by the customer). */
         quote: z.string(),
         author: z.string(),
         /** Two key figures; the first one's value is the site count shown on the closed slice. Placeholders like `[X]` are allowed until the figures are confirmed. */
@@ -37,5 +37,5 @@ export const schema = z.strictObject({
         href: z.string().startsWith('/').nullable(),
       }),
     )
-    .length(3),
+    .min(1),
 });

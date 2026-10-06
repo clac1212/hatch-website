@@ -7,7 +7,6 @@ import Button from '../components/ui/Button.astro';
 import DemoEcran from '../components/sections/DemoEcran.astro';
 import AgentCards from '../components/pages/AgentCards.astro';
 import { agentPhoto, avatars } from '../components/pages/agent-visuels';
-import { casVisuels } from '../components/sections/cas-visuels';
 import { fill, longDate } from '../components/pages/format';
 import { section } from '../content/section';
 import type { AgentSlug, toolLogos } from '../content/schemas/agents';
@@ -60,21 +59,6 @@ const demo = (await section('demo', locale)).lieux
   .find((a) => a.cle === p.demo);
 if (!demo) throw new Error(`No diorama demo "${p.demo}" (${locale})`);
 const telephone = demo.ecran.appareil === 'telephone' || demo.ecran.appareil === 'formation';
-
-// The customer case the scenario links to: its page must exist.
-const scenarioCase = p.scenario?.case;
-const caseEntry = scenarioCase ? await getEntry('cases', `${locale}/${scenarioCase}`) : undefined;
-if (scenarioCase && !caseEntry) {
-  throw new Error(
-    `Agent "${slug}" links to a missing case: src/content/cases/${locale}/${scenarioCase}.yaml`,
-  );
-}
-const lien = scenarioCase &&
-  caseEntry && {
-    ...casVisuels[scenarioCase],
-    client: caseEntry.data.client,
-    href: entryRoutes.clients(scenarioCase)[locale],
-  };
 
 const LOGOS: Record<(typeof toolLogos)[number], ImageMetadata> = {
   whatsapp: logoWhatsapp,
@@ -244,26 +228,9 @@ const jsonLd = [
       <section aria-labelledby="agent-scenario" class="py-20 md:py-28">
         <div class={wrap} data-rv-groupe>
           <div
-            class="grid overflow-hidden rounded-card bg-surface shadow-[inset_0_0_0_1px_var(--color-line)] md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]"
+            class="grid overflow-hidden rounded-card bg-surface shadow-[inset_0_0_0_1px_var(--color-line)] "
             data-rv
           >
-            {lien && (
-              <div
-                class="grid min-h-[200px] place-items-center p-10"
-                style={`background-color:${lien.color}`}
-              >
-                <Picture
-                  src={lien.logo}
-                  alt={lien.client}
-                  formats={['avif', 'webp']}
-                  height={lien.logoH * 1.6}
-                  densities={[1, 2]}
-                  loading="lazy"
-                  class="w-auto object-contain"
-                  style={`height:${lien.logoH * 1.6}px`}
-                />
-              </div>
-            )}
             <div class="flex flex-col items-start gap-4 p-8 md:p-12">
               <p class="font-mono text-kicker text-orange-txt uppercase">
                 {num('scenario')} · {ui.scenario.kicker}
@@ -272,11 +239,6 @@ const jsonLd = [
                 {p.scenario.title}
               </h2>
               <p class="max-w-[36rem] text-body text-soft">{p.scenario.text}</p>
-              {lien && (
-                <a href={lien.href} class="lien mt-2">
-                  {fill(ui.scenario.readCase, { client: lien.client })} →
-                </a>
-              )}
             </div>
           </div>
         </div>

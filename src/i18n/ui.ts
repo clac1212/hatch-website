@@ -22,10 +22,9 @@ export const routes = {
 } as const satisfies Record<string, Record<Locale, string>>;
 export type Paths = Record<Locale, string>;
 
-/** Pages generated per entry: an agent (`src/content/agents`), a customer case (`src/content/cases`). */
+/** Pages generated per entry: an agent (`src/content/agents`). */
 export const entryRoutes = {
   agents: (slug: string): Paths => ({ fr: `/agents/${slug}`, en: `/en/agents/${slug}` }),
-  clients: (id: string): Paths => ({ fr: `/clients/${id}`, en: `/en/clients/${id}` }),
 };
 
 /** Short UI strings (nav, footer, buttons, accessibility labels). Marketing copy lives in src/content/. */

@@ -113,11 +113,13 @@ const pageHref = (slug: string) => entryRoutes.agents(slug)[locale];
               </div>
             )}
             {col.map(({ size, rd, agent }) => {
-              const Tag = agent.page ? 'a' : 'div';
+              // Only a published page is linked: drafts wait for the second wave (César 06/10).
+              const publiee = agent.page && !agent.page.brouillon;
+              const Tag = publiee ? 'a' : 'div';
               return (
                 <div data-rv style={`--rd:${rd * 0.09}s`} class={sizeClass[size]}>
                   <Tag
-                    href={agent.page ? pageHref(agent.slug) : undefined}
+                    href={publiee ? pageHref(agent.slug) : undefined}
                     style={agent.style}
                     class="tuile group relative block size-full overflow-hidden rounded-[20px] after:pointer-events-none after:absolute after:inset-0 after:rounded-[20px] after:border-2 after:border-transparent after:transition-colors after:duration-400 hover:after:border-orange focus-visible:after:border-orange"
                   >

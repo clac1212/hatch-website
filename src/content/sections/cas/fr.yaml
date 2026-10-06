@@ -1,4 +1,5 @@
-# Citations et auteurs : brouillons à faire valider par chaque client avant la mise en ligne.
+# Témoignages tirés des entretiens clients (NOBI NOBI : réponses écrites du 05/10/2026 ; PNY : entretien
+# du 29/09/2026). Accord site et LinkedIn donné ; formulation des citations à faire valider par chaque client.
 title: Ils l’ont déployé dans leur réseau
 label: Cas clients
 with: Avec
@@ -6,39 +7,27 @@ readCase: Lire le cas
 sites: sites
 open: 'Afficher le cas {client}'
 cases:
-  - id: la-meulerie
-    client: La Meulerie
-    agent: jay
-    visualAlt: La devanture de La Meulerie.
-    quote: « Une procédure change, nos quatre sites l’ont le jour même. Avant, il fallait des semaines et trois relances. »
-    author: '[Prénom Nom] · Fondateur, La Meulerie'
-    figures:
-      - value: '4'
-        label: sites équipés
-      - value: '[X]'
-        label: procédures mises à jour
-    href: null
   - id: nobinobi
-    client: Nobinobi
-    agent: peep
-    visualAlt: La devanture de Nobinobi.
-    quote: « Les équipes posent leurs questions à Peep au lieu de m’appeler. Je ne garde que les vrais sujets. »
-    author: '[Prénom Nom] · Fondateur, Nobinobi'
-    figures:
-      - value: '12'
-        label: sites équipés
-      - value: '[Y] sem.'
-        label: pour tout déployer
-    href: /clients/nobinobi
-  - id: pny
-    client: PNY
-    agent: owl
-    visualAlt: La devanture de PNY.
-    quote: « En plein rush, un équipier demande à Owl et a la réponse à voix haute, sans lâcher la commande. »
-    author: '[Prénom Nom] · Directeur des opérations, PNY'
+    client: NOBI NOBI
+    agent: jay
+    visualAlt: La devanture d’un restaurant NOBI NOBI.
+    quote: « Pour moi, le plus gros gain de temps, c’est l’IA qui retrouve le fichier exact dans un drive de plus de 4 000 documents. »
+    author: Benjamin Schmit · Président, NOBI NOBI
     figures:
       - value: '13'
-        label: sites équipés
-      - value: '[X]'
-        label: questions traitées par mois
+        label: restaurants équipés
+      - value: 4 000+
+        label: documents retrouvés à la demande
+    href: null
+  - id: pny
+    client: PNY
+    agent: peep
+    visualAlt: La devanture d’un restaurant PNY.
+    quote: « C’est un énorme gain de temps… un bon bras droit. »
+    author: Anna · Directrice des opérations, PNY
+    figures:
+      - value: '13'
+        label: restaurants équipés
+      - value: 5 min
+        label: pour créer une formation
     href: null

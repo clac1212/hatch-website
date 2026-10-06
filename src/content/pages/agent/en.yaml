@@ -10,7 +10,6 @@ actions:
   kicker: What I do
 scenario:
   kicker: A customer story
-  readCase: Read the {client} story
 tools:
   kicker: Tools
   title: The tools I work with

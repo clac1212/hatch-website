@@ -30,7 +30,6 @@ page:
   scenario:
     title: 'At Nobinobi'
     text: '[Draft, to be validated with Nobinobi] The teams of the 12 locations ask Peep on WhatsApp instead of calling the founder, who only keeps the real issues.'
-    case: nobinobi
   tools:
     text: 'I talk to your teams where they already are, and I read your documents where they are already stored.'
     items:

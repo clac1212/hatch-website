@@ -3,9 +3,12 @@ import { getCollection } from 'astro:content';
 import AgentPage from '../../../views/AgentPage.astro';
 import type { AgentSlug } from '../../../content/schemas/agents';
 
-/** One page per agent that has its `page` block. */
+/** One page per agent whose `page` block is no longer a draft (drafts wait for the second wave). */
 export async function getStaticPaths() {
-  const agents = await getCollection('agents', (e) => e.id.startsWith('en/') && !!e.data.page);
+  const agents = await getCollection(
+    'agents',
+    (e) => e.id.startsWith('en/') && !!e.data.page && !e.data.page.brouillon,
+  );
   return agents.map((e) => ({ params: { slug: e.id.slice('en/'.length) } }));
 }
 

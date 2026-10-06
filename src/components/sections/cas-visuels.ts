@@ -8,8 +8,7 @@ import nobinobiLogo from '../../assets/cas/logo-nobinobi-marque.png';
 import pnyLogo from '../../assets/cas/logo-pny-marque.png';
 
 /**
- * Visuals of each customer case, shared by the home shelf (Cas.astro) and the case pages
- * (CasePage.astro). `logo` = the brand's version for its own colour (La Meulerie white with its
+ * Visuals of each customer case on the home shelf (Cas.astro). `logo` = the brand's version for its own colour (La Meulerie white with its
  * orange shadow, Nobinobi its original sticker logo, made for dark), `logoH` = its drawn height in px
  * from lg, so the three marks weigh the same despite their ratios (wide wordmark vs. stacked sticker).
  */

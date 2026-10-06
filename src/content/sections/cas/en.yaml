@@ -1,4 +1,5 @@
-# Quotes and authors: drafts, to be validated by each customer before launch.
+# Testimonials from customer interviews (NOBI NOBI: written answers of 05/10/2026; PNY: interview of
+# 29/09/2026). Consent given for the website and LinkedIn; quote wording to be validated by each customer.
 title: They rolled it out across their network
 label: Customer stories
 with: With
@@ -6,39 +7,27 @@ readCase: Read the story
 sites: sites
 open: 'Show the {client} story'
 cases:
-  - id: la-meulerie
-    client: La Meulerie
-    agent: jay
-    visualAlt: The La Meulerie storefront.
-    quote: “When a procedure changes, our four sites have it the same day. It used to take weeks and three reminders.”
-    author: '[First Last] · Founder, La Meulerie'
-    figures:
-      - value: '4'
-        label: locations equipped
-      - value: '[X]'
-        label: procedures updated
-    href: null
   - id: nobinobi
-    client: Nobinobi
-    agent: peep
-    visualAlt: The Nobinobi storefront.
-    quote: “The teams ask Peep instead of calling me. I only keep the real issues.”
-    author: '[First Last] · Founder, Nobinobi'
-    figures:
-      - value: '12'
-        label: locations equipped
-      - value: '[Y] wks'
-        label: to roll everything out
-    href: /en/clients/nobinobi
-  - id: pny
-    client: PNY
-    agent: owl
-    visualAlt: The PNY storefront.
-    quote: “Mid-rush, a crew member asks Owl and hears the answer out loud, without dropping the order.”
-    author: '[First Last] · Head of operations, PNY'
+    client: NOBI NOBI
+    agent: jay
+    visualAlt: The storefront of a NOBI NOBI restaurant.
+    quote: “For me, the biggest time saver is the AI finding the exact file in a drive of more than 4,000 documents.”
+    author: Benjamin Schmit · President, NOBI NOBI
     figures:
       - value: '13'
-        label: locations equipped
-      - value: '[X]'
-        label: questions handled per month
+        label: restaurants equipped
+      - value: 4,000+
+        label: documents found on request
+    href: null
+  - id: pny
+    client: PNY
+    agent: peep
+    visualAlt: The storefront of a PNY restaurant.
+    quote: “It’s a huge time saver… a real right hand.”
+    author: Anna · Head of operations, PNY
+    figures:
+      - value: '13'
+        label: restaurants equipped
+      - value: 5 min
+        label: to create a training course
     href: null

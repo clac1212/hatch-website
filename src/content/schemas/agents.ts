@@ -1,6 +1,5 @@
 import { z } from 'astro/zod';
 import { demoCles } from './demo';
-import { caseIds } from './cas';
 
 /** The seven agents (file names of `src/content/agents/<locale>/<slug>.md`). */
 export const agentSlugs = ['peep', 'owl', 'lark', 'jay', 'finch', 'pecker', 'sparrow'] as const;
@@ -40,8 +39,6 @@ const fiche = z.strictObject({
     .strictObject({
       title: texte,
       text: texte,
-      /** Customer case page it links to, `null` while there is none. */
-      case: z.enum(caseIds).nullable(),
     })
     .nullable(),
   /** Tools it plugs into: only those that really work today. */
