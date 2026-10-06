@@ -24,7 +24,7 @@ cases:
     agent: peep
     visualAlt: The storefront of a PNY restaurant.
     quote: “Our teams used to call us with every question. Now they write on WhatsApp and get their answer. It saves us so much time.”
-    author: Anna · Head of operations, PNY
+    author: Hannah · Head of operations, PNY
     figures:
       - value: '13'
         label: restaurants equipped

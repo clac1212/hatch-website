@@ -24,7 +24,7 @@ cases:
     agent: peep
     visualAlt: La devanture d’un restaurant PNY.
     quote: « Avant, à chaque question, les équipes nous appelaient. Aujourd’hui, elles écrivent sur WhatsApp et ont leur réponse. Ça nous fait gagner un temps fou. »
-    author: Anna · Directrice des opérations, PNY
+    author: Hannah · Directrice des opérations, PNY
     figures:
       - value: '13'
         label: restaurants équipés

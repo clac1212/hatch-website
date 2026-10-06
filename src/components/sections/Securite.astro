@@ -70,21 +70,8 @@ const RATIO = Math.min(...oiseaux.map((o) => o.height / o.width));
               style={`--ratio:${RATIO}`}
               class="oiseau w-auto object-contain"
             />
-            <a href={href} class="lien-secu text-[17px] font-bold text-night sm:text-center">
-              {g.titre.slice(0, g.titre.lastIndexOf(' ') + 1)}
-              {/* The arrow is glued to the last word, so a wrapped label never leaves it alone. */}
-              <span class="whitespace-nowrap">
-                {g.titre.slice(g.titre.lastIndexOf(' ') + 1)}
-                <svg
-                  viewBox="0 0 24 24"
-                  class="ml-1.5 inline-block size-4 align-[-2px]"
-                  fill="currentColor"
-                  aria-hidden="true"
-                >
-                  <path d="M4 11v2h16v-2zm12 2v2h2v-2zm-2 2v2h2v-2zm-2 2v2h2v-2zm4-6V9h2v2zM14 15V7h2v8zm-2 2V5h2v12z" />
-                </svg>
-              </span>
-            </a>
+            {/* A label, not a link (César 06/10): the one link is « Lire notre politique de sécurité ». */}
+            <p class="text-[17px] font-bold text-night sm:text-center">{g.titre}</p>
           </li>
         ))
       }

@@ -119,11 +119,6 @@ const lien = 'lien-pied block w-fit text-[14.5px] leading-[normal] text-paper';
                   </li>
                 ))
               }
-              <li>
-                <a href={paths[other]} hreflang={other} lang={other} class={lien}>
-                  {t('lang.switch')}
-                </a>
-              </li>
             </ul>
           </nav>
           <nav aria-labelledby="pied-legal" class="flex flex-col gap-3">
@@ -147,7 +142,21 @@ const lien = 'lien-pied block w-fit text-[14.5px] leading-[normal] text-paper';
         <div
           class="flex flex-col gap-2 font-mono text-[11px] leading-[14px] tracking-[0.14em] text-stone uppercase sm:flex-row sm:justify-between"
         >
-          <p>{annee} {data.copyright}</p>
+          {/* The language switch sits with the page's fine print, not among the social links. */}
+          <p class="flex flex-wrap gap-x-6 gap-y-2">
+            <span>
+              {annee}
+              {data.copyright}
+            </span>
+            <a
+              href={paths[other]}
+              hreflang={other}
+              lang={other}
+              class="text-paper transition-colors duration-300 hover:text-orange"
+            >
+              {t('lang.switch')}
+            </a>
+          </p>
           <p>{data.mention}</p>
         </div>
       </div>

@@ -1,7 +1,7 @@
 title: They already run their network with Hatch OS
 figures:
-  - { prefix: '', value: 13, suffix: '', label: franchise networks }
-  - { prefix: '', value: 244, suffix: '+', label: locations }
+  - { prefix: '', value: 14, suffix: '', label: franchise networks }
+  - { prefix: '', value: 250, suffix: '+', label: locations }
   - { prefix: '', value: 10000, suffix: '+', label: questions answered }
   - { prefix: '< ', value: 10, suffix: ' s', label: per answer }
 band:
