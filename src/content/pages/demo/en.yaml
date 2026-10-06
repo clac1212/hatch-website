@@ -1,14 +1,9 @@
 seo:
   title: 'Book a demo — Hatch OS'
-  description: 'Book 45 minutes with Patrick, co-founder of Hatch OS: a personalized demo built around the use cases of your franchise network.'
-kicker: 'Personalized demo · 45 minutes'
+  description: 'Book a Hatch OS demo with Patrick, co-founder: we walk you through the platform on the use cases of your franchise network. Pick a slot online.'
 title: 'Your teams deserve better.'
 titleAccent: 'See how.'
 lead: 'Pick a time below, fill in your details and confirm your meeting right away. We’ll walk you through Hatch OS on your own network’s use cases.'
-points:
-  - '45 minutes with Patrick, co-founder'
-  - 'A demo built around your network'
-  - 'Then a 30-day pilot, no strings attached'
 agendaTitle: 'Book your slot with Patrick'
 agendaHint: 'Times are shown in your time zone.'
 agendaFallback: 'Loading the calendar…'

@@ -10,11 +10,9 @@ const seo = z.strictObject({ title: z.string(), description: z.string() });
 /** /demo — booking page with the inline Cal.com agenda. */
 export const demoPage = z.strictObject({
   seo,
-  kicker: z.string(),
   title: z.string(),
   titleAccent: z.string(),
   lead: z.string(),
-  points: z.array(z.string()).min(2).max(3),
   agendaTitle: z.string(),
   agendaHint: z.string(),
   /** Shown inside the agenda frame until Cal.com has loaded (and when JS is off). */
