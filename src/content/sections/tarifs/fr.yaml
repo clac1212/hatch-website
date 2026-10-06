@@ -5,9 +5,9 @@ formule:
   legende: Formule de facturation
   mensuel: Mensuel
   annuel: Annuel · jusqu’à −15 %
-unite: / établissement / mois
-factureMensuel: par établissement et par mois, en formule mensuelle
-factureAnnuel: par établissement et par mois, en formule annuelle
+unite: HT / établissement / mois
+factureMensuel: hors taxes, par établissement et par mois, en formule mensuelle
+factureAnnuel: hors taxes, par établissement et par mois, en formule annuelle
 cta: Réserver une démo
 offres:
   - nom: Kiosques & comptoirs

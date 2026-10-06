@@ -5,9 +5,9 @@ formule:
   legende: Billing plan
   mensuel: Monthly
   annuel: Yearly · up to −15%
-unite: / location / month
-factureMensuel: per location per month, billed monthly
-factureAnnuel: per location per month, billed yearly
+unite: excl. VAT / location / month
+factureMensuel: excl. VAT, per location per month, billed monthly
+factureAnnuel: excl. VAT, per location per month, billed yearly
 cta: Book a demo
 offres:
   - nom: Kiosks & counters
