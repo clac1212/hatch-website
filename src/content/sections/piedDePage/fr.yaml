@@ -4,19 +4,26 @@ agents:
   titre: Les agents
   residents:
     - etage: COMBLES
-      libelle: Établissement — Owl
+      metier: Établissement
+      agent: owl
     - etage: 3e D
-      libelle: Direction — Lark
+      metier: Direction
+      agent: lark
     - etage: 2e G
-      libelle: Formation — Pecker
+      metier: Formation
+      agent: pecker
     - etage: 2e G
-      libelle: Développement — Sparrow
+      metier: Développement
+      agent: sparrow
     - etage: 2e D
-      libelle: Qualité — Finch
+      metier: Qualité
+      agent: finch
     - etage: 1er G
-      libelle: Vie de réseau — Peep
+      metier: Vie de réseau
+      agent: peep
     - etage: 1er D
-      libelle: Documentation — Jay
+      metier: Documentation
+      agent: jay
 legal:
   titre: Légal
   conditions: Conditions d'utilisation

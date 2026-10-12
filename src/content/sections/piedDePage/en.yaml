@@ -4,19 +4,26 @@ agents:
   titre: The agents
   residents:
     - etage: ATTIC
-      libelle: On site — Owl
+      metier: On site
+      agent: owl
     - etage: 3rd R
-      libelle: Management — Lark
+      metier: Management
+      agent: lark
     - etage: 2nd L
-      libelle: Training — Pecker
+      metier: Training
+      agent: pecker
     - etage: 2nd L
-      libelle: Development — Sparrow
+      metier: Development
+      agent: sparrow
     - etage: 2nd R
-      libelle: Quality — Finch
+      metier: Quality
+      agent: finch
     - etage: 1st L
-      libelle: Network life — Peep
+      metier: Network life
+      agent: peep
     - etage: 1st R
-      libelle: Documentation — Jay
+      metier: Documentation
+      agent: jay
 legal:
   titre: Legal
   conditions: Terms of service

@@ -2,7 +2,15 @@
 import { Image, Picture } from 'astro:assets';
 import Button from './ui/Button.astro';
 import { section } from '../content/section';
-import { routes, otherLocale, useTranslations, type Locale, type Paths } from '../i18n/ui';
+import { getEntry } from 'astro:content';
+import {
+  entryRoutes,
+  routes,
+  otherLocale,
+  useTranslations,
+  type Locale,
+  type Paths,
+} from '../i18n/ui';
 import { socialLinks } from '../seo/jsonld';
 import logo from '../assets/brand/hatch-os-night.png';
 import immeuble from '../assets/footer/immeuble.jpg';
@@ -20,6 +28,19 @@ const { locale, paths } = Astro.props;
 const t = useTranslations(locale);
 const data = await section('piedDePage', locale);
 const home = routes.home[locale];
+/** The building's residents: each floor links to its agent's page once published (César 12/10). */
+const residents = await Promise.all(
+  data.agents.residents.map(async (r) => {
+    const e = await getEntry('agents', `${locale}/${r.agent}`);
+    if (!e) throw new Error(`Missing src/content/agents/${locale}/${r.agent}.md`);
+    const publiee = !!e.data.page && !e.data.page.brouillon;
+    return {
+      ...r,
+      nom: e.data.name,
+      href: publiee ? entryRoutes.agents(r.agent)[locale] : `${home}#agents`,
+    };
+  }),
+);
 const other = otherLocale(locale);
 const produit = [
   { href: `${home}#agents`, label: t('nav.agents') },
@@ -89,16 +110,18 @@ const lien = 'lien-pied block w-fit text-[14.5px] leading-[normal] text-paper';
           <h2 id="pied-agents" class={titre}>{data.agents.titre}</h2>
           <ul class="mt-3">
             {
-              data.agents.residents.map((r) => (
+              residents.map((r) => (
                 <li>
                   <a
-                    href={`${home}#agents`}
+                    href={r.href}
                     class="lien-pied flex w-fit items-center gap-3 py-1.5 leading-[normal]"
                   >
                     <span class="w-[58px] shrink-0 font-mono text-[11px] tracking-[0.8px] text-orange">
                       {r.etage}
                     </span>
-                    <span class="text-[14.5px] whitespace-nowrap">{r.libelle}</span>
+                    <span class="text-[14.5px] whitespace-nowrap">
+                      {r.metier} · {r.nom}
+                    </span>
                   </a>
                 </li>
               ))
