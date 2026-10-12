@@ -1,0 +1,293 @@
+---
+import { Image } from 'astro:assets';
+import type { ProblemeDe } from '../../../content/schemas/agent-probleme';
+import Icone from '../Icone.astro';
+import jointAvant from '../../../assets/agents/finch/joint-avant.jpg';
+
+/**
+ * Finch's problem, as objects: the March report sent by email and never answered, the action plan
+ * nobody ticked, then the June audit that finds the same gap, stamped "already flagged".
+ * Sized in `cqw` (the panel is a size container) so the composition holds from 1440 to 390.
+ */
+interface Props {
+  d: ProblemeDe<'finch'>;
+}
+const { d } = Astro.props;
+---
+
+<div class="panneau">
+  <div class="mail" data-c style="--i:0">
+    <p class="mail-tete">
+      <span class="mail-av">{d.mail.de.charAt(0)}</span>
+      <b class="flex-1">{d.mail.de}</b>
+      <span class="mail-date">{d.mail.date}</span>
+    </p>
+    <p class="mail-objet">{d.mail.objet}</p>
+    <p class="piece">
+      <span class="pdf">PDF</span>
+      {d.mail.piece}
+    </p>
+    <p class="statut"><Icone nom="clock" taille={13} />{d.mail.statut}</p>
+  </div>
+
+  <div class="plan" data-c style="--i:1">
+    <p class="plan-titre">{d.plan.titre}</p>
+    <ul>
+      {
+        d.plan.actions.map((a) => (
+          <li>
+            <span class="case" />
+            {a}
+          </li>
+        ))
+      }
+    </ul>
+    <p class="plan-maj">{d.plan.maj}</p>
+  </div>
+
+  <div class="audit" data-c style="--i:2">
+    <Image src={jointAvant} alt="" width={360} class="audit-photo" loading="lazy" />
+    <div class="audit-corps">
+      <p class="audit-tete">{d.audit.entete}</p>
+      <b>{d.audit.point}</b>
+      <span class="etat">{d.audit.etat}</span>
+    </div>
+    <span class="tampon" data-final>{d.audit.tampon}</span>
+  </div>
+</div>
+
+<style>
+  .panneau {
+    position: relative;
+    aspect-ratio: 6 / 5;
+    overflow: hidden;
+    border-radius: 28px;
+    background: var(--color-mur);
+    container-type: size;
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+  }
+  .panneau > * {
+    position: absolute;
+    border-radius: 2.4cqw;
+    background: var(--color-white);
+  }
+
+  /* The March email, at the back. */
+  .mail {
+    top: 7cqh;
+    left: 6cqw;
+    width: 58cqw;
+    padding: 3.2cqw 3.6cqw;
+    box-shadow: var(--shadow-1);
+    rotate: -2.5deg;
+    font-size: 2.3cqw;
+  }
+  .mail-tete {
+    display: flex;
+    align-items: center;
+    gap: 1.8cqw;
+    font-size: 2.4cqw;
+  }
+  .mail-av {
+    display: grid;
+    place-items: center;
+    width: 5.4cqw;
+    height: 5.4cqw;
+    border-radius: 999px;
+    background: var(--color-statut-bleu-tint);
+    font-weight: 700;
+    color: var(--color-statut-bleu);
+  }
+  .mail-date {
+    color: var(--color-gray-500);
+  }
+  .mail-objet {
+    margin: 2cqw 0 1.6cqw;
+    font-size: 2.9cqw;
+    font-weight: 600;
+  }
+  .piece {
+    display: inline-flex;
+    align-items: center;
+    gap: 1.4cqw;
+    padding: 1.2cqw 1.8cqw 1.2cqw 1.2cqw;
+    border-radius: 1.4cqw;
+    box-shadow: inset 0 0 0 1px var(--color-ligne-claire);
+    color: var(--color-gray-700);
+  }
+  .pdf {
+    padding: 0.5cqw 0.9cqw;
+    border-radius: 0.8cqw;
+    background: var(--color-statut-rouge);
+    font-size: 1.7cqw;
+    font-weight: 700;
+    color: var(--color-white);
+  }
+  .statut {
+    display: flex;
+    align-items: center;
+    gap: 1.2cqw;
+    margin-top: 2.2cqw;
+    padding-top: 2cqw;
+    border-top: 1px solid var(--color-ligne-claire);
+    color: var(--color-gray-500);
+  }
+
+  /* The action plan, a sheet nobody ticked. */
+  .plan {
+    top: 24cqh;
+    right: 5cqw;
+    width: 44cqw;
+    padding: 3.6cqw;
+    border-radius: 0.8cqw;
+    box-shadow: var(--shadow-2);
+    rotate: 3deg;
+    font-size: 2.3cqw;
+  }
+  .plan-titre {
+    padding-bottom: 2cqw;
+    border-bottom: 2px solid var(--color-ink);
+    font: 700 2.8cqw/1.2 var(--font-display);
+  }
+  .plan li {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.6cqw;
+    padding: 1.8cqw 0;
+    border-bottom: 1px solid var(--color-ligne-claire);
+    line-height: 1.35;
+  }
+  .case {
+    flex: none;
+    width: 2.6cqw;
+    height: 2.6cqw;
+    margin-top: 0.2cqw;
+    border-radius: 0.5cqw;
+    box-shadow: inset 0 0 0 1.5px var(--color-gray-500);
+  }
+  .plan-maj {
+    margin-top: 2cqw;
+    font-size: 1.9cqw;
+    color: var(--color-gray-500);
+  }
+
+  /* The June audit, in front, and its stamp. */
+  .audit {
+    bottom: 7cqh;
+    left: 7cqw;
+    display: flex;
+    width: 66cqw;
+    overflow: visible;
+    box-shadow: var(--shadow-3);
+    rotate: -1deg;
+  }
+  .audit-photo {
+    width: 24cqw;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 2.4cqw 0 0 2.4cqw;
+  }
+  .audit-corps {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1.4cqw;
+    padding: 3cqw 3.4cqw;
+    font-size: 2.9cqw;
+  }
+  .audit-tete {
+    font: 400 1.9cqw/1.3 var(--font-mono);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    text-transform: uppercase;
+    color: var(--color-gray-500);
+  }
+  .etat {
+    align-self: flex-start;
+    padding: 0.8cqw 1.8cqw;
+    border-radius: 999px;
+    background: var(--color-statut-rouge-tint);
+    font-size: 2.1cqw;
+    font-weight: 600;
+    color: var(--color-statut-rouge);
+  }
+  .tampon {
+    position: absolute;
+    top: -5cqw;
+    right: -6cqw;
+    padding: 1.6cqw 2.4cqw;
+    border: 0.6cqw solid var(--color-statut-rouge);
+    border-radius: 1.4cqw;
+    background: color-mix(in srgb, var(--color-white) 70%, transparent);
+    font: 700 2.4cqw/1 var(--font-sans);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-statut-rouge);
+    rotate: -9deg;
+  }
+
+  /* Narrow panels: taller, so the three objects stack with less overlap. */
+  @media (max-width: 47.99rem) {
+    .panneau {
+      aspect-ratio: 3 / 4;
+    }
+    .mail {
+      top: 5cqh;
+      width: 78cqw;
+      font-size: 3.2cqw;
+    }
+    .mail-tete,
+    .piece,
+    .statut {
+      font-size: 3.2cqw;
+    }
+    .mail-av {
+      width: 7cqw;
+      height: 7cqw;
+    }
+    .mail-objet {
+      font-size: 3.9cqw;
+    }
+    .pdf {
+      font-size: 2.4cqw;
+    }
+    .plan {
+      top: 31cqh;
+      width: 62cqw;
+      font-size: 3.3cqw;
+    }
+    .plan-titre {
+      font-size: 3.9cqw;
+    }
+    .plan-maj {
+      font-size: 2.8cqw;
+    }
+    .case {
+      width: 3.4cqw;
+      height: 3.4cqw;
+    }
+    .audit {
+      bottom: 4cqh;
+      left: 4cqw;
+      width: 88cqw;
+    }
+    .audit-photo {
+      width: 30cqw;
+    }
+    .audit-corps {
+      font-size: 3.8cqw;
+    }
+    .audit-tete {
+      font-size: 2.6cqw;
+    }
+    .etat {
+      font-size: 3cqw;
+    }
+    .tampon {
+      top: -7cqw;
+      right: 2cqw;
+      font-size: 3.2cqw;
+    }
+  }
+</style>

@@ -1,0 +1,57 @@
+# "What Finch does for you" wall: pilot of the "more real" walls (César 11/10), after the Pencil mock-up "Page agent".
+agent: finch
+mobile:
+  titre: The audit on mobile
+  app: Audit · Lille Centre
+  heure: '10:42'
+  point: Hygiene
+  n: 4
+  total: 18
+  controle: Cold room door seal
+  conforme: Compliant
+  nonConforme: Not compliant
+  historique: 'Previous audit: not compliant'
+grilles:
+  titre: Your checklists, weighted
+  lignes:
+    - { texte: Hygiene, poids: '×3' }
+    - { texte: Safety, poids: '×2' }
+    - { texte: Customer service, poids: '×1' }
+score:
+  titre: A score out of 100
+  valeur: 84
+  sur: / 100
+plan:
+  titre: An action plan suggested by AI
+  document: Action plan · Lille Centre
+  signature: Drafted by AI, approved by the network manager
+  lignes:
+    - { texte: Cold room door seal, etat: Critical, ton: rouge }
+    - { texte: Prep labelling, etat: Major, ton: orange }
+    - { texte: Allergen display, etat: Minor, ton: gris }
+rapport:
+  titre: A PDF report sent on WhatsApp
+  heure: '17:42'
+  app: WhatsApp
+  quand: now
+  expediteur: Finch · BunBun audits
+  document: Report_Lille_Centre.pdf
+auto:
+  titre: Self-assessment
+  texte: Between two visits
+tableau:
+  titre: A network dashboard
+  ecran: Finch · BunBun network
+  texte: Checkpoints that are drifting
+  unite: restaurants
+  sur: 10
+  lignes:
+    - { texte: Prep labelling, restaurants: 4 }
+    - { texte: Cold room door seal, restaurants: 3 }
+    - { texte: Allergen display, restaurants: 2 }
+preuves:
+  titre: Proof of correction
+  legende: Cold room door seal · Lille Centre
+  avant: Before
+  apres: After
+  tampon: Proven

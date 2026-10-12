@@ -1,0 +1,37 @@
+# "What Lark does for you" wall (centre tile: column 3, row 1). Fictional BunBun network.
+agent: lark
+accueil:
+  titre: A network home page
+  ecran: BunBun network · week 42
+  bonjour: Good morning Claire, here is what your agents saw.
+  source: Peep, Pecker and Finch · last 7 days
+  chiffres:
+    - { valeur: 3, libelle: restaurants missed an announcement }
+    - { valeur: 2, libelle: overdue courses }
+    - { valeur: 5, libelle: actions in progress }
+  lignes:
+    - { texte: Recent audit · Lille Centre, valeur: 84 / 100, ton: vert }
+    - { texte: Opening · Bordeaux, valeur: D-18, ton: bleu }
+    - { texte: Critical action · Nantes Centre, valeur: Open, ton: rouge }
+conversation:
+  titre: A conversation about the state of the network
+  question: Which restaurants are behind on the hygiene course?
+  agent: Lark
+  reponse: 'Three restaurants:'
+  source: Pecker · training tracking
+  lignes:
+    - { texte: Nantes Centre, nombre: 4, unite: team members }
+    - { texte: Bordeaux Gare, nombre: 2, unite: team members }
+    - { texte: Rennes Centre, nombre: 1, unite: team member }
+tableau:
+  titre: A network dashboard
+sujets:
+  titre: The topics coming up from the field
+  unite: questions
+  source: Questions asked to the agents · last 7 days
+  themes:
+    - { texte: Allergens, nombre: 24 }
+    - { texte: Scheduling, nombre: 18 }
+    - { texte: Hygiene, nombre: 12 }
+    - { texte: Delivery, nombre: 8 }
+    - { texte: Recipes, nombre: 5 }

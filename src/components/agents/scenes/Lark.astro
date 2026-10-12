@@ -1,0 +1,1153 @@
+---
+import { Image, Picture } from 'astro:assets';
+import type { SceneDe } from '../../../content/schemas/scenes';
+import IphoneReel from '../IphoneReel.astro';
+import Icone from '../Icone.astro';
+import { avatars } from '../../pages/agent-visuels';
+import { centres } from '../visuels';
+
+/**
+ * Lark's "Exemple d'usage" scene (César 11/10): each step shows the device of whoever acts, the
+ * previous one steps back (Exemple.astro's engine, `data-etapes`: device, screen, seconds).
+ * 1. The network director's Hatch OS window, Monday 08:45: the home page builds itself, Lark's
+ *    brief is typed in, the other agents' signals land one by one, the cursor sends the call list
+ *    to her phone.
+ * 2. Her iPhone: Lark's notification on the lock screen, a tap, the call list slides up, a tap on
+ *    the first franchisee, the call screen with Lark's note while it rings, then the timer runs.
+ * Each screen's markup is its final state; `.joue` (set by the engine) replays its beats, each
+ * timed by `--t` (seconds from the screen's start).
+ */
+interface Props {
+  d: SceneDe<'lark'>;
+}
+const { d } = Astro.props;
+const etapes = [
+  { a: 'siege', e: 0, d: 8 },
+  { a: 'tel', e: 0, d: 9.5 },
+];
+const MENU = ['house', 'message-square', 'chart-line', 'settings'];
+const COMMANDES = ['mic-off', 'grid-3x3', 'volume-2'];
+const initiale = (nom: string) => nom.charAt(0);
+const { accueil, telephone } = d;
+---
+
+<div class="pile" data-etapes={JSON.stringify(etapes)}>
+  <div class="appareil devant" data-appareil="siege">
+    <div class="fenetre on" data-ecran="0">
+      <p class="fen-barre">
+        <span class="feux"><span></span><span></span><span></span></span>
+        <b>{accueil.app}</b>
+        <span>{accueil.contexte}</span>
+      </p>
+      <div class="os">
+        <nav class="os-menu">
+          <span class="os-logo"></span>
+          {
+            MENU.map((nom, i) => (
+              <span class:list={['os-icone', { on: i === 0 }]}>
+                <Icone nom={nom} taille={14} />
+              </span>
+            ))
+          }
+        </nav>
+        <div class="page">
+          <p class="date b" style="--t:0.9s">{accueil.date}</p>
+          <p class="bonjour b" style="--t:1s">{accueil.bonjour}</p>
+
+          <div class="brief b" style="--t:1.5s">
+            <Image src={avatars.lark} alt="" width={56} densities={[1]} class="brief-av" />
+            <div class="flex-1">
+              <p class="brief-tete">
+                <b>{accueil.brief.agent}</b>
+                <span>{accueil.brief.libelle}</span>
+                <Icone nom="sparkles" taille={12} />
+              </p>
+              <div class="brief-corps">
+                <p class="brief-texte">{accueil.brief.texte}</p>
+                <span class="frappe"
+                  ><span style="--k:0"></span><span style="--k:1"></span><span style="--k:2"
+                  ></span></span
+                >
+              </div>
+            </div>
+          </div>
+
+          <ul class="signaux">
+            {
+              accueil.signaux.map((s, i) => (
+                <li class="b" style={`--t:${3.1 + i * 0.6}s`}>
+                  <Image src={avatars[s.agent]} alt="" width={52} densities={[1]} class="s-av" />
+                  <span class="s-texte">
+                    <b>{s.titre}</b>
+                    <span class="s-source">{s.source}</span>
+                  </span>
+                  <span class={`etat etat-${s.ton}`}>{s.etat}</span>
+                  {s.details.length > 0 && (
+                    <span class="details">
+                      {s.details.map((x, j) => (
+                        <span
+                          class:list={['detail', `detail-${s.ton}`]}
+                          style={`--t:${3.4 + i * 0.6 + j * 0.12}s`}
+                        >
+                          {x}
+                        </span>
+                      ))}
+                    </span>
+                  )}
+                </li>
+              ))
+            }
+          </ul>
+
+          <p class="pied-source b" style="--t:4.8s">{accueil.source}</p>
+          <div class="pied">
+            <span class="bouton b" style="--t:5s">
+              <Icone nom="phone" taille={13} />
+              {accueil.bouton}
+              <span class="curseur"><Icone nom="mouse-pointer-2" taille={20} /></span>
+            </span>
+            <span class="envoye">
+              <Icone nom="smartphone" taille={13} />
+              {accueil.envoye}
+              <Icone nom="check-check" taille={14} />
+            </span>
+          </div>
+
+          <div class="squelette">
+            <span style="width:34%"></span>
+            <span style="width:78%;height:22px"></span>
+            <span style="height:74px"></span>
+            <span style="height:52px"></span>
+            <span style="height:52px"></span>
+            <span style="height:40px"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="appareil" data-appareil="tel">
+    <div class="tel">
+      <IphoneReel>
+        <div class="ecran-tel on" data-ecran="0">
+          <div class="verrou">
+            <Picture
+              src={centres.lark.src}
+              alt=""
+              formats={['avif', 'webp']}
+              widths={[400]}
+              sizes="250px"
+              class="fond-flou"
+            />
+            <p class="verrou-heure">{telephone.heure}</p>
+            <p class="verrou-date">{telephone.date}</p>
+            <div class="notif b" style="--t:0.5s">
+              <p class="notif-tete">
+                <Image src={avatars.lark} alt="" width={30} densities={[1]} class="notif-av" />
+                <span class="flex-1">{telephone.notif.app}</span>
+                <span>{telephone.notif.quand}</span>
+              </p>
+              <b>{telephone.notif.titre}</b>
+              <span>{telephone.notif.texte}</span>
+              <span class="doigt doigt-notif"></span>
+            </div>
+          </div>
+
+          <div class="liste">
+            <p class="l-tete">
+              <Icone nom="chevron-left" taille={14} />
+              <Image src={avatars.lark} alt="" width={40} densities={[1]} class="l-av" />
+              <span class="flex flex-col">
+                <b>{telephone.liste.titre}</b>
+                <span>{telephone.liste.sous}</span>
+              </span>
+            </p>
+            <p class="l-message">
+              <Image src={avatars.lark} alt="" width={30} densities={[1]} class="l-message-av" />
+              <span>{telephone.liste.message}</span>
+            </p>
+            <ul class="appels">
+              {
+                telephone.liste.appels.map((p, i) => (
+                  <li style={`--t:${3.2 + i * 0.18}s`}>
+                    <span class="l-initiale">{initiale(p.nom)}</span>
+                    <span class="l-qui">
+                      <b>
+                        {p.nom} · {p.site}
+                      </b>
+                      <span class={`motif motif-${p.ton}`}>{p.motif}</span>
+                    </span>
+                    <span class:list={['l-appeler', { premier: i === 0 }]}>
+                      <Icone nom="phone" taille={13} />
+                      {i === 0 && <span class="doigt doigt-appel" />}
+                    </span>
+                  </li>
+                ))
+              }
+            </ul>
+            <p class="l-source">{telephone.liste.source}</p>
+          </div>
+
+          <div class="appel">
+            <Picture
+              src={centres.lark.src}
+              alt=""
+              formats={['avif', 'webp']}
+              widths={[400]}
+              sizes="250px"
+              class="fond-flou fond-appel"
+            />
+            <div class="a-tete">
+              <span class="a-initiale">{initiale(telephone.appel.nom)}</span>
+              <span class="a-statut">
+                <span class="sonne">{telephone.appel.sonne}</span>
+                <span
+                  class="minuteur"
+                  style={`--lk-s:${telephone.appel.secondes};--lk-n:${telephone.appel.secondes}`}
+                ></span>
+              </span>
+              <b>{telephone.appel.nom}</b>
+              <span>{telephone.appel.site}</span>
+            </div>
+            <div class="note">
+              <p class="note-tete">
+                <Image src={avatars.lark} alt="" width={30} densities={[1]} class="note-av" />
+                <b>{telephone.appel.note.titre}</b>
+              </p>
+              <p>{telephone.appel.note.texte}</p>
+              <ul>
+                {telephone.appel.note.lignes.map((l) => <li>{l}</li>)}
+              </ul>
+              <p class="note-pied">{telephone.appel.note.pied}</p>
+            </div>
+            <ul class="commandes">
+              {
+                telephone.appel.commandes.map((c, i) => (
+                  <li>
+                    <span class="rond">
+                      <Icone nom={COMMANDES[i]} taille={15} />
+                    </span>
+                    {c}
+                  </li>
+                ))
+              }
+            </ul>
+            <span class="raccrocher"><Icone nom="phone-off" taille={16} /></span>
+          </div>
+        </div>
+      </IphoneReel>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Generic beat: arrives at `--t` when its screen plays. */
+  .joue .b {
+    animation: lk-arrive 0.55s var(--ease-entree) var(--t, 0s) both;
+  }
+  @keyframes lk-arrive {
+    from {
+      opacity: 0;
+      translate: 0 10px;
+    }
+  }
+  @keyframes lk-fondu {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes lk-pop {
+    from {
+      opacity: 0;
+      scale: 0.6;
+    }
+  }
+  /* Shown from the screen's start, gone once the animation ends (backwards fill only). */
+  @keyframes lk-tient {
+    from,
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* 1. The network director's window. */
+  .fenetre {
+    width: min(540px, 100%);
+    overflow: hidden;
+    border-radius: 14px;
+    background: var(--color-galet);
+    box-shadow: var(--shadow-3);
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+    container-type: inline-size;
+  }
+  .fen-barre {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--color-ligne-claire);
+    background: var(--color-white);
+    font-size: 12px;
+    color: var(--color-gray-500);
+  }
+  .fen-barre b {
+    font: 700 14px/1 var(--font-display);
+    color: var(--color-ink);
+  }
+  .feux {
+    display: flex;
+    gap: 6px;
+    margin-right: 4px;
+  }
+  .feux span {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: var(--color-statut-rouge);
+  }
+  .feux span:nth-child(2) {
+    background: var(--color-amber-line);
+  }
+  .feux span:nth-child(3) {
+    background: var(--color-success);
+  }
+  .os {
+    display: flex;
+  }
+  .os-menu {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 46px;
+    padding-top: 16px;
+    border-right: 1px solid var(--color-ligne-claire);
+    background: var(--color-white);
+    color: var(--color-gray-500);
+  }
+  .os-logo {
+    width: 18px;
+    height: 18px;
+    margin-bottom: 6px;
+    border-radius: 5px;
+    background: var(--color-orange);
+  }
+  .os-icone {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+  }
+  .os-icone.on {
+    background: var(--color-orange-tint);
+    color: var(--color-orange-txt);
+  }
+  .page {
+    position: relative;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+    padding: 18px 20px 20px;
+  }
+  .date {
+    font: 400 10px/1.3 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-gray-500);
+  }
+  .bonjour {
+    font: 600 19px/1.2 var(--font-display);
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  /* Lark's brief: three dots while it writes, then the text. */
+  .brief {
+    display: flex;
+    gap: 10px;
+    margin-top: 2px;
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--color-white);
+    box-shadow:
+      inset 0 0 0 1px var(--color-ligne-claire),
+      var(--shadow-1);
+  }
+  .brief-av {
+    flex: none;
+    width: 28px;
+    height: 28px;
+  }
+  .brief-tete {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 3px;
+    font-size: 12px;
+    color: var(--color-orange-txt);
+  }
+  .brief-tete span {
+    font: 400 10px/1 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-gray-500);
+  }
+  .brief-tete b {
+    color: var(--color-ink);
+  }
+  .brief-corps {
+    position: relative;
+  }
+  .brief-texte {
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--color-gray-800);
+  }
+  .frappe {
+    position: absolute;
+    top: 4px;
+    left: 0;
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+  }
+  .frappe span {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--color-gray-400);
+  }
+  .joue .brief-texte {
+    animation: lk-fondu 0.45s var(--ease-doux) 2.6s both;
+  }
+  .joue .frappe {
+    animation: lk-tient 2.6s linear backwards;
+  }
+  .joue .frappe span {
+    animation: lk-saute 0.5s var(--ease-doux) calc(1.7s + var(--k) * 0.14s) 2;
+  }
+  @keyframes lk-saute {
+    50% {
+      translate: 0 -3px;
+      background: var(--color-gray-500);
+    }
+  }
+
+  /* The other agents' signals. */
+  .signaux {
+    overflow: hidden;
+    border-radius: 12px;
+    background: var(--color-white);
+    box-shadow: inset 0 0 0 1px var(--color-ligne-claire);
+  }
+  .signaux li {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 0 10px;
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+  .signaux li + li {
+    border-top: 1px solid var(--color-ligne-claire);
+  }
+  .s-av {
+    grid-row: span 2;
+    width: 26px;
+    height: 26px;
+  }
+  .s-texte {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .s-source {
+    font: 400 9.5px/1.3 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-gray-500);
+  }
+  .details {
+    display: flex;
+    grid-column: 2 / -1;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 6px;
+  }
+  .detail {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 7px;
+    border-radius: 6px;
+    background: var(--color-galet);
+    box-shadow: inset 0 0 0 1px var(--color-ligne-claire);
+    font-size: 10.5px;
+    color: var(--color-gray-700);
+  }
+  .detail::before {
+    width: 5px;
+    height: 5px;
+    border-radius: 999px;
+    content: '';
+  }
+  .detail-orange::before {
+    background: var(--color-orange);
+  }
+  .detail-rouge::before {
+    background: var(--color-statut-rouge);
+  }
+  .joue .detail {
+    animation: lk-pop 0.35s var(--ease-pop) var(--t) both;
+  }
+  .etat {
+    flex: none;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 10.5px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .etat-orange {
+    background: var(--color-orange-tint);
+    color: var(--color-orange-txt);
+  }
+  .etat-rouge {
+    background: var(--color-statut-rouge-tint);
+    color: var(--color-statut-rouge);
+  }
+  .etat-vert {
+    background: var(--color-success-tint);
+    color: var(--color-success-txt);
+  }
+
+  /* The call list goes to her phone: the cursor comes, clicks, the confirmation appears. */
+  .pied {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px;
+    margin-top: 4px;
+  }
+  .pied-source {
+    font: 400 9.5px/1.3 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-gray-500);
+  }
+  .bouton {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 13px;
+    border-radius: 8px;
+    background: var(--color-ink);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-white);
+  }
+  .joue .bouton {
+    animation:
+      lk-arrive 0.55s var(--ease-entree) var(--t) both,
+      lk-clic 0.3s var(--ease-doux) 6.3s;
+  }
+  @keyframes lk-clic {
+    40% {
+      scale: 0.94;
+      background: var(--color-gray-800);
+    }
+  }
+  .curseur {
+    position: absolute;
+    top: 55%;
+    left: 62%;
+    display: flex;
+    opacity: 0;
+    filter: drop-shadow(0 1px 1px color-mix(in srgb, var(--color-shadow) 30%, transparent));
+  }
+  .curseur :global(svg) {
+    fill: var(--color-ink);
+    stroke: var(--color-white);
+  }
+  .joue .curseur {
+    animation: lk-curseur 1.9s var(--ease-camera) 5.3s both;
+  }
+  @keyframes lk-curseur {
+    0% {
+      opacity: 0;
+      translate: 70px 60px;
+    }
+    12% {
+      opacity: 1;
+    }
+    55% {
+      translate: 0 0;
+      scale: 1;
+    }
+    62% {
+      scale: 0.88;
+    }
+    70% {
+      scale: 1;
+    }
+    88% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      translate: 0 0;
+    }
+  }
+  .envoye {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 11px;
+    border-radius: 999px;
+    background: var(--color-success-tint);
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--color-success-txt);
+  }
+  .joue .envoye {
+    animation: lk-arrive 0.5s var(--ease-entree) 6.7s both;
+  }
+
+  /* While the page loads: grey placeholders, gone once the content is there. */
+  .squelette {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 18px 20px;
+    background: var(--color-galet);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .squelette span {
+    height: 10px;
+    border-radius: 8px;
+    background:
+      linear-gradient(
+          90deg,
+          transparent,
+          color-mix(in srgb, var(--color-white) 70%, transparent),
+          transparent
+        )
+        0 0 / 50% 100% no-repeat,
+      var(--color-gray-100);
+  }
+  .joue .squelette {
+    animation: lk-squelette 1.25s linear backwards;
+  }
+  .joue .squelette span {
+    animation: lk-reflet 0.9s linear 2;
+  }
+  @keyframes lk-squelette {
+    0%,
+    75% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes lk-reflet {
+    from {
+      background-position:
+        -100% 0,
+        0 0;
+    }
+    to {
+      background-position:
+        200% 0,
+        0 0;
+    }
+  }
+
+  @container (max-width: 420px) {
+    .os-menu {
+      display: none;
+    }
+    .page {
+      gap: 8px;
+      padding: 14px 14px 16px;
+    }
+    .bonjour {
+      font-size: 15.5px;
+    }
+    .brief {
+      padding: 10px;
+    }
+    .brief-av {
+      display: none;
+    }
+    .brief-texte,
+    .signaux li {
+      font-size: 11px;
+    }
+    .signaux li {
+      grid-template-columns: auto minmax(0, 1fr);
+      padding: 9px 10px;
+    }
+    .s-av {
+      grid-row: span 3;
+      width: 22px;
+      height: 22px;
+    }
+    .s-source {
+      display: none;
+    }
+    .etat {
+      justify-self: start;
+      margin-top: 4px;
+      font-size: 10px;
+    }
+    .bouton {
+      font-size: 11.5px;
+    }
+    .squelette {
+      padding: 14px;
+    }
+  }
+
+  /* 2. Her iPhone: lock screen, then the call list slides up, then the call. */
+  .tel {
+    width: 250px;
+  }
+  .ecran-tel {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+  }
+  .fond-flou {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(10px) brightness(0.75);
+    scale: 1.2;
+  }
+  .verrou {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20cqw 5cqw 0;
+    background: var(--color-night);
+  }
+  .verrou-heure {
+    position: relative;
+    font: 300 22cqw/1 var(--font-sans);
+    letter-spacing: -0.02em;
+    color: var(--color-white);
+  }
+  .verrou-date {
+    position: relative;
+    margin: 2cqw 0 8cqw;
+    font-size: 5cqw;
+    color: color-mix(in srgb, var(--color-white) 85%, transparent);
+  }
+  .notif {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8cqw;
+    width: 100%;
+    padding: 4cqw;
+    border-radius: 6cqw;
+    background: color-mix(in srgb, var(--color-white) 82%, transparent);
+    backdrop-filter: blur(12px);
+    font-size: 4.6cqw;
+    line-height: 1.35;
+  }
+  .notif b {
+    font-size: 4.8cqw;
+  }
+  .notif-tete {
+    display: flex;
+    align-items: center;
+    gap: 2cqw;
+    margin-bottom: 1cqw;
+    font-size: 4cqw;
+    color: var(--color-gray-700);
+  }
+  .notif-av {
+    width: 7cqw;
+    height: 7cqw;
+  }
+
+  /* A fingertip presses at its moment, then lifts off. */
+  .doigt {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 11cqw;
+    height: 11cqw;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-ink) 22%, transparent);
+    box-shadow: 0 0 0 2cqw color-mix(in srgb, var(--color-ink) 8%, transparent);
+    translate: -50% -50%;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .joue .doigt-notif {
+    animation: lk-tape 0.9s var(--ease-doux) 1.6s both;
+  }
+  .joue .doigt-appel {
+    animation: lk-tape 0.9s var(--ease-doux) 4.6s both;
+  }
+  @keyframes lk-tape {
+    0% {
+      opacity: 0;
+      scale: 1.6;
+    }
+    35% {
+      opacity: 1;
+      scale: 1;
+    }
+    55% {
+      scale: 0.85;
+    }
+    100% {
+      opacity: 0;
+      scale: 1.1;
+    }
+  }
+
+  .liste {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-galet);
+  }
+  .joue .liste {
+    animation: lk-monte 0.6s var(--ease-camera) 2.3s both;
+  }
+  @keyframes lk-monte {
+    from {
+      translate: 0 100%;
+    }
+  }
+  .l-tete {
+    display: flex;
+    align-items: center;
+    gap: 2.5cqw;
+    padding: 14cqw 4cqw 3.5cqw;
+    border-bottom: 1px solid var(--color-ligne-claire);
+    background: var(--color-white);
+    font-size: 3.8cqw;
+    color: var(--color-gray-500);
+  }
+  .l-tete b {
+    font: 700 5.2cqw/1.2 var(--font-display);
+    color: var(--color-ink);
+  }
+  .l-av {
+    width: 9cqw;
+    height: 9cqw;
+  }
+  .l-message {
+    display: flex;
+    align-items: flex-start;
+    gap: 2cqw;
+    margin: 4cqw 3.5cqw 0;
+    padding: 3cqw 3.5cqw;
+    border-radius: 4cqw 4cqw 4cqw 1.2cqw;
+    background: var(--color-orange-tint);
+    font-size: 4cqw;
+    line-height: 1.4;
+    color: var(--color-gray-800);
+  }
+  .l-message-av {
+    flex: none;
+    width: 6.5cqw;
+    height: 6.5cqw;
+  }
+  .joue .l-message {
+    animation: lk-arrive 0.5s var(--ease-entree) 2.8s both;
+  }
+  .appels {
+    margin: 3cqw 3.5cqw 0;
+    overflow: hidden;
+    border-radius: 4cqw;
+    background: var(--color-white);
+    box-shadow: inset 0 0 0 1px var(--color-ligne-claire);
+  }
+  .appels li {
+    display: flex;
+    align-items: center;
+    gap: 2.5cqw;
+    padding: 3.6cqw 3cqw;
+  }
+  .appels li + li {
+    border-top: 1px solid var(--color-ligne-claire);
+  }
+  .joue .appels li {
+    animation: lk-arrive 0.5s var(--ease-entree) var(--t) both;
+  }
+  .l-initiale {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 9cqw;
+    height: 9cqw;
+    border-radius: 999px;
+    background: var(--color-mur);
+    font-size: 4.2cqw;
+    font-weight: 700;
+    color: var(--color-gray-700);
+  }
+  .l-qui {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.6cqw;
+    min-width: 0;
+  }
+  .l-qui b {
+    font-size: 4.4cqw;
+    line-height: 1.25;
+  }
+  .motif {
+    font-size: 3.8cqw;
+    font-weight: 600;
+  }
+  .motif-rouge {
+    color: var(--color-statut-rouge);
+  }
+  .motif-orange {
+    color: var(--color-orange-txt);
+  }
+  .l-appeler {
+    position: relative;
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 9cqw;
+    height: 9cqw;
+    border-radius: 999px;
+    background: var(--color-orange-tint);
+    color: var(--color-orange-txt);
+  }
+  .l-appeler.premier {
+    background: var(--color-orange);
+    color: var(--color-ink);
+  }
+  .joue .l-appeler.premier {
+    animation: lk-presse 0.3s var(--ease-doux) 4.95s;
+  }
+  @keyframes lk-presse {
+    50% {
+      scale: 0.85;
+    }
+  }
+  .l-source {
+    margin: 3cqw 4cqw 0;
+    font: 400 3cqw/1.4 var(--font-mono);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--color-gray-500);
+  }
+  .joue .l-source {
+    animation: lk-fondu 0.4s var(--ease-doux) 4s both;
+  }
+
+  /* The call: rings, Lark's note comes up, then the timer runs. */
+  .appel {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16cqw 5cqw 7cqw;
+    background: var(--color-night);
+    color: var(--color-white);
+  }
+  .fond-appel {
+    filter: blur(14px) brightness(0.32);
+  }
+  .joue .appel {
+    animation: lk-appel 0.5s var(--ease-entree) 5.4s both;
+  }
+  @keyframes lk-appel {
+    from {
+      opacity: 0;
+      scale: 1.06;
+    }
+  }
+  .a-tete {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6cqw;
+    text-align: center;
+    font-size: 4.2cqw;
+    color: color-mix(in srgb, var(--color-white) 75%, transparent);
+  }
+  .a-tete b {
+    font: 500 8.5cqw/1.1 var(--font-sans);
+    letter-spacing: -0.01em;
+    color: var(--color-white);
+  }
+  .a-initiale {
+    display: grid;
+    place-items: center;
+    width: 16cqw;
+    height: 16cqw;
+    margin-bottom: 2cqw;
+    border-radius: 999px;
+    background: var(--color-gray-500);
+    font-size: 7cqw;
+    font-weight: 600;
+    color: var(--color-white);
+  }
+  .joue .a-initiale {
+    animation: lk-sonne 0.75s var(--ease-doux) 5.7s 2;
+  }
+  @keyframes lk-sonne {
+    from {
+      box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-white) 45%, transparent);
+    }
+    to {
+      box-shadow: 0 0 0 5cqw transparent;
+    }
+  }
+  .a-statut {
+    display: grid;
+    font-variant-numeric: tabular-nums;
+  }
+  .a-statut > span {
+    grid-area: 1 / 1;
+  }
+  .sonne {
+    opacity: 0;
+  }
+  .joue .sonne {
+    animation: lk-tient 7s linear backwards;
+  }
+  @property --lk-s {
+    syntax: '<integer>';
+    inherits: false;
+    initial-value: 0;
+  }
+  .minuteur {
+    counter-reset: lk-s var(--lk-s);
+  }
+  .minuteur::after {
+    content: '00:' counter(lk-s, decimal-leading-zero);
+  }
+  .joue .minuteur {
+    animation:
+      lk-fondu 0.01s linear 7s both,
+      lk-compte calc(var(--lk-n) * 1s) steps(var(--lk-n), end) 7s both;
+  }
+  @keyframes lk-compte {
+    from {
+      --lk-s: 0;
+    }
+  }
+  .note {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1.6cqw;
+    width: 100%;
+    margin-top: 7cqw;
+    padding: 4cqw;
+    border-radius: 5cqw;
+    background: color-mix(in srgb, var(--color-white) 92%, transparent);
+    box-shadow: var(--shadow-3);
+    font-size: 4.2cqw;
+    line-height: 1.4;
+    color: var(--color-gray-800);
+  }
+  .joue .note {
+    animation: lk-arrive 0.6s var(--ease-entree) 6.3s both;
+  }
+  .note-tete {
+    display: flex;
+    align-items: center;
+    gap: 2cqw;
+    font-size: 4.2cqw;
+    color: var(--color-ink);
+  }
+  .note-av {
+    width: 7cqw;
+    height: 7cqw;
+  }
+  .note ul {
+    display: flex;
+    flex-direction: column;
+    gap: 1cqw;
+  }
+  .note li {
+    display: flex;
+    align-items: center;
+    gap: 2cqw;
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+  .note li::before {
+    flex: none;
+    width: 1.8cqw;
+    height: 1.8cqw;
+    border-radius: 999px;
+    background: var(--color-statut-rouge);
+    content: '';
+  }
+  .note-pied {
+    padding-top: 1.6cqw;
+    border-top: 1px solid var(--color-ligne-claire);
+    font-size: 3.6cqw;
+    color: var(--color-soft);
+  }
+  .commandes {
+    position: relative;
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    margin-top: auto;
+  }
+  .commandes li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5cqw;
+    font-size: 3.4cqw;
+    color: color-mix(in srgb, var(--color-white) 85%, transparent);
+  }
+  .rond {
+    display: grid;
+    place-items: center;
+    width: 15cqw;
+    height: 15cqw;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-white) 18%, transparent);
+    color: var(--color-white);
+  }
+  .raccrocher {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 15cqw;
+    height: 15cqw;
+    margin-top: 4cqw;
+    border-radius: 999px;
+    background: var(--color-statut-rouge);
+    color: var(--color-white);
+  }
+</style>

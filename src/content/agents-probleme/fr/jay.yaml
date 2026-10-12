@@ -1,0 +1,40 @@
+agent: jay
+manuel:
+  fichier: Manuel_operatoire_BunBun.pdf
+  page: Page 1 sur 120
+  reseau: Réseau BunBun
+  titre: Manuel opératoire
+  edition: Édition 2023 · Diffusion interne
+dossier:
+  chemin:
+    - Drive partagé
+    - Réseau BunBun
+    - Manuel opératoire
+  colonnes:
+    nom: Nom
+    proprietaire: Propriétaire
+    modifie: Modifié
+  fichiers:
+    - nom: Fiche_ouverture_v2.docx
+      type: doc
+      proprietaire: Claire
+      modifie: 3 févr. 2025
+    - nom: Fiche_ouverture_v3.docx
+      type: doc
+      proprietaire: Marc
+      modifie: 18 sept. 2025
+    - nom: Fiche_ouverture_v3_FINAL.docx
+      type: doc
+      proprietaire: Claire
+      modifie: 2 mars 2026
+    - nom: Fiche ouverture (1).pdf
+      type: pdf
+      proprietaire: Karim
+      modifie: 14 juin 2026
+  compteur: 214 fichiers
+message:
+  groupe: Équipe Lille Centre
+  membres: Sarah, Yanis et 6 autres
+  de: Yanis
+  texte: "C'est laquelle la bonne fiche d'ouverture\u00a0?"
+  heure: '06:52'

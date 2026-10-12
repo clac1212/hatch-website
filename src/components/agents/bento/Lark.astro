@@ -1,0 +1,523 @@
+---
+import { Image, Picture } from 'astro:assets';
+import type { BentoDe } from '../../../content/schemas/bento';
+import Tuile from '../Tuile.astro';
+import Icone from '../Icone.astro';
+import Ipad from '../../ui/Ipad.astro';
+import { centres } from '../visuels';
+import bureau from '../../../assets/agents/lark/bureau.jpg';
+
+/**
+ * Lark's feature wall on Finch's "more real" model (César 11/10), one register per tile: the home
+ * page on a real iPad cut by the tile's edge, the conversation on a dark tile, the dashboard as a
+ * voxel desk, the field's topics as a cloud of words. The centre tile (Lark's render, drawn by
+ * Mur.astro) is at column 3, row 1.
+ */
+interface Props {
+  d: BentoDe<'lark'>;
+}
+const { d } = Astro.props;
+/** The Hatch OS sidebar on the iPad: home (current), conversation, dashboard, settings. */
+const MENU = ['house', 'message-square', 'chart-line', 'settings'];
+---
+
+<Tuile col={1} row={1} w={2} h={2} titre={d.accueil.titre} class="t-lark-accueil">
+  <div class="tablette" data-c>
+    <Ipad>
+      <div class="os">
+        <nav class="os-menu" aria-hidden="true">
+          <span class="os-logo"></span>
+          {
+            MENU.map((nom, i) => (
+              <span class:list={['os-icone', { on: i === 0 }]}>
+                <Icone nom={nom} taille={12} />
+              </span>
+            ))
+          }
+        </nav>
+        <div class="os-page">
+          <p class="os-kicker">{d.accueil.ecran}</p>
+          <p class="os-bonjour">{d.accueil.bonjour}</p>
+          <ul class="os-chiffres">
+            {
+              d.accueil.chiffres.map((c, i) => (
+                <li data-c style={`--i:${i + 1}`}>
+                  <b data-compte={c.valeur}>{c.valeur}</b>
+                  <span>{c.libelle}</span>
+                </li>
+              ))
+            }
+          </ul>
+          <p class="os-source">{d.accueil.source}</p>
+          <ul class="os-lignes">
+            {
+              d.accueil.lignes.map((l, i) => (
+                <li data-c style={`--i:${i + 4}`}>
+                  <span class={`point point-${l.ton}`} />
+                  <span class="flex-1">{l.texte}</span>
+                  <span class={`statut statut-${l.ton}`}>{l.valeur}</span>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+    </Ipad>
+  </div>
+</Tuile>
+
+<Tuile col={5} row={1} w={2} h={2} titre={d.conversation.titre} class="t-lark-conversation">
+  <div class="fil">
+    <p class="question" data-c>{d.conversation.question}</p>
+    <div class="lark" data-c style="--i:2">
+      <span class="lark-avatar" style={`background-color:${centres.lark.fond}`}>
+        <Picture
+          src={centres.lark.src}
+          alt=""
+          formats={['avif', 'webp']}
+          widths={[96]}
+          sizes="32px"
+        />
+      </span>
+      <b>{d.conversation.agent}</b>
+      <span class="inline-flex" data-amb="pouls"><Icone nom="sparkles" taille={12} /></span>
+    </div>
+    <p class="reponse" data-c style="--i:3">{d.conversation.reponse}</p>
+    <ul class="restos">
+      {
+        d.conversation.lignes.map((l, i) => (
+          <li data-c style={`--i:${i + 4}`}>
+            <b data-compte={l.nombre}>{l.nombre}</b>
+            <span class="resto">
+              <span>{l.texte}</span>
+              <small>{l.unite}</small>
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="fil-source">{d.conversation.source}</p>
+  </div>
+</Tuile>
+
+<Tuile col={1} row={3} w={3} h={1} titre={d.tableau.titre} class="t-lark-tableau" plein>
+  <Image
+    src={bureau}
+    alt=""
+    widths={[700, 1300]}
+    sizes="(min-width: 1024px) 648px, 92vw"
+    class="bureau"
+    loading="lazy"
+  />
+</Tuile>
+
+<Tuile
+  col={4}
+  row={3}
+  w={3}
+  h={1}
+  titre={d.sujets.titre}
+  disposition="ligne"
+  empile
+  class="t-lark-sujets"
+>
+  <div class="nuage">
+    <ul class="mots">
+      {
+        d.sujets.themes.map((t, i) => (
+          <li class={`mot mot-${i}`} data-c style={`--i:${i}`}>
+            {t.texte}
+            <sup>
+              <span data-compte={t.nombre}>{t.nombre}</span>
+              <span class="sr-only"> {d.sujets.unite}</span>
+            </sup>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="nuage-source">{d.sujets.source}</p>
+  </div>
+</Tuile>
+
+<style>
+  .point {
+    flex: none;
+    width: 1.4cqw;
+    height: 1.4cqw;
+    border-radius: 999px;
+  }
+  .point-vert {
+    background: var(--color-success);
+  }
+  .point-orange {
+    background: var(--color-orange);
+  }
+  .point-gris {
+    background: var(--color-gray-400);
+  }
+  .point-bleu {
+    background: var(--color-statut-bleu);
+  }
+  .point-rouge {
+    background: var(--color-statut-rouge);
+  }
+
+  /* Une page d'accueil du réseau: Hatch OS on a real iPad, slightly turned, run off two edges. */
+  :global(.mur .t-lark-accueil .tuile-corps) {
+    align-items: flex-start;
+    overflow: visible;
+  }
+  /* 580 px at 1440 (1.51 × the tile's width), scaled down with the tile below. */
+  .tablette {
+    width: min(580px, 151%);
+    margin: 4px 0 0 14px;
+    rotate: -3deg;
+  }
+  .os {
+    display: flex;
+    height: 100%;
+    background: var(--color-surface-2);
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+  }
+  .os-menu {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.4cqw;
+    width: 8cqw;
+    padding-top: 4cqw;
+    border-right: 1px solid var(--color-line);
+    background: var(--color-white);
+    color: var(--color-gray-700);
+  }
+  .os-logo {
+    width: 3.6cqw;
+    height: 3.6cqw;
+    margin-bottom: 1.6cqw;
+    border-radius: 1cqw;
+    background: var(--color-orange);
+  }
+  .os-icone {
+    display: grid;
+    place-items: center;
+    width: 5cqw;
+    height: 5cqw;
+    border-radius: 1.2cqw;
+  }
+  .os-icone.on {
+    background: var(--color-orange-tint);
+    color: var(--color-orange-txt);
+  }
+  .os-page {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 2cqw;
+    padding: 4.4cqw 5cqw;
+  }
+  .os-kicker {
+    font: 400 2cqw/1 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-soft);
+  }
+  .os-bonjour {
+    max-width: 54cqw;
+    font: 600 4.2cqw/1.15 var(--font-display);
+    letter-spacing: -0.01em;
+  }
+  .os-chiffres {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.8cqw;
+    max-width: 55cqw;
+    margin-top: 1cqw;
+  }
+  .os-chiffres li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8cqw;
+    padding: 2.4cqw 2.6cqw;
+    border-radius: 2cqw;
+    background: var(--color-white);
+    box-shadow: 0 0 0 1px var(--color-line);
+  }
+  .os-chiffres b {
+    font: 600 8cqw/1 var(--font-display);
+    letter-spacing: -0.03em;
+  }
+  .os-chiffres li:first-child b {
+    color: var(--color-orange-txt);
+  }
+  .os-chiffres span {
+    font-size: 2.2cqw;
+    line-height: 1.25;
+    color: var(--color-soft);
+  }
+  .os-source {
+    font: 400 1.7cqw/1 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-gray-700);
+  }
+  .os-lignes {
+    max-width: 55cqw;
+    margin-top: 1cqw;
+    padding: 0 2.6cqw;
+    border-radius: 2cqw;
+    background: var(--color-white);
+    box-shadow: 0 0 0 1px var(--color-line);
+  }
+  .os-lignes li {
+    display: flex;
+    align-items: center;
+    gap: 1.8cqw;
+    padding: 2cqw 0;
+    font-size: 2.4cqw;
+  }
+  .os-lignes li + li {
+    border-top: 1px solid var(--color-ligne-claire);
+  }
+  .statut {
+    flex: none;
+    padding: 0.4cqw 1.6cqw;
+    border-radius: 999px;
+    font-size: 2cqw;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .statut-vert {
+    background: var(--color-success-tint);
+    color: var(--color-success-txt);
+  }
+  .statut-orange {
+    background: var(--color-orange-tint);
+    color: var(--color-orange-txt);
+  }
+  .statut-gris {
+    box-shadow: inset 0 0 0 1px var(--color-ligne-claire);
+    color: var(--color-gray-700);
+  }
+  .statut-rouge {
+    background: var(--color-statut-rouge-tint);
+    color: var(--color-statut-rouge);
+  }
+  .statut-bleu {
+    background: var(--color-statut-bleu-tint);
+    color: var(--color-statut-bleu);
+  }
+
+  /* Une conversation sur l'état du réseau: a dark tile, the answer's figures as large type. */
+  :global(.mur .tuile.t-lark-conversation) {
+    background: var(--color-night);
+  }
+  :global(.mur .tuile.t-lark-conversation .tuile-tete h3) {
+    color: var(--color-white);
+  }
+  :global(.mur .t-lark-conversation .tuile-corps) {
+    align-items: stretch;
+    padding: 0 8px;
+  }
+  .fil {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 10px;
+    font-family: var(--font-sans);
+    color: var(--color-white);
+  }
+  .question {
+    align-self: flex-end;
+    max-width: 82%;
+    margin-top: 4px;
+    padding: 10px 14px;
+    border-radius: 18px 18px 6px 18px;
+    background: var(--color-white);
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--color-ink);
+  }
+  .lark {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    font-size: 13px;
+  }
+  .lark-avatar {
+    width: 26px;
+    height: 26px;
+    overflow: hidden;
+    border-radius: 999px;
+  }
+  .lark-avatar :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    scale: 1.7;
+    translate: 0 8%;
+  }
+  .reponse {
+    font-size: 14px;
+    color: color-mix(in srgb, var(--color-white) 75%, transparent);
+  }
+  .restos li {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 6px 0;
+  }
+  .restos li + li {
+    border-top: 1px solid var(--color-line-night);
+  }
+  .restos b {
+    min-width: 30px;
+    font: 600 36px/1 var(--font-display);
+    letter-spacing: -0.03em;
+  }
+  .resto {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .resto small {
+    font-size: 12px;
+    font-weight: 400;
+    color: color-mix(in srgb, var(--color-white) 60%, transparent);
+  }
+  .fil-source {
+    margin-top: auto;
+    font: 400 10px/1 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--color-white) 60%, transparent);
+  }
+
+  /* Un tableau de bord réseau: a voxel desk, its screen a rising chart; the title on the backdrop. */
+  :global(.mur .t-lark-tableau .tuile-tete) {
+    position: relative;
+    z-index: 1;
+    width: 190px;
+    padding: 28px 0 0 28px;
+    text-align: left;
+  }
+  :global(.mur .tuile.t-lark-tableau .tuile-tete h3) {
+    font-size: 19px;
+    font-weight: 500;
+    line-height: 1.25;
+  }
+  .bureau {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 60% 58%;
+  }
+
+  /* Les sujets qui remontent du terrain: one word per theme, as large as its count. */
+  .nuage {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .mots {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 16px;
+    row-gap: 2px;
+  }
+  .mot {
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--color-ink);
+  }
+  .mot sup {
+    margin-left: 3px;
+    font: 500 11px/1 var(--font-sans);
+    letter-spacing: 0;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-gray-700);
+  }
+  .mot-0 {
+    font-size: 46px;
+    color: var(--color-orange-txt);
+  }
+  .mot-1 {
+    font-size: 34px;
+  }
+  .mot-2 {
+    font-size: 27px;
+  }
+  .mot-3 {
+    font-size: 21px;
+    color: var(--color-soft);
+  }
+  .mot-4,
+  .mot-5 {
+    font-size: 17px;
+    color: var(--color-soft);
+  }
+  .nuage-source {
+    font: 400 10px/1.3 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-gray-700);
+  }
+
+  /* 1024–1280: the conversation tightens under its two-line title; the word cloud, now under its
+     title (`empile`), takes two lines at smaller sizes. */
+  @media (min-width: 64rem) and (max-width: 79.99rem) {
+    .fil {
+      gap: 8px;
+    }
+    .restos li {
+      padding: 4px 0;
+    }
+    .restos b {
+      font-size: 30px;
+    }
+    .mot-0 {
+      font-size: 34px;
+    }
+    .mot-1 {
+      font-size: 26px;
+    }
+    .mot-2 {
+      font-size: 21px;
+    }
+    .mot-3 {
+      font-size: 17px;
+    }
+    .mot-4,
+    .mot-5 {
+      font-size: 14px;
+    }
+  }
+  @media (max-width: 39.99rem) {
+    .tablette {
+      width: 470px;
+    }
+    :global(.mur .t-lark-tableau .tuile-tete) {
+      width: 160px;
+      padding: 22px 0 0 20px;
+    }
+    .bureau {
+      object-position: 78% 60%;
+    }
+    .nuage {
+      align-items: center;
+      text-align: center;
+    }
+    .mots {
+      justify-content: center;
+    }
+  }
+</style>

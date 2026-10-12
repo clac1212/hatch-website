@@ -1,0 +1,33 @@
+agent: peep
+mail:
+  de: Claire · Siège BunBun
+  a: Tous les restaurants
+  date: 29 sept.
+  objet: Lancement burger d'automne
+  apercu: Bonjour à tous, le burger d'automne arrive en restaurant le lundi 12 octobre. Fiche recette et affiches en pièce jointe.
+  piece: Fiche_recette_burger_automne.pdf
+groupe:
+  nom: Franchisés BunBun
+  membres: Claire, Karim, Kevin, Sarah et 21 autres
+  nonLus: '147'
+  annonce:
+    date: 29 septembre
+    texte: Le burger d'automne sort le lundi 12 octobre ! Fiche et affiches envoyées par mail.
+    heure: '09:14'
+  bavardage:
+    - de: Kevin · Lyon Part-Dieu
+      texte: Quelqu'un a des boîtes kraft en rab ? Livraison décalée à lundi
+      heure: '11:02'
+    - de: Sarah · Lille Centre
+      texte: Le TPE replante, vous avez le numéro du support ?
+      heure: '18:47'
+  jour: Aujourd'hui
+  question:
+    de: Karim · Bordeaux
+    texte: Le nouveau burger sort quand ? On a rien reçu à Bordeaux.
+    heure: '10:41'
+appel:
+  app: Téléphone
+  quand: maintenant
+  de: Karim · Bordeaux
+  texte: Appel manqué

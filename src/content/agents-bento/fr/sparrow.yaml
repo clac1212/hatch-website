@@ -1,0 +1,59 @@
+# Mur « Ce que Sparrow fait pour vous », d'après la maquette Pencil « Page agent — Sparrow ».
+agent: sparrow
+numero:
+  titre: Un numéro WhatsApp dédié à votre enseigne
+  entrees:
+    - { texte: QR code, icone: qr-code }
+    - { texte: Formulaire, icone: file-input }
+    - { texte: Import CSV, icone: upload }
+relances:
+  titre: Des automatisations et des relances
+  heure: '9:41'
+  app: WhatsApp
+  expediteur: BunBun Franchise
+  message: Bonjour Thomas, avez-vous pu compléter votre dossier ?
+  pastille: Relance · J+2
+reprise:
+  titre: La reprise par le siège
+  bouton: Reprendre la main
+prequalification:
+  titre: La préqualification
+  heure: '10:24'
+  contact: BunBun Franchise
+  question: "Bonjour, je suis l'assistant IA de l'enseigne. Quel est votre apport personnel ?"
+  reponse: 80 000 €, sur Nantes.
+  criteres:
+    - { texte: Apport, verifie: true }
+    - { texte: Zone, verifie: true }
+    - { texte: Expérience, verifie: false }
+chantier:
+  titre: Le suivi de chantier
+  pieces:
+    - { texte: Plan du local, etat: Reçu, recu: true }
+    - { texte: Devis travaux, etat: Manquant, recu: false }
+espace:
+  titre: Un espace porteur de projet
+  faites: 6
+  total: 9
+  legende: tâches terminées
+pipeline:
+  titre: Votre pipeline
+  etapes:
+    - { valeur: 24, libelle: Contact }
+    - { valeur: 9, libelle: Qualifié }
+    - { valeur: 4, libelle: Rencontre }
+    - { valeur: 1, libelle: Signature }
+tableau:
+  titre: Un tableau de bord
+  valeur: 12
+  legende: candidats ce mois · 3 ouvertures
+ouverture:
+  titre: "Le projet d'ouverture"
+  ecran: BunBun Bordeaux
+  pastille: Rétroplanning recalculé
+  taches:
+    - { texte: Bail signé, debut: 0, fin: 11, etat: fait }
+    - { texte: Travaux, debut: 8, fin: 48, etat: en-cours }
+    - { texte: Recrutement, debut: 32, fin: 62, etat: a-venir }
+    - { texte: Formation, debut: 51, fin: 73, etat: a-venir }
+    - { texte: Ouverture · J-18, debut: 72, fin: 78, etat: jalon }

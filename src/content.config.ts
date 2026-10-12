@@ -12,6 +12,9 @@ import { schema as securite } from './content/schemas/securite';
 import { schema as tarifs } from './content/schemas/tarifs';
 import { schema as piedDePage } from './content/schemas/piedDePage';
 import { schema as agent } from './content/schemas/agents';
+import { schema as bento } from './content/schemas/bento';
+import { schema as scene } from './content/schemas/scenes';
+import { schema as agentProbleme } from './content/schemas/agent-probleme';
 import {
   demoPage,
   securityPage,
@@ -46,6 +49,24 @@ const home = defineCollection({
 const agents = defineCollection({
   loader: glob({ pattern: '*/*.md', base: './src/content/agents' }),
   schema: agent,
+});
+
+/** Each agent page's feature wall, one YAML per agent and per locale (`fr/peep.yaml`). */
+const agentsBento = defineCollection({
+  loader: glob({ pattern: '*/*.yaml', base: './src/content/agents-bento' }),
+  schema: bento,
+});
+
+/** Each agent page's "Exemple d'usage" scene, one YAML per agent and per locale (`fr/pecker.yaml`). */
+const agentsScenes = defineCollection({
+  loader: glob({ pattern: '*/*.yaml', base: './src/content/agents-scenes' }),
+  schema: scene,
+});
+
+/** The objects that show each agent page's problem, one YAML per agent and per locale. */
+const agentsProbleme = defineCollection({
+  loader: glob({ pattern: '*/*.yaml', base: './src/content/agents-probleme' }),
+  schema: agentProbleme,
 });
 
 /**
@@ -84,6 +105,9 @@ export const collections = {
   agentPage: pageCollection('agent', agentPage),
   home,
   agents,
+  agentsBento,
+  agentsScenes,
+  agentsProbleme,
   hero: sectionCollection('hero', hero),
   clients: sectionCollection('clients', clients),
   probleme: sectionCollection('probleme', probleme),

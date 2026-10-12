@@ -1,50 +1,126 @@
 ---
 name: Owl
 job: On site
-pitch: I answer out loud during service, on the location's tablet.
+pitch: "I answer out loud during service, on the location's tablet."
 order: 3
-# /en/agents/owl page: draft written from the site's content, Unfiltered (August 2026) and the Notion page "Les agents Hatch OS", to be reviewed by Patrick.
+# /en/agents/owl page: translation of Patrick's copy (Notion "08 · Pages agents", 08/10/2026), laid out after the Pencil mock-up "Page agent".
 page:
-  brouillon: true
-  updated: '2026-10-02'
+  brouillon: false
+  updated: '2026-10-08'
   seo:
-    title: 'Owl · the AI assistant on the restaurant tablet | Hatch OS'
-    description: "Owl answers kitchen and front-of-house teams out loud, on the restaurant's tablet, from the network's procedures and recipe sheets."
-  title: "The AI assistant on the restaurant's tablet"
-  lead: "Owl answers crew members out loud in the kitchen and front of house, on the restaurant's tablet, from the network's procedures, so they find the right step without leaving their station."
+    title: "Owl · the AI assistant on the restaurant's tablet | Hatch OS"
+    description: "Owl runs on the restaurant's tablet. Crew members ask their question by voice or in writing and get the answer drawn from your sheets, without leaving their station."
+  title: "An assistant on the restaurant's tablet to answer crew members during service"
+  lead: "Owl is the Hatch OS agent installed on the restaurant's tablet: crew members ask their question by voice or in writing and get the answer drawn from your sheets, without leaving their station or digging through a binder."
   problem:
-    title: 'Mid-service, nobody has time to look for the sheet'
-    text: 'The cooking sheet is in a binder, the manual in a Drive, the manager at the pass. So the crew member asks a colleague, or goes from memory. And every location ends up with its own version of the recipe.'
+    titre: 'Mid-service, no one goes looking for a recipe card.'
+    texte: "The binder is in the office, the Drive isn't open, and the question ends up with the manager, when they're around."
   actions:
-    title: 'What I do in the kitchen and front of house'
-    items:
-      - title: 'I answer by voice'
-        text: 'Ask me out loud, I answer out loud. The keyboard works too.'
-      - title: 'I show the procedure step by step'
-        text: "I read the sheet and show each step on screen, at the crew member's pace."
-      - title: 'I know every location'
-        text: "Head office tells me what applies to each site: I answer with your location's own information."
-      - title: 'I stay on all day'
-        text: 'In kiosk mode on a shared tablet, in the dining room or the kitchen, I answer the teams throughout service.'
-  demo: owl
-  scenario: null
-  tools:
-    text: 'I run in Hatch OS, on a shared tablet, with the same documents as Peep.'
-    items:
-      - { name: Tablet in kiosk mode }
-      - { name: Google Drive, logo: google-drive }
-      - { name: Notion, logo: notion }
-      - { name: Word, logo: word }
-      - { name: PDF, logo: pdf }
-      - { name: Excel, logo: excel }
+    - '**It runs in kiosk mode** on a shared tablet: the screen stays on Owl, nothing else.'
+    - '**It understands voice**: crew members dictate their question, hands full or not.'
+    - '**It answers from your documents**, the same ones Peep and Jay use.'
+    - '**It adapts to the restaurant**: one profile per tablet, and tags that set what each location sees (format, menu, region).'
+  control:
+    agent:
+      - Answer the questions asked on the tablet
+      - Show the answer that fits the restaurant
+    you:
+      - The documents it can access
+      - The tags of each tablet
+  exemple:
+    contexte: Tablet · Kitchen
+    etapes:
+      - texte: "A crew member who started last week asks the tablet for a product's cooking temperature."
+        demande:
+          qui: Crew member · kitchen
+          texte: What temperature do we cook the chicken to?
+        carte:
+          icone: file-text
+          libelle: Network sheet · Cooking
+          titre: 74 °C at the core
+          texte: Check with the probe thermometer before serving.
+          pastilles:
+            - texte: Cooking sheet · PDF
+              icone: book-open
+              sombre: false
+            - texte: Read out loud
+              icone: volume-2
+              sombre: true
+      - texte: "Owl answers with the network's sheet."
+        demande:
+          qui: Crew member · kitchen
+          texte: Read me the whole sheet.
+        carte:
+          icone: volume-2
+          libelle: Read out loud · Cooking sheet
+          titre: 'Breaded chicken, step by step'
+          lignes:
+            - texte: Fryer preheated
+              etat: 170 °C
+              ton: gris
+            - texte: Cooking time
+              etat: 6 min
+              ton: gris
+            - texte: Probe check
+              etat: 74 °C at the core
+              ton: orange
+          pastilles:
+            - texte: BunBun manual · Cooking v2
+              icone: file-text
+              sombre: false
+            - texte: Profile · Lille Centre
+              icone: tablet
+              sombre: true
+      - texte: The manager was not interrupted.
+        demande:
+          qui: 'Manager · Lille Centre · 15:00'
+          texte: How many questions during lunch service?
+        carte:
+          icone: chart-bar
+          libelle: Kitchen tablet · lunch service
+          titre: '14 questions, 14 answers from the sheets'
+          lignes:
+            - texte: Cooking the chicken
+              etat: Answered
+              ton: vert
+            - texte: Cleaning the fryer
+              etat: Answered
+              ton: vert
+            - texte: Passed on to the manager
+              etat: '0'
+              ton: gris
+          pastilles:
+            - texte: No interruption
+              icone: check
+              sombre: true
+  with:
+    cartes:
+      - titre: Jay
+        texte: which keeps the documents Owl relies on up to date.
+        visuel:
+          agents: [jay]
+      - titre: Peep
+        texte: which brings the same knowledge to WhatsApp.
+        visuel:
+          agents: [peep]
+      - titre: Pecker
+        texte: to train crew members on what they ask most.
+        visuel:
+          agents: [pecker]
   faq:
-    - q: "How do you set Owl up on the restaurant's tablet?"
-      a: 'Head office creates an Owl access profile for the location, invites an address dedicated to the site, then signs the tablet in with that account.'
-    - q: "What's the difference between Owl and Peep?"
-      a: "It's the same assistant. Peep answers on WhatsApp, on everyone's phone; Owl answers in Hatch OS, on the location's shared tablet."
-    - q: 'Does Owl answer the same way in every restaurant?'
-      a: "It answers with the network's procedures, and with what is specific to each location once head office has told it."
-    - q: 'Are conversations kept?'
-      a: 'Yes, the conversation history stays available. Your data is hosted in Europe and never trains any AI.'
-  related: [peep, jay, pecker]
+    - q: What is the difference between Owl and Peep?
+      a: "Peep answers on WhatsApp, on each person's phone. Owl is on the restaurant's shared tablet, for those who do not have their phone during service."
+    - q: Can you ask a question by voice?
+      a: 'Yes, Owl understands voice dictation.'
+    - q: Does every restaurant see the same information?
+      a: "Not if you do not want it to: tags adapt the answers to the restaurant's format or menu."
+    - q: Is my data protected?
+      a: 'Data hosted in Europe, encrypted in transit and at rest, isolated per customer. No model is trained on your data, and that is written into the contract.'
+  related:
+    - agent: peep
+      texte: the same knowledge on WhatsApp
+    - agent: jay
+      texte: your documents
+    - agent: pecker
+      texte: training
 ---

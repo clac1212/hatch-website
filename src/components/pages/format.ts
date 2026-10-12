@@ -15,3 +15,8 @@ export function longDate(iso: string, locale: Locale) {
     new Date(`${iso}T00:00:00Z`),
   );
 }
+
+/** Splits a line on `**…**` into runs; odd runs are bold (the schema rejects an unbalanced `**`). */
+export function richText(s: string) {
+  return s.split('**').map((text, i) => ({ text, bold: i % 2 === 1 }));
+}

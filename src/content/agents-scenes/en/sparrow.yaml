@@ -1,0 +1,92 @@
+# Sparrow's "A typical use" scene: each step shows the device of whoever acts (César 11/10).
+agent: sparrow
+salon:
+  modes: [Video, Photo, Portrait]
+  panneau: Open your BunBun
+  banniere: { app: WhatsApp, texte: Message BunBun Franchise }
+whatsapp:
+  contact: BunBun Franchise
+  statut: Business account
+  jour: Today
+  champ: Message
+  premier: { texte: 'Hello, I would like to open a restaurant in Nantes.', heure: '10:21' }
+  accueil:
+    texte: "Hello, I am the brand's AI assistant. A few questions to prepare your file."
+    heure: '10:21'
+  question:
+    texte: 'How much personal capital do you have, and in which city would you like to open?'
+    heure: '10:22'
+  reponse:
+    texte: '€80,000 of capital, for Nantes. I ran a bakery for six years.'
+    heure: '10:24'
+  recap:
+    titre: Your file
+    lignes:
+      - { texte: 'Capital · €80,000', etat: Verified }
+      - { texte: Area · Nantes, etat: Available }
+      - { texte: Experience · 6 years, etat: Verified }
+    heure: '10:24'
+  pieces:
+    texte: 'Thank you Thomas. Send me a proof of capital and an ID, and I will pass your file on to Marc, our network developer.'
+    heure: '10:25'
+  document: { nom: Proof_of_capital.pdf, meta: 2 pages · PDF, heure: '10:31' }
+pipeline:
+  app: Hatch OS
+  contexte: Development · Candidates
+  titre: Candidate pipeline
+  agent: Sparrow on
+  colonnes:
+    - nom: Contact
+      total: 24
+      cartes:
+        - { nom: Julien Morel, ville: Rennes }
+        - { nom: Hugo Petit, ville: Tours }
+    - nom: Qualified
+      total: 9
+      cartes:
+        - { nom: Camille Benoît, ville: Angers }
+    - nom: Meeting
+      total: 4
+      cartes:
+        - { nom: Paul Garnier, ville: Montpellier }
+        - { nom: Chloé Roux, ville: Lyon }
+  candidat: { nom: Thomas Leroy, ville: Nantes, badge: New, note: Qualified by Sparrow }
+  dossier:
+    libelle: Candidate file
+    titre: Thomas Leroy · Nantes
+    statut: Ready for the meeting
+    lignes:
+      - { texte: 'Capital · €80,000', etat: Verified }
+      - { texte: Area · Nantes, etat: Available }
+      - { texte: Experience · 6 years in retail, etat: Verified }
+      - { texte: Proof of capital, etat: Received }
+      - { texte: ID, etat: Requested, attente: true }
+    piece: Proof of capital · PDF
+    bouton: Book the meeting
+espace:
+  invitation:
+    app: Hatch OS
+    quand: now
+    titre: BunBun Nantes
+    texte: Marc has invited you to your project owner space.
+  marque: Project owner space
+  bonjour: Hello Thomas
+  projet: BunBun Nantes
+  date: Opening planned for 3 March
+  modele: BunBun opening template · 42 tasks · 20 weeks
+  mois: [Oct, Nov, Dec, Jan, Feb, Mar]
+  phases:
+    - { texte: Premises, debut: 7, fin: 24, etat: en-cours }
+    - { texte: Works, debut: 20, fin: 62, etat: a-venir }
+    - { texte: Recruitment, debut: 50, fin: 76, etat: a-venir }
+    - { texte: Training, debut: 66, fin: 82, etat: a-venir }
+    - { texte: Opening, debut: 82, fin: 86, etat: jalon }
+  etapes:
+    titre: My next steps
+    compte: 3 / 42 tasks
+    taches:
+      - { texte: Franchise agreement, etat: Signed, faite: true }
+      - { texte: Company registration, etat: Sent, faite: true }
+      - { texte: Floor plan, etat: Sent, faite: true }
+      - { texte: Works quote, etat: To send, faite: false }
+  recalcul: Back-schedule recalculated if a date moves

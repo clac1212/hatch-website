@@ -1,0 +1,73 @@
+# "What Peep does for you" wall, after the Pencil mock-up "Page agent — Peep v4".
+agent: peep
+terrain:
+  titre: Answers the field
+  contact: Peep
+  statut: online
+  jour: Today
+  messages:
+    - de: equipe
+      texte: Where's the allergen sheet for the new burger?
+      heure: '14:02'
+    - de: agent
+      document:
+        titre: Allergens autumn menu
+        meta: 2 pages · PDF
+      texte: The signature burger contains gluten, egg and sesame.
+      signature: Peep · 14:02
+    - de: equipe
+      texte: And for the kids' menu?
+      heure: '14:03'
+    - de: agent
+      texte: 'No sesame: gluten and milk. Sheet p. 2.'
+      signature: Peep · 14:03
+vocal:
+  titre: Voice notes
+  duree: '0:12'
+  transcription: '“How much sauce on the signature burger?”'
+installer:
+  titre: Nothing to install
+langues:
+  titre: In everyone's language
+  phrases:
+    - { lang: en, texte: 'Gluten, egg, sesame.' }
+    - { lang: bn, texte: 'গ্লুটেন, ডিম, তিল।' }
+    - { lang: es, texte: 'Gluten, huevo, sésamo.' }
+    - { lang: ta, texte: 'பசையம், முட்டை, எள்.' }
+    - { lang: fr, texte: 'Gluten, œuf, sésame.' }
+invente:
+  titre: Makes nothing up
+  texte: What isn't in your documents goes to head office.
+  notif:
+    titre: Passed to head office
+    meta: Lyon Part-Dieu · 14:10
+ciblage:
+  titre: Targeted by tags
+  etiquettes:
+    - { texte: Autumn menu, actif: true }
+    - { texte: Franchised, actif: true }
+    - { texte: Company-owned, actif: false }
+    - { texte: Kiosk, actif: false }
+  total: 12 restaurants
+lecture:
+  titre: Who read what
+  valeur: 10
+  sur: 12
+  legende: restaurants read “Autumn burger”
+  lignes:
+    - { texte: Lille Centre, etat: 'Read · 09:12', ton: vert }
+    - { texte: Lyon Part-Dieu, etat: 'Read · 09:40', ton: vert }
+    - { texte: Lille Flandres, etat: 'Read · 10:05', ton: vert }
+    - { texte: Marseille Prado, etat: 'Read · 11:30', ton: vert }
+    - { texte: Nantes Centre, etat: Reminded, ton: orange }
+    - { texte: Bordeaux Gare, etat: Unread, ton: gris }
+redaction:
+  titre: Writes your announcements
+  ideeLibelle: Your idea
+  idee: The autumn burger, with the sheet and a quiz
+  banniere: Autumn burger
+  texte: Available from Monday in the restaurants with the autumn menu. Sheet attached.
+  pastille: Quiz · 3 questions
+envoi:
+  titre: Scheduled send
+  heure: Monday · 9:00

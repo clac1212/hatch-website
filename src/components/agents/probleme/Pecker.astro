@@ -1,0 +1,379 @@
+---
+import type { ProblemeDe } from '../../../content/schemas/agent-probleme';
+import Icone from '../Icone.astro';
+
+/**
+ * Pecker's problem, as objects: the training platform's login screen, failing; the admin table
+ * where the crew has never logged in; the module PDF, 24 dense pages of French.
+ */
+interface Props {
+  d: ProblemeDe<'pecker'>;
+}
+const { d } = Astro.props;
+const { connexion: c, suivi: s, pdf } = d;
+---
+
+<div class="panneau">
+  <div class="login" data-c style="--i:0">
+    <p class="login-tete"><span class="logo"></span>{c.plateforme}</p>
+    <p class="login-titre">{c.titre}</p>
+    <p class="champ-nom">{c.identifiant}</p>
+    <p class="champ en-erreur">{c.valeur}</p>
+    <p class="champ-nom">{c.motDePasse}</p>
+    <p class="champ en-erreur points">••••••••</p>
+    <p class="erreur"><Icone nom="circle-alert" taille={13} />{c.erreur}</p>
+    <p class="bouton">{c.bouton}</p>
+    <p class="oubli">{c.oubli}</p>
+  </div>
+
+  <div class="suivi" data-c style="--i:1">
+    <p class="suivi-titre">{s.titre}</p>
+    <p class="onglets">
+      {s.onglets.map((o, i) => <span class:list={{ actif: i === 1 }}>{o}</span>)}
+    </p>
+    <div class="ligne entete">
+      {s.colonnes.map((col) => <span>{col}</span>)}
+    </div>
+    {
+      s.lignes.map((l) => (
+        <div class="ligne">
+          <span class="qui">
+            <span class="av">{l.nom.charAt(0)}</span>
+            {l.nom}
+          </span>
+          <span>{l.restaurant}</span>
+          <span class="jamais">{l.connexion}</span>
+        </div>
+      ))
+    }
+    <p class="plus">{s.plus}</p>
+    <span class="pastille" data-final>{s.progression}</span>
+  </div>
+
+  <div class="pdf" data-c style="--i:2">
+    <p class="pdf-barre">
+      <span class="pdf-tag">PDF</span>
+      <span class="flex-1">{pdf.fichier}</span>
+      <span>{pdf.pages}</span>
+    </p>
+    <div class="page" lang="fr">
+      <p class="page-titre">{pdf.titre}</p>
+      <p class="page-section">{pdf.section}</p>
+      {pdf.paragraphes.map((t) => <p class="para">{t}</p>)}
+    </div>
+  </div>
+</div>
+
+<style>
+  .panneau {
+    position: relative;
+    aspect-ratio: 6 / 5;
+    overflow: hidden;
+    border-radius: 28px;
+    background: var(--color-mur);
+    container-type: size;
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+  }
+  .panneau > * {
+    position: absolute;
+    border-radius: 2.4cqw;
+    background: var(--color-white);
+  }
+
+  /* Login screen */
+  .login {
+    top: 5cqh;
+    left: 4cqw;
+    width: 43cqw;
+    padding: 0 3.6cqw 3.4cqw;
+    box-shadow: var(--shadow-1);
+    rotate: -2.5deg;
+    font-size: 2.2cqw;
+  }
+  .login-tete {
+    display: flex;
+    align-items: center;
+    gap: 1.4cqw;
+    margin: 0 -3.6cqw;
+    padding: 2.2cqw 3.6cqw;
+    border-bottom: 1px solid var(--color-ligne-claire);
+    font-size: 2cqw;
+    font-weight: 600;
+    color: var(--color-gray-700);
+  }
+  .logo {
+    width: 3.4cqw;
+    height: 3.4cqw;
+    border-radius: 0.9cqw;
+    background: var(--color-gray-400);
+  }
+  .login-titre {
+    margin: 2.4cqw 0 1.8cqw;
+    font-size: 3.4cqw;
+    font-weight: 700;
+  }
+  .champ-nom {
+    margin-bottom: 0.8cqw;
+    font-size: 1.9cqw;
+    font-weight: 500;
+    color: var(--color-gray-700);
+  }
+  .champ {
+    margin-bottom: 1.6cqw;
+    padding: 1.3cqw 1.8cqw;
+    border-radius: 1cqw;
+    box-shadow: inset 0 0 0 1px var(--color-gray-400);
+    color: var(--color-gray-800);
+  }
+  .champ.en-erreur {
+    box-shadow: inset 0 0 0 1.5px var(--color-statut-rouge);
+  }
+  .points {
+    letter-spacing: 0.12em;
+  }
+  .erreur {
+    display: flex;
+    align-items: center;
+    gap: 1cqw;
+    margin: -0.4cqw 0 2.2cqw;
+    font-size: 1.9cqw;
+    font-weight: 500;
+    color: var(--color-statut-rouge);
+  }
+  .bouton {
+    padding: 1.5cqw;
+    border-radius: 1cqw;
+    background: var(--color-statut-bleu);
+    font-weight: 600;
+    text-align: center;
+    color: var(--color-white);
+  }
+  .oubli {
+    margin-top: 1.8cqw;
+    font-size: 1.9cqw;
+    text-align: center;
+    text-decoration: underline;
+    text-underline-offset: 0.3em;
+    color: var(--color-statut-bleu);
+  }
+
+  /* Admin table */
+  .suivi {
+    top: 9cqh;
+    right: 3cqw;
+    width: 50cqw;
+    padding: 3cqw 3cqw 2.4cqw;
+    box-shadow: var(--shadow-2);
+    rotate: 2deg;
+    font-size: 2.1cqw;
+  }
+  .suivi-titre {
+    font-size: 2.9cqw;
+    font-weight: 700;
+  }
+  .onglets {
+    display: flex;
+    gap: 2.6cqw;
+    margin: 1.8cqw 0 1cqw;
+    border-bottom: 1px solid var(--color-ligne-claire);
+    font-size: 1.9cqw;
+    color: var(--color-gray-500);
+  }
+  .onglets span {
+    padding: 0.8cqw 0;
+  }
+  .onglets .actif {
+    box-shadow: inset 0 -2px 0 var(--color-ink);
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+  .ligne {
+    display: grid;
+    grid-template-columns: 11fr 11fr 15fr;
+    align-items: center;
+    gap: 1.2cqw;
+    padding: 1.4cqw 0;
+    border-bottom: 1px solid var(--color-ligne-claire);
+    white-space: nowrap;
+    color: var(--color-gray-700);
+  }
+  .ligne.entete {
+    padding: 1cqw 0;
+    font-size: 1.8cqw;
+    color: var(--color-gray-500);
+  }
+  .qui {
+    display: flex;
+    align-items: center;
+    gap: 1.2cqw;
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+  .av {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 4.2cqw;
+    height: 4.2cqw;
+    border-radius: 999px;
+    background: var(--color-gray-100);
+    font-size: 1.9cqw;
+    font-weight: 700;
+    color: var(--color-gray-700);
+  }
+  .jamais {
+    color: var(--color-gray-500);
+  }
+  .plus {
+    margin-top: 1.8cqw;
+    font-size: 1.9cqw;
+    font-weight: 500;
+    color: var(--color-statut-bleu);
+  }
+  .pastille {
+    position: absolute;
+    top: -2.6cqw;
+    right: 3cqw;
+    padding: 1cqw 2cqw;
+    border-radius: 999px;
+    background: var(--color-statut-rouge-tint);
+    box-shadow:
+      inset 0 0 0 1.5px var(--color-statut-rouge),
+      var(--shadow-1);
+    font-size: 2.3cqw;
+    font-weight: 700;
+    white-space: nowrap;
+    color: var(--color-statut-rouge);
+    rotate: 4deg;
+  }
+
+  /* The module PDF */
+  .pdf {
+    bottom: 4cqh;
+    right: 8cqw;
+    width: 50cqw;
+    overflow: hidden;
+    box-shadow: var(--shadow-3);
+    rotate: -1.2deg;
+  }
+  .pdf-barre {
+    display: flex;
+    align-items: center;
+    gap: 1.4cqw;
+    padding: 1.4cqw 2.4cqw;
+    background: var(--color-gray-800);
+    font-size: 1.9cqw;
+    color: var(--color-white);
+  }
+  .pdf-tag {
+    padding: 0.4cqw 0.8cqw;
+    border-radius: 0.6cqw;
+    background: var(--color-statut-rouge);
+    font-size: 1.6cqw;
+    font-weight: 700;
+  }
+  .page {
+    height: 25cqw;
+    overflow: hidden;
+    padding: 3cqw 4cqw 0;
+    color: var(--color-gray-800);
+  }
+  .page-titre {
+    font: 700 2.8cqw/1.2 var(--font-display);
+    color: var(--color-ink);
+  }
+  .page-section {
+    margin: 1.8cqw 0 1cqw;
+    font-size: 2cqw;
+    font-weight: 700;
+  }
+  .para {
+    margin-bottom: 1.2cqw;
+    font-size: 1.85cqw;
+    line-height: 1.45;
+    text-align: justify;
+    hyphens: auto;
+  }
+
+  @media (max-width: 47.99rem) {
+    .panneau {
+      aspect-ratio: 3 / 4;
+    }
+    .login {
+      top: 2.5cqh;
+      left: 4cqw;
+      width: 72cqw;
+      font-size: 3.1cqw;
+    }
+    .login-titre,
+    .bouton {
+      display: none;
+    }
+    .erreur {
+      margin-bottom: 1.4cqw;
+    }
+    .login-tete {
+      margin-bottom: 2.4cqw;
+    }
+    .login-tete,
+    .champ-nom,
+    .erreur,
+    .oubli {
+      font-size: 2.9cqw;
+    }
+    .logo {
+      width: 4.4cqw;
+      height: 4.4cqw;
+    }
+    .suivi {
+      top: 41cqh;
+      right: 3cqw;
+      width: 80cqw;
+      font-size: 3cqw;
+    }
+    .plus {
+      display: none;
+    }
+    .suivi-titre {
+      font-size: 3.9cqw;
+    }
+    .onglets,
+    .ligne.entete,
+    .plus,
+    .av {
+      font-size: 2.8cqw;
+    }
+    .av {
+      width: 5.6cqw;
+      height: 5.6cqw;
+    }
+    .pastille {
+      font-size: 3.2cqw;
+    }
+    .pdf {
+      right: auto;
+      bottom: 2.5cqh;
+      left: 5cqw;
+      width: 76cqw;
+    }
+    .pdf-barre {
+      font-size: 2.8cqw;
+    }
+    .pdf-tag {
+      font-size: 2.4cqw;
+    }
+    .page {
+      height: 25cqw;
+    }
+    .page-titre {
+      font-size: 3.9cqw;
+    }
+    .page-section {
+      font-size: 3cqw;
+    }
+    .para {
+      font-size: 2.7cqw;
+    }
+  }
+</style>

@@ -1,0 +1,1487 @@
+---
+import { Image, Picture } from 'astro:assets';
+import type { SceneDe } from '../../../content/schemas/scenes';
+import IphoneReel from '../IphoneReel.astro';
+import Icone from '../Icone.astro';
+import LogoWhatsapp from '../LogoWhatsapp.astro';
+import { avatars } from '../../pages/agent-visuels';
+import { centres } from '../visuels';
+import burger from '../../../assets/agents/peep/burger.jpg';
+
+/**
+ * Peep's "Exemple d'usage" scene (César 11/10): each step shows the device of whoever acts, the
+ * previous one steps back (Exemple.astro's engine, `data-etapes`: device, screen, seconds).
+ * 1. Claire's Hatch OS window: her request types itself, Peep drafts the announcement (photo,
+ *    sheet), the three quiz questions come one by one.
+ * 2. A Lyon Part-Dieu crew member's iPhone, Monday 9:00: the WhatsApp notification lands on the
+ *    lock screen, the chat opens on the announcement, a tap starts the quiz.
+ * 3. Claire's window again, Tuesday: read tracking counts up, a click on "Unread" keeps the two
+ *    restaurants that haven't opened it, a click on "Remind now" sends the reminder.
+ * 4. The same iPhone: the crew member types his plating question, Peep "is typing", the answer
+ *    comes with the sheet's excerpt.
+ * Each screen's markup is its final state; `.joue` (set by the engine) replays its beats, each
+ * timed by `--t` (seconds from the screen's start).
+ */
+interface Props {
+  d: SceneDe<'peep'>;
+}
+const { d } = Astro.props;
+const etapes = [
+  { a: 'siege', e: 0, d: 6.8 },
+  { a: 'tel', e: 0, d: 7.8 },
+  { a: 'siege', e: 1, d: 6.6 },
+  { a: 'tel', e: 1, d: 6.4 },
+];
+const mots = (texte: string) => texte.split(' ');
+const nonLus = d.suivi.total - d.suivi.lus;
+---
+
+<div class="pile" data-etapes={JSON.stringify(etapes)}>
+  <div class="appareil devant" data-appareil="siege">
+    <div class="fenetre">
+      <div class="fen-ecran on" data-ecran="0">
+        <p class="fen-barre">
+          <span class="feux"><span></span><span></span><span></span></span>
+          <b>{d.redaction.app}</b>
+          <span class="fen-contexte">{d.redaction.contexte}</span>
+        </p>
+        <div class="fen-corps">
+          <div class="demande">
+            <span class="demande-qui">{d.redaction.demande.qui}</span>
+            <p>
+              {
+                mots(d.redaction.demande.texte).map((m, i) => (
+                  <>
+                    <span class="mot" style={`--t:${(0.4 + i * 0.1).toFixed(2)}s`}>
+                      {m}
+                    </span>{' '}
+                  </>
+                ))
+              }
+            </p>
+          </div>
+          <div class="peep">
+            <Image src={avatars.peep} alt="" width={56} densities={[1]} class="peep-av" />
+            <div class="peep-corps">
+              <b class="peep-nom">{d.redaction.agent}</b>
+              <div class="attente">
+                <p class="redige">
+                  <span class="points"><span></span><span></span><span></span></span>
+                  {d.redaction.redige}
+                </p>
+                <div class="annonce b" style="--t:2.9s">
+                  <div class="annonce-haut">
+                    <Image src={burger} alt="" width={360} class="annonce-photo" loading="lazy" />
+                    <div class="annonce-texte">
+                      <b>{d.redaction.annonce.titre}</b>
+                      <p>{d.redaction.annonce.texte}</p>
+                      <span class="piece">
+                        <span class="piece-icone"><Icone nom="file-text" taille={13} /></span>
+                        <span class="flex flex-col">
+                          <b>{d.redaction.annonce.fiche.titre}</b>
+                          <span>{d.redaction.annonce.fiche.meta}</span>
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="quiz">
+                    <p class="quiz-libelle">
+                      <Icone nom="list-checks" taille={13} />
+                      {d.redaction.quiz.libelle}
+                    </p>
+                    <ol>
+                      {
+                        d.redaction.quiz.questions.map((q, i) => (
+                          <li class="b" style={`--t:${3.7 + i * 0.5}s`}>
+                            <span class="quiz-n">{i + 1}</span>
+                            {q}
+                          </li>
+                        ))
+                      }
+                    </ol>
+                  </div>
+                </div>
+              </div>
+              <p class="actions b" style="--t:5.4s">
+                <span class="btn">{d.redaction.boutons[0]}</span>
+                <span class="btn sombre">{d.redaction.boutons[1]}</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fen-ecran suivi" data-ecran="1">
+        <p class="fen-barre">
+          <span class="feux"><span></span><span></span><span></span></span>
+          <b>{d.suivi.app}</b>
+          <span class="fen-contexte">{d.suivi.contexte}</span>
+        </p>
+        <div class="fen-corps">
+          <div class="suivi-tete">
+            <span class="kicker">{d.suivi.libelle}</span>
+            <p class="chiffre">
+              <b class="compteur" style={`--pp-n:${d.suivi.lus}`}></b>
+              <span class="sur">/ {d.suivi.total}</span>
+              <span class="legende">{d.suivi.legende}</span>
+            </p>
+            <span class="jauge"><span style={`--a:${d.suivi.lus / d.suivi.total}`}></span></span>
+          </div>
+          <p class="onglets">
+            <span class="onglet tous">{d.suivi.onglets[0]} <i>{d.suivi.total}</i></span>
+            <span class="onglet nonlus">
+              {d.suivi.onglets[1]}
+              <i>{nonLus}</i>
+              <span class="curseur c1"><Icone nom="mouse-pointer-2" taille={20} /></span>
+            </span>
+          </p>
+          <ul class="liste">
+            {
+              d.suivi.restaurants.map((r, i) => (
+                <li class:list={{ lu: r.lu }}>
+                  <span class="nom b" style={`--t:${0.5 + i * 0.18}s`}>
+                    {r.nom}
+                  </span>
+                  {r.lu ? (
+                    <span class="etat ok b" style={`--t:${0.6 + i * 0.18}s`}>
+                      <Icone nom="check-check" taille={12} />
+                      {r.etat}
+                    </span>
+                  ) : (
+                    <span class="echange b" style={`--t:${0.6 + i * 0.18}s`}>
+                      <span class="etat gris avant">
+                        <Icone nom="eye-off" taille={12} />
+                        {r.etat}
+                      </span>
+                      <span class="etat orange apres">
+                        <Icone nom="refresh-cw" taille={12} />
+                        {d.suivi.relance.etat}
+                      </span>
+                    </span>
+                  )}
+                </li>
+              ))
+            }
+          </ul>
+          <div class="relance deplie" style="--t:3.35s">
+            <span class="btn sombre relancer">
+              <span class="echange">
+                <span class="avant"><Icone nom="send" taille={13} />{d.suivi.relance.bouton}</span>
+                <span class="apres"><Icone nom="check" taille={13} />{d.suivi.relance.fait}</span>
+              </span>
+              <span class="curseur c2"><Icone nom="mouse-pointer-2" taille={20} /></span>
+            </span>
+            <span class="auto">{d.suivi.relance.auto}</span>
+          </div>
+          <span class="ressort"></span>
+          <p class="bilan deplie" style="--t:3.6s">
+            <span class="bilan-icone"><Icone nom="list-checks" taille={14} /></span>
+            <span class="flex flex-col">
+              <b>{d.suivi.quiz.libelle}</b>
+              <span>{d.suivi.quiz.texte}</span>
+            </span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="appareil" data-appareil="tel">
+    <div class="tel">
+      <IphoneReel>
+        <div class="ecran-tel on" data-ecran="0">
+          <div class="verrou">
+            <Picture
+              src={centres.peep.src}
+              alt=""
+              formats={['avif', 'webp']}
+              widths={[400]}
+              sizes="250px"
+              class="verrou-fond"
+            />
+            <p class="verrou-heure">{d.telephone.heure}</p>
+            <p class="verrou-date">{d.telephone.date}</p>
+            <div class="notif">
+              <p class="notif-tete">
+                <span class="wa"><LogoWhatsapp taille={9} /></span>
+                <span class="flex-1">{d.telephone.notif.app}</span>
+                <span>{d.telephone.notif.quand}</span>
+              </p>
+              <b>{d.telephone.notif.titre}</b>
+              <span>{d.telephone.notif.texte}</span>
+            </div>
+          </div>
+          <div class="chat glisse">
+            <p class="chat-tete">
+              <Icone nom="chevron-left" taille={14} />
+              <Image src={avatars.peep} alt="" width={48} densities={[1]} class="chat-av" />
+              <span class="flex flex-col">
+                <b>{d.telephone.contact}</b>
+                <span>{d.telephone.statut}</span>
+              </span>
+            </p>
+            <div class="chat-fil">
+              <span class="jour">{d.telephone.jour}</span>
+              <div class="bulle b" style="--t:3s">
+                <Image src={burger} alt="" width={400} class="bulle-photo" loading="lazy" />
+                <b class="bulle-titre">{d.telephone.annonce.titre}</b>
+                <p>{d.telephone.annonce.texte}</p>
+                <span class="pdf">
+                  <span class="pdf-icone">PDF</span>
+                  <span class="flex flex-col">
+                    <b>{d.telephone.annonce.fiche.titre}</b>
+                    <span>{d.telephone.annonce.fiche.meta}</span>
+                  </span>
+                </span>
+                <span class="heure">{d.telephone.annonce.heure}</span>
+              </div>
+              <div class="bulle b" style="--t:3.7s">
+                <p class="quiz-tel">
+                  <Icone nom="list-checks" taille={12} />
+                  <b>{d.telephone.quiz.titre}</b>
+                  <span>· {d.telephone.quiz.meta}</span>
+                </p>
+                <span class="bouton-wa">
+                  {d.telephone.quiz.bouton}
+                  <span class="doigt"></span>
+                </span>
+              </div>
+              <div class="bulle sortant b" style="--t:5.5s">
+                <p>{d.telephone.reponse.texte}</p>
+                <span class="heure">
+                  {d.telephone.reponse.heure}
+                  <Icone nom="check-check" taille={11} class="vu" />
+                </span>
+              </div>
+              <div class="bulle b" style="--t:6.3s">
+                <p>{d.telephone.question.texte}</p>
+                <span class="heure">{d.telephone.question.heure}</span>
+              </div>
+            </div>
+            <p class="saisie">
+              <span class="saisie-champ"><span class="saisie-ph">{d.question.saisie}</span></span>
+              <span class="saisie-rond"><Icone nom="mic" taille={13} /></span>
+            </p>
+          </div>
+        </div>
+
+        <div class="ecran-tel" data-ecran="1">
+          <div class="chat">
+            <p class="chat-tete">
+              <Icone nom="chevron-left" taille={14} />
+              <Image src={avatars.peep} alt="" width={48} densities={[1]} class="chat-av" />
+              <span class="flex flex-col">
+                <b>{d.telephone.contact}</b>
+                <span class="echange">
+                  <span class="avant-ecrit">{d.telephone.statut}</span>
+                  <span class="ecrit">{d.question.ecrit}</span>
+                </span>
+              </span>
+            </p>
+            <div class="chat-fil">
+              <div class="bulle">
+                <Image src={burger} alt="" width={400} class="bulle-photo" loading="lazy" />
+                <b class="bulle-titre">{d.telephone.annonce.titre}</b>
+                <p>{d.telephone.annonce.texte}</p>
+                <span class="heure">{d.telephone.annonce.heure}</span>
+              </div>
+              <div class="bulle sortant">
+                <p>{d.telephone.reponse.texte}</p>
+                <span class="heure">
+                  {d.telephone.reponse.heure}
+                  <Icone nom="check-check" taille={11} class="vu" />
+                </span>
+              </div>
+              <div class="bulle">
+                <p>{d.telephone.question.texte}</p>
+                <span class="heure">{d.telephone.question.heure}</span>
+              </div>
+              <span class="jour">{d.telephone.jour}</span>
+              <div class="bulle sortant envoi">
+                <p>{d.question.texte}</p>
+                <span class="heure">
+                  {d.question.heure}
+                  <Icone nom="check-check" taille={11} class="vu" />
+                </span>
+              </div>
+              <span class="bulle points-tel">
+                <span class="points"><span></span><span></span><span></span></span>
+              </span>
+              <div class="bulle b" style="--t:4.3s">
+                <span class="extrait">
+                  <Image src={burger} alt="" width={400} class="extrait-photo" loading="lazy" />
+                  <span class="extrait-source">
+                    <Icone nom="file-text" taille={11} />
+                    <span class="flex flex-col">
+                      <b>{d.question.reponse.source.titre}</b>
+                      <span>{d.question.reponse.source.meta}</span>
+                    </span>
+                  </span>
+                </span>
+                <b class="bulle-titre">{d.question.reponse.titre}</b>
+                <p>{d.question.reponse.texte}</p>
+                <span class="signature">{d.question.reponse.signature}</span>
+              </div>
+            </div>
+            <p class="saisie">
+              <span class="saisie-champ">
+                <span class="saisie-ph">{d.question.saisie}</span>
+                <span class="saisie-texte">
+                  {
+                    mots(d.question.texte).map((m, i) => (
+                      <>
+                        <span class="mot" style={`--t:${(0.4 + i * 0.13).toFixed(2)}s`}>
+                          {m}
+                        </span>{' '}
+                      </>
+                    ))
+                  }
+                </span>
+              </span>
+              <span class="saisie-rond">
+                <span class="micro"><Icone nom="mic" taille={13} /></span>
+                <span class="envoyer"><Icone nom="send-horizontal" taille={13} /></span>
+                <span class="doigt"></span>
+              </span>
+            </p>
+          </div>
+        </div>
+      </IphoneReel>
+    </div>
+  </div>
+</div>
+
+<style>
+  @property --pp-n {
+    syntax: '<integer>';
+    inherits: false;
+    initial-value: 0;
+  }
+
+  /* Generic beat: arrives at `--t` when its screen plays. */
+  .joue .b {
+    animation: pp-arrive 0.55s var(--ease-entree) var(--t, 0s) both;
+  }
+  @keyframes pp-arrive {
+    from {
+      opacity: 0;
+      translate: 0 10px;
+    }
+  }
+  /* A typed word shows at `--t`. */
+  .joue .mot {
+    animation: pp-fondu 0.08s linear var(--t) both;
+  }
+  @keyframes pp-fondu {
+    from {
+      opacity: 0;
+    }
+  }
+  /* Transient beats (fill none): `pp-montre` shows a hidden element while it runs, `pp-masque`
+     hides a visible one. */
+  @keyframes pp-montre {
+    from,
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes pp-masque {
+    from,
+    to {
+      opacity: 0;
+    }
+  }
+  /* Two states sharing one place: the final one (`.apres`) replaces the first (`.avant`). */
+  .echange {
+    display: inline-grid;
+  }
+  .echange > * {
+    grid-area: 1 / 1;
+  }
+  .echange .avant,
+  .echange .ecrit {
+    opacity: 0;
+  }
+  /* "Typing" dots. */
+  .points {
+    display: inline-flex;
+    gap: 3px;
+  }
+  .points span {
+    width: 5px;
+    height: 5px;
+    border-radius: 999px;
+    background: currentColor;
+  }
+  /* They bounce only while their screen plays, a few times, then rest. */
+  .joue .points span {
+    animation: pp-point 0.6s var(--ease-doux) 2s 6;
+  }
+  .joue .points span:nth-child(2) {
+    animation-delay: 2.15s;
+  }
+  .joue .points span:nth-child(3) {
+    animation-delay: 2.3s;
+  }
+  @keyframes pp-point {
+    50% {
+      opacity: 0.3;
+      translate: 0 -2px;
+    }
+  }
+
+  /* 1 and 3. Claire's window: two screens stacked in one frame, so it keeps its height. */
+  .fenetre {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    width: min(540px, 100%);
+    overflow: hidden;
+    border-radius: 14px;
+    background: var(--color-galet);
+    box-shadow: var(--shadow-3);
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+    container-type: inline-size;
+  }
+  .fen-ecran {
+    display: flex;
+    flex-direction: column;
+    grid-area: 1 / 1;
+    min-width: 0;
+  }
+  .fen-barre {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--color-ligne-claire);
+    background: var(--color-white);
+    font-size: 12px;
+    color: var(--color-gray-500);
+    white-space: nowrap;
+  }
+  .fen-barre b {
+    font: 700 14px/1 var(--font-display);
+    color: var(--color-ink);
+  }
+  .fen-contexte {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .feux {
+    display: flex;
+    flex: none;
+    gap: 6px;
+    margin-right: 4px;
+  }
+  .feux span {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: var(--color-statut-rouge);
+  }
+  .feux span:nth-child(2) {
+    background: var(--color-amber-line);
+  }
+  .feux span:nth-child(3) {
+    background: var(--color-success);
+  }
+  .fen-corps {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 14px;
+    padding: 18px;
+  }
+  .demande {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-self: flex-end;
+    max-width: 82%;
+    padding: 10px 13px;
+    border-radius: 12px 12px 4px 12px;
+    background: var(--color-orange-tint);
+    font-size: 12.5px;
+    line-height: 1.45;
+  }
+  .demande-qui {
+    font: 400 10px/1.3 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-orange-txt);
+  }
+  .peep {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .peep-av {
+    flex: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+  }
+  .peep-corps {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+  }
+  .peep-nom {
+    font-size: 12px;
+  }
+  .attente {
+    position: relative;
+  }
+  .redige {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: var(--color-white);
+    box-shadow: inset 0 0 0 1px var(--color-ligne-claire);
+    font-size: 11.5px;
+    color: var(--color-gray-500);
+    opacity: 0;
+  }
+  .joue .redige {
+    animation: pp-montre 0.9s linear 2s;
+  }
+  .annonce {
+    overflow: hidden;
+    border-radius: 12px;
+    background: var(--color-white);
+    box-shadow:
+      inset 0 0 0 1px var(--color-ligne-claire),
+      var(--shadow-1);
+  }
+  .annonce-haut {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+  }
+  .annonce-photo {
+    flex: none;
+    width: 112px;
+    height: 104px;
+    border-radius: 8px;
+    object-fit: cover;
+    object-position: 50% 45%;
+  }
+  .annonce-texte {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+    font-size: 11.5px;
+    line-height: 1.4;
+    color: var(--color-soft);
+  }
+  .annonce-texte > b {
+    font: 700 16px/1.15 var(--font-display);
+    color: var(--color-ink);
+  }
+  .piece {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    align-self: flex-start;
+    max-width: 100%;
+    margin-top: 2px;
+    padding: 5px 9px 5px 5px;
+    border-radius: 8px;
+    background: var(--color-mur);
+    font-size: 10px;
+    line-height: 1.25;
+    color: var(--color-gray-500);
+  }
+  .piece b {
+    font-size: 10.5px;
+    color: var(--color-ink);
+  }
+  .piece-icone {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    background: var(--color-statut-rouge-tint);
+    color: var(--color-statut-rouge);
+  }
+  .quiz {
+    padding: 10px 12px 12px;
+    border-top: 1px solid var(--color-ligne-claire);
+  }
+  .quiz-libelle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 7px;
+    font: 400 10px/1.3 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-orange-txt);
+  }
+  .quiz ol {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .quiz li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11.5px;
+    line-height: 1.35;
+  }
+  .quiz-n {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    background: var(--color-mur);
+    font: 400 10px/1 var(--font-mono);
+    color: var(--color-gray-700);
+  }
+  .actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+  .btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border-radius: 8px;
+    background: var(--color-white);
+    box-shadow: inset 0 0 0 1px var(--color-ligne-claire);
+    font-size: 11.5px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .btn.sombre {
+    background: var(--color-night);
+    box-shadow: none;
+    color: var(--color-white);
+  }
+
+  /* 3. Read tracking. */
+  .suivi .fen-corps {
+    gap: 12px;
+  }
+  .suivi-tete {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .kicker {
+    font: 400 10px/1.3 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-orange-txt);
+  }
+  .chiffre {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--color-soft);
+  }
+  .compteur::before {
+    content: counter(pp-n);
+  }
+  .compteur {
+    counter-reset: pp-n var(--pp-n);
+    font: 700 30px/1 var(--font-display);
+    letter-spacing: -0.02em;
+    color: var(--color-ink);
+  }
+  .joue .compteur {
+    animation: pp-compte 1.6s var(--ease-doux) 0.4s both;
+  }
+  @keyframes pp-compte {
+    from {
+      --pp-n: 0;
+    }
+  }
+  .sur {
+    font: 700 18px/1 var(--font-display);
+    color: var(--color-gray-500);
+  }
+  .legende {
+    margin-left: 2px;
+  }
+  .jauge {
+    display: block;
+    height: 6px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--color-gray-100);
+  }
+  .jauge span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--color-orange);
+    transform-origin: left;
+    scale: var(--a) 1;
+  }
+  .joue .jauge span {
+    animation: pp-jauge 1.6s var(--ease-doux) 0.4s both;
+  }
+  @keyframes pp-jauge {
+    from {
+      scale: 0 1;
+    }
+  }
+  .onglets {
+    display: flex;
+    gap: 4px;
+    align-self: flex-start;
+    padding: 3px;
+    border-radius: 9px;
+    background: var(--color-mur);
+    font-size: 11.5px;
+  }
+  .onglet {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 11px;
+    border-radius: 7px;
+    color: var(--color-gray-500);
+  }
+  .onglet i {
+    font: 400 10px/1 var(--font-mono);
+    font-style: normal;
+  }
+  .onglet.nonlus {
+    background: var(--color-white);
+    box-shadow: var(--shadow-1);
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+  .joue .onglet.tous {
+    animation: pp-etait-actif 0.2s var(--ease-doux) 2.75s both;
+  }
+  .joue .onglet.nonlus {
+    animation: pp-etait-inactif 0.2s var(--ease-doux) 2.75s both;
+  }
+  @keyframes pp-etait-actif {
+    from {
+      background: var(--color-white);
+      box-shadow: var(--shadow-1);
+      font-weight: 600;
+      color: var(--color-ink);
+    }
+  }
+  @keyframes pp-etait-inactif {
+    from {
+      background: transparent;
+      box-shadow: none;
+      font-weight: 400;
+      color: var(--color-gray-500);
+    }
+  }
+  .liste {
+    overflow: hidden;
+    border-radius: 12px;
+    background: var(--color-white);
+    box-shadow: inset 0 0 0 1px var(--color-ligne-claire);
+  }
+  .liste li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    max-height: 40px;
+    padding: 8px 14px;
+    border-top: 1px solid var(--color-ligne-claire);
+    font-size: 12px;
+  }
+  .liste li:first-child,
+  .liste li.lu + li:not(.lu) {
+    border-top-width: 0;
+  }
+  /* The filter keeps the unread: the read rows fold away. */
+  .liste li.lu {
+    max-height: 0;
+    padding-block: 0;
+    overflow: hidden;
+    border-top-width: 0;
+    opacity: 0;
+  }
+  .joue .liste li.lu {
+    animation: pp-replie 0.45s var(--ease-camera) 2.9s both;
+  }
+  .joue .liste li.lu:not(:first-child),
+  .joue .liste li.lu + li:not(.lu) {
+    animation: pp-replie-bord 0.45s var(--ease-camera) 2.9s both;
+  }
+  @keyframes pp-replie {
+    from {
+      max-height: 40px;
+      padding-block: 8px;
+      opacity: 1;
+    }
+  }
+  @keyframes pp-replie-bord {
+    from {
+      max-height: 40px;
+      padding-block: 8px;
+      border-top-width: 1px;
+      opacity: 1;
+    }
+  }
+  .nom {
+    font-weight: 600;
+  }
+  .etat {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 10.5px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .etat.ok {
+    background: var(--color-statut-vert-tint);
+    color: var(--color-success-txt);
+  }
+  .etat.gris {
+    background: var(--color-gray-100);
+    color: var(--color-gray-700);
+  }
+  .etat.orange {
+    background: var(--color-orange-tint);
+    color: var(--color-orange-txt);
+  }
+  .echange .avant {
+    justify-self: end;
+  }
+  .echange .apres {
+    justify-self: end;
+  }
+  .relance {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+  }
+  .relancer .echange > * {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    justify-self: center;
+  }
+  /* The reminder bar and the quiz summary unfold once the filter has folded the read rows. */
+  .joue .deplie {
+    animation: pp-deplie 0.5s var(--ease-entree) var(--t) both;
+  }
+  @keyframes pp-deplie {
+    from {
+      max-height: 0;
+      margin-top: -12px;
+      padding-block: 0;
+      overflow: hidden;
+      opacity: 0;
+    }
+    to {
+      max-height: 80px;
+    }
+  }
+  .ressort {
+    flex: 1;
+  }
+  .bilan {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: var(--color-white);
+    box-shadow: inset 0 0 0 1px var(--color-ligne-claire);
+    font-size: 11px;
+    line-height: 1.35;
+    color: var(--color-gray-500);
+  }
+  .bilan b {
+    font-size: 12px;
+    color: var(--color-ink);
+  }
+  .bilan-icone {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--color-orange-tint);
+    color: var(--color-orange-txt);
+  }
+  .auto {
+    font-size: 11px;
+    color: var(--color-gray-500);
+  }
+  .joue .relancer .avant {
+    animation: pp-montre 4.8s linear;
+  }
+  .joue .relancer .apres {
+    animation: pp-masque 4.8s linear;
+  }
+  .joue .liste .avant {
+    animation: pp-montre 5s linear;
+  }
+  .joue .liste .apres {
+    animation:
+      pp-masque 5s linear,
+      pp-pop 0.4s var(--ease-pop) 5s both;
+  }
+  .joue .liste li:last-child .apres {
+    animation:
+      pp-masque 5.15s linear,
+      pp-pop 0.4s var(--ease-pop) 5.15s both;
+  }
+  .joue .liste li:last-child .avant {
+    animation: pp-montre 5.15s linear;
+  }
+  @keyframes pp-pop {
+    from {
+      scale: 0.6;
+    }
+  }
+  /* The mouse pointer glides onto its target, clicks, and goes. */
+  .curseur {
+    position: absolute;
+    top: 55%;
+    left: 62%;
+    z-index: 2;
+    display: inline-flex;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .curseur :global(svg) {
+    fill: var(--color-white);
+    color: var(--color-ink);
+    filter: drop-shadow(0 1px 1px color-mix(in srgb, var(--color-shadow) 30%, transparent));
+  }
+  .joue .c1 {
+    animation: pp-pointe 1.5s var(--ease-camera) 1.8s both;
+  }
+  .joue .c2 {
+    animation: pp-pointe 1.5s var(--ease-camera) 3.85s both;
+  }
+  @keyframes pp-pointe {
+    0% {
+      opacity: 0;
+      translate: 70px 50px;
+    }
+    15% {
+      opacity: 1;
+    }
+    55% {
+      translate: 0 0;
+      scale: 1;
+    }
+    63% {
+      scale: 0.82;
+    }
+    72% {
+      scale: 1;
+    }
+    88% {
+      opacity: 1;
+      translate: 0 0;
+    }
+    100% {
+      opacity: 0;
+      translate: 0 0;
+    }
+  }
+
+  /* Narrow screens: the photo goes on top of the announcement. */
+  @container (max-width: 420px) {
+    .fen-barre {
+      padding: 10px 12px;
+    }
+    .fen-corps {
+      gap: 11px;
+      padding: 12px;
+    }
+    .demande {
+      max-width: 92%;
+      font-size: 11.5px;
+    }
+    .peep-av {
+      display: none;
+    }
+    .annonce-haut {
+      flex-direction: column;
+      gap: 8px;
+      padding: 0 0 10px;
+    }
+    .annonce-photo {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 3 / 1;
+      border-radius: 0;
+    }
+    .annonce-texte {
+      padding: 0 10px;
+    }
+    .annonce-texte > p {
+      display: none;
+    }
+    .quiz li {
+      font-size: 11px;
+    }
+    .btn {
+      padding: 6px 10px;
+      font-size: 11px;
+    }
+    .chiffre .legende {
+      flex-basis: 100%;
+      margin: 0;
+    }
+    .chiffre {
+      flex-wrap: wrap;
+      row-gap: 2px;
+    }
+    .liste li {
+      padding-inline: 11px;
+    }
+  }
+
+  /* 2 and 4. The crew member's phone. */
+  .tel {
+    width: 250px;
+  }
+  .ecran-tel {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+  }
+  .verrou {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20cqw 5cqw 0;
+    background: var(--color-night);
+  }
+  .verrou-fond {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(10px) brightness(0.7);
+    scale: 1.2;
+  }
+  .verrou-heure {
+    position: relative;
+    font: 300 22cqw/1 var(--font-sans);
+    letter-spacing: -0.02em;
+    color: var(--color-white);
+  }
+  .verrou-date {
+    position: relative;
+    margin: 2cqw 0 8cqw;
+    font-size: 5cqw;
+    color: color-mix(in srgb, var(--color-white) 85%, transparent);
+  }
+  .notif {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8cqw;
+    width: 100%;
+    padding: 4cqw;
+    border-radius: 6cqw;
+    background: color-mix(in srgb, var(--color-white) 82%, transparent);
+    backdrop-filter: blur(12px);
+    font-size: 4.6cqw;
+    line-height: 1.35;
+  }
+  .notif b {
+    font-size: 4.8cqw;
+  }
+  .joue .notif {
+    animation: pp-tombe 0.6s var(--ease-entree) 0.6s both;
+  }
+  @keyframes pp-tombe {
+    from {
+      opacity: 0;
+      translate: 0 -14cqw;
+      scale: 0.94;
+    }
+  }
+  .notif-tete {
+    display: flex;
+    align-items: center;
+    gap: 2cqw;
+    margin-bottom: 1cqw;
+    font-size: 4cqw;
+    color: var(--color-gray-700);
+  }
+  .wa {
+    display: grid;
+    place-items: center;
+    width: 7cqw;
+    height: 7cqw;
+    border-radius: 2cqw;
+    background: var(--color-whatsapp-brand);
+    color: var(--color-white);
+  }
+  .chat {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-whatsapp-wall);
+  }
+  .joue .glisse {
+    animation: pp-monte 0.6s var(--ease-camera) 2.3s both;
+  }
+  @keyframes pp-monte {
+    from {
+      translate: 0 100%;
+    }
+  }
+  .chat-tete {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 2.5cqw;
+    padding: 14cqw 4cqw 3cqw;
+    background: var(--color-white);
+    font-size: 3.8cqw;
+    line-height: 1.3;
+    color: var(--color-gray-500);
+  }
+  .chat-tete b {
+    font-size: 4.6cqw;
+    color: var(--color-ink);
+  }
+  .chat-av {
+    width: 9cqw;
+    height: 9cqw;
+    border-radius: 999px;
+    background: var(--color-orange-tint);
+  }
+  .ecrit {
+    color: var(--color-success-txt);
+  }
+  .joue .avant-ecrit {
+    animation: pp-masque 1.2s linear 3.1s;
+  }
+  .joue .ecrit {
+    animation: pp-montre 1.2s linear 3.1s;
+  }
+  .chat-fil {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 2.2cqw;
+    min-height: 0;
+    overflow: hidden;
+    padding: 3cqw 3.5cqw;
+  }
+  /* In the chat, a message that arrives pushes the older ones up, as in WhatsApp. */
+  .chat-fil .b,
+  .chat-fil .envoi {
+    overflow: hidden;
+  }
+  .joue .chat-fil .b,
+  .joue .chat-fil .envoi {
+    animation: pp-pousse 0.6s var(--ease-entree) var(--t) both;
+  }
+  @keyframes pp-pousse {
+    from {
+      max-height: 0;
+      padding-block: 0;
+      margin-top: -2.2cqw;
+      opacity: 0;
+    }
+    to {
+      max-height: 150cqw;
+    }
+  }
+  .jour {
+    align-self: center;
+    flex: none;
+    padding: 0.8cqw 3cqw;
+    border-radius: 2.4cqw;
+    background: var(--color-white);
+    font-size: 3.4cqw;
+    color: var(--color-gray-500);
+  }
+  .bulle {
+    position: relative;
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    gap: 1.4cqw;
+    width: fit-content;
+    max-width: 88%;
+    padding: 2cqw 2.5cqw;
+    border-radius: 3.5cqw;
+    background: var(--color-white);
+    box-shadow: 0 1px 1px color-mix(in srgb, var(--color-shadow) 8%, transparent);
+    font-size: 4cqw;
+    line-height: 1.35;
+  }
+  .bulle.sortant {
+    align-self: flex-end;
+    background: var(--color-whatsapp);
+  }
+  .bulle-photo {
+    width: 100%;
+    aspect-ratio: 2.6 / 1;
+    border-radius: 2.4cqw;
+    object-fit: cover;
+    object-position: 50% 42%;
+  }
+  .bulle-titre {
+    font-size: 4.4cqw;
+    line-height: 1.25;
+  }
+  .heure {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8cqw;
+    align-self: flex-end;
+    margin-top: -1cqw;
+    font-size: 3cqw;
+    color: var(--color-gray-500);
+  }
+  .heure :global(.vu) {
+    color: var(--color-whatsapp-tick);
+  }
+  .pdf {
+    display: flex;
+    align-items: center;
+    gap: 2cqw;
+    padding: 1.8cqw;
+    border-radius: 2.4cqw;
+    background: var(--color-mur);
+    font-size: 3.2cqw;
+    line-height: 1.25;
+    color: var(--color-gray-500);
+  }
+  .pdf b {
+    font-size: 3.5cqw;
+    color: var(--color-ink);
+  }
+  .pdf-icone {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 7.5cqw;
+    height: 9cqw;
+    border-radius: 1.2cqw;
+    background: var(--color-statut-rouge);
+    font-size: 2.4cqw;
+    font-weight: 700;
+    color: var(--color-white);
+  }
+  .quiz-tel {
+    display: flex;
+    align-items: center;
+    gap: 1.4cqw;
+    color: var(--color-gray-500);
+  }
+  .quiz-tel b {
+    color: var(--color-ink);
+  }
+  .bouton-wa {
+    position: relative;
+    display: block;
+    margin: 0.5cqw -2.5cqw -2cqw;
+    padding: 2.4cqw 0;
+    border-top: 1px solid var(--color-ligne-claire);
+    text-align: center;
+    font-weight: 600;
+    color: var(--color-success-txt);
+  }
+  /* A fingertip presses at its moment, then lifts off. */
+  .doigt {
+    position: absolute;
+    top: 50%;
+    left: 55%;
+    width: 11cqw;
+    height: 11cqw;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-ink) 22%, transparent);
+    box-shadow: 0 0 0 2cqw color-mix(in srgb, var(--color-ink) 8%, transparent);
+    translate: -50% -50%;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .joue .bouton-wa .doigt {
+    animation: pp-tape 0.9s var(--ease-doux) 4.6s both;
+  }
+  @keyframes pp-tape {
+    0% {
+      opacity: 0;
+      scale: 1.6;
+    }
+    35% {
+      opacity: 1;
+      scale: 1;
+    }
+    55% {
+      scale: 0.85;
+    }
+    100% {
+      opacity: 0;
+      scale: 1.1;
+    }
+  }
+  .saisie {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 2cqw;
+    padding: 2cqw 3cqw 6cqw;
+  }
+  .saisie-champ {
+    position: relative;
+    display: grid;
+    flex: 1;
+    min-width: 0;
+    padding: 2.2cqw 3.5cqw;
+    border-radius: 999px;
+    background: var(--color-white);
+    font-size: 3.8cqw;
+    line-height: 1.3;
+  }
+  .saisie-champ > * {
+    grid-area: 1 / 1;
+  }
+  .saisie-ph {
+    color: var(--color-gray-400);
+  }
+  /* While he types, the field grows upwards over the chat, as WhatsApp's does. */
+  .saisie-texte {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 2.2cqw 3.5cqw;
+    border-radius: 4.5cqw;
+    background: var(--color-white);
+    opacity: 0;
+  }
+  .saisie-rond {
+    position: relative;
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 9cqw;
+    height: 9cqw;
+    border-radius: 999px;
+    background: var(--color-whatsapp-brand);
+    color: var(--color-white);
+  }
+  .saisie-rond > span:not(.doigt) {
+    display: inline-flex;
+    grid-area: 1 / 1;
+  }
+  .envoyer {
+    opacity: 0;
+  }
+  /* 4. He types, sends; Peep is typing; the answer comes from the sheet. */
+  .joue .saisie-ph,
+  .joue .micro {
+    animation: pp-masque 2.1s linear 0.35s;
+  }
+  .joue .saisie-texte,
+  .joue .envoyer {
+    animation: pp-montre 2.1s linear 0.35s;
+  }
+  .joue .saisie-rond .doigt {
+    animation: pp-tape 0.9s var(--ease-doux) 1.95s both;
+  }
+  .joue .envoi {
+    --t: 2.5s;
+  }
+  /* Peep's typing bubble opens, then gives way to the answer. */
+  .points-tel {
+    max-height: 0;
+    margin-top: -2.2cqw;
+    padding-block: 0;
+    overflow: hidden;
+    color: var(--color-gray-400);
+    opacity: 0;
+  }
+  .joue .points-tel {
+    animation: pp-indicateur 1.25s var(--ease-doux) 3.05s;
+  }
+  @keyframes pp-indicateur {
+    0%,
+    100% {
+      max-height: 0;
+      margin-top: -2.2cqw;
+      padding-block: 0;
+      opacity: 0;
+    }
+    15%,
+    88% {
+      max-height: 12cqw;
+      margin-top: 0;
+      padding-block: 2.6cqw;
+      opacity: 1;
+    }
+  }
+  .extrait {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-left: 1cqw solid var(--color-orange);
+    border-radius: 2cqw;
+    background: var(--color-mur);
+  }
+  .extrait-photo {
+    width: 100%;
+    aspect-ratio: 2.4 / 1;
+    object-fit: cover;
+    object-position: 50% 46%;
+  }
+  .extrait-source {
+    display: flex;
+    align-items: center;
+    gap: 1.6cqw;
+    padding: 1.6cqw 2cqw;
+    font-size: 3.1cqw;
+    line-height: 1.25;
+    color: var(--color-gray-500);
+  }
+  .extrait-source b {
+    font-size: 3.3cqw;
+    color: var(--color-ink);
+  }
+  .signature {
+    align-self: flex-end;
+    font-size: 3cqw;
+    color: var(--color-gray-500);
+  }
+</style>

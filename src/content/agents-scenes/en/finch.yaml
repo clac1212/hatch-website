@@ -1,0 +1,71 @@
+# Finch's "Exemple d'usage" scene: each step shows the device of whoever acts (César 11/10).
+agent: finch
+plan:
+  - texte: Cold room door seal
+    criticite: Critical
+    echeance: Today
+    ton: rouge
+  - texte: Prep labelling
+    criticite: Major
+    echeance: Before Friday
+    ton: orange
+  - texte: Allergen display
+    criticite: Minor
+    echeance: Within 15 days
+    ton: gris
+audit:
+  heure: '17:38'
+  app: Audit · Lille Centre
+  n: 18
+  total: 18
+  rubrique: Hygiene
+  poids: '×3'
+  controle: Cold room door seal
+  historique: 'Previous audit: not compliant'
+  photo: Take a photo
+  conforme: Compliant
+  nonConforme: Not compliant
+  synthese:
+    titre: Audit complete
+    score: 84
+    sur: / 100
+    detail: 18 checkpoints · 3 gaps
+    plan: Action plan suggested by AI
+    bouton: Send the report
+    envoye: Sent to the franchisee on WhatsApp
+franchise:
+  heure: '17:42'
+  date: Tuesday 13 October
+  notif:
+    app: WhatsApp
+    quand: now
+    titre: Finch · BunBun audits
+    texte: 'Your audit report is ready: 84 / 100, 3 actions including 1 critical.'
+  contact: Finch · BunBun audits
+  statut: Business account
+  document: { type: PDF, nom: Report_Lille_Centre.pdf, meta: 6 pages · PDF }
+  message: 'Audit of 13 October: 84 / 100. Your action plan:'
+  saisie: Message
+  question: Got the report. Where do I start?
+  heureQuestion: '17:44'
+  reponse: "With the cold room seal, it's the only critical point. Send me the photo once it's replaced."
+validation:
+  app: Finch · BunBun network
+  date: Thursday 15 October
+  rubrique: Action plan · Lille Centre
+  controle: Cold room door seal
+  criticite: Critical
+  avant: Before
+  apres: After
+  depose: Proof uploaded by the franchisee · 9:12
+  bouton: Approve the proof
+  valide: Proof approved
+  tampon: Approved
+  tableau:
+    libelle: Drifting checkpoints
+    nombre: 3
+    unite: restaurants with the same gap
+    lignes:
+      - { texte: Lille Centre, etat: Fixed, ton: vert }
+      - { texte: Nantes Centre, etat: Open · critical, ton: rouge }
+      - { texte: Bordeaux Gare, etat: Open · major, ton: orange }

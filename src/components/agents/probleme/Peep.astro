@@ -1,0 +1,383 @@
+---
+import type { ProblemeDe } from '../../../content/schemas/agent-probleme';
+import Icone from '../Icone.astro';
+
+interface Props {
+  d: ProblemeDe<'peep'>;
+}
+const { d } = Astro.props;
+const { mail, groupe, appel } = d;
+---
+
+<div class="panneau">
+  <div class="mail" data-c style="--i:0">
+    <p class="mail-tete">
+      <span class="mail-av">{mail.de.charAt(0)}</span>
+      <b class="flex-1">{mail.de}</b>
+      <span class="gris">{mail.date}</span>
+    </p>
+    <p class="mail-a gris">{mail.a}</p>
+    <p class="mail-objet">{mail.objet}</p>
+    <p class="mail-apercu">{mail.apercu}</p>
+    <p class="piece">
+      <span class="pdf">PDF</span>
+      {mail.piece}
+    </p>
+  </div>
+
+  <div class="groupe" data-c style="--i:1">
+    <p class="wa-tete">
+      <span class="retour">
+        <Icone nom="chevron-left" taille={18} />
+        <span class="non-lus" data-final>{groupe.nonLus}</span>
+      </span>
+      <span class="wa-av"><Icone nom="users" taille={16} /></span>
+      <span class="wa-nom">
+        <b>{groupe.nom}</b>
+        <span class="gris">{groupe.membres}</span>
+      </span>
+    </p>
+    <div class="fil">
+      <p class="jour">{groupe.annonce.date}</p>
+      <p class="bulle moi">
+        {groupe.annonce.texte}
+        <span class="heure">
+          {groupe.annonce.heure}
+          <Icone nom="check-check" taille={13} />
+        </span>
+      </p>
+      {
+        groupe.bavardage.map((m, i) => (
+          <p class:list={['bulle', `n${i}`]}>
+            <b class="auteur">{m.de}</b>
+            {m.texte}
+            <span class="heure">{m.heure}</span>
+          </p>
+        ))
+      }
+      <p class="jour">{groupe.jour}</p>
+      <p class="bulle karim">
+        <b class="auteur">{groupe.question.de}</b>
+        {groupe.question.texte}
+        <span class="heure">{groupe.question.heure}</span>
+      </p>
+    </div>
+  </div>
+
+  <div class="appel" data-c style="--i:2">
+    <span class="appel-ic"><Icone nom="phone-missed" taille={18} /></span>
+    <span class="appel-corps">
+      <span class="appel-app">
+        <span class="flex-1">{appel.app}</span>
+        <span class="gris">{appel.quand}</span>
+      </span>
+      <b>{appel.de}</b>
+      <span>{appel.texte}</span>
+    </span>
+  </div>
+</div>
+
+<style>
+  .panneau {
+    position: relative;
+    aspect-ratio: 6 / 5;
+    overflow: hidden;
+    border-radius: 28px;
+    background: var(--color-mur);
+    container-type: size;
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+  }
+  .panneau > * {
+    position: absolute;
+    border-radius: 2.4cqw;
+    background: var(--color-white);
+  }
+  .gris {
+    color: var(--color-gray-500);
+  }
+
+  /* The launch email */
+  .mail {
+    top: 7cqh;
+    left: 4cqw;
+    width: 49cqw;
+    padding: 3cqw 3.4cqw;
+    box-shadow: var(--shadow-1);
+    rotate: -2.5deg;
+    font-size: 2.2cqw;
+    line-height: 1.4;
+  }
+  .mail-tete {
+    display: flex;
+    align-items: center;
+    gap: 1.6cqw;
+    font-size: 2.3cqw;
+  }
+  .mail-av {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 5.2cqw;
+    height: 5.2cqw;
+    border-radius: 999px;
+    background: var(--color-statut-bleu-tint);
+    font-weight: 700;
+    color: var(--color-statut-bleu);
+  }
+  .mail-a {
+    margin: 0.6cqw 0 0 6.8cqw;
+    font-size: 2cqw;
+  }
+  .mail-objet {
+    margin: 1.8cqw 0 0.8cqw;
+    font-size: 2.7cqw;
+    font-weight: 600;
+    line-height: 1.25;
+  }
+  .mail-apercu {
+    color: var(--color-gray-700);
+  }
+  .piece {
+    display: inline-flex;
+    align-items: center;
+    gap: 1.4cqw;
+    margin-top: 2cqw;
+    padding: 1.1cqw 1.8cqw 1.1cqw 1.1cqw;
+    border-radius: 1.4cqw;
+    box-shadow: inset 0 0 0 1px var(--color-ligne-claire);
+    font-size: 2cqw;
+    color: var(--color-gray-700);
+  }
+  .pdf {
+    padding: 0.5cqw 0.9cqw;
+    border-radius: 0.8cqw;
+    background: var(--color-statut-rouge);
+    font-size: 1.7cqw;
+    font-weight: 700;
+    color: var(--color-white);
+  }
+
+  /* The franchisees' WhatsApp group */
+  .groupe {
+    top: 3.5cqh;
+    right: 3.5cqw;
+    width: 44cqw;
+    overflow: hidden;
+    box-shadow: var(--shadow-2);
+    rotate: 2.5deg;
+    font-size: 2.1cqw;
+    line-height: 1.35;
+  }
+  .wa-tete {
+    display: flex;
+    align-items: center;
+    gap: 1.2cqw;
+    padding: 1.6cqw 2.4cqw 1.6cqw 1.4cqw;
+    border-bottom: 1px solid var(--color-ligne-claire);
+  }
+  .retour {
+    display: flex;
+    flex: none;
+    align-items: center;
+    color: var(--color-success-txt);
+  }
+  .non-lus {
+    display: inline-grid;
+    place-items: center;
+    min-width: 4.6cqw;
+    padding: 0.5cqw 1cqw;
+    border-radius: 999px;
+    background: var(--color-success-txt);
+    font-size: 1.8cqw;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--color-white);
+  }
+  .wa-av {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 5.4cqw;
+    height: 5.4cqw;
+    border-radius: 999px;
+    background: var(--color-gray-100);
+    color: var(--color-gray-700);
+  }
+  .wa-nom {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    font-size: 2.2cqw;
+  }
+  .wa-nom .gris {
+    overflow: hidden;
+    font-size: 1.8cqw;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .fil {
+    display: flex;
+    flex-direction: column;
+    gap: 1cqw;
+    padding: 1.6cqw 2cqw 2.2cqw;
+    background: var(--color-whatsapp-wall);
+  }
+  .jour {
+    align-self: center;
+    padding: 0.5cqw 1.6cqw;
+    border-radius: 1cqw;
+    background: var(--color-white);
+    font-size: 1.8cqw;
+    color: var(--color-gray-700);
+    box-shadow: var(--shadow-1);
+  }
+  .bulle {
+    position: relative;
+    max-width: 90%;
+    padding: 1cqw 1.6cqw 0.8cqw;
+    border-radius: 1.6cqw;
+    background: var(--color-white);
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--color-ink) 10%, transparent);
+  }
+  .bulle.moi {
+    align-self: flex-end;
+    background: var(--color-whatsapp);
+  }
+  .auteur {
+    display: block;
+    font-size: 1.9cqw;
+    font-weight: 600;
+  }
+  .n0 .auteur {
+    color: var(--color-trad-magenta);
+  }
+  .n1 .auteur {
+    color: var(--color-statut-bleu);
+  }
+  .karim .auteur {
+    color: var(--color-orange-txt);
+  }
+  .heure {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.6cqw;
+    margin-top: 0;
+    font-size: 1.8cqw;
+    color: var(--color-gray-500);
+  }
+
+  /* Karim's missed call on head office's phone, with the earlier notifications stacked under it */
+  .appel {
+    bottom: 8cqh;
+    left: 6cqw;
+    display: flex;
+    align-items: center;
+    gap: 2cqw;
+    width: 48cqw;
+    padding: 2.4cqw 2.8cqw;
+    border-radius: 3cqw;
+    box-shadow:
+      0 1.6cqw 0 -0.8cqw color-mix(in srgb, var(--color-white) 75%, var(--color-gray-400)),
+      0 3cqw 0 -1.6cqw color-mix(in srgb, var(--color-white) 55%, var(--color-gray-400)),
+      var(--shadow-3);
+    rotate: -1.5deg;
+    font-size: 2.3cqw;
+    line-height: 1.3;
+  }
+  .appel-ic {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 7cqw;
+    height: 7cqw;
+    border-radius: 1.8cqw;
+    background: var(--color-statut-rouge-tint);
+    color: var(--color-statut-rouge);
+  }
+  .appel-corps {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+  }
+  .appel-app {
+    display: flex;
+    font-size: 1.9cqw;
+    color: var(--color-gray-700);
+  }
+
+  @media (max-width: 47.99rem) {
+    .panneau {
+      aspect-ratio: 3 / 4;
+    }
+    .mail {
+      top: 3cqh;
+      left: 4cqw;
+      width: 78cqw;
+      font-size: 3.1cqw;
+    }
+    .mail-tete {
+      font-size: 3.2cqw;
+    }
+    .mail-av {
+      width: 7cqw;
+      height: 7cqw;
+    }
+    .mail-a {
+      margin-left: 8.6cqw;
+      font-size: 2.8cqw;
+    }
+    .mail-objet {
+      font-size: 3.7cqw;
+    }
+    .mail-apercu {
+      display: none;
+    }
+    .piece {
+      font-size: 2.8cqw;
+    }
+    .pdf {
+      font-size: 2.4cqw;
+    }
+    .groupe {
+      top: 28cqh;
+      right: 3cqw;
+      width: 74cqw;
+      font-size: 3cqw;
+    }
+    .non-lus {
+      min-width: 6.4cqw;
+      font-size: 2.7cqw;
+    }
+    .wa-av {
+      width: 7.4cqw;
+      height: 7.4cqw;
+    }
+    .wa-nom {
+      font-size: 3.2cqw;
+    }
+    .wa-nom .gris,
+    .jour,
+    .auteur,
+    .heure {
+      font-size: 2.7cqw;
+    }
+    .n1 {
+      display: none;
+    }
+    .appel {
+      bottom: 2.5cqh;
+      left: 4cqw;
+      width: 66cqw;
+      font-size: 3.3cqw;
+    }
+    .appel-ic {
+      width: 9.4cqw;
+      height: 9.4cqw;
+    }
+    .appel-app {
+      font-size: 2.8cqw;
+    }
+  }
+</style>

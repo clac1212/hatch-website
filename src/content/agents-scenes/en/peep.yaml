@@ -1,0 +1,73 @@
+# Peep's "A typical use" scene: each step shows the device of whoever acts (César 11/10).
+agent: peep
+redaction:
+  app: Hatch OS
+  contexte: Announcements · New announcement
+  demande:
+    qui: Claire · head office
+    texte: 'Peep, write the autumn burger announcement, with the sheet and three quiz questions.'
+  agent: Peep
+  redige: Peep is writing…
+  annonce:
+    titre: Autumn burger
+    texte: Available from Monday in the restaurants concerned. The sheet is attached.
+    fiche: { titre: Recipe sheet · Autumn burger, meta: 2 pages · PDF }
+  quiz:
+    libelle: Quiz · 3 questions
+    questions:
+      - Which allergens does the autumn burger contain?
+      - How many slices of roast squash go in one burger?
+      - Until when does it stay on the menu?
+  boutons: [Edit, Choose restaurants]
+telephone:
+  heure: '9:00'
+  date: Monday 12 October
+  notif:
+    app: WhatsApp
+    quand: now
+    titre: Peep · BunBun
+    texte: 'New: the autumn burger arrives today. Sheet and quiz inside.'
+  contact: Peep · BunBun
+  statut: Business account
+  jour: Today
+  annonce:
+    titre: Autumn burger
+    texte: Available from today in your restaurant. The sheet is attached.
+    fiche: { titre: Recipe sheet · Autumn burger, meta: 2 pages · PDF }
+    heure: '9:00'
+  quiz: { titre: Quiz · 3 questions, meta: 2 minutes, bouton: Start the quiz }
+  reponse: { texte: Start the quiz, heure: '9:01' }
+  question: { texte: '1/3 · Which allergens does the autumn burger contain?', heure: '9:01' }
+suivi:
+  app: Hatch OS
+  contexte: Announcements · Autumn burger
+  libelle: Read tracking · Tuesday 13 October
+  lus: 10
+  total: 12
+  legende: restaurants have read it
+  onglets: [All, Unread]
+  restaurants:
+    - { nom: Lille Centre, etat: 'Read · 09:12', lu: true }
+    - { nom: Lyon Part-Dieu, etat: 'Read · 09:40', lu: true }
+    - { nom: Lille Flandres, etat: 'Read · 10:05', lu: true }
+    - { nom: Marseille Prado, etat: 'Read · 11:30', lu: true }
+    - { nom: Nantes Centre, etat: Not opened, lu: false }
+    - { nom: Bordeaux Gare, etat: Not opened, lu: false }
+  relance:
+    bouton: Remind now
+    fait: Reminder sent
+    etat: Reminded
+    auto: Otherwise, Peep reminds them on its own at 14:00.
+  quiz:
+    libelle: Understanding quiz
+    texte: '38 crew members took it · 92% right answers'
+question:
+  saisie: Message
+  texte: Does the sauce go before or after the cheddar?
+  heure: '11:20'
+  ecrit: Peep is typing…
+  reponse:
+    source: { titre: Recipe sheet · Autumn burger, meta: Step 4 · Plating }
+    titre: 'After the cheddar, just before closing it.'
+    texte: "That's step 4 of plating, with a photo in the sheet."
+    signature: Peep · 11:20

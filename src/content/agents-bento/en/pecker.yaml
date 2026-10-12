@@ -1,0 +1,60 @@
+# "What Pecker does for you" wall (mixed registers, after Finch, César 11/10).
+agent: pecker
+lien:
+  titre: A magic link sent on WhatsApp
+  heure: '9:05'
+  expediteur: BunBun Training
+  compte: Business account
+  jour: Today
+  parcours: Your onboarding course
+  meta: 3 modules · opens in the browser
+  message: Hi Yanis, here is your training. One tap is all it takes.
+  envoi: '9:05'
+  bouton: Open the training
+  garanties:
+    - No app
+    - No account
+declencheurs:
+  titre: Automatic triggers
+  evenement: New crew member
+  parcours: Onboarding course
+relance:
+  titre: Reminds those who drop off
+  pastille: Reminded · D+3
+quiz:
+  titre: Quizzes with results
+  legende: Quiz · Kitchen hygiene
+  reponses: [true, true, true, false, true, true, true, true, false, true]
+  rate: { etat: To review, texte: Shelf life of a sauce }
+traduction:
+  titre: Automatic translation
+  mots:
+    - { lang: en, texte: Welcome }
+    - { lang: es, texte: Bienvenido }
+    - { lang: bn, texte: স্বাগতম }
+    - { lang: pt, texte: Bem-vindo }
+evaluation:
+  titre: Skills assessments
+  document: Grid · Crew member
+  criteres:
+    - { texte: Customer welcome, valide: true }
+    - { texte: Prep, valide: true }
+    - { texte: Till, valide: false }
+  tampon: PDF filed
+tableau:
+  titre: A dashboard
+  ecran: Onboarding course
+  texte: BunBun network · 6 crew members
+  lignes:
+    - { texte: Yanis · Lille Centre, etat: Finished, ton: vert, progression: 100 }
+    - { texte: Inès · Nantes, etat: Finished, ton: vert, progression: 100 }
+    - { texte: Moussa · Lyon Part-Dieu, etat: Started, ton: orange, progression: 60 }
+    - { texte: Nora · Bordeaux, etat: Started, ton: orange, progression: 35 }
+    - { texte: Mehdi · Marseille, etat: Dropped off, ton: rouge, progression: 15 }
+    - { texte: Sofia · Rennes, etat: Finished, ton: vert, progression: 100 }
+editeur:
+  titre: A course editor
+  modules:
+    - { numero: Module 1, titre: Welcome, meta: 5 screens, type: ecrans }
+    - { numero: Module 2, titre: Hygiene, meta: Quiz · 10 q., type: quiz }
+    - { numero: Module 3, titre: Till, meta: Video, type: video }

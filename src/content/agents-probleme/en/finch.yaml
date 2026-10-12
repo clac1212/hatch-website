@@ -1,0 +1,19 @@
+agent: finch
+mail:
+  de: Network coordinator
+  objet: Audit report · Lille Centre
+  date: 12 March
+  piece: Audit_Lille_Centre_March.pdf
+  statut: No reply
+plan:
+  titre: Action plan · Lille Centre
+  actions:
+    - Replace the cold room door seal
+    - Label the prep containers
+    - Display the allergens
+  maj: Last edited on 12 March
+audit:
+  entete: Audit · Lille Centre · June
+  point: Cold room door seal
+  etat: Not compliant
+  tampon: Already flagged in March

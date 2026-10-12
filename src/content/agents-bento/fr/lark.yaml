@@ -1,0 +1,37 @@
+# Mur « Ce que Lark fait pour vous » (tuile centrale : col. 3, rang 1). Réseau fictif BunBun.
+agent: lark
+accueil:
+  titre: Une page d'accueil du réseau
+  ecran: Réseau BunBun · semaine 42
+  bonjour: Bonjour Claire, voici ce que vos agents ont vu.
+  source: Peep, Pecker et Finch · 7 derniers jours
+  chiffres:
+    - { valeur: 3, libelle: restaurants sans lire une comm }
+    - { valeur: 2, libelle: formations en retard }
+    - { valeur: 5, libelle: actions en cours }
+  lignes:
+    - { texte: Audit récent · Lille Centre, valeur: 84 / 100, ton: vert }
+    - { texte: Ouverture · Bordeaux, valeur: J-18, ton: bleu }
+    - { texte: Action critique · Nantes Centre, valeur: Ouverte, ton: rouge }
+conversation:
+  titre: Une conversation sur l'état du réseau
+  question: Quels restaurants sont en retard sur la formation hygiène ?
+  agent: Lark
+  reponse: 'Trois restaurants :'
+  source: Pecker · suivi des formations
+  lignes:
+    - { texte: Nantes Centre, nombre: 4, unite: équipiers }
+    - { texte: Bordeaux Gare, nombre: 2, unite: équipiers }
+    - { texte: Rennes Centre, nombre: 1, unite: équipier }
+tableau:
+  titre: Un tableau de bord réseau
+sujets:
+  titre: Les sujets qui remontent du terrain
+  unite: questions
+  source: Questions posées aux agents · 7 derniers jours
+  themes:
+    - { texte: Allergènes, nombre: 24 }
+    - { texte: Planning, nombre: 18 }
+    - { texte: Hygiène, nombre: 12 }
+    - { texte: Livraison, nombre: 8 }
+    - { texte: Recettes, nombre: 5 }

@@ -1,0 +1,546 @@
+---
+import type { ProblemeDe } from '../../../content/schemas/agent-probleme';
+import Icone from '../Icone.astro';
+
+/**
+ * Lark's problem, as objects: the audits spreadsheet (cells highlighted by hand, a score never
+ * entered), the announcements WhatsApp group where only some answered, the franchise candidates tool, and,
+ * last, the network director's sticky note that cross-checks the three by hand.
+ */
+interface Props {
+  d: ProblemeDe<'lark'>;
+}
+const { d } = Astro.props;
+const { tableur, whatsapp, candidats } = d;
+const colonnes = ['restaurant', 'date', 'score', 'actions'] as const;
+const nombres = new Set<string>(['score', 'actions']);
+---
+
+<div class="panneau">
+  <div class="tableur" data-c style="--i:0">
+    <p class="fenetre">
+      <span class="feux"><i></i><i></i><i></i></span>
+      <span class="fichier">{tableur.fichier}</span>
+    </p>
+    <div class="grille">
+      <span class="coin"></span>
+      {colonnes.map((_, n) => <span class="lettre">{String.fromCharCode(65 + n)}</span>)}
+      <span class="num">1</span>
+      {
+        colonnes.map((c) => (
+          <b class:list={['cel', { nb: nombres.has(c) }]}>{tableur.colonnes[c]}</b>
+        ))
+      }
+      {
+        tableur.lignes.map((l, n) => (
+          <>
+            <span class="num">{n + 2}</span>
+            {colonnes.map((c) => (
+              <span
+                class:list={[
+                  'cel',
+                  {
+                    nb: nombres.has(c),
+                    surligne: l.surligne?.includes(c),
+                    active: !l[c],
+                  },
+                ]}
+              >
+                {l[c]}
+              </span>
+            ))}
+          </>
+        ))
+      }
+    </div>
+    <p class="feuilles">
+      {
+        tableur.feuilles.map((f, n) => (
+          <span class:list={{ ouverte: n === tableur.feuilles.length - 1 }}>{f}</span>
+        ))
+      }
+    </p>
+  </div>
+
+  <div class="wa" data-c style="--i:1">
+    <p class="wa-tete">
+      <span class="wa-av"><Icone nom="users" taille={14} /></span>
+      <span class="wa-nom">
+        <b>{whatsapp.groupe}</b>
+        <span>{whatsapp.membres}</span>
+      </span>
+    </p>
+    <div class="wa-fil">
+      <p class="bulle moi">
+        {whatsapp.message.texte}
+        <span class="heure"
+          >{whatsapp.message.heure}<Icone nom="check-check" taille={13} class="coches" /></span
+        >
+        <span class="reaction">{whatsapp.reaction}</span>
+      </p>
+      {
+        whatsapp.reponses.map((r, n) => (
+          <p class:list={['bulle', { secondaire: n > 0 }]}>
+            <b class:list={['de', `de-${n}`]}>{r.de}</b>
+            {r.texte}
+            <span class="heure">{r.heure}</span>
+          </p>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="recrut" data-c style="--i:2">
+    <p class="recrut-tete">
+      <b>{candidats.app}</b>
+      <span class="recherche"><Icone nom="search" taille={12} />{candidats.recherche}</span>
+    </p>
+    <p class="recrut-titre">{candidats.titre}</p>
+    <p class="offre offre-cols secondaire">
+      <span>{candidats.colonnes.candidat}</span>
+      <span>{candidats.colonnes.statut}</span>
+    </p>
+    {
+      candidats.lignes.map((c, n) => (
+        <p class:list={['offre', { secondaire: n > 0 }]}>
+          <span class="poste">
+            <b>{c.nom}</b>
+            <span>
+              {c.ville} · {c.depuis}
+            </span>
+          </span>
+          <span class="compte">{c.statut}</span>
+        </p>
+      ))
+    }
+  </div>
+
+  <div class="postit" data-final>
+    {d.postit.map((l) => <p>{l}</p>)}
+  </div>
+</div>
+
+<style>
+  .panneau {
+    position: relative;
+    aspect-ratio: 6 / 5;
+    overflow: hidden;
+    border-radius: 28px;
+    background: var(--color-mur);
+    container-type: size;
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+  }
+  .panneau > * {
+    position: absolute;
+    overflow: hidden;
+    border-radius: 1.6cqw;
+    background: var(--color-white);
+  }
+
+  /* The spreadsheet: a plain grid, numbers right-aligned, cells highlighted by hand in yellow
+     (no yellow token: amber-line mixed with white), the active cell on the empty score. */
+  .tableur {
+    top: 5cqh;
+    left: 4cqw;
+    width: 56cqw;
+    box-shadow: var(--shadow-1);
+    rotate: -1.5deg;
+    font-size: 2cqw;
+  }
+  .fenetre {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.4cqw;
+    background: var(--color-gray-100);
+    font-size: 1.9cqw;
+    color: var(--color-gray-700);
+  }
+  .feux {
+    position: absolute;
+    left: 1.8cqw;
+    display: flex;
+    gap: 0.8cqw;
+  }
+  .feux i {
+    width: 1.3cqw;
+    height: 1.3cqw;
+    border-radius: 999px;
+    background: var(--color-gray-400);
+  }
+  .fichier {
+    font-weight: 600;
+  }
+  .grille {
+    display: grid;
+    grid-template-columns: 3.6cqw 1.6fr 0.9fr 0.85fr 1.4fr;
+    border-top: 1px solid var(--color-gray-400);
+  }
+  .grille > * {
+    min-height: 4.4cqw;
+    padding: 0 1.2cqw;
+    border-right: 1px solid var(--color-ligne-claire);
+    border-bottom: 1px solid var(--color-ligne-claire);
+    line-height: 4.4cqw;
+    white-space: nowrap;
+  }
+  .coin,
+  .lettre,
+  .num {
+    background: var(--color-gray-50);
+    font-size: 1.8cqw;
+    text-align: center;
+    color: var(--color-gray-500);
+  }
+  .lettre {
+    min-height: 3.4cqw;
+    line-height: 3.4cqw;
+  }
+  .coin {
+    min-height: 3.4cqw;
+  }
+  .num {
+    padding: 0;
+  }
+  b.cel {
+    font-weight: 700;
+  }
+  .nb {
+    text-align: right;
+  }
+  .surligne {
+    background: color-mix(in srgb, var(--color-amber-line) 65%, var(--color-white));
+  }
+  .active {
+    box-shadow: inset 0 0 0 0.35cqw var(--color-statut-bleu);
+  }
+  .feuilles {
+    display: flex;
+    gap: 0.4cqw;
+    padding: 0 1.4cqw 1cqw;
+    background: var(--color-gray-50);
+    font-size: 1.8cqw;
+    color: var(--color-gray-500);
+  }
+  .feuilles span {
+    padding: 0.8cqw 1.8cqw;
+  }
+  .feuilles .ouverte {
+    background: var(--color-white);
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--color-shadow) 18%, transparent);
+    font-weight: 600;
+    color: var(--color-statut-bleu);
+  }
+
+  /* The WhatsApp group: the director's announcement, grey ticks, two answers out of fifteen. */
+  .wa {
+    top: 6cqh;
+    right: 3cqw;
+    width: 36cqw;
+    box-shadow: var(--shadow-2);
+    rotate: 2.5deg;
+    font-size: 1.9cqw;
+  }
+  .wa-tete {
+    display: flex;
+    align-items: center;
+    gap: 1.4cqw;
+    padding: 1.6cqw 2cqw;
+    border-bottom: 1px solid var(--color-ligne-claire);
+  }
+  .wa-av {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 4.8cqw;
+    height: 4.8cqw;
+    border-radius: 999px;
+    background: var(--color-gray-100);
+    color: var(--color-gray-500);
+  }
+  .wa-nom {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    line-height: 1.3;
+  }
+  .wa-nom b {
+    font-size: 2.1cqw;
+  }
+  .wa-nom span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 1.8cqw;
+    color: var(--color-gray-500);
+  }
+  .wa-fil {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4cqw;
+    padding: 2cqw 2cqw 2.4cqw;
+    background: var(--color-whatsapp-wall);
+  }
+  .bulle {
+    position: relative;
+    align-self: flex-start;
+    max-width: 86%;
+    padding: 1.2cqw 1.6cqw 1cqw;
+    border-radius: 1.4cqw;
+    background: var(--color-white);
+    box-shadow: 0 1px 1px color-mix(in srgb, var(--color-shadow) 10%, transparent);
+    line-height: 1.35;
+  }
+  .bulle.moi {
+    align-self: flex-end;
+    margin-bottom: 1.8cqw;
+    background: var(--color-whatsapp);
+  }
+  .de {
+    display: block;
+    font-weight: 600;
+  }
+  .de-0 {
+    color: var(--color-orange-txt);
+  }
+  .de-1 {
+    color: var(--color-trad-violet);
+  }
+  .heure {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5cqw;
+    margin-top: 0.3cqw;
+    font-size: 1.8cqw;
+    color: var(--color-gray-500);
+  }
+  .bulle :global(.coches) {
+    width: 2.2cqw;
+    height: 2.2cqw;
+    color: var(--color-gray-500);
+  }
+  .reaction {
+    position: absolute;
+    bottom: -2.4cqw;
+    left: 1.6cqw;
+    padding: 0.3cqw 1cqw;
+    border-radius: 999px;
+    background: var(--color-white);
+    box-shadow: 0 1px 3px color-mix(in srgb, var(--color-shadow) 18%, transparent);
+    font-size: 1.8cqw;
+  }
+
+  /* The recruitment tool. */
+  .recrut {
+    bottom: 4cqh;
+    left: 5cqw;
+    width: 50cqw;
+    box-shadow: var(--shadow-2);
+    rotate: 1.2deg;
+    font-size: 2cqw;
+  }
+  .recrut-tete {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2cqw;
+    padding: 1.6cqw 2.4cqw;
+    border-bottom: 1px solid var(--color-ligne-claire);
+    font-size: 2.2cqw;
+  }
+  .recherche {
+    display: flex;
+    align-items: center;
+    gap: 0.8cqw;
+    padding: 0.7cqw 1.6cqw;
+    border-radius: 999px;
+    background: var(--color-gray-50);
+    box-shadow: inset 0 0 0 1px var(--color-ligne-claire);
+    font-size: 1.8cqw;
+    color: var(--color-gray-500);
+  }
+  .recrut-titre {
+    padding: 2cqw 2.4cqw 0.6cqw;
+    font: 600 2.5cqw/1.2 var(--font-display);
+  }
+  .offre {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2cqw;
+    margin: 0 2.4cqw;
+    padding: 1.2cqw 0;
+    border-bottom: 1px solid var(--color-ligne-claire);
+  }
+  .offre:last-child {
+    border-bottom: 0;
+    margin-bottom: 0.8cqw;
+  }
+  .offre-cols {
+    padding: 0.8cqw 0;
+    font-size: 1.8cqw;
+    color: var(--color-gray-500);
+  }
+  .poste {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
+  }
+  .poste span {
+    font-size: 1.8cqw;
+    color: var(--color-gray-500);
+  }
+  .compte {
+    min-width: 6cqw;
+    font-weight: 600;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  /* The sticky note, written by hand (Fraunces italic stands in for the handwriting). No yellow
+     token: amber-line mixed with white. */
+  .postit {
+    right: 6cqw;
+    bottom: 6cqh;
+    width: 32cqw;
+    overflow: visible;
+    padding: 3.6cqw 3cqw 3cqw;
+    border-radius: 0.4cqw;
+    background: color-mix(in srgb, var(--color-amber-line) 55%, var(--color-white));
+    box-shadow: var(--shadow-3);
+    rotate: -4deg;
+    font: italic 400 2.6cqw/1.4 var(--font-display);
+    color: var(--color-gray-800);
+  }
+  .postit::before {
+    position: absolute;
+    top: -1.6cqw;
+    left: 50%;
+    width: 12cqw;
+    height: 3.2cqw;
+    background: color-mix(in srgb, var(--color-white) 55%, transparent);
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--color-shadow) 12%, transparent);
+    content: '';
+    translate: -50% 0;
+    rotate: 3deg;
+  }
+  .postit p:first-child {
+    margin-bottom: 0.4cqw;
+    text-decoration: underline;
+    text-decoration-thickness: 0.25cqw;
+    text-underline-offset: 0.6cqw;
+  }
+
+  @media (max-width: 47.99rem) {
+    .panneau {
+      aspect-ratio: 3 / 4;
+    }
+    /* On a phone, each object keeps its first item only (the first answer, the first job post,
+       the search field goes): four objects in 340 px. */
+    .secondaire,
+    .recherche {
+      display: none;
+    }
+    .offre {
+      gap: 1cqw;
+      margin-bottom: 1.2cqw;
+    }
+    .compte {
+      min-width: 0;
+    }
+    .poste span {
+      white-space: nowrap;
+    }
+    .panneau > * {
+      border-radius: 2.4cqw;
+    }
+    .tableur {
+      top: 3cqh;
+      left: 4cqw;
+      width: 84cqw;
+      font-size: 2.9cqw;
+    }
+    .fenetre,
+    .coin,
+    .lettre,
+    .num,
+    .feuilles {
+      font-size: 2.6cqw;
+    }
+    .feux i {
+      width: 1.8cqw;
+      height: 1.8cqw;
+    }
+    .grille {
+      grid-template-columns: 5cqw 1.7fr 0.9fr 0.8fr 1.35fr;
+    }
+    .grille > * {
+      min-height: 6cqw;
+      line-height: 6cqw;
+    }
+    .lettre,
+    .coin {
+      min-height: 4.6cqw;
+      line-height: 4.6cqw;
+    }
+    .wa {
+      top: 39cqh;
+      right: 3cqw;
+      width: 58cqw;
+      font-size: 3cqw;
+    }
+    .wa-av {
+      width: 6.6cqw;
+      height: 6.6cqw;
+    }
+    .wa-nom b {
+      font-size: 3cqw;
+    }
+    .wa-nom span,
+    .heure,
+    .reaction {
+      font-size: 2.8cqw;
+    }
+    .bulle :global(.coches) {
+      width: 3cqw;
+      height: 3cqw;
+    }
+    .bulle.moi {
+      margin-bottom: 2.8cqw;
+    }
+    .reaction {
+      bottom: -3.4cqw;
+    }
+    .recrut {
+      bottom: 4cqh;
+      left: 3cqw;
+      width: 56cqw;
+      font-size: 3cqw;
+    }
+    .recrut-tete {
+      font-size: 3cqw;
+    }
+    .recherche,
+    .offre-cols,
+    .poste span {
+      font-size: 2.8cqw;
+    }
+    .recrut-titre {
+      font-size: 3.4cqw;
+    }
+    .postit {
+      right: 3cqw;
+      bottom: 3cqh;
+      width: 37cqw;
+      padding: 4.4cqw 3.6cqw 3.6cqw;
+      font-size: 3.4cqw;
+    }
+    .postit::before {
+      width: 14cqw;
+      height: 4cqw;
+    }
+  }
+</style>

@@ -1,0 +1,60 @@
+# Mur « Ce que Pecker fait pour vous » (registres mêlés, modèle Finch, César 11/10).
+agent: pecker
+lien:
+  titre: Un lien magique envoyé sur WhatsApp
+  heure: '9:05'
+  expediteur: BunBun Formation
+  compte: Compte professionnel
+  jour: "Aujourd'hui"
+  parcours: "Ton parcours d'accueil"
+  meta: "3 modules · s'ouvre dans le navigateur"
+  message: Bonjour Yanis, voici ta formation. Un clic suffit.
+  envoi: '9:05'
+  bouton: Ouvrir la formation
+  garanties:
+    - Sans appli
+    - Sans compte
+declencheurs:
+  titre: Des déclencheurs automatiques
+  evenement: Nouvel équipier
+  parcours: "Parcours d'accueil"
+relance:
+  titre: Relance ceux qui décrochent
+  pastille: Relancé · J+3
+quiz:
+  titre: Des quiz avec résultats
+  legende: Quiz · Hygiène en cuisine
+  reponses: [true, true, true, false, true, true, true, true, false, true]
+  rate: { etat: À revoir, texte: "Durée de vie d'une sauce" }
+traduction:
+  titre: La traduction automatique
+  mots:
+    - { lang: fr, texte: Bienvenue }
+    - { lang: es, texte: Bienvenido }
+    - { lang: bn, texte: স্বাগতম }
+    - { lang: pt, texte: Bem-vindo }
+evaluation:
+  titre: Des évaluations de compétences
+  document: Grille · Équipier
+  criteres:
+    - { texte: Accueil client, valide: true }
+    - { texte: Mise en place, valide: true }
+    - { texte: Caisse, valide: false }
+  tampon: PDF archivé
+tableau:
+  titre: Un tableau de bord
+  ecran: "Parcours d'accueil"
+  texte: Réseau BunBun · 6 équipiers
+  lignes:
+    - { texte: Yanis · Lille Centre, etat: Terminé, ton: vert, progression: 100 }
+    - { texte: Inès · Nantes, etat: Terminé, ton: vert, progression: 100 }
+    - { texte: Moussa · Lyon Part-Dieu, etat: Commencé, ton: orange, progression: 60 }
+    - { texte: Nora · Bordeaux, etat: Commencé, ton: orange, progression: 35 }
+    - { texte: Mehdi · Marseille, etat: Décroché, ton: rouge, progression: 15 }
+    - { texte: Sofia · Rennes, etat: Terminé, ton: vert, progression: 100 }
+editeur:
+  titre: Un éditeur de formations
+  modules:
+    - { numero: Module 1, titre: Bienvenue, meta: 5 écrans, type: ecrans }
+    - { numero: Module 2, titre: Hygiène, meta: Quiz · 10 q., type: quiz }
+    - { numero: Module 3, titre: Caisse, meta: Vidéo, type: video }

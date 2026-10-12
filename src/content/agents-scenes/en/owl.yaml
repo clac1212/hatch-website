@@ -1,0 +1,46 @@
+# Owl's "A typical use" scene: each step shows the device of whoever acts (César 11/10).
+agent: owl
+kiosque:
+  app: Owl
+  contexte: Kitchen tablet · Lille Centre
+  mode: Kiosk mode
+  repos: Tap to talk
+  ecoute: "I'm listening"
+  parle: Answering out loud
+question:
+  qui: Crew member · kitchen
+  texte: What temperature do we cook the chicken to?
+  reponse:
+    libelle: Network sheet · Cooking
+    titre: 74 °C at the core
+    texte: Check with the probe thermometer before serving.
+    source: Cooking sheet · PDF
+    lire: Read out loud
+lecture:
+  qui: Crew member · kitchen
+  texte: Read me the whole sheet.
+  libelle: Read out loud · Cooking sheet
+  titre: Breaded chicken, step by step
+  etapes:
+    - { texte: Fryer preheated, valeur: 170 °C }
+    - { texte: Cooking time, valeur: 6 min }
+    - { texte: Probe check, valeur: 74 °C at the core }
+  pastilles:
+    - BunBun manual · Cooking v2
+    - Profile · Lille Centre
+manager:
+  heure: '15:00'
+  app: Owl
+  contexte: Kitchen tablet · Lille Centre
+  question: How many questions during lunch service?
+  placeholder: Message Owl
+  libelle: Kitchen tablet · lunch service
+  questions: 14
+  unite: questions
+  sousTitre: 14 answers from the sheets
+  plusPosees: Most asked
+  lignes:
+    - { texte: Cooking the chicken, nombre: '×4', etat: Answered }
+    - { texte: Cleaning the fryer, nombre: '×3', etat: Answered }
+  transmises: { texte: Passed on to the manager, nombre: '0' }
+  tampon: No interruption

@@ -1,0 +1,67 @@
+agent: lark
+tableur:
+  fichier: Audits_2026.xlsx
+  feuilles:
+    - August
+    - September
+  colonnes:
+    restaurant: Restaurant
+    date: Date
+    score: Score
+    actions: Open actions
+  lignes:
+    - restaurant: Bordeaux Gare
+      date: 11/09
+      score: '88'
+      actions: '0'
+    - restaurant: Lille Centre
+      date: 18/09
+      score: '62'
+      actions: '3'
+      surligne:
+        - score
+        - actions
+    - restaurant: Lyon Part-Dieu
+      date: 25/09
+      actions: '2'
+    - restaurant: Nantes Centre
+      date: 30/09
+      score: '71'
+      actions: '2'
+      surligne:
+        - actions
+whatsapp:
+  groupe: BunBun Announcements
+  membres: You, Karim, Kevin, Sarah…
+  message:
+    texte: 'Reminder: new menu on Monday. Recipe cards are in the Drive, please confirm.'
+    heure: '09:12'
+  reaction: 👍 2
+  reponses:
+    - de: Karim
+      texte: Got it for Bordeaux
+      heure: '09:20'
+    - de: Kevin
+      texte: Ok
+      heure: '10:41'
+candidats:
+  app: Candidates
+  recherche: Search candidates
+  titre: Franchise applications
+  colonnes:
+    candidat: Candidate
+    statut: Status
+  lignes:
+    - nom: Julien Morel
+      ville: Rennes
+      statut: Incomplete file
+      depuis: 12 days ago
+    - nom: Thomas Leroy
+      ville: Nantes
+      statut: Call back
+      depuis: 5 days ago
+postit:
+  - 'Lille: audit 62'
+  - memo unread?
+  - call Thomas back
+  - call Sarah!

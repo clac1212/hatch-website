@@ -1,26 +1,15 @@
-# Labels shared by the agent pages (/en/agents/<slug>). {name} = agent name, {client} = customer name, {date} = date.
+# Section headings shared by the agent pages (/en/agents/<slug>), from Patrick's copy and the Pencil mock-ups. {name} = agent name.
 breadcrumb:
-  label: Breadcrumb
   home: Home
   agents: Agents
-problem:
-  kicker: The problem
-  answer: '{name} answers'
-actions:
-  kicker: What I do
-scenario:
-  kicker: A customer story
-tools:
-  kicker: Tools
-  title: The tools I work with
-faq:
-  kicker: FAQ
-  title: Your questions about {name}
+actions: What {name} does for you
+control:
+  title: You stay in control
+  agent: '{name} does on its own'
+  you: You decide
+example: A typical use
+with: It works with
+faq: Frequently asked questions
 related:
-  kicker: Teamwork
-  title: The agents I work with
-allCases: See customer stories
-cta:
-  title: See {name} at work, on your own documents
-  text: "We show you Hatch OS with your network's procedures, and what {name} does with them."
-updated: Updated on {date}
+  title: Going further
+  demo: See Hatch OS on your network

@@ -1,0 +1,52 @@
+# "What Jay does for you" wall, after the Pencil mock-up "Page agent — Jay".
+agent: jay
+outils:
+  titre: Plugs into the tools you already use
+  apps:
+    - { nom: Google Drive, icone: hard-drive, ton: vert }
+    - { nom: Notion, icone: notebook-text, ton: noir }
+    - { nom: Airtable, icone: table, ton: jaune }
+    - { nom: OneDrive / SharePoint, icone: cloud, ton: bleu }
+  synchro: Synced last night · 02:00
+imports:
+  titre: Imports your PDFs
+  fichiers:
+    - { type: PDF, ton: rouge }
+    - { type: XLS, ton: vert }
+    - { type: MP4, ton: violet }
+acces:
+  titre: Sets who sees what
+  profils:
+    - { texte: Managers, voit: true }
+    - { texte: Franchisees, voit: true }
+    - { texte: Crew, voit: false }
+sources:
+  titre: Cites its sources
+  document: BunBun · Kitchen opening sheet
+  avant:
+    - 'Turn on the hood and the pass lights.'
+  passage: 'Turn the fryers on 30 min before service, then check the temperatures.'
+  apres:
+    - 'Fill the sauce tubs and date the containers.'
+    - 'Sign off the opening checklist.'
+  source: 'Source: Opening sheet · Google Drive'
+exclure:
+  titre: Lets you exclude a document
+  document: Opening procedure v2
+  etat: Excluded from answers
+nourrit:
+  titre: Feeds the other agents
+  agents:
+    - { agent: peep, nom: Peep, texte: on WhatsApp }
+    - { agent: owl, nom: Owl, texte: on the tablet }
+    - { agent: pecker, nom: Pecker, texte: in training }
+redaction:
+  titre: Helps you write
+  fiche: Fryer cleaning
+  selection: Drain the oil once it has cooled.
+  suite: Filter it, then clean the tank.
+  menu: Edit with Jay
+  actions:
+    - Rephrase
+    - Complete
+    - Structure

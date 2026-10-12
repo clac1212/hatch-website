@@ -1,0 +1,69 @@
+# Scène « Exemple d'usage » de Jay : chaque étape montre l'appareil de la personne qui agit (César 11/10).
+agent: jay
+siege:
+  app: Hatch OS
+  contexte: Documentation · Sources
+  titre: Connecter une source
+  connecteurs:
+    - { nom: Google Drive, icone: hard-drive, ton: vert }
+    - { nom: Notion, icone: notebook-text, ton: noir }
+    - { nom: Airtable, icone: table, ton: jaune }
+    - { nom: OneDrive / SharePoint, icone: cloud, ton: bleu }
+  connecter: Connecter
+  connecte: Connecté
+  choix:
+    titre: Choisir un dossier
+    dossiers:
+      - { nom: Manuel opératoire, meta: 214 fichiers }
+      - { nom: Marketing, meta: 58 fichiers }
+      - { nom: Archives 2024, meta: 1 302 fichiers }
+    choisi: 0
+  index:
+    libelle: Jay indexe
+    dossier: Manuel opératoire
+    total: 214
+    unite: documents
+    lignes:
+      - { texte: Fiche ouverture, etat: À jour, ton: vert }
+      - { texte: Nettoyage friteuse v4, etat: À jour, ton: vert }
+      - { texte: Procédure ouverture v2, etat: Exclue des réponses, ton: gris }
+    fin: Synchronisé
+    nuit: Resynchro chaque nuit · 02:00
+telephone:
+  heure: '21:40'
+  contact: Peep
+  statut: en ligne
+  ecrit: écrit…
+  jour: Aujourd'hui
+  question: "Demain j'ouvre seul, c'est quoi la procédure d'ouverture ?"
+  placeholder: Message
+  reponse:
+    intro: "L'ouverture en quatre étapes :"
+    etapes:
+      - "Allumer la hotte et l'éclairage du passe."
+      - 'Allumer les friteuses 30 min avant le service, puis contrôler les températures.'
+      - 'Remplir les bacs à sauce et dater les contenants.'
+      - "Valider la check-list d'ouverture."
+    source: { libelle: Source, titre: Fiche ouverture, meta: Google Drive · Manuel opératoire }
+    signature: Peep · 21:40
+drive:
+  fichier: Fiche ouverture cuisine
+  chemin: Manuel opératoire › Ouverture
+  enregistre: Enregistré dans Drive
+  auteur: Claire
+  titre: BunBun · Fiche ouverture cuisine
+  etapes:
+    - "Allumer la hotte et l'éclairage du passe."
+    - 'Allumer les friteuses 30 min avant le service, puis contrôler les températures.'
+    - 'Remplir les bacs à sauce et dater les contenants.'
+    - "Valider la check-list d'ouverture."
+  ajout: 'Chambre froide : entre 0 et 4 °C, noter le relevé.'
+  sous: 1
+  nuit: Cette nuit · 02:00 · Jay resynchronise
+  synchro:
+    libelle: Resynchronisé cette nuit · 02:00
+    titre: Fiche ouverture · v3
+    lignes:
+      - { texte: Fiche ouverture v3, etat: À jour, ton: vert }
+      - { texte: Fiche ouverture v2, etat: Remplacée, ton: gris }
+      - { texte: 'Réponses de Peep, Owl et Pecker', etat: Nouvelle version, ton: bleu }

@@ -1,0 +1,33 @@
+agent: owl
+classeur:
+  titre: Procédures cuisine
+  sousTitre: BunBun · Lille Centre
+  fiche: Cuisson · Poulet pané
+  intercalaires:
+    - Cuisson
+    - Hygiène
+    - Nettoyage
+  postit: Ne pas sortir du bureau !
+drive:
+  onglet: Fiches cuisine · Drive
+  chemin:
+    - Mon Drive
+    - BunBun
+    - Fiches cuisine
+  colonnes:
+    nom: Nom
+    modifie: Modifié
+  fichiers:
+    - nom: Cuisson_poulet_v2.pdf
+      modifie: il y a 4 mois
+    - nom: Nettoyage_friteuse.pdf
+      modifie: il y a 4 mois
+    - nom: Allergenes_carte_ete.pdf
+      modifie: il y a 5 mois
+whatsapp:
+  contact: Léo · Manager
+  statut: vu aujourd'hui à 10:12
+  message: Le poulet, c'est combien de minutes à la friteuse déjà ?
+  heure: '12:41'
+  relance: '??'
+  heureRelance: '12:47'

@@ -1,0 +1,23 @@
+# Mur « Ce que Owl fait pour vous », d'après la maquette Pencil « Page agent — Owl ».
+agent: owl
+kiosque:
+  titre: Tourne en mode kiosque
+voix:
+  titre: Comprend la voix
+  question: « Combien de frites par portion ? »
+  pastille: Dictée vocale
+documents:
+  titre: Répond à partir de vos documents
+  extrait: Frites · 150 g par portion
+  sources:
+    - { texte: Fiches recettes, source: Google Drive, icone: file-text }
+    - { texte: Nettoyage friteuse, source: Notion, icone: sparkles }
+    - { texte: Plan HACCP, source: PDF, icone: shield-check }
+restaurant:
+  titre: S'adapte au restaurant
+  ecran: Profil de la tablette
+  tablette: Tablette · Lille Centre
+  etiquettes:
+    - Food court
+    - Carte d'automne
+    - Hauts-de-France

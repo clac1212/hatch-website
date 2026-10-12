@@ -215,6 +215,14 @@ export const demoCles = [
  * has two (candidates, openings). `cle` ties it to its marker and camera in
  * Demo.astro; Sparrow has two (candidates, openings).
  */
+/** Any of the four demo screens. */
+const ecran = z.discriminatedUnion('appareil', [
+  ecranTablette,
+  ecranTelephone,
+  ecranFormation,
+  ecranTableau,
+]);
+
 const demoAgent = z.strictObject({
   cle: z.enum(demoCles),
   nom: texte,
@@ -222,12 +230,7 @@ const demoAgent = z.strictObject({
   role: texte,
   /** What its demo shows, one sentence. */
   titre: texte,
-  ecran: z.discriminatedUnion('appareil', [
-    ecranTablette,
-    ecranTelephone,
-    ecranFormation,
-    ecranTableau,
-  ]),
+  ecran,
 });
 
 const lieu = z.strictObject({

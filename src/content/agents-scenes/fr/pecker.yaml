@@ -1,0 +1,53 @@
+# Scène « Exemple d'usage » de Pecker : chaque étape montre l'appareil de celui qui agit (César 11/10).
+agent: pecker
+siege:
+  app: Hatch OS
+  contexte: Équipe · Lille Centre
+  equipe:
+    - { nom: Emma Martin, role: Équipière }
+    - { nom: Léo Benali, role: Manager }
+  nouveau: { nom: Yanis Diallo, role: Équipier, badge: "Arrivé aujourd'hui" }
+  regle:
+    libelle: Déclencheur
+    quand: Quand un équipier arrive
+    alors: "Envoyer le parcours d'accueil"
+  envoye: Envoyé à Yanis sur WhatsApp
+telephone:
+  heure: '9:05'
+  date: Lundi 12 octobre
+  notif:
+    app: WhatsApp
+    quand: maintenant
+    titre: BunBun Formation
+    texte: "Bienvenue Yanis ! Ton parcours d'accueil t'attend."
+  contact: BunBun Formation
+  statut: Compte professionnel
+  message: 'Bonjour Yanis, voici ta formation. Un clic suffit, sans appli ni mot de passe.'
+  carte: { titre: "Parcours d'accueil", meta: 3 modules · s'ouvre dans le navigateur }
+  bouton: Ouvrir la formation
+formation:
+  module: Module 2 · Hygiène
+  n: 2
+  total: 3
+  question: "À l'ouverture, la chambre froide affiche 6 °C. Tu fais quoi ?"
+  options:
+    - "J'ouvre, ça va redescendre"
+    - Je préviens le manager
+    - Je baisse le thermostat
+  bonne: 1
+  retour: Bien vu. Au-dessus de 4 °C, on alerte et on trace.
+  relance:
+    app: Pecker
+    quand: J+3
+    titre: Il te reste un module
+    texte: 'Tu en étais au module 3, on le finit pendant ta pause ?'
+  fin: { titre: Parcours validé, texte: "Bravo Yanis, ton parcours d'accueil est terminé." }
+evaluation:
+  entete: Évaluation au poste
+  equipier: Yanis Diallo · Caisse
+  grille:
+    - { texte: Accueil client, etat: Validé, valide: true }
+    - { texte: Mise en place, etat: Validé, valide: true }
+    - { texte: Encaissement, etat: À revoir, valide: false }
+  score: 17 / 20
+  tampon: PDF archivé

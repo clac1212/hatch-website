@@ -1,0 +1,73 @@
+# Scène « Exemple d'usage » de Peep : chaque étape montre l'appareil de celui qui agit (César 11/10).
+agent: peep
+redaction:
+  app: Hatch OS
+  contexte: Communications · Nouvelle annonce
+  demande:
+    qui: Claire · siège
+    texte: "Peep, prépare l'annonce du burger d'automne, avec la fiche et trois questions de quiz."
+  agent: Peep
+  redige: Peep rédige…
+  annonce:
+    titre: "Burger d'automne"
+    texte: Disponible dès lundi dans les restaurants concernés. La fiche est jointe.
+    fiche: { titre: "Fiche recette · Burger d'automne", meta: 2 pages · PDF }
+  quiz:
+    libelle: Quiz · 3 questions
+    questions:
+      - "Quels allergènes contient le burger d'automne ?"
+      - Combien de tranches de courge rôtie dans un burger ?
+      - "Jusqu'à quand reste-t-il à la carte ?"
+  boutons: [Modifier, Choisir les restaurants]
+telephone:
+  heure: '9:00'
+  date: Lundi 12 octobre
+  notif:
+    app: WhatsApp
+    quand: maintenant
+    titre: Peep · BunBun
+    texte: "Nouveau : le burger d'automne arrive aujourd'hui. Fiche et quiz à l'intérieur."
+  contact: Peep · BunBun
+  statut: Compte professionnel
+  jour: "Aujourd'hui"
+  annonce:
+    titre: "Burger d'automne"
+    texte: "Disponible dès aujourd'hui dans ton restaurant. La fiche est jointe."
+    fiche: { titre: "Fiche recette · Burger d'automne", meta: 2 pages · PDF }
+    heure: '9:00'
+  quiz: { titre: Quiz · 3 questions, meta: 2 minutes, bouton: Commencer le quiz }
+  reponse: { texte: Commencer le quiz, heure: '9:01' }
+  question: { texte: "1/3 · Quels allergènes contient le burger d'automne ?", heure: '9:01' }
+suivi:
+  app: Hatch OS
+  contexte: "Communications · Burger d'automne"
+  libelle: Suivi de lecture · mardi 13 octobre
+  lus: 10
+  total: 12
+  legende: restaurants ont lu
+  onglets: [Tous, Non lus]
+  restaurants:
+    - { nom: Lille Centre, etat: 'Lu · 09:12', lu: true }
+    - { nom: Lyon Part-Dieu, etat: 'Lu · 09:40', lu: true }
+    - { nom: Lille Flandres, etat: 'Lu · 10:05', lu: true }
+    - { nom: Marseille Prado, etat: 'Lu · 11:30', lu: true }
+    - { nom: Nantes Centre, etat: Non ouvert, lu: false }
+    - { nom: Bordeaux Gare, etat: Non ouvert, lu: false }
+  relance:
+    bouton: Relancer maintenant
+    fait: Relance envoyée
+    etat: Relancé
+    auto: 'Sinon, Peep relance tout seul à 14:00.'
+  quiz:
+    libelle: Quiz de compréhension
+    texte: "38 équipiers l'ont passé · 92 % de bonnes réponses"
+question:
+  saisie: Message
+  texte: 'La sauce, on la met avant ou après le cheddar ?'
+  heure: '11:20'
+  ecrit: Peep écrit…
+  reponse:
+    source: { titre: "Fiche recette · Burger d'automne", meta: Étape 4 · Dressage }
+    titre: 'Après le cheddar, juste avant de refermer.'
+    texte: "C'est l'étape 4 du dressage, photo à l'appui dans la fiche."
+    signature: Peep · 11:20

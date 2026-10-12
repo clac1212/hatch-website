@@ -1,0 +1,69 @@
+# Jay's "A typical use" scene: each step shows the device of whoever acts (César 11/10).
+agent: jay
+siege:
+  app: Hatch OS
+  contexte: Documentation · Sources
+  titre: Connect a source
+  connecteurs:
+    - { nom: Google Drive, icone: hard-drive, ton: vert }
+    - { nom: Notion, icone: notebook-text, ton: noir }
+    - { nom: Airtable, icone: table, ton: jaune }
+    - { nom: OneDrive / SharePoint, icone: cloud, ton: bleu }
+  connecter: Connect
+  connecte: Connected
+  choix:
+    titre: Choose a folder
+    dossiers:
+      - { nom: Operations manual, meta: 214 files }
+      - { nom: Marketing, meta: 58 files }
+      - { nom: Archive 2024, meta: '1,302 files' }
+    choisi: 0
+  index:
+    libelle: Jay is indexing
+    dossier: Operations manual
+    total: 214
+    unite: documents
+    lignes:
+      - { texte: Opening sheet, etat: Up to date, ton: vert }
+      - { texte: Fryer cleaning v4, etat: Up to date, ton: vert }
+      - { texte: Opening procedure v2, etat: Excluded from answers, ton: gris }
+    fin: Synced
+    nuit: Resynced every night · 02:00
+telephone:
+  heure: '21:40'
+  contact: Peep
+  statut: online
+  ecrit: typing…
+  jour: Today
+  question: "I'm opening on my own tomorrow, what's the opening procedure?"
+  placeholder: Message
+  reponse:
+    intro: 'Opening, in four steps:'
+    etapes:
+      - 'Turn on the hood and the pass lights.'
+      - 'Turn the fryers on 30 min before service, then check the temperatures.'
+      - 'Fill the sauce tubs and date the containers.'
+      - 'Sign off the opening checklist.'
+    source: { libelle: Source, titre: Opening sheet, meta: Google Drive · Operations manual }
+    signature: Peep · 21:40
+drive:
+  fichier: Kitchen opening sheet
+  chemin: Operations manual › Opening
+  enregistre: Saved to Drive
+  auteur: Claire
+  titre: BunBun · Kitchen opening sheet
+  etapes:
+    - 'Turn on the hood and the pass lights.'
+    - 'Turn the fryers on 30 min before service, then check the temperatures.'
+    - 'Fill the sauce tubs and date the containers.'
+    - 'Sign off the opening checklist.'
+  ajout: 'Cold room: between 0 and 4 °C, log the reading.'
+  sous: 1
+  nuit: Overnight · 02:00 · Jay resyncs
+  synchro:
+    libelle: Resynced overnight · 02:00
+    titre: Opening sheet · v3
+    lignes:
+      - { texte: Opening sheet v3, etat: Up to date, ton: vert }
+      - { texte: Opening sheet v2, etat: Replaced, ton: gris }
+      - { texte: 'Answers from Peep, Owl and Pecker', etat: New version, ton: bleu }

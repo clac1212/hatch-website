@@ -1,0 +1,68 @@
+# Lark's "A typical use" scene: each step shows the device of whoever acts (César 11/10).
+# Claire, at BunBun head office, Monday 12 October 08:45. Signals held to the demo's truth table:
+# Peep, "Allergen posters" sent the week before, 27 / 30 read (unread Metz Centre, Lille Centre,
+# Rennes Centre); Finch, Nantes Centre audit with two critical actions; Sparrow, BunBun Bordeaux
+# opening on track (D-18).
+agent: lark
+accueil:
+  app: Hatch OS
+  contexte: BunBun network
+  date: Monday 12 October · 08:45
+  bonjour: Good morning Claire, here is what needs your attention this week.
+  brief:
+    agent: Lark
+    libelle: Monday brief
+    texte: 'Three restaurants have not read “Allergen posters” and the Nantes Centre audit has two critical actions still open. Bordeaux is on track.'
+  signaux:
+    - agent: peep
+      source: Peep · communications
+      titre: '“Allergen posters” · 27 / 30 read'
+      etat: Follow up
+      ton: orange
+      details: [Metz Centre, Lille Centre, Rennes Centre]
+    - agent: finch
+      source: Finch · audits
+      titre: Nantes Centre audit
+      etat: 2 critical actions
+      ton: rouge
+      details: [Cold room door seal, Cold room at 6 °C]
+    - agent: sparrow
+      source: Sparrow · openings
+      titre: BunBun Bordeaux opening
+      etat: D-18 · on track
+      ton: vert
+      details: []
+  source: Peep, Finch and Sparrow · last 7 days
+  bouton: Call the franchisees
+  envoye: List sent to your iPhone
+telephone:
+  heure: '8:47'
+  date: Monday 12 October
+  notif:
+    app: Hatch OS
+    quand: now
+    titre: Lark
+    texte: '4 franchisees to call this morning, the list is ready.'
+  liste:
+    titre: To call this morning
+    sous: 4 franchisees · prepared by Lark
+    message: 'I sorted them by urgency. Antoine first: his audit has two critical actions still open.'
+    appels:
+      - { nom: Antoine, site: Nantes Centre, motif: Audit · 2 critical actions, ton: rouge }
+      - { nom: Sonia, site: Metz Centre, motif: Posters unread, ton: orange }
+      - { nom: Sarah, site: Lille Centre, motif: Posters unread, ton: orange }
+      - { nom: Nicolas, site: Rennes Centre, motif: Posters unread, ton: orange }
+    source: Peep · Finch · numbers from the contact card
+  appel:
+    nom: Antoine
+    site: BunBun Nantes Centre
+    sonne: calling…
+    secondes: 9
+    commandes: [mute, keypad, speaker]
+    note:
+      titre: Lark's note
+      texte: 'Audit of 9 October, two critical actions still open:'
+      lignes:
+        - Cold room door seal
+        - Cold room at 6 °C
+      pied: To fix before Friday, photo proof in Finch.

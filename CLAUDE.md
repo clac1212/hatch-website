@@ -41,19 +41,23 @@ pnpm format:check
 
 ## Where things live
 
-| What                                | Where                                                                        |
-| ----------------------------------- | ---------------------------------------------------------------------------- |
-| Home page copy                      | `src/content/home/{fr,en}.yaml`, one block per section                       |
-| Agents (7, + future agent pages)    | `src/content/agents/{fr,en}/<slug>.md`                                       |
-| Content schemas (Zod, strict)       | `src/content.config.ts`: exact filename, Astro discovers it                  |
-| Short UI strings, routes per locale | `src/i18n/ui.ts`                                                             |
-| Design tokens                       | `src/styles/global.css` under `@theme`                                       |
-| Layout, nav, footer                 | `src/layouts/Base.astro`, `src/components/{Nav,Footer}.astro`                |
-| DS primitives                       | `src/components/ui/` (Button, Logo…), mirroring the Pencil components        |
-| Home sections                       | `src/components/sections/*.astro`, one component per section                 |
-| Page bodies shared by FR and EN     | `src/views/*.astro`; `src/pages/**` files only pick the locale               |
-| Images                              | `src/assets/` (optimised by Astro), never `public/` unless it must stay raw  |
-| Fonts                               | Astro Fonts API in `astro.config.mjs`; Departure Mono in `src/assets/fonts/` |
+| What                                | Where                                                                                                              |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Home page copy                      | `src/content/home/{fr,en}.yaml`, one block per section                                                             |
+| Agents (7, + future agent pages)    | `src/content/agents/{fr,en}/<slug>.md`                                                                             |
+| Agent pages: feature wall copy      | `src/content/agents-bento/{fr,en}/<slug>.yaml`, one schema per agent in `src/content/schemas/bento/`               |
+| Agent pages: components             | `src/views/AgentPage.astro`, `src/components/agents/` (Mur, Tuile, Exemple, `bento/<Agent>.astro`)                 |
+| Agent pages: problem objects        | `src/content/agents-probleme/{fr,en}/<slug>.yaml`, `src/content/schemas/agent-probleme/`, `probleme/<Agent>.astro` |
+| Agent pages: usage-example scenes   | `src/content/agents-scenes/{fr,en}/<slug>.yaml`, `src/content/schemas/scenes/`, `scenes/<Agent>.astro`             |
+| Content schemas (Zod, strict)       | `src/content.config.ts`: exact filename, Astro discovers it                                                        |
+| Short UI strings, routes per locale | `src/i18n/ui.ts`                                                                                                   |
+| Design tokens                       | `src/styles/global.css` under `@theme`                                                                             |
+| Layout, nav, footer                 | `src/layouts/Base.astro`, `src/components/{Nav,Footer}.astro`                                                      |
+| DS primitives                       | `src/components/ui/` (Button, Logo…), mirroring the Pencil components                                              |
+| Home sections                       | `src/components/sections/*.astro`, one component per section                                                       |
+| Page bodies shared by FR and EN     | `src/views/*.astro`; `src/pages/**` files only pick the locale                                                     |
+| Images                              | `src/assets/` (optimised by Astro), never `public/` unless it must stay raw                                        |
+| Fonts                               | Astro Fonts API in `astro.config.mjs`; Departure Mono in `src/assets/fonts/`                                       |
 
 ## Content rules
 
@@ -61,9 +65,9 @@ pnpm format:check
 - FR and EN must have **identical keys**. The Zod schemas are strict objects, so a missing or extra key fails the build.
 - A new page gets an entry in `routes` (`src/i18n/ui.ts`) with its URL in both locales, and a file under `src/pages/` and `src/pages/en/`.
 - Writing rules from the DS:
-  - one H1 per page, in Departure Mono, stating a fact; exception: the home hero title is in Fraunces 600 (more legible over the map, César 01/10);
+  - one H1 per page, in Departure Mono, stating a fact; exception: the home hero title is in Fraunces 600 (more legible over the map, César 01/10), and so are the agent pages' H1s (César 12/10);
   - a kicker naming the section's function;
-  - agents presented by job first, speaking in the first person;
+  - agents presented by job first, speaking in the first person; exception: the agent pages (`/agents/<slug>`) are Patrick's copy (Notion « 08 · Pages agents »), in the third person and taken word for word (César 09/10), only the agent's `pitch` stays in the first person; except the problem block, rewritten landing-page style: a short title naming the pain, one or two concrete sentences, no « a network told us » (César 12/10);
   - every number carries a source;
   - no em dash inside a sentence, no « opérationnel en quelques minutes ».
 - Two calls to action, the classic SaaS pair (César 06/10): the demo, primary (`Button variant="orange"`, « Réserver une démo » / « Book a demo » → `/demo`, Cal.com), and access to the platform, secondary: « Se connecter » / « Log in » as a text link in the nav (`appUrls.login`; the app's /auth page also lets a newcomer sign up), « Essayer Hatch OS » / « Try Hatch OS » as a `secondary` button in the hero (`appUrls.signup`). Every other CTA (pricing, footer, inner pages) is the demo alone. App URLs live in `appUrls` (src/i18n/ui.ts).
@@ -88,7 +92,7 @@ pnpm format:check
 ## Motion and accessibility
 
 - Pinned scroll sections share one engine (`src/scripts/pistes.ts`, lot 4). Every animation respects `prefers-reduced-motion`, and content stays readable without JS.
-- Real `<a>`/`<button>`, one `h1` then `h2`/`h3`, landmarks, a pause control on anything that auto-plays. Pixel-font labels are real text, never vectorised SVG.
+- Real `<a>`/`<button>`, one `h1` then `h2`/`h3`, landmarks, a pause control on anything that auto-plays in a loop; an animation that plays once and stops on its last state needs none (the agent pages' scenarios, César 09/10). Living details that repeat (the agent pages' walls) stay under 5 s in total, so they need no control either (WCAG 2.2.2). Pixel-font labels are real text, never vectorised SVG.
 - Budget: < 3 MB on first load of the home. Below-the-fold images lazy-load through `<Image>`/`<Picture>`.
 
 ## Git

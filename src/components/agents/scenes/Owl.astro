@@ -1,0 +1,988 @@
+---
+import { Image } from 'astro:assets';
+import type { SceneDe } from '../../../content/schemas/scenes';
+import IphoneReel from '../IphoneReel.astro';
+import Ipad from '../../ui/Ipad.astro';
+import Icone from '../Icone.astro';
+import { avatars } from '../../pages/agent-visuels';
+
+/**
+ * Owl's "Exemple d'usage" scene (César 11/10): each step shows the device of whoever acts, the
+ * previous one steps back (Exemple.astro's engine, `data-etapes`: device, screen, seconds).
+ * 1. The kitchen tablet in kiosk mode (dark, as on Owl's wall): a finger taps the mic, the crew
+ *    member's voice moves the waveform, the words write themselves, Owl thinks, the network's sheet
+ *    lands with the core temperature, and Owl's own (orange) voice answers.
+ * 2. The same tablet: "read me the whole sheet", then Owl reads it aloud, a highlight walking down
+ *    the steps and ticking each one, the probe check staying lit.
+ * 3. The manager's iPhone at 15:00: he types his question to Owl and sends it, Owl types, the
+ *    question count climbs to 14, the most asked come in, none was passed on to him, the stamp.
+ * Each screen's markup is its final state; `.joue` (set by the engine) replays its beats, each
+ * timed by `--t` (seconds from the screen's start).
+ */
+interface Props {
+  d: SceneDe<'owl'>;
+}
+const { d } = Astro.props;
+const etapes = [
+  { a: 'tablette', e: 0, d: 8.6 },
+  { a: 'tablette', e: 1, d: 8.6 },
+  { a: 'tel', e: 0, d: 9 },
+];
+
+/** A sentence cut into words, French punctuation kept with its word. */
+const mots = (texte: string) => texte.replace(/ ([?!:;])/g, ' $1').split(' ');
+/** Words appearing one by one between `de` and `a` seconds. */
+const tempo = (texte: string, de: number, a: number) => {
+  const m = mots(texte);
+  return m.map((mot, i) => ({ mot, t: de + (i * (a - de)) / Math.max(1, m.length - 1) }));
+};
+
+/** The waveform's bars (height in %); `o` offsets each bar's beat so the wave looks spoken. */
+const ONDE = [
+  18, 34, 56, 40, 74, 52, 90, 64, 100, 70, 44, 80, 96, 58, 32, 50, 84, 66, 38, 60, 28, 46, 22, 14,
+].map((h, i) => ({ h, o: ((i * 7) % 5) * 0.06 }));
+
+/**
+ * One voice per screen: when the crew member speaks (white bars) and when Owl does (orange bars),
+ * [start, length] in seconds. The status under the mic follows.
+ */
+const voix = [
+  { equipier: [0.8, 2.8], owl: [5.6, 1.8] },
+  { equipier: [0.3, 1.4], owl: [2.4, 4.5] },
+];
+---
+
+<div class="pile" data-etapes={JSON.stringify(etapes)}>
+  <div class="appareil devant" data-appareil="tablette">
+    <div class="tablette">
+      <Ipad>
+        {
+          voix.map((v, n) => (
+            <div
+              class:list={['kiosque', { on: n === 0 }]}
+              data-ecran={n}
+              style={`--e0:${v.equipier[0]}s;--e1:${v.equipier[1]}s;--o0:${v.owl[0]}s;--o1:${v.owl[1]}s;--ne:${2 * Math.round(v.equipier[1] / 0.7)};--no:${2 * Math.round(v.owl[1] / 0.6)};--na:${Math.round(v.equipier[1] / 0.9)}`}
+            >
+              <p class="k-barre">
+                <Image src={avatars.owl} alt="" width={40} densities={[1]} class="k-av" />
+                <b>{d.kiosque.app}</b>
+                <span class="flex-1">{d.kiosque.contexte}</span>
+                <span class="k-mode">
+                  <Icone nom="lock" taille={11} />
+                  {d.kiosque.mode}
+                </span>
+              </p>
+              <div class="k-corps">
+                <div class="voix">
+                  <Image src={avatars.owl} alt="" width={160} densities={[1]} class="hibou" />
+                  <span class="onde">
+                    {ONDE.map((b) => (
+                      <span style={`height:${b.h}%;--o:${b.o}s`} />
+                    ))}
+                  </span>
+                  <span class="micro">
+                    <Icone nom="mic" taille={16} />
+                    {n === 0 && <span class="doigt" />}
+                  </span>
+                  <span class="statut">
+                    <span class="s-repos">{d.kiosque.repos}</span>
+                    <span class="s-ecoute">{d.kiosque.ecoute}</span>
+                    <span class="s-parle">{d.kiosque.parle}</span>
+                  </span>
+                </div>
+
+                {n === 0 ? (
+                  <div class="fil">
+                    <p class="dit b" style="--t:0.8s">
+                      <span class="dit-qui">
+                        <Icone nom="mic" taille={10} />
+                        {d.question.qui}
+                      </span>
+                      <span>
+                        {tempo(d.question.texte, 1, 3.3).map((m) => (
+                          <span class="mot" style={`--t:${m.t}s`}>
+                            {m.mot}{' '}
+                          </span>
+                        ))}
+                      </span>
+                    </p>
+                    <span class="points" style="--t:3.8s;--l:0.8s">
+                      <span />
+                      <span />
+                      <span />
+                    </span>
+                    <div class="fiche b" style="--t:4.6s">
+                      <p class="fiche-libelle">
+                        <Icone nom="file-text" taille={12} />
+                        {d.question.reponse.libelle}
+                      </p>
+                      <p class="temp">
+                        <span class="temp-icone">
+                          <Icone nom="thermometer" taille={18} />
+                        </span>
+                        <b>{d.question.reponse.titre}</b>
+                      </p>
+                      <p class="fiche-texte b" style="--t:5.3s">
+                        {d.question.reponse.texte}
+                      </p>
+                      <p class="pastilles b" style="--t:5.7s">
+                        <span class="pastille">
+                          <Icone nom="book-open" taille={10} />
+                          {d.question.reponse.source}
+                        </span>
+                        <span class="pastille sombre">
+                          <Icone nom="volume-2" taille={10} />
+                          {d.question.reponse.lire}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div class="fil">
+                    <p class="dit b" style="--t:0.3s">
+                      <span class="dit-qui">
+                        <Icone nom="mic" taille={10} />
+                        {d.lecture.qui}
+                      </span>
+                      <span>
+                        {tempo(d.lecture.texte, 0.5, 1.6).map((m) => (
+                          <span class="mot" style={`--t:${m.t}s`}>
+                            {m.mot}{' '}
+                          </span>
+                        ))}
+                      </span>
+                    </p>
+                    <div class="fiche b" style="--t:2s">
+                      <p class="fiche-libelle">
+                        <Icone nom="volume-2" taille={12} />
+                        {d.lecture.libelle}
+                      </p>
+                      <p class="fiche-titre">{d.lecture.titre}</p>
+                      <ol class="etapes-fiche">
+                        {d.lecture.etapes.map((e, i, tout) => (
+                          <li
+                            class:list={{ cle: i === tout.length - 1 }}
+                            style={`--t:${2.6 + i * 1.5}s`}
+                          >
+                            <span class="num">{i + 1}</span>
+                            <span class="flex-1">{e.texte}</span>
+                            <b>{e.valeur}</b>
+                          </li>
+                        ))}
+                      </ol>
+                      <p class="pastilles b" style="--t:7s">
+                        <span class="pastille">
+                          <Icone nom="file-text" taille={10} />
+                          {d.lecture.pastilles[0]}
+                        </span>
+                        <span class="pastille sombre">
+                          <Icone nom="tablet" taille={10} />
+                          {d.lecture.pastilles[1]}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))
+        }
+      </Ipad>
+    </div>
+  </div>
+
+  <div class="appareil" data-appareil="tel">
+    <div class="tel">
+      <IphoneReel>
+        <div class="ecran-tel on" data-ecran="0">
+          <p class="t-statut">
+            <span>{d.manager.heure}</span>
+            <span class="t-icones">
+              <Icone nom="signal" taille={12} />
+              <Icone nom="wifi" taille={12} />
+              <Icone nom="battery-full" taille={14} />
+            </span>
+          </p>
+          <p class="t-tete">
+            <Icone nom="chevron-left" taille={14} />
+            <Image src={avatars.owl} alt="" width={40} densities={[1]} class="t-av" />
+            <span class="flex flex-col">
+              <b>{d.manager.app}</b>
+              <span>{d.manager.contexte}</span>
+            </span>
+          </p>
+          <div class="t-fil">
+            <p class="moi b" style="--t:3s">{d.manager.question}</p>
+            <span class="points clair" style="--t:3.5s;--l:0.8s">
+              <span></span>
+              <span></span>
+              <span></span>
+            </span>
+            <div class="bilan b" style="--t:4.3s">
+              <p class="fiche-libelle">
+                <Icone nom="chart-bar" taille={11} />
+                {d.manager.libelle}
+              </p>
+              <p class="compte">
+                <b class="compteur" style={`--ow-n:${d.manager.questions}`}></b>
+                <span>{d.manager.unite}</span>
+              </p>
+              <p class="bilan-sous b" style="--t:5.7s">{d.manager.sousTitre}</p>
+              <p class="bilan-label b" style="--t:6s">{d.manager.plusPosees}</p>
+              <ul class="bilan-lignes">
+                {
+                  d.manager.lignes.map((l, i) => (
+                    <li class="b" style={`--t:${6.2 + i * 0.4}s`}>
+                      <span class="flex-1">{l.texte}</span>
+                      <span class="fois">{l.nombre}</span>
+                      <span class="ok">
+                        <Icone nom="check" taille={10} />
+                        {l.etat}
+                      </span>
+                    </li>
+                  ))
+                }
+                <li class="transmises b" style={`--t:${6.4 + d.manager.lignes.length * 0.4}s`}>
+                  <span class="flex-1">{d.manager.transmises.texte}</span>
+                  <b>{d.manager.transmises.nombre}</b>
+                </li>
+              </ul>
+              <span class="tampon">
+                <Icone nom="check" taille={11} />
+                {d.manager.tampon}
+              </span>
+            </div>
+          </div>
+          <p class="saisie">
+            <span class="champ">
+              <span class="champ-vide">{d.manager.placeholder}</span>
+              <span class="champ-tape">
+                {
+                  tempo(d.manager.question, 0.6, 2.4).map((m) => (
+                    <span class="mot" style={`--t:${m.t}s`}>
+                      {m.mot}{' '}
+                    </span>
+                  ))
+                }
+              </span>
+            </span>
+            <span class="envoyer">
+              <Icone nom="arrow-up" taille={13} />
+              <span class="doigt"></span>
+            </span>
+          </p>
+        </div>
+      </IphoneReel>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Generic beat: arrives at `--t` when its screen plays. */
+  .joue .b {
+    animation: ow-arrive 0.55s var(--ease-entree) var(--t, 0s) both;
+  }
+  @keyframes ow-arrive {
+    from {
+      opacity: 0;
+      translate: 0 10px;
+    }
+  }
+  /* A word of a sentence being spoken or typed. */
+  .joue .mot {
+    animation: ow-mot 0.25s var(--ease-doux) var(--t) both;
+  }
+  @keyframes ow-mot {
+    from {
+      opacity: 0;
+    }
+  }
+  /* Typing dots: only there while the answer is being found, from `--t` for `--l`. */
+  .points {
+    display: none;
+  }
+  .joue .points {
+    display: inline-flex;
+    gap: 1cqw;
+    align-self: flex-start;
+    height: 0;
+    padding: 0 3cqw;
+    overflow: hidden;
+    opacity: 0;
+    animation: ow-points var(--l) linear var(--t);
+  }
+  @keyframes ow-points {
+    0%,
+    100% {
+      height: 0;
+      padding-block: 0;
+      opacity: 0;
+    }
+    12%,
+    88% {
+      height: 6cqw;
+      padding-block: 2.2cqw;
+      opacity: 1;
+    }
+  }
+  .points span {
+    width: 1.6cqw;
+    height: 1.6cqw;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-white) 70%, transparent);
+    animation: ow-saut 0.6s var(--ease-doux) calc(var(--t) + var(--i, 0s)) 2;
+  }
+  .points span:nth-child(2) {
+    --i: 0.15s;
+  }
+  .points span:nth-child(3) {
+    --i: 0.3s;
+  }
+  @keyframes ow-saut {
+    50% {
+      translate: 0 -40%;
+    }
+  }
+  /* A fingertip presses at its moment, then lifts off. */
+  .doigt {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 11cqw;
+    height: 11cqw;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-white) 30%, transparent);
+    box-shadow: 0 0 0 2cqw color-mix(in srgb, var(--color-white) 12%, transparent);
+    translate: -50% -50%;
+    opacity: 0;
+    pointer-events: none;
+  }
+  @keyframes ow-tape {
+    0% {
+      opacity: 0;
+      scale: 1.6;
+    }
+    35% {
+      opacity: 1;
+      scale: 1;
+    }
+    55% {
+      scale: 0.85;
+    }
+    100% {
+      opacity: 0;
+      scale: 1.1;
+    }
+  }
+  @keyframes ow-pop {
+    from {
+      scale: 0.4;
+      opacity: 0;
+    }
+  }
+
+  /* 1 and 2. The kitchen tablet, in kiosk mode: dark like Owl's wall, nothing but Owl. */
+  .tablette {
+    width: min(560px, 100%);
+  }
+  .kiosque {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-night);
+    font-family: var(--font-sans);
+    color: var(--color-white);
+  }
+  .k-barre {
+    display: flex;
+    align-items: center;
+    gap: 1.6cqw;
+    padding: 2.2cqw 3.4cqw;
+    border-bottom: 1px solid var(--color-line-night);
+    font-size: 2.5cqw;
+    color: color-mix(in srgb, var(--color-white) 60%, transparent);
+  }
+  .k-barre b {
+    font: 700 3cqw/1 var(--font-display);
+    color: var(--color-white);
+  }
+  .k-av {
+    width: 4.4cqw;
+    height: 4.4cqw;
+  }
+  .k-mode {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8cqw;
+    padding: 0.7cqw 1.6cqw;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-white) 8%, transparent);
+    font: 400 2cqw/1 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .k-mode :global(svg) {
+    width: 2.2cqw;
+    height: 2.2cqw;
+  }
+  .k-corps {
+    display: grid;
+    flex: 1;
+    grid-template-columns: 34% 1fr;
+    min-height: 0;
+  }
+
+  /* The voice column: Owl, the waveform, the mic, its state. */
+  .voix {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2.6cqw;
+    padding: 2cqw;
+    border-right: 1px solid var(--color-line-night);
+  }
+  .hibou {
+    width: 15cqw;
+    height: 15cqw;
+    object-fit: contain;
+  }
+  .onde {
+    display: flex;
+    align-items: center;
+    gap: 0.55cqw;
+    height: 9cqw;
+  }
+  .onde span {
+    width: 0.75cqw;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-white) 70%, transparent);
+    scale: 1 0.12;
+  }
+  .joue .onde span {
+    animation:
+      ow-onde 0.35s ease-in-out calc(var(--e0) + var(--o)) var(--ne) alternate,
+      ow-onde-owl 0.3s ease-in-out calc(var(--o0) + var(--o)) var(--no) alternate;
+  }
+  @keyframes ow-onde {
+    from {
+      scale: 1 0.15;
+    }
+    to {
+      scale: 1 1;
+    }
+  }
+  @keyframes ow-onde-owl {
+    from {
+      scale: 1 0.2;
+      background: var(--color-orange);
+    }
+    to {
+      scale: 1 1;
+      background: var(--color-orange);
+    }
+  }
+  .micro {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 9cqw;
+    height: 9cqw;
+    border-radius: 999px;
+    background: var(--color-orange);
+    color: var(--color-ink);
+  }
+  .micro :global(svg) {
+    width: 4cqw;
+    height: 4cqw;
+  }
+  /* While it listens, the mic's ring breathes. */
+  .joue .micro {
+    animation: ow-anneau 0.9s var(--ease-doux) var(--e0) var(--na);
+  }
+  @keyframes ow-anneau {
+    0% {
+      box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-orange) 55%, transparent);
+    }
+    100% {
+      box-shadow: 0 0 0 3cqw color-mix(in srgb, var(--color-orange) 0%, transparent);
+    }
+  }
+  .joue .micro .doigt {
+    animation: ow-tape 0.9s var(--ease-doux) 0.2s both;
+  }
+  .statut {
+    display: grid;
+    font: 400 2cqw/1.3 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-align: center;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--color-white) 60%, transparent);
+  }
+  .statut span {
+    grid-area: 1 / 1;
+  }
+  .s-ecoute,
+  .s-parle {
+    opacity: 0;
+  }
+  .s-parle {
+    color: var(--color-orange);
+  }
+  .joue .s-repos {
+    animation: ow-masque calc(var(--o0) + var(--o1) - var(--e0) + 0.2s) linear var(--e0);
+  }
+  .joue .s-ecoute {
+    animation: ow-fenetre var(--e1) linear var(--e0);
+  }
+  .joue .s-parle {
+    animation: ow-fenetre calc(var(--o1) + 0.2s) linear var(--o0);
+  }
+  @keyframes ow-masque {
+    0%,
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes ow-fenetre {
+    0%,
+    100% {
+      opacity: 0;
+    }
+    6%,
+    94% {
+      opacity: 1;
+    }
+  }
+
+  /* The conversation column. */
+  .fil {
+    display: flex;
+    flex-direction: column;
+    gap: 1.8cqw;
+    padding: 2.6cqw 3.4cqw;
+    min-height: 0;
+  }
+  .dit {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8cqw;
+    align-self: flex-end;
+    max-width: 92%;
+    padding: 1.6cqw 2.4cqw;
+    border-radius: 2.6cqw 2.6cqw 0.8cqw 2.6cqw;
+    background: color-mix(in srgb, var(--color-white) 10%, transparent);
+    font-size: 3.1cqw;
+    line-height: 1.35;
+  }
+  .dit-qui {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8cqw;
+    font: 400 1.9cqw/1.2 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--color-white) 60%, transparent);
+  }
+  .dit-qui :global(svg) {
+    width: 2.2cqw;
+    height: 2.2cqw;
+    color: var(--color-orange);
+  }
+  .fiche {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4cqw;
+    padding: 2.4cqw 3cqw;
+    border-radius: 2.4cqw;
+    background: var(--color-white);
+    box-shadow: var(--shadow-2);
+    color: var(--color-ink);
+  }
+  .fiche-libelle {
+    display: flex;
+    align-items: center;
+    gap: 1cqw;
+    font-size: 2.3cqw;
+    font-weight: 600;
+    color: var(--color-orange-txt);
+  }
+  .fiche-libelle :global(svg) {
+    width: 2.6cqw;
+    height: 2.6cqw;
+  }
+  .temp {
+    display: flex;
+    align-items: center;
+    gap: 2cqw;
+  }
+  .temp-icone {
+    display: grid;
+    place-items: center;
+    width: 7.4cqw;
+    height: 7.4cqw;
+    border-radius: 1.8cqw;
+    background: var(--color-orange-tint);
+    color: var(--color-orange-txt);
+  }
+  .temp-icone :global(svg) {
+    width: 4cqw;
+    height: 4cqw;
+  }
+  .temp b {
+    font: 700 6.4cqw/1 var(--font-display);
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .joue .temp {
+    animation: ow-pop 0.5s var(--ease-pop) 5s both;
+  }
+  .fiche-texte {
+    font-size: 2.6cqw;
+    line-height: 1.4;
+    color: var(--color-soft);
+  }
+  .pastilles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.2cqw;
+  }
+  .pastille {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8cqw;
+    padding: 0.9cqw 1.8cqw;
+    border-radius: 999px;
+    background: var(--color-mur);
+    font-size: 2.1cqw;
+    font-weight: 600;
+    color: var(--color-gray-700);
+  }
+  .pastille :global(svg) {
+    width: 2.2cqw;
+    height: 2.2cqw;
+  }
+  .pastille.sombre {
+    background: var(--color-ink);
+    color: var(--color-white);
+  }
+
+  /* 2. The whole sheet read aloud: a highlight walks down the steps, ticking each one. */
+  .fiche-titre {
+    font: 700 3.3cqw/1.15 var(--font-display);
+  }
+  .etapes-fiche li {
+    display: flex;
+    align-items: center;
+    gap: 1.8cqw;
+    margin: 0 -1.2cqw;
+    padding: 1.1cqw 1.2cqw;
+    border-radius: 1.2cqw;
+    font-size: 2.6cqw;
+  }
+  .etapes-fiche li + li {
+    border-top: 1px solid var(--color-ligne-claire);
+  }
+  .etapes-fiche b {
+    font-size: 2.6cqw;
+    font-weight: 600;
+    color: var(--color-gray-700);
+  }
+  .num {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 3.8cqw;
+    height: 3.8cqw;
+    border-radius: 999px;
+    background: var(--color-orange);
+    font: 700 2cqw/1 var(--font-sans);
+    color: var(--color-ink);
+  }
+  .etapes-fiche .cle {
+    background: var(--color-orange-tint);
+  }
+  .etapes-fiche .cle b {
+    color: var(--color-orange-txt);
+  }
+  .joue .etapes-fiche li {
+    animation: ow-lu 1.5s var(--ease-doux) var(--t);
+  }
+  .joue .etapes-fiche .cle {
+    animation: ow-allume 0.35s var(--ease-doux) var(--t) both;
+  }
+  .joue .num {
+    animation: ow-coche 0.35s var(--ease-pop) var(--t) both;
+  }
+  @keyframes ow-lu {
+    0%,
+    100% {
+      background: transparent;
+    }
+    12%,
+    85% {
+      background: var(--color-orange-tint);
+    }
+  }
+  @keyframes ow-allume {
+    from {
+      background: transparent;
+    }
+  }
+  @keyframes ow-coche {
+    from {
+      background: var(--color-gray-100);
+      color: var(--color-gray-500);
+      scale: 0.85;
+    }
+  }
+
+  /* 3. The manager's iPhone at 15:00: his chat with Owl. */
+  .tel {
+    width: 250px;
+  }
+  .ecran-tel {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--color-galet);
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+  }
+  .t-statut {
+    position: absolute;
+    top: 4.4cqw;
+    right: 8cqw;
+    left: 11cqw;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 4.6cqw;
+    font-weight: 600;
+  }
+  .t-icones {
+    display: flex;
+    align-items: center;
+    gap: 1.2cqw;
+  }
+  .t-icones :global(svg) {
+    width: 4.4cqw;
+    height: 4.4cqw;
+  }
+  .t-icones :global(svg:last-child) {
+    width: 6cqw;
+    height: 6cqw;
+  }
+  .t-tete {
+    display: flex;
+    align-items: center;
+    gap: 2.5cqw;
+    padding: 15cqw 4cqw 3cqw;
+    border-bottom: 1px solid var(--color-ligne-claire);
+    background: var(--color-white);
+    font-size: 3.8cqw;
+    color: var(--color-gray-500);
+  }
+  .t-tete b {
+    font: 700 5.2cqw/1.1 var(--font-display);
+    color: var(--color-ink);
+  }
+  .t-av {
+    width: 9cqw;
+    height: 9cqw;
+  }
+  .t-fil {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 3cqw;
+    padding: 5cqw 4cqw;
+  }
+  .moi {
+    align-self: flex-end;
+    max-width: 82%;
+    padding: 3cqw 3.6cqw;
+    border-radius: 4cqw 4cqw 1.2cqw 4cqw;
+    background: var(--color-ink);
+    font-size: 4.6cqw;
+    line-height: 1.35;
+    color: var(--color-white);
+  }
+  .points.clair {
+    border-radius: 4cqw;
+    background: var(--color-white);
+  }
+  .points.clair span {
+    background: var(--color-gray-400);
+  }
+  .bilan {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 2.2cqw;
+    padding: 4.4cqw;
+    border-radius: 4cqw;
+    background: var(--color-white);
+    box-shadow: inset 0 0 0 1px var(--color-ligne-claire);
+  }
+  .bilan .fiche-libelle {
+    gap: 1.5cqw;
+    font-size: 3.9cqw;
+  }
+  .bilan .fiche-libelle :global(svg) {
+    width: 4.2cqw;
+    height: 4.2cqw;
+  }
+  .compte {
+    display: flex;
+    align-items: baseline;
+    gap: 2cqw;
+    font-size: 5.2cqw;
+    font-weight: 600;
+  }
+  /* The count climbs from 0 to its value (a registered integer, so it steps through the numbers). */
+  @property --ow-n {
+    syntax: '<integer>';
+    inherits: false;
+    initial-value: 0;
+  }
+  .compteur {
+    font: 700 17cqw/1 var(--font-display);
+    letter-spacing: -0.03em;
+    counter-reset: ow-n var(--ow-n);
+  }
+  .compteur::before {
+    content: counter(ow-n);
+  }
+  .joue .compteur {
+    animation: ow-compte 1.2s var(--ease-doux) 4.6s both;
+  }
+  @keyframes ow-compte {
+    from {
+      --ow-n: 0;
+    }
+  }
+  .bilan-sous {
+    font-size: 4.2cqw;
+    color: var(--color-soft);
+  }
+  .bilan-label {
+    margin-top: 2cqw;
+    font: 400 3.4cqw/1.2 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-gray-500);
+  }
+  .bilan-lignes li {
+    display: flex;
+    align-items: center;
+    gap: 2cqw;
+    padding: 3cqw 0;
+    border-top: 1px solid var(--color-ligne-claire);
+    font-size: 4.3cqw;
+  }
+  .fois {
+    font: 400 3.6cqw/1 var(--font-mono);
+    color: var(--color-gray-500);
+  }
+  .ok {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8cqw;
+    font-size: 3.7cqw;
+    font-weight: 600;
+    color: var(--color-success-txt);
+  }
+  .transmises b {
+    font: 700 6cqw/1 var(--font-display);
+  }
+  .tampon {
+    display: inline-flex;
+    align-items: center;
+    gap: 1.5cqw;
+    align-self: flex-start;
+    margin-top: 1.5cqw;
+    padding: 2cqw 3.4cqw;
+    border-radius: 999px;
+    background: var(--color-ink);
+    font-size: 3.9cqw;
+    font-weight: 600;
+    color: var(--color-white);
+  }
+  .joue .tampon {
+    animation: ow-pop 0.45s var(--ease-pop) 7.6s both;
+  }
+
+  /* The composer: the question types itself, a tap on send, the field empties. */
+  .saisie {
+    display: flex;
+    align-items: center;
+    gap: 2.5cqw;
+    padding: 3cqw 4cqw 9cqw;
+    border-top: 1px solid var(--color-ligne-claire);
+    background: var(--color-white);
+  }
+  .champ {
+    display: grid;
+    flex: 1;
+    min-width: 0;
+    padding: 2.6cqw 3.6cqw;
+    border-radius: 999px;
+    background: var(--color-galet);
+    box-shadow: inset 0 0 0 1px var(--color-ligne-claire);
+    font-size: 4.2cqw;
+    line-height: 1.3;
+  }
+  .champ > span {
+    grid-area: 1 / 1;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .champ-vide {
+    color: var(--color-gray-500);
+  }
+  .champ-tape {
+    display: flex;
+    justify-content: flex-end;
+    opacity: 0;
+  }
+  /* Flex items trim their spaces, so the gap between words is a margin. */
+  .champ-tape .mot {
+    flex: none;
+    margin-right: 0.28em;
+  }
+  .joue .champ-vide {
+    animation: ow-masque 2.9s linear 0.5s;
+  }
+  .joue .champ-tape {
+    animation: ow-tape-champ 2.5s linear 0.5s;
+  }
+  @keyframes ow-tape-champ {
+    0%,
+    99% {
+      opacity: 1;
+    }
+  }
+  .envoyer {
+    position: relative;
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 9cqw;
+    height: 9cqw;
+    border-radius: 999px;
+    background: var(--color-orange);
+    color: var(--color-ink);
+  }
+  .envoyer .doigt {
+    background: color-mix(in srgb, var(--color-ink) 22%, transparent);
+    box-shadow: 0 0 0 2cqw color-mix(in srgb, var(--color-ink) 8%, transparent);
+  }
+  .joue .envoyer .doigt {
+    animation: ow-tape 0.9s var(--ease-doux) 2.4s both;
+  }
+</style>

@@ -163,20 +163,16 @@ export const sansFiltrePage = z.strictObject({
 });
 
 /**
- * Chrome of the agent pages (`/agents/<slug>`, src/views/AgentPage.astro): section labels shared by
- * the seven agents. `{name}` is replaced by the agent's name, `{client}` by a customer's, `{date}` by
- * the formatted date.
+ * Chrome of the agent pages (`/agents/<slug>`, src/views/AgentPage.astro): the section headings
+ * shared by the seven agents, as Patrick wrote them. `{name}` is replaced by the agent's name.
  */
-const kickerTitle = z.strictObject({ kicker: z.string(), title: z.string() });
 export const agentPage = z.strictObject({
-  breadcrumb: z.strictObject({ label: z.string(), home: z.string(), agents: z.string() }),
-  problem: z.strictObject({ kicker: z.string(), answer: z.string() }),
-  actions: z.strictObject({ kicker: z.string() }),
-  scenario: z.strictObject({ kicker: z.string() }),
-  tools: kickerTitle,
-  faq: kickerTitle,
-  related: kickerTitle,
-  allCases: z.string(),
-  cta: z.strictObject({ title: z.string(), text: z.string() }),
-  updated: z.string(),
+  /** Names of the breadcrumb's first two steps (structured data only, not shown). */
+  breadcrumb: z.strictObject({ home: z.string(), agents: z.string() }),
+  actions: z.string(),
+  control: z.strictObject({ title: z.string(), agent: z.string(), you: z.string() }),
+  example: z.string(),
+  with: z.string(),
+  faq: z.string(),
+  related: z.strictObject({ title: z.string(), demo: z.string() }),
 });

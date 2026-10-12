@@ -1,0 +1,46 @@
+# Scène « Exemple d'usage » d'Owl : chaque étape montre l'appareil de celui qui agit (César 11/10).
+agent: owl
+kiosque:
+  app: Owl
+  contexte: Tablette cuisine · Lille Centre
+  mode: Mode kiosque
+  repos: Touche pour parler
+  ecoute: "Je t'écoute"
+  parle: Je réponds à voix haute
+question:
+  qui: Équipier · cuisine
+  texte: Quelle est la température de cuisson du poulet ?
+  reponse:
+    libelle: Fiche du réseau · Cuisson
+    titre: 74 °C à cœur
+    texte: Contrôler au thermomètre sonde avant de servir.
+    source: Fiche Cuisson · PDF
+    lire: Lire à voix haute
+lecture:
+  qui: Équipier · cuisine
+  texte: Lis-moi la fiche en entier.
+  libelle: Lu à voix haute · Fiche Cuisson
+  titre: Poulet pané, étape par étape
+  etapes:
+    - { texte: Friteuse préchauffée, valeur: 170 °C }
+    - { texte: Temps de cuisson, valeur: 6 min }
+    - { texte: Contrôle à la sonde, valeur: 74 °C à cœur }
+  pastilles:
+    - Manuel BunBun · Cuisson v2
+    - Profil · Lille Centre
+manager:
+  heure: '15:00'
+  app: Owl
+  contexte: Tablette cuisine · Lille Centre
+  question: Combien de questions pendant le service de midi ?
+  placeholder: Écrire à Owl
+  libelle: Tablette cuisine · service de midi
+  questions: 14
+  unite: questions
+  sousTitre: 14 réponses tirées des fiches
+  plusPosees: Les plus posées
+  lignes:
+    - { texte: Cuisson du poulet, nombre: '×4', etat: Répondu }
+    - { texte: Nettoyage friteuse, nombre: '×3', etat: Répondu }
+  transmises: { texte: Transmises au manager, nombre: '0' }
+  tampon: Aucune interruption

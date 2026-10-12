@@ -1,0 +1,53 @@
+# Pecker's "A typical use" scene: each step shows the device of whoever acts (César 11/10).
+agent: pecker
+siege:
+  app: Hatch OS
+  contexte: Team · Lille Centre
+  equipe:
+    - { nom: Emma Martin, role: Crew member }
+    - { nom: Léo Benali, role: Manager }
+  nouveau: { nom: Yanis Diallo, role: Crew member, badge: Joined today }
+  regle:
+    libelle: Trigger
+    quand: When a crew member joins
+    alors: Send the onboarding course
+  envoye: Sent to Yanis on WhatsApp
+telephone:
+  heure: '9:05'
+  date: Monday 12 October
+  notif:
+    app: WhatsApp
+    quand: now
+    titre: BunBun Training
+    texte: 'Welcome Yanis! Your onboarding course is waiting.'
+  contact: BunBun Training
+  statut: Business account
+  message: 'Hi Yanis, here is your training. One tap, no app and no password.'
+  carte: { titre: Onboarding course, meta: 3 modules · opens in the browser }
+  bouton: Open the course
+formation:
+  module: Module 2 · Hygiene
+  n: 2
+  total: 3
+  question: 'At opening, the cold room reads 6 °C. What do you do?'
+  options:
+    - "I open, it'll cool down"
+    - I tell the manager
+    - I turn the thermostat down
+  bonne: 1
+  retour: Well spotted. Above 4 °C, we alert and log it.
+  relance:
+    app: Pecker
+    quand: Day 3
+    titre: One module left
+    texte: 'You stopped at module 3, shall we finish it on your break?'
+  fin: { titre: Course completed, texte: 'Well done Yanis, your onboarding course is finished.' }
+evaluation:
+  entete: On-the-job assessment
+  equipier: Yanis Diallo · Till
+  grille:
+    - { texte: Customer welcome, etat: Passed, valide: true }
+    - { texte: Setup, etat: Passed, valide: true }
+    - { texte: Payment, etat: To review, valide: false }
+  score: 17 / 20
+  tampon: PDF filed

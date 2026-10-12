@@ -1,0 +1,983 @@
+---
+import { Image, Picture } from 'astro:assets';
+import type { BentoDe } from '../../../content/schemas/bento';
+import Tuile from '../Tuile.astro';
+import Icone from '../Icone.astro';
+import IphoneReel from '../IphoneReel.astro';
+import Ipad from '../../ui/Ipad.astro';
+import { centres } from '../visuels';
+import equipier from '../../../assets/agents/pecker/equipier.jpg';
+import sonnette from '../../../assets/agents/pecker/sonnette.jpg';
+
+/**
+ * Pecker's feature wall, in mixed registers (after Finch, César 11/10): a real phone, a field photo,
+ * a voxel object, a dark score tile, typography, a sheet of paper, an iPad, stacked course cards.
+ * The centre tile (Pecker's render, drawn by Mur.astro) is at column 3, row 2.
+ */
+interface Props {
+  d: BentoDe<'pecker'>;
+}
+const { d } = Astro.props;
+const teinte = centres.pecker.fond;
+const justes = d.quiz.reponses.filter(Boolean).length;
+const initiale = (s: string) => s.charAt(0);
+---
+
+<Tuile
+  col={1}
+  row={1}
+  w={2}
+  h={2}
+  titre={d.lien.titre}
+  class="t-pecker-lien"
+  style={`background-color:${teinte}`}
+>
+  <div class="scene">
+    <div class="tel" data-c>
+      <IphoneReel>
+        <div class="wa">
+          <p class="wa-statut">{d.lien.heure}</p>
+          <p class="wa-tete">
+            <Icone nom="chevron-left" taille={12} />
+            <span class="wa-avatar">{initiale(d.lien.expediteur)}</span>
+            <span class="wa-qui">
+              <b>{d.lien.expediteur}</b>
+              <span>{d.lien.compte}</span>
+            </span>
+          </p>
+          <div class="wa-fil">
+            <span class="wa-jour">{d.lien.jour}</span>
+            <div class="wa-bulle">
+              <div class="wa-apercu">
+                <Image
+                  src={centres.pecker.src}
+                  alt=""
+                  width={360}
+                  class="wa-image"
+                  loading="lazy"
+                />
+                <p class="wa-carte">
+                  <b>{d.lien.parcours}</b>
+                  <span>{d.lien.meta}</span>
+                </p>
+              </div>
+              <p class="wa-texte">
+                {d.lien.message}
+                <span class="wa-heure">{d.lien.envoi}</span>
+              </p>
+              <p class="wa-bouton">
+                <Icone nom="external-link" taille={10} />
+                {d.lien.bouton}
+                <span class="wa-tap" data-amb="pouls" aria-hidden="true"></span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </IphoneReel>
+    </div>
+    <ul class="garanties">
+      {
+        d.lien.garanties.map((g, i) => (
+          <li class={`garantie garantie-${i}`} data-c style={`--i:${i + 2}`}>
+            <Icone nom="check" taille={12} />
+            {g}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</Tuile>
+
+<Tuile col={3} row={1} w={1} h={1} titre={d.declencheurs.titre} class="t-pecker-declencheurs">
+  <div class="terrain">
+    <Picture
+      src={equipier}
+      alt=""
+      formats={['avif', 'webp']}
+      widths={[400, 600]}
+      sizes="200px"
+      class="terrain-image"
+    />
+    <p class="evenement" data-c>
+      <span class="eclair" data-amb="flash"><Icone nom="zap" taille={12} /></span>
+      <span class="evenement-texte">
+        <b>{d.declencheurs.evenement}</b>
+        <span>
+          <Icone nom="arrow-right" taille={9} />
+          {d.declencheurs.parcours}
+        </span>
+      </span>
+    </p>
+  </div>
+</Tuile>
+
+<Tuile col={4} row={1} w={1} h={1} titre={d.relance.titre} class="t-pecker-relance" plein>
+  <Picture
+    src={sonnette}
+    alt=""
+    formats={['avif', 'webp']}
+    widths={[400, 600]}
+    sizes="200px"
+    class="relance-image"
+  />
+  <span class="relance-pastille" data-c>
+    <span class="inline-flex" data-amb="sonne"><Icone nom="bell-ring" taille={12} /></span>
+    {d.relance.pastille}
+  </span>
+</Tuile>
+
+<Tuile col={5} row={1} w={2} h={2} titre={d.quiz.titre} class="t-pecker-quiz">
+  <p class="score">
+    <span data-compte={justes}>{justes}</span>
+    <small>/ {d.quiz.reponses.length}</small>
+  </p>
+  <p class="score-legende">{d.quiz.legende}</p>
+  <ol class="cases" style={`--n:${d.quiz.reponses.length}`} aria-hidden="true">
+    {
+      d.quiz.reponses.map((juste, i) => (
+        <li class:list={['case', { juste }]} data-c style={`--i:${i + 1}`}>
+          <Icone nom={juste ? 'check' : 'x'} taille={14} />
+        </li>
+      ))
+    }
+  </ol>
+  <p class="rate" data-c style={`--i:${d.quiz.reponses.length + 1}`}>
+    <span class="rate-etat">{d.quiz.rate.etat}</span>
+    {d.quiz.rate.texte}
+  </p>
+</Tuile>
+
+<Tuile col={1} row={3} w={1} h={1} titre={d.traduction.titre}>
+  <div class="mots">
+    {
+      d.traduction.mots.map((m, i) => (
+        <p class={`mot mot-${i}`} lang={m.lang} data-c style={`--i:${i}`}>
+          {m.texte}
+        </p>
+      ))
+    }
+  </div>
+</Tuile>
+
+<Tuile col={2} row={3} w={1} h={1} titre={d.evaluation.titre} class="t-pecker-evaluation">
+  <div class="papier" data-c>
+    <p class="papier-titre">{d.evaluation.document}</p>
+    <ul>
+      {
+        d.evaluation.criteres.map((c) => (
+          <li>
+            <span>{c.texte}</span>
+            <span class:list={['coche', { valide: c.valide }]}>
+              {c.valide && <Icone nom="check" taille={11} />}
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+    <span class="tampon">{d.evaluation.tampon}</span>
+  </div>
+</Tuile>
+
+<Tuile col={5} row={3} w={2} h={2} titre={d.tableau.titre} class="t-pecker-tableau">
+  <div class="tablette" data-c>
+    <Ipad>
+      <div class="tb">
+        <p class="tb-tete">
+          <b>{d.tableau.ecran}</b>
+          <span>{d.tableau.texte}</span>
+        </p>
+        <ul class="tb-lignes">
+          {
+            d.tableau.lignes.map((l, i) => (
+              <li>
+                <span class="tb-avatar">{initiale(l.texte)}</span>
+                <span class="tb-nom">{l.texte}</span>
+                <span class="tb-piste">
+                  <span
+                    class={`tb-barre tb-barre-${l.ton}`}
+                    style={`width:${l.progression}%;--i:${i}`}
+                  />
+                </span>
+                <span class={`statut statut-${l.ton}`}>{l.etat}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </Ipad>
+  </div>
+</Tuile>
+
+<Tuile
+  col={1}
+  row={4}
+  w={4}
+  h={1}
+  titre={d.editeur.titre}
+  disposition="ligne"
+  class="t-pecker-editeur"
+>
+  <div class="editeur">
+    {
+      d.editeur.modules.map((m, i) => (
+        <div class={`module module-${i}`} data-c style={`--i:${i}`}>
+          <div
+            class={`couverture couverture-${m.type}`}
+            style={m.type === 'ecrans' ? `background-color:${teinte}` : undefined}
+            aria-hidden="true"
+          >
+            {m.type === 'ecrans' && (
+              <>
+                <span class="mini" />
+                <span class="mini" />
+                <span class="mini" />
+              </>
+            )}
+            {m.type === 'quiz' && <Icone nom="list-checks" taille={26} />}
+            {m.type === 'video' && (
+              <span class="lecture">
+                <Icone nom="play" taille={14} />
+              </span>
+            )}
+          </div>
+          <p class="module-texte">
+            <span>{m.numero}</span>
+            <b>{m.titre}</b>
+            <span>{m.meta}</span>
+          </p>
+        </div>
+      ))
+    }
+    <span class="ajouter" data-c data-amb="pouls" style={`--i:${d.editeur.modules.length}`}>
+      <Icone nom="plus" taille={18} />
+    </span>
+  </div>
+</Tuile>
+
+<style>
+  /* Lien magique: a real phone, slightly turned, cut by the tile's bottom; what it spares beside it. */
+  :global(.mur .t-pecker-lien .tuile-corps) {
+    align-items: stretch;
+    overflow: visible;
+  }
+  .scene {
+    position: relative;
+    flex: 1;
+  }
+  .tel {
+    width: 212px;
+    margin: 4px 0 0 34px;
+    rotate: -4deg;
+  }
+  .wa {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--color-whatsapp-wall);
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+  }
+  .wa-statut {
+    padding: 4.4cqw 9cqw 2cqw;
+    background: var(--color-white);
+    font-size: 4.8cqw;
+    font-weight: 600;
+  }
+  .wa-tete {
+    display: flex;
+    align-items: center;
+    gap: 2.2cqw;
+    padding: 1.5cqw 4cqw 3cqw;
+    background: var(--color-white);
+    box-shadow: 0 1px 0 var(--color-ligne-claire);
+  }
+  .wa-avatar {
+    display: grid;
+    place-items: center;
+    width: 9cqw;
+    height: 9cqw;
+    border-radius: 999px;
+    background: var(--color-orange);
+    font-size: 4.6cqw;
+    font-weight: 700;
+    color: var(--color-ink);
+  }
+  .wa-qui {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+  }
+  .wa-qui b {
+    font-size: 5cqw;
+    font-weight: 600;
+  }
+  .wa-qui span {
+    font-size: 3.8cqw;
+    color: var(--color-gray-700);
+  }
+  .wa-fil {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3cqw;
+    padding: 4cqw 4cqw;
+  }
+  .wa-jour {
+    align-self: center;
+    padding: 1cqw 3cqw;
+    border-radius: 2cqw;
+    background: var(--color-white);
+    font-size: 3.6cqw;
+    color: var(--color-gray-700);
+  }
+  .wa-bulle {
+    width: 88%;
+    padding: 1.6cqw 1.6cqw 0;
+    border-radius: 0 3.5cqw 3.5cqw;
+    background: var(--color-white);
+    box-shadow: 0 1px 1px color-mix(in srgb, var(--color-shadow) 10%, transparent);
+  }
+  .wa-apercu {
+    overflow: hidden;
+    border-radius: 2.4cqw;
+    background: var(--color-galet);
+  }
+  .wa-image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    object-position: 55% 72%;
+  }
+  .wa-carte {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6cqw;
+    padding: 2.2cqw 2.6cqw 2.6cqw;
+    line-height: 1.25;
+  }
+  .wa-carte b {
+    font-size: 4.6cqw;
+    font-weight: 600;
+  }
+  .wa-carte span {
+    font-size: 3.5cqw;
+    color: var(--color-gray-700);
+  }
+  .wa-texte {
+    padding: 2.4cqw 1.6cqw 1.8cqw;
+    font-size: 4.5cqw;
+    line-height: 1.35;
+  }
+  .wa-heure {
+    float: right;
+    margin: 1.6cqw 0 0 2cqw;
+    font-size: 3.2cqw;
+    color: var(--color-gray-700);
+  }
+  .wa-bouton {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.6cqw;
+    margin: 0 -1.6cqw;
+    padding: 3cqw 0 3.4cqw;
+    border-top: 1px solid var(--color-ligne-claire);
+    font-size: 4.5cqw;
+    font-weight: 600;
+    color: var(--color-statut-bleu);
+  }
+  /* The tap on the button, pulsing while the tile is on screen. */
+  .wa-tap {
+    position: absolute;
+    right: 18%;
+    top: 50%;
+    width: 9cqw;
+    height: 9cqw;
+    margin-top: -4.5cqw;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-statut-bleu) 22%, transparent);
+    box-shadow: 0 0 0 2cqw color-mix(in srgb, var(--color-statut-bleu) 10%, transparent);
+  }
+  .garanties {
+    position: absolute;
+    top: 52%;
+    right: 3%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+  }
+  .garantie {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px 7px 10px;
+    border-radius: 999px;
+    background: var(--color-white);
+    box-shadow:
+      0 0 0 1px var(--color-ligne-claire),
+      0 10px 24px color-mix(in srgb, var(--color-shadow) 16%, transparent);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+  .garantie :global(svg) {
+    color: var(--color-success-txt);
+  }
+  .garantie-0 {
+    rotate: 3deg;
+  }
+  .garantie-1 {
+    margin-right: 18px;
+    rotate: -2deg;
+  }
+  .garantie-2 {
+    rotate: 2deg;
+  }
+
+  /* Déclencheurs: the new crew member on his first day, the event that fires over the photo. */
+  :global(.mur .t-pecker-declencheurs .tuile-corps) {
+    align-items: stretch;
+  }
+  .terrain {
+    position: relative;
+    flex: 1;
+    min-height: 120px;
+    margin: 0 -16px -16px;
+  }
+  .terrain-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 62% 28%;
+  }
+  .evenement {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    left: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 9px;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--color-white) 82%, transparent);
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-2);
+  }
+  .eclair {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 7px;
+    background: var(--color-orange);
+    color: var(--color-ink);
+  }
+  .evenement-texte {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    line-height: 1.25;
+  }
+  .evenement-texte b {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+  .evenement-texte span {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10.5px;
+    color: var(--color-gray-700);
+  }
+
+  /* Relance: a voxel counter bell that has just rung, the reminder under it. */
+  :global(.mur .t-pecker-relance .tuile-tete) {
+    position: relative;
+    z-index: 1;
+    padding: 22px 12px 0;
+  }
+  .relance-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 62%;
+    /* Lower the bell a little, under the two-line title. */
+    scale: 1.12;
+    transform-origin: 50% 0;
+  }
+  .relance-pastille {
+    position: absolute;
+    right: 0;
+    bottom: 9px;
+    left: 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    width: fit-content;
+    margin: 0 auto;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-white) 88%, transparent);
+    box-shadow: var(--shadow-1);
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--color-ink);
+  }
+
+  /* Quiz: a dark tile, the score in large type, one cell per question. */
+  :global(.mur .tuile.t-pecker-quiz) {
+    background: var(--color-night);
+  }
+  :global(.mur .tuile.t-pecker-quiz .tuile-tete h3) {
+    color: var(--color-white);
+  }
+  :global(.mur .t-pecker-quiz .tuile-corps) {
+    justify-content: center;
+  }
+  .score {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font: 600 148px/0.9 var(--font-display);
+    letter-spacing: -0.04em;
+    color: var(--color-white);
+    font-variant-numeric: tabular-nums;
+  }
+  .score small {
+    font-size: 40px;
+    letter-spacing: -0.02em;
+    color: color-mix(in srgb, var(--color-white) 60%, transparent);
+  }
+  .score-legende {
+    margin-top: 14px;
+    font: 400 11px/1.2 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--color-white) 60%, transparent);
+  }
+  .cases {
+    display: grid;
+    grid-template-columns: repeat(var(--n), 1fr);
+    gap: 6px;
+    width: 100%;
+    max-width: 330px;
+    margin-top: 22px;
+  }
+  .case {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    border-radius: 7px;
+    box-shadow: inset 0 0 0 1.5px var(--color-line-night);
+    color: color-mix(in srgb, var(--color-white) 60%, transparent);
+  }
+  .case.juste {
+    box-shadow: none;
+    background: var(--color-orange);
+    color: var(--color-ink);
+  }
+  .rate {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+    font-size: 13px;
+    color: color-mix(in srgb, var(--color-white) 75%, transparent);
+  }
+  .rate-etat {
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-statut-rouge) 40%, transparent);
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--color-white);
+  }
+
+  /* Traduction: one word down the languages, each smaller than the last. */
+  .mots {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: -6px;
+    text-align: center;
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+  }
+  .mot:lang(bn) {
+    font-family: var(--font-sans);
+  }
+  .mot-0 {
+    font-size: 30px;
+    color: var(--color-ink);
+  }
+  .mot-1 {
+    font-size: 23px;
+    color: var(--color-trad-violet);
+  }
+  .mot-2 {
+    font-size: 18px;
+    color: var(--color-trad-bleu);
+  }
+  .mot-3 {
+    font-size: 14px;
+    color: var(--color-trad-magenta);
+  }
+  .mot-4 {
+    font-size: 12px;
+    color: var(--color-gray-700);
+  }
+
+  /* Évaluations: the grid on a sheet of paper, run off the tile, the filing stamp across it. */
+  :global(.mur .tuile.t-pecker-evaluation) {
+    background: var(--color-sand);
+  }
+  .papier {
+    position: relative;
+    width: min(148px, 100%);
+    margin: 2px 0 -40px;
+    padding: 12px 12px 30px;
+    border-radius: 4px;
+    background: var(--color-white);
+    box-shadow:
+      0 0 0 1px var(--color-ligne-claire),
+      0 12px 26px color-mix(in srgb, var(--color-shadow) 16%, transparent);
+    rotate: 2.5deg;
+  }
+  .papier-titre {
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--color-ligne-claire);
+    font: 400 9px/1.2 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-gray-700);
+  }
+  .papier li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px dashed var(--color-ligne-claire);
+    font-size: 11px;
+    color: var(--color-ink);
+  }
+  .coche {
+    display: grid;
+    place-items: center;
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    box-shadow: inset 0 0 0 1px var(--color-gray-400);
+  }
+  .coche.valide {
+    color: var(--color-success-txt);
+  }
+  .tampon {
+    position: absolute;
+    top: 46px;
+    right: -8px;
+    padding: 4px 8px;
+    border: 2px solid var(--color-statut-bleu);
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--color-white) 70%, transparent);
+    font: 700 10px/1 var(--font-sans);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--color-statut-bleu);
+    rotate: -14deg;
+  }
+  :global(.mur.js) .tampon {
+    scale: 1.6;
+    opacity: 0;
+  }
+  :global(.mur.js .vu) .tampon {
+    scale: 1;
+    opacity: 1;
+    transition:
+      scale 0.45s var(--ease-pop) 0.9s,
+      opacity 0.2s 0.9s;
+  }
+
+  /* Tableau de bord: the crew's progress on an iPad, turned and cut by the tile's edges. */
+  :global(.mur .t-pecker-tableau .tuile-corps) {
+    align-items: flex-start;
+    justify-content: flex-end;
+    overflow: visible;
+  }
+  /* 430 px at 1440 (the tile's width + 46 px), scaled down with the tile below. */
+  .tablette {
+    width: min(430px, calc(100% + 46px));
+    margin: 0 -26px -44px 0;
+    rotate: -3deg;
+  }
+  .tb {
+    display: flex;
+    flex-direction: column;
+    gap: 3.6cqw;
+    height: 100%;
+    padding: 5cqw 6cqw;
+    background: var(--color-white);
+    font-family: var(--font-sans);
+  }
+  .tb-tete {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8cqw;
+  }
+  .tb-tete b {
+    font-size: 3.4cqw;
+    color: var(--color-ink);
+  }
+  .tb-tete span {
+    font-size: 2.6cqw;
+    color: var(--color-gray-700);
+  }
+  .tb-lignes li {
+    display: grid;
+    grid-template-columns: 5.4cqw 1fr 20cqw 15cqw;
+    align-items: center;
+    gap: 2.4cqw;
+    padding: 1.5cqw 0;
+    font-size: 2.6cqw;
+    color: var(--color-ink);
+  }
+  .tb-lignes li + li {
+    border-top: 1px solid var(--color-ligne-claire);
+  }
+  .tb-avatar {
+    display: grid;
+    place-items: center;
+    width: 5.4cqw;
+    height: 5.4cqw;
+    border-radius: 999px;
+    background: var(--color-galet);
+    box-shadow: inset 0 0 0 1px var(--color-ligne-claire);
+    font-size: 2.4cqw;
+    font-weight: 600;
+    color: var(--color-gray-700);
+  }
+  .tb-nom {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .tb-piste {
+    display: block;
+    height: 1.4cqw;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--color-gray-100);
+  }
+  .tb-barre {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    transform-origin: left;
+  }
+  .tb-barre-vert {
+    background: var(--color-success);
+  }
+  .tb-barre-orange {
+    background: var(--color-orange);
+  }
+  .tb-barre-rouge {
+    background: var(--color-statut-rouge);
+  }
+  .tb-barre-gris,
+  .tb-barre-bleu {
+    background: var(--color-gray-400);
+  }
+  :global(.mur.js) .tb-barre {
+    scale: 0 1;
+  }
+  :global(.mur.js .vu) .tb-barre {
+    scale: 1 1;
+    transition: scale 1s var(--ease-doux) calc(0.4s + var(--i) * 0.12s);
+  }
+  .statut {
+    justify-self: end;
+    padding: 0.5cqw 1.8cqw;
+    border-radius: 999px;
+    font-size: 2.3cqw;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .statut-vert {
+    background: var(--color-statut-vert-tint);
+    color: var(--color-success-txt);
+  }
+  .statut-orange {
+    background: var(--color-amber-tint);
+    color: var(--color-amber-txt);
+  }
+  .statut-rouge {
+    background: var(--color-statut-rouge-tint);
+    color: var(--color-statut-rouge);
+  }
+  .statut-gris,
+  .statut-bleu {
+    box-shadow: inset 0 0 0 1px var(--color-ligne-claire);
+    color: var(--color-gray-700);
+  }
+
+  /* Éditeur: the course's modules as cards fanned on the table, each with its cover, then add. */
+  :global(.mur .tuile.t-pecker-editeur) {
+    background: var(--color-paper);
+  }
+  .editeur {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 8px 0;
+  }
+  .module {
+    position: relative;
+    flex: 0 1 168px;
+    min-width: 0;
+    overflow: hidden;
+    border-radius: 14px;
+    background: var(--color-white);
+    box-shadow:
+      0 0 0 1px var(--color-ligne-claire),
+      0 12px 26px color-mix(in srgb, var(--color-shadow) 14%, transparent);
+  }
+  .module + .module {
+    margin-left: -16px;
+  }
+  .module-0 {
+    rotate: -3deg;
+  }
+  /* Raised on `top`: the reveal owns `translate` on `data-c` elements. */
+  .module-1 {
+    top: -6px;
+    z-index: 1;
+    rotate: 1.5deg;
+  }
+  .module-2 {
+    z-index: 2;
+    rotate: -1deg;
+  }
+  .couverture {
+    display: grid;
+    place-items: center;
+    height: 68px;
+  }
+  .couverture-ecrans {
+    position: relative;
+  }
+  .mini {
+    position: absolute;
+    top: 14px;
+    width: 26px;
+    height: 46px;
+    border-radius: 5px;
+    background: var(--color-white);
+    box-shadow:
+      0 0 0 1px var(--color-ligne-claire),
+      0 4px 10px color-mix(in srgb, var(--color-shadow) 12%, transparent);
+  }
+  .mini:nth-child(1) {
+    translate: -22px 4px;
+    rotate: -8deg;
+  }
+  .mini:nth-child(2) {
+    translate: 22px 4px;
+    rotate: 8deg;
+  }
+  .mini:nth-child(3) {
+    top: 10px;
+  }
+  .couverture-quiz {
+    background: var(--color-orange-tint);
+    color: var(--color-orange-txt);
+  }
+  .couverture-video {
+    background: var(--color-night);
+  }
+  .lecture {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    padding-left: 2px;
+    border-radius: 999px;
+    background: var(--color-white);
+    color: var(--color-night);
+  }
+  .lecture :global(svg) {
+    fill: currentColor;
+  }
+  .module-texte {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 9px 12px 11px;
+    font-size: 10.5px;
+    line-height: 1.3;
+    color: var(--color-gray-700);
+  }
+  .module-texte b {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+  .ajouter {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin-left: 18px;
+    border-radius: 999px;
+    background: var(--color-ink);
+    color: var(--color-white);
+  }
+
+  @media (min-width: 64rem) and (max-width: 79.99rem) {
+    .mot-0 {
+      font-size: 26px;
+    }
+    .mot-1 {
+      font-size: 21px;
+    }
+  }
+  @media (max-width: 39.99rem) {
+    .tel {
+      margin-left: 14px;
+    }
+    .garantie {
+      font-size: 12px;
+    }
+    .tablette {
+      width: 100%;
+      margin: 6px 0 -40px;
+    }
+    .mot-0 {
+      font-size: 24px;
+    }
+    .mot-1 {
+      font-size: 19px;
+    }
+    .mot-2 {
+      font-size: 16px;
+    }
+    .ajouter {
+      margin-left: 10px;
+    }
+  }
+</style>
