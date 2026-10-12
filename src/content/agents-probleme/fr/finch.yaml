@@ -1,0 +1,19 @@
+agent: finch
+mail:
+  de: Animatrice réseau
+  objet: Rapport d'audit · Lille Centre
+  date: 12 mars
+  piece: Audit_Lille_Centre_mars.pdf
+  statut: Pas de réponse
+plan:
+  titre: Plan d'action · Lille Centre
+  actions:
+    - Changer le joint de porte chambre froide
+    - Étiqueter les préparations
+    - Afficher les allergènes
+  maj: Dernière modification le 12 mars
+audit:
+  entete: Audit · Lille Centre · juin
+  point: Joint de porte chambre froide
+  etat: Non conforme
+  tampon: Déjà relevé en mars

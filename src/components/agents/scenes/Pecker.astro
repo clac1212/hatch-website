@@ -1,0 +1,883 @@
+---
+import { Image, Picture } from 'astro:assets';
+import type { SceneDe } from '../../../content/schemas/scenes';
+import IphoneReel from '../IphoneReel.astro';
+import Ipad from '../../ui/Ipad.astro';
+import Icone from '../Icone.astro';
+import LogoWhatsapp from '../LogoWhatsapp.astro';
+import { avatars } from '../../pages/agent-visuels';
+import { centres } from '../visuels';
+
+/**
+ * Pecker's "Exemple d'usage" scene (César 11/10): each step shows the device of whoever acts, the
+ * previous one steps back (Exemple.astro's engine, `data-etapes`: device, screen, seconds).
+ * 1. Head office's Hatch OS window: Yanis joins the team, the trigger switches on, the course goes.
+ * 2. Yanis's iPhone: the WhatsApp notification lands on the lock screen, the chat opens, a tap.
+ * 3. The same iPhone: the course runs (a quiz question, the right answer), Pecker's reminder comes
+ *    in, the course is passed.
+ * 4. The manager's iPad: the grid ticks itself, the score, the "PDF filed" stamp.
+ * Each screen's markup is its final state; `.joue` (set by the engine) replays its beats, each
+ * timed by `--t` (seconds from the screen's start).
+ */
+interface Props {
+  d: SceneDe<'pecker'>;
+}
+const { d } = Astro.props;
+const etapes = [
+  { a: 'siege', e: 0, d: 5.2 },
+  { a: 'tel', e: 0, d: 6.4 },
+  { a: 'tel', e: 1, d: 9 },
+  { a: 'ipad', e: 0, d: 6 },
+];
+const initiale = (nom: string) => nom.charAt(0);
+---
+
+<div class="pile" data-etapes={JSON.stringify(etapes)}>
+  <div class="appareil devant" data-appareil="siege">
+    <div class="fenetre on" data-ecran="0">
+      <p class="fen-barre">
+        <span class="feux"><span></span><span></span><span></span></span>
+        <b>{d.siege.app}</b>
+        <span>{d.siege.contexte}</span>
+      </p>
+      <div class="fen-corps">
+        <ul class="equipe">
+          {
+            d.siege.equipe.map((m) => (
+              <li>
+                <span class="pastille-nom">{initiale(m.nom)}</span>
+                <span class="flex-1">
+                  <b>{m.nom}</b>
+                  <span>{m.role}</span>
+                </span>
+              </li>
+            ))
+          }
+          <li class="nouveau b" style="--t:0.5s">
+            <span class="pastille-nom orange">{initiale(d.siege.nouveau.nom)}</span>
+            <span class="flex-1">
+              <b>{d.siege.nouveau.nom}</b>
+              <span>{d.siege.nouveau.role}</span>
+            </span>
+            <span class="badge">{d.siege.nouveau.badge}</span>
+          </li>
+        </ul>
+        <div class="regle b" style="--t:1.4s">
+          <span class="regle-icone"><Icone nom="zap" taille={15} /></span>
+          <span class="flex-1">
+            <span class="regle-libelle">{d.siege.regle.libelle}</span>
+            <b>{d.siege.regle.quand}</b>
+            <span>→ {d.siege.regle.alors}</span>
+          </span>
+          <span class="interrupteur"><span></span></span>
+        </div>
+        <p class="envoye b" style="--t:3s">
+          <span class="wa"><LogoWhatsapp taille={12} /></span>
+          {d.siege.envoye}
+          <Icone nom="check-check" taille={14} />
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="appareil" data-appareil="tel">
+    <div class="tel">
+      <IphoneReel>
+        <div class="ecran-tel on" data-ecran="0">
+          <div class="verrou">
+            <Picture
+              src={centres.pecker.src}
+              alt=""
+              formats={['avif', 'webp']}
+              widths={[400]}
+              sizes="250px"
+              class="verrou-fond"
+            />
+            <p class="verrou-heure">{d.telephone.heure}</p>
+            <p class="verrou-date">{d.telephone.date}</p>
+            <div class="notif b" style="--t:0.5s">
+              <p class="notif-tete">
+                <span class="wa"><LogoWhatsapp taille={9} /></span>
+                <span class="flex-1">{d.telephone.notif.app}</span>
+                <span>{d.telephone.notif.quand}</span>
+              </p>
+              <b>{d.telephone.notif.titre}</b>
+              <span>{d.telephone.notif.texte}</span>
+            </div>
+          </div>
+          <div class="chat">
+            <p class="chat-tete">
+              <Icone nom="chevron-left" taille={14} />
+              <span class="chat-av">B</span>
+              <span class="flex flex-col">
+                <b>{d.telephone.contact}</b>
+                <span>{d.telephone.statut}</span>
+              </span>
+            </p>
+            <div class="chat-fil">
+              <div class="bulle b" style="--t:3s">
+                <div class="lien">
+                  <Image
+                    src={centres.pecker.src}
+                    alt=""
+                    width={400}
+                    class="lien-image"
+                    loading="lazy"
+                  />
+                  <b>{d.telephone.carte.titre}</b>
+                  <span>{d.telephone.carte.meta}</span>
+                </div>
+                <p>{d.telephone.message}</p>
+                <span class="ouvrir">
+                  <Icone nom="external-link" taille={11} />
+                  {d.telephone.bouton}
+                  <span class="doigt"></span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ecran-tel formation" data-ecran="1">
+          <p class="f-tete">
+            <Image src={avatars.pecker} alt="" width={40} densities={[1]} class="f-av" />
+            <b>{d.formation.module}</b>
+            <span>{d.formation.n} / {d.formation.total}</span>
+          </p>
+          <span class="f-progres"
+            ><span
+              style={`--de:${(d.formation.n - 1) / d.formation.total};--a:${d.formation.n / d.formation.total}`}
+            ></span></span
+          >
+          <p class="f-question b" style="--t:0.8s">{d.formation.question}</p>
+          <ul class="f-options">
+            {
+              d.formation.options.map((o, i) => (
+                <li
+                  class:list={['b', { bonne: i === d.formation.bonne }]}
+                  style={`--t:${1 + i * 0.15}s`}
+                >
+                  {o}
+                  {i === d.formation.bonne && <span class="doigt" />}
+                </li>
+              ))
+            }
+          </ul>
+          <p class="f-retour"><Icone nom="check" taille={12} />{d.formation.retour}</p>
+          <div class="relance">
+            <p class="notif-tete">
+              <Image src={avatars.pecker} alt="" width={30} densities={[1]} class="relance-av" />
+              <span class="flex-1">{d.formation.relance.app}</span>
+              <span>{d.formation.relance.quand}</span>
+            </p>
+            <b>{d.formation.relance.titre}</b>
+            <span>{d.formation.relance.texte}</span>
+          </div>
+          <div class="fin">
+            <span class="fin-rond"><Icone nom="check" taille={26} /></span>
+            <b>{d.formation.fin.titre}</b>
+            <span>{d.formation.fin.texte}</span>
+          </div>
+        </div>
+      </IphoneReel>
+    </div>
+  </div>
+
+  <div class="appareil" data-appareil="ipad">
+    <div class="tablette">
+      <Ipad>
+        <div class="eval on" data-ecran="0">
+          <p class="eval-tete">
+            <span class="eval-libelle">{d.evaluation.entete}</span>
+            <b>{d.evaluation.equipier}</b>
+          </p>
+          <ul class="grille">
+            {
+              d.evaluation.grille.map((l, i) => (
+                <li style={`--t:${0.8 + i * 0.7}s`}>
+                  <span class:list={['case', { ok: l.valide }]}>
+                    <Icone nom={l.valide ? 'check' : 'minus'} taille={13} />
+                  </span>
+                  <span class="flex-1">{l.texte}</span>
+                  <span class:list={['etat', { ok: l.valide }]}>{l.etat}</span>
+                </li>
+              ))
+            }
+          </ul>
+          <p class="score b" style="--t:3s">{d.evaluation.score}</p>
+          <span class="tampon">
+            <Icone nom="file-check" taille={16} />
+            {d.evaluation.tampon}
+          </span>
+        </div>
+      </Ipad>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Generic beat: arrives at `--t` when its screen plays. */
+  .joue .b {
+    animation: pk-arrive 0.55s var(--ease-entree) var(--t, 0s) both;
+  }
+  @keyframes pk-arrive {
+    from {
+      opacity: 0;
+      translate: 0 10px;
+    }
+  }
+
+  /* 1. Head office's window. */
+  .fenetre {
+    width: min(540px, 100%);
+    overflow: hidden;
+    border-radius: 14px;
+    background: var(--color-galet);
+    box-shadow: var(--shadow-3);
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+  }
+  .fen-barre {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--color-ligne-claire);
+    background: var(--color-white);
+    font-size: 12px;
+    color: var(--color-gray-500);
+  }
+  .fen-barre b {
+    font: 700 14px/1 var(--font-display);
+    color: var(--color-ink);
+  }
+  .feux {
+    display: flex;
+    gap: 6px;
+    margin-right: 4px;
+  }
+  .feux span {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: var(--color-statut-rouge);
+  }
+  .feux span:nth-child(2) {
+    background: var(--color-amber-line);
+  }
+  .feux span:nth-child(3) {
+    background: var(--color-success);
+  }
+  .fen-corps {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 18px;
+  }
+  .equipe {
+    overflow: hidden;
+    border-radius: 12px;
+    background: var(--color-white);
+    box-shadow: inset 0 0 0 1px var(--color-ligne-claire);
+  }
+  .equipe li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    font-size: 12px;
+  }
+  .equipe li + li {
+    border-top: 1px solid var(--color-ligne-claire);
+  }
+  .equipe li span span,
+  .equipe li b {
+    display: block;
+  }
+  .equipe li span span {
+    font-size: 11px;
+    color: var(--color-gray-500);
+  }
+  .pastille-nom {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    background: var(--color-mur);
+    font-weight: 700;
+    color: var(--color-gray-700);
+  }
+  .pastille-nom.orange {
+    background: var(--color-orange);
+    color: var(--color-ink);
+  }
+  .nouveau {
+    background: var(--color-orange-tint);
+  }
+  .badge {
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: var(--color-white);
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--color-orange-txt);
+  }
+  .regle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    border-radius: 12px;
+    background: var(--color-white);
+    box-shadow:
+      inset 0 0 0 1px var(--color-ligne-claire),
+      var(--shadow-1);
+    font-size: 12px;
+  }
+  .regle b,
+  .regle span span {
+    display: block;
+  }
+  .regle-libelle {
+    font: 400 10px/1.4 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-gray-500);
+  }
+  .regle-icone {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    background: var(--color-orange-tint);
+    color: var(--color-orange-txt);
+  }
+  .interrupteur {
+    position: relative;
+    flex: none;
+    width: 36px;
+    height: 20px;
+    border-radius: 999px;
+    background: var(--color-orange);
+  }
+  .interrupteur span {
+    position: absolute;
+    top: 2px;
+    left: 18px;
+    width: 16px;
+    height: 16px;
+    border-radius: 999px;
+    background: var(--color-white);
+    box-shadow: var(--shadow-1);
+  }
+  .joue .interrupteur {
+    animation: pk-allume 0.3s var(--ease-doux) 2.2s both;
+  }
+  .joue .interrupteur span {
+    animation: pk-glisse 0.3s var(--ease-doux) 2.2s both;
+  }
+  @keyframes pk-allume {
+    from {
+      background: var(--color-gray-100);
+    }
+  }
+  @keyframes pk-glisse {
+    from {
+      left: 2px;
+    }
+  }
+  .envoye {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    align-self: flex-start;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: var(--color-success-tint);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-success-txt);
+  }
+  .wa {
+    display: grid;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 5px;
+    background: var(--color-whatsapp-brand);
+    color: var(--color-white);
+  }
+
+  /* 2. Yanis's phone: lock screen, then the chat slides up over it. */
+  .tel {
+    width: 250px;
+  }
+  .ecran-tel {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+  }
+  .verrou {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20cqw 5cqw 0;
+    background: var(--color-night);
+  }
+  .verrou-fond {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(10px) brightness(0.75);
+    scale: 1.2;
+  }
+  .verrou-heure {
+    position: relative;
+    font: 300 22cqw/1 var(--font-sans);
+    letter-spacing: -0.02em;
+    color: var(--color-white);
+  }
+  .verrou-date {
+    position: relative;
+    margin: 2cqw 0 8cqw;
+    font-size: 5cqw;
+    color: color-mix(in srgb, var(--color-white) 85%, transparent);
+  }
+  .notif {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8cqw;
+    width: 100%;
+    padding: 4cqw;
+    border-radius: 6cqw;
+    background: color-mix(in srgb, var(--color-white) 82%, transparent);
+    backdrop-filter: blur(12px);
+    font-size: 4.6cqw;
+    line-height: 1.35;
+  }
+  .notif b {
+    font-size: 4.8cqw;
+  }
+  .notif-tete {
+    display: flex;
+    align-items: center;
+    gap: 2cqw;
+    margin-bottom: 1cqw;
+    font-size: 4cqw;
+    color: var(--color-gray-700);
+  }
+  .notif-tete .wa {
+    width: 7cqw;
+    height: 7cqw;
+    border-radius: 2cqw;
+  }
+  .chat {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-whatsapp-wall);
+  }
+  .joue .chat {
+    animation: pk-monte 0.6s var(--ease-camera) 2.3s both;
+  }
+  @keyframes pk-monte {
+    from {
+      translate: 0 100%;
+    }
+  }
+  .chat-tete {
+    display: flex;
+    align-items: center;
+    gap: 2.5cqw;
+    padding: 14cqw 4cqw 3cqw;
+    background: var(--color-white);
+    font-size: 4cqw;
+    color: var(--color-gray-500);
+  }
+  .chat-tete b {
+    font-size: 4.8cqw;
+    color: var(--color-ink);
+  }
+  .chat-av {
+    display: grid;
+    place-items: center;
+    width: 9cqw;
+    height: 9cqw;
+    border-radius: 999px;
+    background: var(--color-orange);
+    font-size: 4.5cqw;
+    font-weight: 700;
+    color: var(--color-ink);
+  }
+  .chat-fil {
+    padding: 5cqw 4cqw;
+  }
+  .bulle {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5cqw;
+    width: 86%;
+    padding: 2.5cqw;
+    border-radius: 4cqw;
+    background: var(--color-white);
+    box-shadow: 0 1px 1px color-mix(in srgb, var(--color-shadow) 8%, transparent);
+    font-size: 4.4cqw;
+    line-height: 1.4;
+  }
+  .lien {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6cqw;
+    overflow: hidden;
+    border-radius: 3cqw;
+    background: var(--color-statut-vert-tint);
+    font-size: 3.8cqw;
+    color: var(--color-gray-700);
+  }
+  .lien b,
+  .lien span {
+    padding: 0 3cqw;
+  }
+  .lien span {
+    padding-bottom: 2.5cqw;
+  }
+  .lien b {
+    font-size: 4.6cqw;
+    color: var(--color-ink);
+  }
+  .lien-image {
+    width: 100%;
+    aspect-ratio: 2 / 1;
+    object-fit: cover;
+    object-position: 50% 65%;
+  }
+  .ouvrir {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5cqw;
+    padding: 2.5cqw 0 1cqw;
+    border-top: 1px solid var(--color-ligne-claire);
+    font-weight: 600;
+    color: var(--color-success-txt);
+  }
+  /* A fingertip presses at its moment, then lifts off. */
+  .doigt {
+    position: absolute;
+    top: 50%;
+    left: 60%;
+    width: 11cqw;
+    height: 11cqw;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-ink) 22%, transparent);
+    box-shadow: 0 0 0 2cqw color-mix(in srgb, var(--color-ink) 8%, transparent);
+    translate: -50% -50%;
+    opacity: 0;
+  }
+  .joue .ouvrir .doigt {
+    animation: pk-tape 0.9s var(--ease-doux) 4.4s both;
+  }
+  @keyframes pk-tape {
+    0% {
+      opacity: 0;
+      scale: 1.6;
+    }
+    35% {
+      opacity: 1;
+      scale: 1;
+    }
+    55% {
+      scale: 0.85;
+    }
+    100% {
+      opacity: 0;
+      scale: 1.1;
+    }
+  }
+
+  /* 3. The course on the same phone. */
+  .formation {
+    display: flex;
+    flex-direction: column;
+    gap: 3.5cqw;
+    padding: 15cqw 5cqw 5cqw;
+    background: var(--color-white);
+  }
+  .f-tete {
+    display: flex;
+    align-items: center;
+    gap: 2.5cqw;
+    font-size: 4.6cqw;
+  }
+  .f-tete span {
+    margin-left: auto;
+    font: 400 4cqw/1 var(--font-mono);
+    color: var(--color-gray-500);
+  }
+  .f-av {
+    width: 9cqw;
+    height: 9cqw;
+  }
+  .f-progres {
+    display: block;
+    height: 1.6cqw;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--color-gray-100);
+  }
+  .f-progres span {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--color-orange);
+    transform-origin: left;
+    scale: var(--a) 1;
+  }
+  .joue .f-progres span {
+    animation: pk-avance 0.8s var(--ease-doux) 0.5s both;
+  }
+  @keyframes pk-avance {
+    from {
+      scale: var(--de) 1;
+    }
+  }
+  .f-question {
+    margin-top: 2cqw;
+    font: 600 5.6cqw/1.3 var(--font-sans);
+  }
+  .f-options {
+    display: flex;
+    flex-direction: column;
+    gap: 2.2cqw;
+  }
+  .f-options li {
+    position: relative;
+    padding: 3.2cqw 3.5cqw;
+    border-radius: 3cqw;
+    box-shadow: inset 0 0 0 1px var(--color-ligne-claire);
+    font-size: 4.4cqw;
+  }
+  .f-options .bonne {
+    background: var(--color-success-tint);
+    box-shadow: inset 0 0 0 1.5px var(--color-success);
+    color: var(--color-success-txt);
+    font-weight: 600;
+  }
+  .joue .f-options .bonne {
+    animation:
+      pk-arrive 0.55s var(--ease-entree) var(--t) both,
+      pk-choisi 0.3s var(--ease-doux) 2.6s both;
+  }
+  @keyframes pk-choisi {
+    from {
+      background: var(--color-white);
+      box-shadow: inset 0 0 0 1px var(--color-ligne-claire);
+      color: var(--color-ink);
+    }
+  }
+  .joue .f-options .doigt {
+    animation: pk-tape 0.9s var(--ease-doux) 2.2s both;
+  }
+  .f-retour {
+    display: flex;
+    align-items: center;
+    gap: 2cqw;
+    padding: 3cqw;
+    border-radius: 3cqw;
+    background: var(--color-success-tint);
+    font-size: 4cqw;
+    color: var(--color-success-txt);
+  }
+  .joue .f-retour {
+    animation: pk-arrive 0.5s var(--ease-entree) 2.9s both;
+  }
+  .relance {
+    position: absolute;
+    top: 12cqw;
+    right: 3cqw;
+    left: 3cqw;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8cqw;
+    padding: 3.5cqw 4cqw;
+    border-radius: 6cqw;
+    background: color-mix(in srgb, var(--color-white) 92%, transparent);
+    box-shadow: var(--shadow-3);
+    backdrop-filter: blur(12px);
+    font-size: 4.4cqw;
+    line-height: 1.35;
+    opacity: 0;
+  }
+  .relance-av {
+    width: 7cqw;
+    height: 7cqw;
+  }
+  .joue .relance {
+    animation: pk-notifie 2s var(--ease-entree) 4.3s both;
+  }
+  @keyframes pk-notifie {
+    0% {
+      opacity: 0;
+      translate: 0 -30cqw;
+    }
+    20%,
+    85% {
+      opacity: 1;
+      translate: 0 0;
+    }
+    100% {
+      opacity: 0;
+      translate: 0 -30cqw;
+    }
+  }
+  .fin {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3cqw;
+    padding: 0 10cqw;
+    background: var(--color-white);
+    text-align: center;
+    font-size: 4.4cqw;
+    color: var(--color-soft);
+  }
+  .fin b {
+    font: 700 7.5cqw/1.15 var(--font-display);
+    color: var(--color-ink);
+  }
+  .fin-rond {
+    display: grid;
+    place-items: center;
+    width: 20cqw;
+    height: 20cqw;
+    border-radius: 999px;
+    background: var(--color-success-tint);
+    color: var(--color-success-txt);
+  }
+  .joue .fin {
+    animation: pk-fondu 0.4s var(--ease-doux) 6.6s both;
+  }
+  .joue .fin-rond {
+    animation: pk-pop 0.5s var(--ease-pop) 6.9s both;
+  }
+  @keyframes pk-fondu {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes pk-pop {
+    from {
+      scale: 0.4;
+      opacity: 0;
+    }
+  }
+
+  /* 4. The manager's iPad: the grid ticks itself, the score, the stamp. */
+  .tablette {
+    width: min(560px, 100%);
+  }
+  .eval {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 3cqw;
+    height: 100%;
+    padding: 5cqw 6cqw;
+    background: var(--color-white);
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+  }
+  .eval-tete {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8cqw;
+  }
+  .eval-libelle {
+    font: 400 2.2cqw/1.3 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-orange-txt);
+  }
+  .eval-tete b {
+    font: 700 4cqw/1.2 var(--font-display);
+  }
+  .grille li {
+    display: flex;
+    align-items: center;
+    gap: 2.5cqw;
+    padding: 2.4cqw 0;
+    border-top: 1px solid var(--color-ligne-claire);
+    font-size: 3cqw;
+  }
+  .case {
+    display: grid;
+    place-items: center;
+    width: 4.6cqw;
+    height: 4.6cqw;
+    border-radius: 1.2cqw;
+    background: var(--color-amber-tint);
+    color: var(--color-amber-txt);
+  }
+  .case.ok {
+    background: var(--color-success);
+    color: var(--color-white);
+  }
+  .etat {
+    font-size: 2.6cqw;
+    font-weight: 600;
+    color: var(--color-amber-txt);
+  }
+  .etat.ok {
+    color: var(--color-success-txt);
+  }
+  .joue .case,
+  .joue .etat {
+    animation: pk-pop 0.4s var(--ease-pop) var(--t) both;
+  }
+  .score {
+    margin-top: auto;
+    font: 700 7cqw/1 var(--font-sans);
+    letter-spacing: -0.03em;
+  }
+  .tampon {
+    position: absolute;
+    right: 6cqw;
+    bottom: 5cqw;
+    display: inline-flex;
+    align-items: center;
+    gap: 1.5cqw;
+    padding: 1.6cqw 3cqw;
+    border: 0.5cqw solid var(--color-statut-bleu);
+    border-radius: 1.6cqw;
+    font: 700 2.8cqw/1 var(--font-sans);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--color-statut-bleu);
+    rotate: -8deg;
+  }
+  .joue .tampon {
+    animation: pk-tampon 0.45s var(--ease-pop) 3.6s both;
+  }
+  @keyframes pk-tampon {
+    from {
+      opacity: 0;
+      scale: 1.8;
+    }
+  }
+</style>

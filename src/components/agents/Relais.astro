@@ -1,0 +1,483 @@
+---
+import { Image } from 'astro:assets';
+import type { AgentSlug } from '../../content/schemas/agents';
+import { avatars } from '../pages/agent-visuels';
+import { richText } from '../pages/format';
+import { centres } from './visuels';
+import Icone from './Icone.astro';
+import LogoWhatsapp from './LogoWhatsapp.astro';
+
+/**
+ * "Il travaille avec" as a relay diagram (César 12/10, option B of the three compared): the page's
+ * agent in the middle, the agents and apps it works with around it, each with Patrick's words,
+ * tied to it by a thread. Once on screen, a pulse runs along each thread towards the middle, once.
+ * The threads are drawn by the script from the real positions; without JS (or below 1024 px, where
+ * the nodes stack under the agent) there are none and the list reads on its own.
+ */
+export interface Lien {
+  titre: string;
+  texte: string;
+  /** The agents the link names (their avatars), or an app's icon. */
+  agents?: AgentSlug[];
+  icone?: string;
+  ton?: 'whatsapp' | 'bleu' | 'cuivre';
+  /** The agent's page, when the link names one agent whose page is published. */
+  href?: string;
+}
+interface Props {
+  titre: string;
+  /** Patrick's sentence above the diagram (Lark, who works with all the others). */
+  intro?: string;
+  centre: { slug: AgentSlug; name: string };
+  liens: Lien[];
+}
+const { titre, intro, centre, liens } = Astro.props;
+const gauche = liens.slice(0, Math.ceil(liens.length / 2));
+const droite = liens.slice(Math.ceil(liens.length / 2));
+const colonnes = [
+  { cote: 'g', liens: gauche, depart: 0 },
+  { cote: 'd', liens: droite, depart: gauche.length },
+];
+---
+
+<section aria-labelledby="agent-avec" class="relais-section">
+  <div class="wrap-agent flex flex-col gap-6" data-rv-groupe>
+    <h2 id="agent-avec" class="font-display text-section font-bold text-ink" data-rv>{titre}</h2>
+    {
+      intro && (
+        <p class="intro" data-rv>
+          {richText(intro).map((r) => (r.bold ? <b>{r.text}</b> : r.text))}
+        </p>
+      )
+    }
+    <div class="relais" data-relais data-rv>
+      <svg class="fils" aria-hidden="true"></svg>
+      <div class="centre" style={`--f:${centres[centre.slug].fond}`}>
+        <span class="centre-av">
+          <Image src={avatars[centre.slug]} alt="" width={150} densities={[1, 2]} />
+        </span>
+        <b>{centre.name}</b>
+      </div>
+      {
+        colonnes.map((c) => (
+          <ul class={`colonne ${c.cote}`}>
+            {c.liens.map((l, i) => {
+              const Balise = l.href ? 'a' : 'div';
+              return (
+                <li style={`--i:${c.depart + i}`}>
+                  <Balise class="noeud" href={l.href}>
+                    {l.agents ? (
+                      <span class="av" style={`--f:${centres[l.agents[0]].fond}`}>
+                        <Image src={avatars[l.agents[0]]} alt="" width={64} densities={[1, 2]} />
+                        {l.agents.slice(1).map((a, j) => (
+                          <span class={`duo duo-${j}`} style={`--f:${centres[a].fond}`}>
+                            <Image src={avatars[a]} alt="" width={36} densities={[1, 2]} />
+                          </span>
+                        ))}
+                      </span>
+                    ) : (
+                      <span class={`av app ton-${l.ton}`}>
+                        <span class="app-icone">
+                          {l.icone === 'whatsapp' ? (
+                            <LogoWhatsapp taille={26} />
+                          ) : (
+                            <Icone nom={l.icone!} taille={22} />
+                          )}
+                        </span>
+                      </span>
+                    )}
+                    <span class="txt">
+                      <b>{l.titre}</b>
+                      <span>{l.texte}</span>
+                    </span>
+                  </Balise>
+                </li>
+              );
+            })}
+          </ul>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<script>
+  const calme = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const large = window.matchMedia('(min-width: 64rem)');
+
+  /**
+   * An element's box in the stage's pixels, from offsets: they ignore the reveal's `translate`, so
+   * the threads land where the nodes end up, not where they start.
+   */
+  const boite = (el: HTMLElement, scene: HTMLElement) => {
+    let x = 0;
+    let y = 0;
+    for (
+      let n: HTMLElement | null = el;
+      n && n !== scene;
+      n = n.offsetParent as HTMLElement | null
+    ) {
+      x += n.offsetLeft;
+      y += n.offsetTop;
+    }
+    return { x, y, w: el.offsetWidth, h: el.offsetHeight };
+  };
+
+  /**
+   * Draws a curve from each node's avatar to the middle agent. The paths are created once and only
+   * reshaped afterwards, so a resize never replays the pulse.
+   */
+  const tracer = (scene: HTMLElement) => {
+    const svg = scene.querySelector<SVGSVGElement>('.fils')!;
+    if (!large.matches) {
+      svg.replaceChildren();
+      return;
+    }
+    const c = boite(scene.querySelector<HTMLElement>('.centre-av')!, scene);
+    const cx = c.x + c.w / 2;
+    const cy = c.y + c.h / 2;
+    const noeuds = [...scene.querySelectorAll<HTMLElement>('.noeud')];
+    if (!svg.childElementCount)
+      svg.innerHTML = noeuds
+        .map((_, i) => `<path/><path class="flux" pathLength="100" style="--i:${i}"/>`)
+        .join('');
+    const chemins = svg.querySelectorAll('path');
+    noeuds.forEach((n, i) => {
+      const a = boite(n.querySelector<HTMLElement>('.av')!, scene);
+      const g = !!n.closest('.g');
+      const x = g ? a.x + a.w + 12 : a.x - 12;
+      const y = a.y + a.h / 2;
+      const bord = cx + (g ? -1 : 1) * (c.w / 2 + 10);
+      const mx = (x + bord) / 2;
+      const d = `M${x},${y} C${mx},${y} ${mx},${cy} ${bord},${cy}`;
+      chemins[2 * i].setAttribute('d', d);
+      chemins[2 * i + 1].setAttribute('d', d);
+    });
+    svg.setAttribute('viewBox', `0 0 ${scene.offsetWidth} ${scene.offsetHeight}`);
+  };
+
+  for (const scene of document.querySelectorAll<HTMLElement>('[data-relais]')) {
+    tracer(scene);
+    new ResizeObserver(() => tracer(scene)).observe(scene);
+    // The web fonts can re-wrap the texts and move the nodes without resizing the stage.
+    document.fonts.ready.then(() => tracer(scene));
+    if (calme) continue;
+    scene.classList.add('js');
+    const vue = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting) return;
+        vue.disconnect();
+        scene.classList.add('vu');
+      },
+      { threshold: 0.4 },
+    );
+    vue.observe(scene);
+  }
+</script>
+
+<style>
+  .relais-section {
+    padding: 96px 0 112px;
+  }
+  .intro {
+    max-width: 52rem;
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--color-soft);
+  }
+  .intro b {
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+
+  /* Stage: the nodes on either side, the agent in the middle, the threads under them. */
+  .relais {
+    position: relative;
+    display: grid;
+    gap: 28px;
+    margin-top: 24px;
+  }
+  @media (min-width: 64rem) {
+    .relais {
+      grid-template-columns: minmax(0, 1fr) 200px minmax(0, 1fr);
+      align-items: center;
+      column-gap: 120px;
+      min-height: 300px;
+      margin-top: 8px;
+    }
+    .colonne.g {
+      grid-column: 1;
+      grid-row: 1;
+    }
+    .centre {
+      grid-column: 2;
+      grid-row: 1;
+    }
+  }
+  .fils {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .fils :global(path) {
+    fill: none;
+    stroke: color-mix(in srgb, var(--color-ink) 12%, transparent);
+    stroke-width: 1.5;
+  }
+  .fils :global(.flux) {
+    stroke: var(--color-orange);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-dasharray: 8 120;
+    stroke-dashoffset: 8;
+    opacity: 0;
+  }
+  .relais.vu .fils :global(.flux) {
+    animation: rl-flux 1.5s var(--ease-entree) calc(0.6s + var(--i) * 0.22s) both;
+  }
+  @keyframes rl-flux {
+    0% {
+      opacity: 1;
+      stroke-dashoffset: 8;
+    }
+    85% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      stroke-dashoffset: -100;
+    }
+  }
+
+  /* The page's agent. */
+  .centre {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    justify-self: center;
+  }
+  .centre-av {
+    display: grid;
+    place-items: center;
+    width: 180px;
+    height: 180px;
+    border-radius: 44px;
+    background: var(--f);
+    box-shadow: var(--shadow-2);
+  }
+  .centre-av img {
+    width: 140px;
+    height: 140px;
+    object-fit: contain;
+  }
+  .centre b {
+    font: 600 15px/1 var(--font-sans);
+    color: var(--color-ink);
+  }
+
+  /* The nodes. */
+  .colonne {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+  .noeud {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    color: inherit;
+    text-decoration: none;
+  }
+  .colonne.g .noeud {
+    flex-direction: row-reverse;
+    text-align: right;
+  }
+  .av {
+    position: relative;
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 76px;
+    height: 76px;
+    border-radius: 22px;
+    background: var(--f);
+    transition:
+      translate 0.35s var(--ease-entree),
+      box-shadow 0.35s var(--ease-entree);
+  }
+  .av > :global(img) {
+    width: 62px;
+    height: 62px;
+    object-fit: contain;
+  }
+  a.noeud:hover .av {
+    translate: 0 -3px;
+    box-shadow: var(--shadow-2);
+  }
+  a.noeud:hover .txt b {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
+  a.noeud:focus-visible {
+    outline: 2px solid var(--color-orange);
+    outline-offset: 6px;
+    border-radius: 12px;
+  }
+  /* A second and third agent, tucked on the avatar's corner. */
+  .duo {
+    position: absolute;
+    right: -12px;
+    bottom: -10px;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 13px;
+    background: var(--f);
+    box-shadow: 0 0 0 3px var(--color-white);
+  }
+  .duo-1 {
+    right: 22px;
+    bottom: -14px;
+  }
+  .duo :global(img) {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+  }
+  .colonne.g .duo-0 {
+    right: auto;
+    left: -12px;
+  }
+  .colonne.g .duo-1 {
+    right: auto;
+    left: 22px;
+  }
+  .app-icone {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    color: var(--color-white);
+  }
+  .ton-whatsapp {
+    background: var(--color-success-tint);
+  }
+  .ton-whatsapp .app-icone {
+    background: var(--color-whatsapp-brand);
+  }
+  .ton-bleu {
+    background: var(--color-statut-bleu-tint);
+  }
+  .ton-bleu .app-icone {
+    background: var(--color-statut-bleu);
+  }
+  .ton-cuivre {
+    background: color-mix(in srgb, var(--color-copper) 22%, var(--color-white));
+  }
+  .ton-cuivre .app-icone {
+    background: var(--color-copper);
+  }
+  .txt {
+    max-width: 22rem;
+  }
+  .txt b {
+    display: block;
+    margin-bottom: 4px;
+    font: 700 20px/1.2 var(--font-display);
+    color: var(--color-ink);
+  }
+  .txt span {
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--color-soft);
+  }
+
+  /* Reveal: the agent, then the nodes in turn. */
+  .relais.js .centre,
+  .relais.js .colonne li {
+    opacity: 0;
+    translate: 0 14px;
+  }
+  .relais.js.vu .centre,
+  .relais.js.vu .colonne li {
+    opacity: 1;
+    translate: 0 0;
+    transition:
+      opacity 0.6s var(--ease-doux),
+      translate 0.8s var(--ease-entree);
+  }
+  .relais.js.vu .colonne li {
+    transition-delay: calc(0.25s + var(--i) * 0.12s);
+  }
+
+  /* Below 1024 px: the agent on top, the nodes listed under it on a rule, no threads. */
+  @media (max-width: 63.99rem) {
+    .relais-section {
+      padding: 72px 0 88px;
+    }
+    .centre {
+      flex-direction: row;
+      justify-self: start;
+      gap: 16px;
+    }
+    .centre-av {
+      width: 96px;
+      height: 96px;
+      border-radius: 26px;
+    }
+    .centre-av img {
+      width: 74px;
+      height: 74px;
+    }
+    .colonne {
+      gap: 22px;
+      padding-left: 20px;
+      border-left: 2px solid var(--color-ligne-claire);
+    }
+    /* One continuous rule: the two lists follow each other with no gap. */
+    .relais {
+      row-gap: 0;
+    }
+    .centre {
+      margin-bottom: 22px;
+    }
+    .colonne.g {
+      padding-bottom: 22px;
+    }
+    .colonne.g .noeud {
+      flex-direction: row;
+      text-align: left;
+    }
+    .colonne.g .duo-0 {
+      right: -12px;
+      left: auto;
+    }
+    .colonne.g .duo-1 {
+      right: 22px;
+      left: auto;
+    }
+    .av {
+      width: 64px;
+      height: 64px;
+      border-radius: 18px;
+    }
+    .av > :global(img) {
+      width: 52px;
+      height: 52px;
+    }
+    .txt b {
+      font-size: 18px;
+    }
+  }
+</style>

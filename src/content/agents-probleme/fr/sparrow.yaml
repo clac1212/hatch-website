@@ -1,0 +1,29 @@
+agent: sparrow
+boite:
+  titre: Boîte de réception
+  nonLus: 38 non lus
+  messages:
+    - { de: Formulaire site, objet: Nouvelle candidature · Julien Morel, heure: '9:42' }
+    - { de: Salon Franchise Expo, objet: Vos contacts du stand (export), heure: '9:15' }
+    - { de: Hugo Petit, objet: 'Re: Ouvrir une franchise', heure: '8:57' }
+    - { de: Formulaire site, objet: Nouvelle candidature, heure: Hier }
+tableur:
+  fichier: Candidats_2026.xlsx
+  colonnes: [Nom, Ville, Apport, Source, Statut]
+  lignes:
+    - cellules: [Thomas Leroy, Nantes, 80 k€, Salon, Rappeler lundi]
+      surligne: { couleur: jaune }
+    - cellules: [Julien Morel, Rennes, '?', Site, '']
+    - cellules: [Hugo Petit, Tours, '', Annonce, NRP]
+      surligne: { couleur: rose, colonne: 4 }
+    - cellules: [Camille Benoît, Angers, '50000', salon, RDV ?]
+      surligne: { couleur: bleu, colonne: 0 }
+    - cellules: [J. Morel, rennes, '', Formulaire, à rappeler]
+      surligne: { couleur: jaune, colonne: 2 }
+  onglets: [Candidats, Salon mars, Copie de Candidats]
+mail:
+  de: Hugo Petit
+  objet: 'Re: Ouvrir une franchise'
+  heure: '8:57'
+  corps: Bonjour, je suis intéressé par la franchise, c'est combien ?
+  signature: Envoyé de mon iPhone

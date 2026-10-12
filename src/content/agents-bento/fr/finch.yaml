@@ -1,0 +1,57 @@
+# Mur « Ce que Finch fait pour vous » : pilote des murs « plus réels » (César 11/10), d'après la maquette Pencil « Page agent ».
+agent: finch
+mobile:
+  titre: L'audit sur mobile
+  app: Audit · Lille Centre
+  heure: '10:42'
+  point: Hygiène
+  n: 4
+  total: 18
+  controle: Joint de porte chambre froide
+  conforme: Conforme
+  nonConforme: Non conforme
+  historique: 'Audit précédent : non conforme'
+grilles:
+  titre: Vos grilles, pondérées
+  lignes:
+    - { texte: Hygiène, poids: '×3' }
+    - { texte: Sécurité, poids: '×2' }
+    - { texte: Accueil, poids: '×1' }
+score:
+  titre: Un score sur 100
+  valeur: 84
+  sur: / 100
+plan:
+  titre: Un plan d'action proposé par l'IA
+  document: Plan d'action · Lille Centre
+  signature: Rédigé par l'IA, validé par l'animatrice
+  lignes:
+    - { texte: Joint de porte chambre froide, etat: Critique, ton: rouge }
+    - { texte: Étiquetage des préparations, etat: Majeure, ton: orange }
+    - { texte: Affichage allergènes, etat: Mineure, ton: gris }
+rapport:
+  titre: Un rapport PDF envoyé sur WhatsApp
+  heure: '17:42'
+  app: WhatsApp
+  quand: maintenant
+  expediteur: Finch · Audits BunBun
+  document: Rapport_Lille_Centre.pdf
+auto:
+  titre: L'auto-évaluation
+  texte: Entre deux visites
+tableau:
+  titre: Un tableau de bord réseau
+  ecran: Finch · Réseau BunBun
+  texte: Points de contrôle qui dérivent
+  unite: restaurants
+  sur: 10
+  lignes:
+    - { texte: Étiquetage des préparations, restaurants: 4 }
+    - { texte: Joint de porte chambre froide, restaurants: 3 }
+    - { texte: Affichage allergènes, restaurants: 2 }
+preuves:
+  titre: Des preuves de correction
+  legende: Joint de porte chambre froide · Lille Centre
+  avant: Avant
+  apres: Après
+  tampon: Prouvée

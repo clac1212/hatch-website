@@ -1,0 +1,29 @@
+agent: sparrow
+boite:
+  titre: Inbox
+  nonLus: 38 unread
+  messages:
+    - { de: Website form, objet: New application · Julien Morel, heure: '9:42 AM' }
+    - { de: Franchise Expo, objet: Your stand contacts (export), heure: '9:15 AM' }
+    - { de: Hugo Petit, objet: 'Re: Opening a franchise', heure: '8:57 AM' }
+    - { de: Website form, objet: New application, heure: Yesterday }
+tableur:
+  fichier: Candidates_2026.xlsx
+  colonnes: [Name, City, Capital, Source, Status]
+  lignes:
+    - cellules: [Thomas Leroy, Nantes, 80k €, Expo, Call Monday]
+      surligne: { couleur: jaune }
+    - cellules: [Julien Morel, Rennes, '?', Website, '']
+    - cellules: [Hugo Petit, Tours, '', Ad, No answer]
+      surligne: { couleur: rose, colonne: 4 }
+    - cellules: [Camille Benoît, Angers, '50000', expo, Meeting?]
+      surligne: { couleur: bleu, colonne: 0 }
+    - cellules: [J. Morel, rennes, '', Form, call back]
+      surligne: { couleur: jaune, colonne: 2 }
+  onglets: [Candidates, Expo March, Copy of Candidates]
+mail:
+  de: Hugo Petit
+  objet: 'Re: Opening a franchise'
+  heure: '8:57 AM'
+  corps: Hi, I'm interested in the franchise, how much is it?
+  signature: Sent from my iPhone

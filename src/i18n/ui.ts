@@ -51,7 +51,7 @@ const fr = {
   'seo.ogImageAlt':
     'Hatch OS : recrutez des agents IA pour piloter et développer votre réseau. Carte de France en voxels avec le siège, un restaurant et un chantier.',
   /** The 404 page: one file served for every unknown URL, French first then English. */
-  '404.seoTitle': 'Page introuvable · Hatch OS',
+  '404.seoTitle': 'Page introuvable | Hatch OS',
   '404.seoDescription':
     "Cette adresse ne correspond à aucune page du site Hatch OS. Retrouvez les sept agents IA des réseaux de franchise depuis l'accueil, ou réservez une démo.",
   '404.kicker': 'Erreur 404',
@@ -78,7 +78,7 @@ const en: Record<keyof typeof fr, string> = {
   'footer.company': 'Hatch OS',
   'seo.ogImageAlt':
     'Hatch OS: hire AI agents to run and grow your network. A voxel map of France with the head office, a restaurant and a building site.',
-  '404.seoTitle': 'Page not found · Hatch OS',
+  '404.seoTitle': 'Page not found | Hatch OS',
   '404.seoDescription':
     'This address matches no page of the Hatch OS website. Meet the seven AI agents for franchise networks from the home page, or book a demo.',
   '404.kicker': 'Error 404',

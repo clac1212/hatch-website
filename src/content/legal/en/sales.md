@@ -1,6 +1,6 @@
 ---
 seo:
-  title: 'Terms of Sale — Hatch OS'
+  title: 'Terms of Sale | Hatch OS'
   description: 'Hatch OS terms of sale: subscription, free trial, price per location, billing, termination, service level, data protection and liability.'
 title: 'Terms of Sale'
 meta: 'Version 2026-10 · Last updated: October 2, 2026 · Effective date: September 25, 2026'

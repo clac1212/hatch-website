@@ -1,0 +1,68 @@
+# Scène « Exemple d'usage » de Lark : chaque étape montre l'appareil de celle qui agit (César 11/10).
+# Claire, au siège BunBun, lundi 12 octobre 08:45. Signaux tenus à la table de vérité de la démo :
+# Peep, « Affiches allergènes » envoyées la semaine précédente, 27 / 30 lus (non lus Metz Centre,
+# Lille Centre, Rennes Centre) ; Finch, audit Nantes Centre avec deux actions critiques ; Sparrow,
+# ouverture de BunBun Bordeaux dans les temps (J-18).
+agent: lark
+accueil:
+  app: Hatch OS
+  contexte: Réseau BunBun
+  date: Lundi 12 octobre · 08:45
+  bonjour: Bonjour Claire, voici ce qui demande votre attention cette semaine.
+  brief:
+    agent: Lark
+    libelle: Brief du lundi
+    texte: "Trois restaurants n'ont pas lu « Affiches allergènes » et l'audit de Nantes Centre a deux actions critiques ouvertes. Bordeaux avance comme prévu."
+  signaux:
+    - agent: peep
+      source: Peep · communications
+      titre: « Affiches allergènes » · 27 / 30 lus
+      etat: À relancer
+      ton: orange
+      details: [Metz Centre, Lille Centre, Rennes Centre]
+    - agent: finch
+      source: Finch · audits
+      titre: Audit Nantes Centre
+      etat: 2 actions critiques
+      ton: rouge
+      details: [Joint de porte chambre froide, Chambre froide à 6 °C]
+    - agent: sparrow
+      source: Sparrow · ouvertures
+      titre: Ouverture BunBun Bordeaux
+      etat: J-18 · dans les temps
+      ton: vert
+      details: []
+  source: Peep, Finch et Sparrow · 7 derniers jours
+  bouton: Appeler les franchisés
+  envoye: Liste envoyée sur votre iPhone
+telephone:
+  heure: '8:47'
+  date: Lundi 12 octobre
+  notif:
+    app: Hatch OS
+    quand: maintenant
+    titre: Lark
+    texte: '4 franchisés à appeler ce matin, la liste est prête.'
+  liste:
+    titre: À appeler ce matin
+    sous: 4 franchisés · préparé par Lark
+    message: "Je les ai classés par urgence. Antoine d'abord : son audit a deux actions critiques ouvertes."
+    appels:
+      - { nom: Antoine, site: Nantes Centre, motif: Audit · 2 actions critiques, ton: rouge }
+      - { nom: Sonia, site: Metz Centre, motif: Affiches non lues, ton: orange }
+      - { nom: Sarah, site: Lille Centre, motif: Affiches non lues, ton: orange }
+      - { nom: Nicolas, site: Rennes Centre, motif: Affiches non lues, ton: orange }
+    source: Peep · Finch · numéros dans la fiche
+  appel:
+    nom: Antoine
+    site: BunBun Nantes Centre
+    sonne: appel…
+    secondes: 9
+    commandes: [silence, clavier, haut-parleur]
+    note:
+      titre: Note de Lark
+      texte: 'Audit du 9 octobre, deux actions critiques encore ouvertes :'
+      lignes:
+        - Joint de porte chambre froide
+        - Chambre froide à 6 °C
+      pied: À corriger avant vendredi, preuves photo dans Finch.

@@ -1,0 +1,52 @@
+# Mur « Ce que Jay fait pour vous », d'après la maquette Pencil « Page agent — Jay ».
+agent: jay
+outils:
+  titre: Se branche sur vos outils actuels
+  apps:
+    - { nom: Google Drive, icone: hard-drive, ton: vert }
+    - { nom: Notion, icone: notebook-text, ton: noir }
+    - { nom: Airtable, icone: table, ton: jaune }
+    - { nom: OneDrive / SharePoint, icone: cloud, ton: bleu }
+  synchro: Synchronisé cette nuit · 02:00
+imports:
+  titre: Importe vos PDF
+  fichiers:
+    - { type: PDF, ton: rouge }
+    - { type: XLS, ton: vert }
+    - { type: MP4, ton: violet }
+acces:
+  titre: Règle qui voit quoi
+  profils:
+    - { texte: Managers, voit: true }
+    - { texte: Franchisés, voit: true }
+    - { texte: Équipiers, voit: false }
+sources:
+  titre: Cite ses sources
+  document: BunBun · Fiche ouverture cuisine
+  avant:
+    - "Allumer la hotte et l'éclairage du passe."
+  passage: 'Allumer les friteuses 30 min avant le service, puis contrôler les températures.'
+  apres:
+    - 'Remplir les bacs à sauce et dater les contenants.'
+    - "Valider la check-list d'ouverture."
+  source: 'Source : Fiche ouverture · Google Drive'
+exclure:
+  titre: Vous laisse exclure un document
+  document: Procédure ouverture v2
+  etat: Exclu des réponses
+nourrit:
+  titre: Nourrit les autres agents
+  agents:
+    - { agent: peep, nom: Peep, texte: sur WhatsApp }
+    - { agent: owl, nom: Owl, texte: sur tablette }
+    - { agent: pecker, nom: Pecker, texte: en formation }
+redaction:
+  titre: Vous aide à rédiger
+  fiche: Nettoyage friteuse
+  selection: Vider l'huile une fois refroidie.
+  suite: Filtrer, puis nettoyer la cuve.
+  menu: Éditer avec Jay
+  actions:
+    - Reformuler
+    - Compléter
+    - Structurer

@@ -69,6 +69,22 @@
   --color-whatsapp-wall: #efeae2; /* chat background */
   --color-whatsapp-tick: #53bdeb; /* read receipts */
 
+  /* Agent pages (Pencil "Page agent" v3/v4, César 10/10): light greys of the feature wall and the
+     cards, and the status colours of the product mock-ups (rows, chips, translations). */
+  --color-mur: #f5f5f7; /* feature wall background, "Vous décidez", "Il travaille avec" captions */
+  --color-galet: #f7f7f5; /* problem cards, "Pour aller plus loin" cards */
+  --color-faq: #fafaf8; /* FAQ section */
+  --color-ligne-claire: #ecede7; /* rules on the light greys */
+  --color-statut-rouge: #c4372c; /* critical, failed, dropped off */
+  --color-statut-rouge-tint: #fdecea;
+  --color-statut-bleu: #2f6fdb; /* info, sources */
+  --color-statut-bleu-tint: #eaf1fd;
+  --color-statut-vert-tint: #eaf5ec; /* problem card icon, "Juste", "Terminé" */
+  --color-trad-bleu: #2f6fdb; /* the translations tile, one colour per language */
+  --color-trad-violet: #7c4ddb;
+  --color-trad-magenta: #b03aa8;
+  --color-trad-lilas: #c3a6ee;
+
   /* Type scale — fluid between mobile and the 1440 px desktop mockups */
   --text-h1: clamp(2.25rem, 1.4rem + 3.4vw, 4rem);
   --text-h1--line-height: 1.1;
@@ -120,6 +136,20 @@
     0.64,
     1
   ); /* back.out: small items only (tick, badge, bubble) */
+}
+
+/* Container of the agent pages: 1280 px of content at 1440, as in the Pencil mock-ups. */
+@utility wrap-agent {
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+  padding-inline: 24px;
+  @media (min-width: 48rem) {
+    padding-inline: 48px;
+  }
+  @media (min-width: 80rem) {
+    padding-inline: 80px;
+  }
 }
 
 /* Font families point at the variables injected by Astro's <Font /> (see astro.config.mjs). */

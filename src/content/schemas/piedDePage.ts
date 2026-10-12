@@ -1,4 +1,5 @@
 import { z } from 'astro/zod';
+import { agentSlugs } from './agents';
 
 /**
  * Copy of the site-wide footer (src/content/sections/piedDePage/{fr,en}.yaml), v4 node DbMpt.
@@ -10,8 +11,10 @@ export const schema = z.strictObject({
   cta: z.string(),
   agents: z.strictObject({
     titre: z.string(),
-    /** One resident per floor of the voxel building, top to bottom. */
-    residents: z.array(z.strictObject({ etage: z.string(), libelle: z.string() })).length(7),
+    /** One resident per floor of the voxel building, top to bottom: its job, and the agent (its page). */
+    residents: z
+      .array(z.strictObject({ etage: z.string(), metier: z.string(), agent: z.enum(agentSlugs) }))
+      .length(7),
   }),
   legal: z.strictObject({
     titre: z.string(),

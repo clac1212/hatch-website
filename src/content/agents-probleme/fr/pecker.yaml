@@ -1,0 +1,36 @@
+agent: pecker
+connexion:
+  plateforme: Espace formation
+  titre: Connexion
+  identifiant: Identifiant
+  valeur: yanis.lille-centre
+  motDePasse: Mot de passe
+  erreur: Identifiant ou mot de passe incorrect.
+  bouton: Se connecter
+  oubli: Mot de passe oublié ?
+suivi:
+  titre: Parcours d'accueil
+  onglets:
+    - Tous (42)
+    - Jamais connectés (31)
+  colonnes:
+    - Équipier
+    - Restaurant
+    - Dernière connexion
+  lignes:
+    - nom: Yanis
+      restaurant: Lille Centre
+      connexion: Jamais
+    - nom: Inès
+      restaurant: Nantes
+      connexion: Jamais
+  plus: Afficher 29 de plus
+  progression: 0 % terminé
+pdf:
+  fichier: Module1_Accueil_client.pdf
+  pages: 1 / 24
+  titre: Module 1 · Accueil client
+  section: 1.1 Principes généraux
+  paragraphes:
+    - "L'accueil de la clientèle constitue un moment déterminant de l'expérience proposée par l'enseigne. Le collaborateur veille à adopter, dès l'entrée du client dans l'établissement, une posture d'ouverture conforme aux standards définis par le réseau, et s'assure de sa prise en charge dans un délai n'excédant pas trente secondes."
+    - "Conformément aux dispositions de la charte qualité, toute sollicitation formulée par le client fait l'objet d'une réponse appropriée, y compris lorsque celle-ci excède le périmètre habituel des attributions du collaborateur concerné."

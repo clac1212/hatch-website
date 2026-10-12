@@ -1,0 +1,71 @@
+# Scène « Exemple d'usage » de Finch : chaque étape montre l'appareil de celui qui agit (César 11/10).
+agent: finch
+plan:
+  - texte: Joint de porte chambre froide
+    criticite: Critique
+    echeance: "Aujourd'hui"
+    ton: rouge
+  - texte: Étiquetage des préparations
+    criticite: Majeure
+    echeance: Avant vendredi
+    ton: orange
+  - texte: Affichage allergènes
+    criticite: Mineure
+    echeance: Sous 15 jours
+    ton: gris
+audit:
+  heure: '17:38'
+  app: Audit · Lille Centre
+  n: 18
+  total: 18
+  rubrique: Hygiène
+  poids: '×3'
+  controle: Joint de porte chambre froide
+  historique: 'Audit précédent : non conforme'
+  photo: Prendre une photo
+  conforme: Conforme
+  nonConforme: Non conforme
+  synthese:
+    titre: Audit terminé
+    score: 84
+    sur: / 100
+    detail: 18 points · 3 écarts
+    plan: "Plan d'action proposé par l'IA"
+    bouton: Envoyer le rapport
+    envoye: Envoyé au franchisé sur WhatsApp
+franchise:
+  heure: '17:42'
+  date: Mardi 13 octobre
+  notif:
+    app: WhatsApp
+    quand: maintenant
+    titre: Finch · Audits BunBun
+    texte: "Votre rapport d'audit est prêt : 84 / 100, 3 actions dont 1 critique."
+  contact: Finch · Audits BunBun
+  statut: Compte professionnel
+  document: { type: PDF, nom: Rapport_Lille_Centre.pdf, meta: 6 pages · PDF }
+  message: "Audit du 13 octobre : 84 / 100. Votre plan d'action :"
+  saisie: Message
+  question: Bien reçu le rapport. Je commence par quoi ?
+  heureQuestion: '17:44'
+  reponse: "Par le joint de la chambre froide, c'est le seul point critique. Envoyez-moi la photo une fois changé."
+validation:
+  app: Finch · Réseau BunBun
+  date: Jeudi 15 octobre
+  rubrique: "Plan d'action · Lille Centre"
+  controle: Joint de porte chambre froide
+  criticite: Critique
+  avant: Avant
+  apres: Après
+  depose: Preuve déposée par le franchisé · 9:12
+  bouton: Valider la preuve
+  valide: Preuve validée
+  tampon: Validé
+  tableau:
+    libelle: Points qui dérivent
+    nombre: 3
+    unite: restaurants avec le même écart
+    lignes:
+      - { texte: Lille Centre, etat: Corrigé, ton: vert }
+      - { texte: Nantes Centre, etat: Ouvert · critique, ton: rouge }
+      - { texte: Bordeaux Gare, etat: Ouvert · majeure, ton: orange }

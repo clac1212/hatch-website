@@ -1,60 +1,122 @@
 import { z } from 'astro/zod';
-import { demoCles } from './demo';
 
 /** The seven agents (file names of `src/content/agents/<locale>/<slug>.md`). */
 export const agentSlugs = ['peep', 'owl', 'lark', 'jay', 'finch', 'pecker', 'sparrow'] as const;
 export type AgentSlug = (typeof agentSlugs)[number];
 
-/** Logos available for a tool chip (files in src/assets/miseEnPlace and src/assets/sans-filtre). */
-export const toolLogos = ['whatsapp', 'google-drive', 'notion', 'word', 'pdf', 'excel'] as const;
-
 const texte = z.string().min(1);
-const point = z.strictObject({ title: texte, text: texte });
+/** A line where `**…**` marks the bold lead-in, as written in the copy (rendered by `richText`). */
+const riche = texte.refine((s) => (s.match(/\*\*/g) ?? []).length % 2 === 0, {
+  message: 'Unbalanced ** in a rich line',
+});
+/** A Lucide icon, by its file name in @lucide/astro (`mail`, `message-circle`…), see Icone.astro. */
+const icone = z.string().regex(/^[a-z0-9-]+$/);
+/** Status colour of a row or a chip in the product mock-ups. */
+export const tonStatut = z.enum(['vert', 'orange', 'rouge', 'gris', 'bleu']);
 
 /**
- * The agent's dedicated page (`/agents/<slug>`), following the SEO content brief (Notion "04 · Le
- * contenu"): the job in the customer's words first, then the problem, what the agent does, a
- * customer scenario, the tools, a FAQ, links, and the update date.
+ * "Exemple d'usage" (Exemple.astro): Patrick's example cut into steps; beside them, a Hatch OS
+ * window where each step shows a request (who, what) and the agent's answer card (BunBun, the
+ * fictional demo network).
+ */
+const carte = z.strictObject({
+  /** Orange label at the top of the card, with its icon (none when the card opens on a banner). */
+  icone: icone.optional(),
+  libelle: texte.optional(),
+  /** Large line under the label (a score, a sheet title…). */
+  titre: texte.optional(),
+  /** A coloured banner (an announcement's visual), then its text. */
+  banniere: texte.optional(),
+  texte: texte.optional(),
+  lignes: z
+    .array(z.strictObject({ texte, etat: texte, ton: tonStatut }))
+    .max(4)
+    .default([]),
+  pastilles: z
+    .array(z.strictObject({ texte, icone, sombre: z.boolean() }))
+    .max(3)
+    .default([]),
+  /** Buttons under the card: a secondary one, then the primary one. */
+  boutons: z.tuple([texte, texte]).optional(),
+});
+const etape = z.strictObject({
+  /** Patrick's words for this step. */
+  texte,
+  demande: z.strictObject({ qui: texte, texte }),
+  carte,
+});
+
+/**
+ * The agent's dedicated page (`/agents/<slug>`), after the Pencil mock-ups "Page agent — <agent>"
+ * (César 10/10). Its copy is Patrick's (Notion "08 · Pages agents · contenus prêts à intégrer"),
+ * taken word for word; the feature wall's copy is in src/content/agents-bento/. Section headings
+ * are the shared labels of src/content/pages/agent/<locale>.yaml.
  */
 const fiche = z.strictObject({
-  /** Draft copy (to be reviewed by Patrick): the page is meant to stay out of the index meanwhile. */
+  /** Draft copy: the page is not built, and tiles and cards pointing to it are not links. */
   brouillon: z.boolean(),
-  /** Last review of the page, shown at its bottom ("Mis à jour le …"). */
+  /** Last review of the page: structured data only (`dateModified`), never shown (César 12/10). */
   updated: z.iso.date(),
-  seo: z.strictObject({ title: texte.max(60), description: texte.min(120).max(160) }),
+  seo: z.strictObject({ title: texte.max(80), description: texte.min(120).max(220) }),
   /** H1: the job in the customer's words, not the bird's name. */
   title: texte,
   /** First sentence of the page: who is served, which problem, which result. No unsourced gain. */
   lead: texte,
   /**
-   * The problem as lived. The request shown beside it is the agent's notification in the home's
-   * Problème section (BunBun, the fictional demo network), looked up by agent.
+   * The problem, landing-page style (César 12/10): a short title naming the pain, one or two
+   * concrete sentences. The objects that show it are in src/content/agents-probleme/.
    */
-  problem: z.strictObject({ title: texte, text: texte }),
-  /** What the agent does, in its own voice; shown beside its diorama demo screen (`demo`). */
-  actions: z.strictObject({ title: texte, items: z.array(point).min(3).max(4) }),
-  demo: z.enum(demoCles),
-  /** A real customer scenario, only with the customer's consent; `null` hides the block. */
-  scenario: z
-    .strictObject({
-      title: texte,
-      text: texte,
-    })
-    .nullable(),
-  /** Tools it plugs into: only those that really work today. */
-  tools: z.strictObject({
-    text: texte,
-    items: z
-      .array(z.strictObject({ name: texte, logo: z.enum(toolLogos).optional() }))
-      .min(1)
-      .max(10),
+  problem: z.strictObject({ titre: texte, texte }),
+  /**
+   * What the agent does, Patrick's lines. The feature wall shows them as visuals; these stay in the
+   * section for screen readers and search engines.
+   */
+  actions: z.array(riche).min(3).max(9),
+  /** "Vous gardez la main": what the agent does alone, and what you decide. */
+  control: z.strictObject({
+    agent: z.array(texte).min(1).max(5),
+    you: z.array(texte).min(1).max(5),
   }),
+  exemple: z.strictObject({
+    /** Patrick's opening sentence of the example, when it sets the scene. */
+    intro: texte.optional(),
+    /** Under the agent's name in the window title bar ("Communications"). */
+    contexte: texte,
+    etapes: z.array(etape).min(2).max(5),
+  }),
+  /**
+   * "Il travaille avec": cards (a tool's app icon or an agent's render, Patrick's line under it),
+   * or, for Lark, Patrick's sentence and the agents it gathers.
+   */
+  with: z.union([
+    z.strictObject({
+      cartes: z
+        .array(
+          z.strictObject({
+            titre: texte,
+            texte,
+            visuel: z.union([
+              /** The agents the card names, in its title's order (« Peep et Owl »). */
+              z.strictObject({ agents: z.array(z.enum(agentSlugs)).min(1).max(3) }),
+              /** A Lucide icon, or `whatsapp` for WhatsApp's own logo. */
+              z.strictObject({ icone, ton: z.enum(['whatsapp', 'bleu', 'cuivre']) }),
+            ]),
+          }),
+        )
+        .min(2)
+        .max(4),
+    }),
+    z.strictObject({ texte, agents: z.array(z.enum(agentSlugs)).min(2).max(6) }),
+  ]),
   faq: z
     .array(z.strictObject({ q: texte, a: texte }))
     .min(3)
-    .max(5),
-  /** Agents that work with this one (cards at the bottom). */
-  related: z.array(z.enum(agentSlugs)).min(1).max(3),
+    .max(6),
+  /** "Pour aller plus loin": the agents to read next, each with Patrick's words for it. */
+  related: z
+    .array(z.strictObject({ agent: z.enum(agentSlugs), texte }))
+    .min(1)
+    .max(3),
 });
 
 /**

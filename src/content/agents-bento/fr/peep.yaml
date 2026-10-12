@@ -1,0 +1,73 @@
+# Mur « Ce que Peep fait pour vous », d'après la maquette Pencil « Page agent — Peep v4 ».
+agent: peep
+terrain:
+  titre: Répond au terrain
+  contact: Peep
+  statut: en ligne
+  jour: Aujourd'hui
+  messages:
+    - de: equipe
+      texte: Où est la fiche allergènes du nouveau burger ?
+      heure: '14:02'
+    - de: agent
+      document:
+        titre: Allergènes carte d'automne
+        meta: 2 pages · PDF
+      texte: Le burger signature contient gluten, œuf et sésame.
+      signature: Peep · 14:02
+    - de: equipe
+      texte: Et pour le menu enfant ?
+      heure: '14:03'
+    - de: agent
+      texte: 'Sans sésame : gluten et lait. Fiche p. 2.'
+      signature: Peep · 14:03
+vocal:
+  titre: Notes vocales
+  duree: '0:12'
+  transcription: « Combien de sauce sur le burger signature ? »
+installer:
+  titre: Rien à installer
+langues:
+  titre: Dans la langue de chacun
+  phrases:
+    - { lang: fr, texte: 'Gluten, œuf, sésame.' }
+    - { lang: bn, texte: 'গ্লুটেন, ডিম, তিল।' }
+    - { lang: es, texte: 'Gluten, huevo, sésamo.' }
+    - { lang: ta, texte: 'பசையம், முட்டை, எள்.' }
+    - { lang: en, texte: 'Gluten, egg, sesame.' }
+invente:
+  titre: N'invente rien
+  texte: Ce qui n'est pas dans vos documents part au siège.
+  notif:
+    titre: Transmis au siège
+    meta: Lyon Part-Dieu · 14:10
+ciblage:
+  titre: Ciblé par étiquettes
+  etiquettes:
+    - { texte: Carte d'automne, actif: true }
+    - { texte: Franchisé, actif: true }
+    - { texte: Succursale, actif: false }
+    - { texte: Kiosque, actif: false }
+  total: 12 restaurants
+lecture:
+  titre: Qui a lu quoi
+  valeur: 10
+  sur: 12
+  legende: restaurants ont lu « Burger d'automne »
+  lignes:
+    - { texte: Lille Centre, etat: 'Lu · 09:12', ton: vert }
+    - { texte: Lyon Part-Dieu, etat: 'Lu · 09:40', ton: vert }
+    - { texte: Lille Flandres, etat: 'Lu · 10:05', ton: vert }
+    - { texte: Marseille Prado, etat: 'Lu · 11:30', ton: vert }
+    - { texte: Nantes Centre, etat: Relancé, ton: orange }
+    - { texte: Bordeaux Gare, etat: Non lu, ton: gris }
+redaction:
+  titre: Rédige vos communications
+  ideeLibelle: Votre idée
+  idee: Le burger d'automne, avec la fiche et un quiz
+  banniere: Burger d'automne
+  texte: Disponible dès lundi dans les restaurants de la carte d'automne. Fiche jointe.
+  pastille: Quiz · 3 questions
+envoi:
+  titre: Envoi programmé
+  heure: Lundi · 9:00

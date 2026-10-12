@@ -1,0 +1,33 @@
+agent: peep
+mail:
+  de: Claire · BunBun HQ
+  a: All restaurants
+  date: 29 Sept
+  objet: Autumn burger launch
+  apercu: Hi all, the autumn burger arrives in restaurants on Monday 12 October. Recipe sheet and posters attached.
+  piece: Autumn_burger_recipe_sheet.pdf
+groupe:
+  nom: BunBun Franchisees
+  membres: Claire, Karim, Kevin, Sarah and 21 others
+  nonLus: '147'
+  annonce:
+    date: 29 September
+    texte: The autumn burger launches on Monday 12 October! Sheet and posters sent by email.
+    heure: '09:14'
+  bavardage:
+    - de: Kevin · Lyon Part-Dieu
+      texte: Anyone got spare kraft boxes? Delivery pushed back to Monday
+      heure: '11:02'
+    - de: Sarah · Lille Centre
+      texte: Card machine down again, anyone have the support number?
+      heure: '18:47'
+  jour: Today
+  question:
+    de: Karim · Bordeaux
+    texte: When does the new burger launch? Nothing has arrived in Bordeaux.
+    heure: '10:41'
+appel:
+  app: Phone
+  quand: now
+  de: Karim · Bordeaux
+  texte: Missed call

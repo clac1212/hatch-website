@@ -1,0 +1,374 @@
+---
+import type { ProblemeDe } from '../../../content/schemas/agent-probleme';
+
+interface Props {
+  d: ProblemeDe<'sparrow'>;
+}
+const { d } = Astro.props;
+const lettres = ['A', 'B', 'C', 'D', 'E'];
+---
+
+<div class="panneau">
+  <div class="boite" data-c style="--i:0">
+    <p class="boite-tete">
+      <b class="flex-1">{d.boite.titre}</b>
+      <span class="non-lus" data-final>{d.boite.nonLus}</span>
+    </p>
+    <ul>
+      {
+        d.boite.messages.map((m) => (
+          <li>
+            <span class="point" />
+            <span class="msg">
+              <span class="msg-ligne">
+                <b>{m.de}</b>
+                <span class="heure">{m.heure}</span>
+              </span>
+              <span class="msg-objet">{m.objet}</span>
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <div class="tableur" data-c style="--i:1">
+    <p class="fichier">{d.tableur.fichier}</p>
+    <table>
+      <thead>
+        <tr class="lettres">
+          <th></th>
+          {lettres.map((l) => <th>{l}</th>)}
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="entetes">
+          <th>1</th>
+          {d.tableur.colonnes.map((c) => <td>{c}</td>)}
+        </tr>
+        {
+          d.tableur.lignes.map((l, n) => (
+            <tr class:list={[l.surligne && l.surligne.colonne === undefined && l.surligne.couleur]}>
+              <th>{n + 2}</th>
+              {l.cellules.map((c, k) => (
+                <td class:list={[l.surligne?.colonne === k && l.surligne.couleur]}>{c}</td>
+              ))}
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+    <p class="onglets">
+      {
+        d.tableur.onglets.map((o, n) => (
+          <span class:list={['onglet', n === 0 && 'actif']}>{o}</span>
+        ))
+      }
+    </p>
+  </div>
+
+  <div class="mail" data-c style="--i:2">
+    <p class="mail-tete">
+      <span class="mail-av">{d.mail.de.charAt(0)}</span>
+      <b class="flex-1">{d.mail.de}</b>
+      <span class="heure">{d.mail.heure}</span>
+    </p>
+    <p class="mail-objet">{d.mail.objet}</p>
+    <p class="mail-corps">{d.mail.corps}</p>
+    <p class="mail-sign">{d.mail.signature}</p>
+  </div>
+</div>
+
+<style>
+  .panneau {
+    position: relative;
+    aspect-ratio: 6 / 5;
+    overflow: hidden;
+    border-radius: 28px;
+    background: var(--color-mur);
+    container-type: size;
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+  }
+  .panneau > * {
+    position: absolute;
+    border-radius: 2.4cqw;
+    background: var(--color-white);
+  }
+  .heure {
+    flex: none;
+    font-weight: 400;
+    color: var(--color-gray-500);
+  }
+
+  /* The inbox */
+  .boite {
+    top: 4cqh;
+    left: 3.5cqw;
+    width: 53cqw;
+    padding: 2.2cqw 0 0.4cqw;
+    box-shadow: var(--shadow-1);
+    rotate: -2deg;
+    font-size: 2cqw;
+  }
+  .boite-tete {
+    display: flex;
+    align-items: center;
+    gap: 1.6cqw;
+    padding: 0 3cqw 1.6cqw;
+    border-bottom: 1px solid var(--color-ligne-claire);
+    font-size: 2.6cqw;
+  }
+  .non-lus {
+    padding: 0.6cqw 1.6cqw;
+    border-radius: 999px;
+    background: var(--color-statut-rouge);
+    font-size: 2cqw;
+    font-weight: 600;
+    color: var(--color-white);
+  }
+  .boite li {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.6cqw;
+    padding: 1.1cqw 3cqw 1.1cqw 2cqw;
+    border-bottom: 1px solid var(--color-ligne-claire);
+  }
+  .boite li:last-child {
+    border-bottom: 0;
+  }
+  .point {
+    flex: none;
+    width: 1.4cqw;
+    height: 1.4cqw;
+    margin-top: 0.9cqw;
+    border-radius: 999px;
+    background: var(--color-statut-bleu);
+  }
+  .msg {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.2cqw;
+    min-width: 0;
+  }
+  .msg-ligne {
+    display: flex;
+    gap: 2cqw;
+    justify-content: space-between;
+  }
+  .msg-objet {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--color-gray-700);
+  }
+
+  /* The spreadsheet kept by hand */
+  .tableur {
+    bottom: 3cqh;
+    left: 5cqw;
+    width: 86cqw;
+    overflow: hidden;
+    border-radius: 1.2cqw;
+    box-shadow: var(--shadow-2);
+    rotate: 1deg;
+    font-size: 1.9cqw;
+  }
+  .fichier {
+    padding: 1cqw 2cqw;
+    border-bottom: 1px solid var(--color-gray-400);
+    background: var(--color-gray-100);
+    font-size: 2cqw;
+    font-weight: 600;
+    text-align: center;
+    color: var(--color-gray-800);
+  }
+  .tableur table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+  .tableur th,
+  .tableur td {
+    height: 4cqw;
+    padding: 0 1cqw;
+    overflow: hidden;
+    border: 1px solid var(--color-stone);
+    white-space: nowrap;
+    text-align: left;
+  }
+  .tableur th {
+    padding: 0;
+    background: var(--color-gray-50);
+    font-weight: 400;
+    text-align: center;
+    color: var(--color-gray-500);
+  }
+  .tableur th:first-child {
+    border-left: 0;
+  }
+  .lettres th {
+    height: 2.9cqw;
+  }
+  .lettres th:first-child {
+    width: 4cqw;
+  }
+  .lettres th:nth-child(2) {
+    width: 21%;
+  }
+  .lettres th:nth-child(6) {
+    width: 22%;
+  }
+  .entetes td {
+    font-weight: 700;
+  }
+  .jaune {
+    background: color-mix(in srgb, var(--color-amber-line) 60%, var(--color-white));
+  }
+  .rose {
+    background: color-mix(in srgb, var(--color-statut-rouge) 22%, var(--color-white));
+  }
+  .bleu {
+    background: color-mix(in srgb, var(--color-statut-bleu) 22%, var(--color-white));
+  }
+  .onglets {
+    display: flex;
+    gap: 0.4cqw;
+    padding: 0 0 0 4cqw;
+    border-top: 1px solid var(--color-gray-400);
+    background: var(--color-gray-100);
+    font-size: 1.9cqw;
+    color: var(--color-gray-700);
+  }
+  .onglet {
+    padding: 0.7cqw 1.8cqw;
+    white-space: nowrap;
+  }
+  .onglet.actif {
+    margin-top: -1px;
+    background: var(--color-white);
+    font-weight: 600;
+    color: var(--color-ink);
+    box-shadow: inset 0 -2px 0 var(--color-gray-800);
+  }
+
+  /* The candidate's email */
+  .mail {
+    top: 7cqh;
+    right: 3cqw;
+    width: 39cqw;
+    padding: 2.8cqw 3cqw;
+    box-shadow: var(--shadow-3);
+    rotate: 3deg;
+    font-size: 2.2cqw;
+  }
+  .mail-tete {
+    display: flex;
+    align-items: center;
+    gap: 1.6cqw;
+  }
+  .mail-av {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 5cqw;
+    height: 5cqw;
+    border-radius: 999px;
+    background: var(--color-orange-tint);
+    font-weight: 700;
+    color: var(--color-orange-txt);
+  }
+  .mail-objet {
+    margin: 1.8cqw 0 1.4cqw;
+    font-size: 2.5cqw;
+    font-weight: 600;
+  }
+  .mail-corps {
+    line-height: 1.45;
+  }
+  .mail-sign {
+    margin-top: 1.8cqw;
+    color: var(--color-gray-500);
+  }
+
+  @media (max-width: 47.99rem) {
+    .panneau {
+      aspect-ratio: 3 / 4;
+    }
+    .boite {
+      top: 3cqh;
+      left: 4cqw;
+      width: 80cqw;
+      padding-top: 3.4cqw;
+      font-size: 2.9cqw;
+    }
+    .boite-tete {
+      padding: 0 4cqw 2.6cqw;
+      font-size: 3.6cqw;
+    }
+    .non-lus {
+      padding: 0.8cqw 2.2cqw;
+      font-size: 2.8cqw;
+    }
+    .boite li {
+      gap: 2cqw;
+      padding: 1.8cqw 4cqw 1.8cqw 3cqw;
+    }
+    .boite li:nth-child(n + 4) {
+      display: none;
+    }
+    .point {
+      width: 1.8cqw;
+      height: 1.8cqw;
+      margin-top: 1.2cqw;
+    }
+    .mail {
+      top: 37.5cqh;
+      right: 3cqw;
+      width: 62cqw;
+      padding: 3.6cqw 4cqw;
+      font-size: 3cqw;
+    }
+    .mail-av {
+      width: 6.6cqw;
+      height: 6.6cqw;
+    }
+    .mail-objet {
+      font-size: 3.4cqw;
+    }
+    .tableur {
+      bottom: 2.5cqh;
+      left: 3cqw;
+      width: 94cqw;
+      font-size: 2.6cqw;
+    }
+    .fichier {
+      font-size: 2.8cqw;
+    }
+    .tableur th,
+    .tableur td {
+      height: 5.6cqw;
+      padding: 0 0.8cqw;
+    }
+    .lettres th:first-child {
+      width: 4.6cqw;
+    }
+    .lettres th {
+      height: 4cqw;
+    }
+    .lettres th:nth-child(2) {
+      width: 25%;
+    }
+    .lettres th:nth-child(6) {
+      width: 23%;
+    }
+    .onglets {
+      padding-left: 4.6cqw;
+      font-size: 2.6cqw;
+    }
+    .onglet {
+      padding: 1.1cqw 1.8cqw;
+    }
+  }
+</style>

@@ -1,0 +1,92 @@
+# Scène « Exemple d'usage » de Sparrow : chaque étape montre l'appareil de celui qui agit (César 11/10).
+agent: sparrow
+salon:
+  modes: [Vidéo, Photo, Portrait]
+  panneau: Ouvrez votre BunBun
+  banniere: { app: WhatsApp, texte: Écrire à BunBun Franchise }
+whatsapp:
+  contact: BunBun Franchise
+  statut: Compte professionnel
+  jour: "Aujourd'hui"
+  champ: Message
+  premier: { texte: 'Bonjour, je souhaite ouvrir un restaurant à Nantes.', heure: '10:21' }
+  accueil:
+    texte: "Bonjour, je suis l'assistant IA de l'enseigne. Quelques questions pour préparer votre dossier."
+    heure: '10:21'
+  question:
+    texte: 'Quel est votre apport personnel, et dans quelle ville souhaitez-vous ouvrir ?'
+    heure: '10:22'
+  reponse:
+    texte: "80 000 € d'apport, pour Nantes. J'ai dirigé une boulangerie pendant six ans."
+    heure: '10:24'
+  recap:
+    titre: Votre dossier
+    lignes:
+      - { texte: Apport · 80 000 €, etat: Vérifié }
+      - { texte: Zone · Nantes, etat: Disponible }
+      - { texte: Expérience · 6 ans, etat: Vérifiée }
+    heure: '10:24'
+  pieces:
+    texte: "Merci Thomas. Envoyez-moi un justificatif d'apport et une pièce d'identité, je transmets votre dossier à Marc, notre développeur réseau."
+    heure: '10:25'
+  document: { nom: Justificatif_apport.pdf, meta: 2 pages · PDF, heure: '10:31' }
+pipeline:
+  app: Hatch OS
+  contexte: Développement · Candidats
+  titre: Pipeline candidats
+  agent: Sparrow actif
+  colonnes:
+    - nom: Contact
+      total: 24
+      cartes:
+        - { nom: Julien Morel, ville: Rennes }
+        - { nom: Hugo Petit, ville: Tours }
+    - nom: Qualifié
+      total: 9
+      cartes:
+        - { nom: Camille Benoît, ville: Angers }
+    - nom: Rencontre
+      total: 4
+      cartes:
+        - { nom: Paul Garnier, ville: Montpellier }
+        - { nom: Chloé Roux, ville: Lyon }
+  candidat: { nom: Thomas Leroy, ville: Nantes, badge: Nouveau, note: Qualifié par Sparrow }
+  dossier:
+    libelle: Dossier candidat
+    titre: Thomas Leroy · Nantes
+    statut: Prêt pour le rendez-vous
+    lignes:
+      - { texte: Apport · 80 000 €, etat: Vérifié }
+      - { texte: Zone · Nantes, etat: Disponible }
+      - { texte: Expérience · 6 ans en commerce, etat: Vérifiée }
+      - { texte: "Justificatif d'apport", etat: Reçu }
+      - { texte: "Pièce d'identité", etat: Demandée, attente: true }
+    piece: "Justificatif d'apport · PDF"
+    bouton: Fixer le rendez-vous
+espace:
+  invitation:
+    app: Hatch OS
+    quand: maintenant
+    titre: BunBun Nantes
+    texte: Marc vous a invité dans votre espace porteur de projet.
+  marque: Espace porteur de projet
+  bonjour: Bonjour Thomas
+  projet: BunBun Nantes
+  date: Ouverture prévue le 3 mars
+  modele: "Modèle d'ouverture BunBun · 42 tâches · 20 semaines"
+  mois: [Oct., Nov., Déc., Janv., Févr., Mars]
+  phases:
+    - { texte: Local, debut: 7, fin: 24, etat: en-cours }
+    - { texte: Travaux, debut: 20, fin: 62, etat: a-venir }
+    - { texte: Recrutement, debut: 50, fin: 76, etat: a-venir }
+    - { texte: Formation, debut: 66, fin: 82, etat: a-venir }
+    - { texte: Ouverture, debut: 82, fin: 86, etat: jalon }
+  etapes:
+    titre: Mes prochaines étapes
+    compte: 3 / 42 tâches
+    taches:
+      - { texte: Contrat de franchise, etat: Signé, faite: true }
+      - { texte: Kbis de la société, etat: Envoyé, faite: true }
+      - { texte: Plan du local, etat: Envoyé, faite: true }
+      - { texte: Devis travaux, etat: À envoyer, faite: false }
+  recalcul: Rétroplanning recalculé si une date bouge

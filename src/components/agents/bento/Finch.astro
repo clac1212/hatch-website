@@ -1,0 +1,797 @@
+---
+import { Image, Picture } from 'astro:assets';
+import type { BentoDe } from '../../../content/schemas/bento';
+import Tuile from '../Tuile.astro';
+import Icone from '../Icone.astro';
+import IphoneReel from '../IphoneReel.astro';
+import LogoWhatsapp from '../LogoWhatsapp.astro';
+import Ipad from '../../ui/Ipad.astro';
+import { centres } from '../visuels';
+import jointAvant from '../../../assets/agents/finch/joint-avant.jpg';
+import jointApres from '../../../assets/agents/finch/joint-apres.jpg';
+import pressePapiers from '../../../assets/agents/finch/presse-papiers.jpg';
+
+/**
+ * Finch's feature wall, the pilot of the "more real" walls (César 11/10): not every tile is an
+ * interface. A real phone runs the audit, the weights are large type, the score sits on a dark
+ * tile in a gauge, the action plan is a sheet of paper on another, the report arrives as a
+ * lock-screen notification, self-assessment is a voxel object, the proof is a before/after pair
+ * of photos with its stamp, the dashboard is on an iPad. The centre tile (Finch's render) is at
+ * column 3, row 2 (Mur.astro).
+ */
+interface Props {
+  d: BentoDe<'finch'>;
+}
+const { d } = Astro.props;
+const teinte = centres.finch.fond;
+const pourcent = (n: number, sur: number) => `${Math.round((100 * n) / sur)}%`;
+/** Gauge: a circle of radius 52, its circumference, the arc for the score. */
+const ARC = 2 * Math.PI * 52;
+---
+
+<Tuile
+  col={1}
+  row={1}
+  w={2}
+  h={2}
+  titre={d.mobile.titre}
+  class="t-finch-mobile"
+  style={`background-color:${teinte}`}
+>
+  <div class="tel" data-c>
+    <IphoneReel>
+      <div class="app">
+        <p class="app-statut">
+          <span>{d.mobile.heure}</span>
+        </p>
+        <p class="app-tete">
+          <Icone nom="chevron-left" taille={13} />
+          <b>{d.mobile.app}</b>
+        </p>
+        <p class="app-point">
+          <span>{d.mobile.point}</span>
+          <span>{d.mobile.n} / {d.mobile.total}</span>
+        </p>
+        <span class="app-progres"
+          ><span style={`width:${pourcent(d.mobile.n, d.mobile.total)}`}></span></span
+        >
+        <p class="app-controle">{d.mobile.controle}</p>
+        <Image src={jointAvant} alt="" width={420} class="app-photo" loading="lazy" />
+        <p class="app-choix">
+          <span>{d.mobile.conforme}</span>
+          <span class="on">{d.mobile.nonConforme}</span>
+        </p>
+        <p class="app-historique">
+          <Icone nom="history" taille={10} />
+          {d.mobile.historique}
+        </p>
+      </div>
+    </IphoneReel>
+  </div>
+</Tuile>
+
+<Tuile col={3} row={1} w={1} h={1} titre={d.grilles.titre}>
+  <ul class="poids">
+    {
+      d.grilles.lignes.map((l, i) => (
+        <li data-c style={`--i:${i}`}>
+          <b class={`poids-${i}`}>{l.poids}</b>
+          <span>{l.texte}</span>
+        </li>
+      ))
+    }
+  </ul>
+</Tuile>
+
+<Tuile col={4} row={1} w={1} h={1} titre={d.score.titre} class="t-finch-score">
+  <div class="jauge">
+    <svg viewBox="0 0 120 120" aria-hidden="true">
+      <circle cx="60" cy="60" r="52" class="jauge-fond"></circle>
+      <circle
+        cx="60"
+        cy="60"
+        r="52"
+        class="jauge-arc"
+        style={`--arc:${ARC};--plein:${ARC * (1 - d.score.valeur / 100)}`}></circle>
+    </svg>
+    <p class="jauge-chiffre">
+      <span data-compte={d.score.valeur}>{d.score.valeur}</span>
+      <small>{d.score.sur}</small>
+    </p>
+  </div>
+</Tuile>
+
+<Tuile col={5} row={1} w={2} h={2} titre={d.plan.titre} class="t-finch-plan">
+  <div class="papiers">
+    <span class="feuille feuille-dessous" aria-hidden="true"></span>
+    <div class="feuille" data-c>
+      <p class="feuille-tete">
+        <b>{d.plan.document}</b>
+        <span class="feuille-ia">
+          <span class="inline-flex" data-amb="pouls">
+            <Icone nom="sparkles" taille={11} />
+          </span>
+          {d.plan.signature}
+        </span>
+      </p>
+      <ol>
+        {
+          d.plan.lignes.map((l, i) => (
+            <li data-c style={`--i:${i + 1}`}>
+              <span class="rang">{i + 1}</span>
+              <span class="flex-1">{l.texte}</span>
+              <span class={`statut statut-${l.ton}`}>{l.etat}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </div>
+</Tuile>
+
+<Tuile col={1} row={3} w={1} h={1} titre={d.rapport.titre} class="t-finch-rapport" plein>
+  <div class="verrou" aria-hidden="true">
+    <Picture
+      src={centres.finch.src}
+      alt=""
+      formats={['avif', 'webp']}
+      widths={[400]}
+      sizes="200px"
+      class="verrou-fond"
+    />
+  </div>
+  <div class="verrou-corps">
+    <p class="verrou-heure">{d.rapport.heure}</p>
+    <div class="notif" data-c>
+      <p class="notif-tete">
+        <span class="notif-app"><LogoWhatsapp taille={10} /></span>
+        <span class="flex-1">{d.rapport.app}</span>
+        <span>{d.rapport.quand}</span>
+      </p>
+      <b>{d.rapport.expediteur}</b>
+      <span class="notif-pdf">
+        <span class="pdf">PDF</span>
+        {d.rapport.document}
+      </span>
+    </div>
+  </div>
+</Tuile>
+
+<Tuile col={2} row={3} w={1} h={1} titre={d.auto.titre} class="t-finch-auto" plein>
+  <Picture
+    src={pressePapiers}
+    alt=""
+    formats={['avif', 'webp']}
+    widths={[400, 600]}
+    sizes="200px"
+    class="auto-image"
+  />
+  <span class="auto-pastille" data-c>{d.auto.texte}</span>
+</Tuile>
+
+<Tuile col={5} row={3} w={2} h={2} titre={d.tableau.titre} class="t-finch-tableau">
+  <div class="tablette" data-c>
+    <Ipad>
+      <div class="tb">
+        <p class="tb-tete">
+          <b>{d.tableau.ecran}</b>
+          <span>{d.tableau.texte}</span>
+        </p>
+        <ul class="tb-lignes">
+          {
+            d.tableau.lignes.map((l, i) => (
+              <li>
+                <span class="tb-libelle">
+                  <span>{l.texte}</span>
+                  <b>
+                    {l.restaurants} {d.tableau.unite}
+                  </b>
+                </span>
+                <span class="tb-piste">
+                  <span style={`width:${pourcent(l.restaurants, d.tableau.sur)};--i:${i}`} />
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </Ipad>
+  </div>
+</Tuile>
+
+<Tuile
+  col={1}
+  row={4}
+  w={4}
+  h={1}
+  titre={d.preuves.titre}
+  disposition="ligne"
+  class="t-finch-preuves"
+>
+  <div class="preuves">
+    <figure class="photo" data-c>
+      <Image src={jointAvant} alt="" width={420} class="photo-image" loading="lazy" />
+      <figcaption class="photo-etiquette">{d.preuves.avant}</figcaption>
+    </figure>
+    <Icone nom="arrow-right" taille={16} class="shrink-0 text-gray-400" />
+    <figure class="photo" data-c style="--i:1">
+      <Image src={jointApres} alt="" width={420} class="photo-image" loading="lazy" />
+      <figcaption class="photo-etiquette">{d.preuves.apres}</figcaption>
+      <span class="tampon">
+        <Icone nom="badge-check" taille={14} />
+        {d.preuves.tampon}
+      </span>
+    </figure>
+    <p class="preuves-legende">{d.preuves.legende}</p>
+  </div>
+</Tuile>
+
+<style>
+  /* L'audit sur mobile: a real phone, slightly turned, cut by the tile's bottom edge. */
+  :global(.mur .t-finch-mobile .tuile-corps) {
+    justify-content: flex-start;
+    overflow: visible;
+  }
+  .tel {
+    width: 214px;
+    margin-top: 6px;
+    rotate: -5deg;
+  }
+  .app {
+    display: flex;
+    flex-direction: column;
+    gap: 2.6cqw;
+    height: 100%;
+    padding: 4cqw 5cqw;
+    background: var(--color-white);
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+  }
+  .app-statut {
+    padding: 0 3cqw 3cqw;
+    font-size: 5cqw;
+    font-weight: 600;
+  }
+  .app-tete {
+    display: flex;
+    align-items: center;
+    gap: 2cqw;
+    font-size: 5.6cqw;
+  }
+  .app-point {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2cqw;
+    font: 400 4.2cqw/1.2 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-gray-700);
+  }
+  .app-progres {
+    height: 1.4cqw;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--color-gray-100);
+  }
+  .app-progres span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--color-orange);
+  }
+  .app-controle {
+    margin-top: 1.5cqw;
+    font-size: 6.6cqw;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+  .app-photo {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    border-radius: 4cqw;
+    object-fit: cover;
+    object-position: 60% 80%;
+  }
+  .app-choix {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5cqw;
+  }
+  .app-choix span {
+    padding: 3cqw 0;
+    border-radius: 3cqw;
+    box-shadow: inset 0 0 0 1px var(--color-ligne-claire);
+    text-align: center;
+    font-size: 4.6cqw;
+    font-weight: 600;
+    color: var(--color-gray-700);
+  }
+  .app-choix .on {
+    box-shadow: none;
+    background: var(--color-statut-rouge);
+    color: var(--color-white);
+  }
+  .app-historique {
+    display: flex;
+    align-items: center;
+    gap: 1.5cqw;
+    font-size: 4.2cqw;
+    color: var(--color-gray-700);
+  }
+
+  /* Vos grilles, pondérées: the weights as large type, each section beside its weight. */
+  .poids {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+  }
+  .poids li {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    line-height: 1.15;
+  }
+  .poids b {
+    min-width: 56px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--color-orange-txt);
+  }
+  .poids-0 {
+    font-size: 40px;
+    line-height: 1;
+  }
+  .poids-1 {
+    font-size: 30px;
+    line-height: 1.05;
+    opacity: 0.75;
+  }
+  .poids-2 {
+    font-size: 22px;
+    line-height: 1.1;
+    opacity: 0.55;
+  }
+  .poids span {
+    font-size: 13px;
+    color: var(--color-gray-700);
+  }
+
+  /* Un score sur 100: a dark tile, the score in a gauge that fills once. */
+  :global(.mur .tuile.t-finch-score) {
+    background: var(--color-night);
+  }
+  :global(.mur .tuile.t-finch-score .tuile-tete h3) {
+    color: var(--color-white);
+  }
+  .jauge {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 112px;
+    height: 112px;
+    margin-top: 2px;
+  }
+  .jauge svg {
+    position: absolute;
+    inset: 0;
+    rotate: -90deg;
+  }
+  .jauge circle {
+    fill: none;
+    stroke-width: 9;
+  }
+  .jauge-fond {
+    stroke: var(--color-line-night);
+  }
+  .jauge-arc {
+    stroke: var(--color-orange);
+    stroke-linecap: round;
+    stroke-dasharray: var(--arc);
+    stroke-dashoffset: var(--plein);
+  }
+  :global(.mur.js) .jauge-arc {
+    stroke-dashoffset: var(--arc);
+  }
+  :global(.mur.js .vu) .jauge-arc {
+    stroke-dashoffset: var(--plein);
+    transition: stroke-dashoffset 1.4s var(--ease-doux) 0.2s;
+  }
+  .jauge-chiffre {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font: 700 38px/1 var(--font-sans);
+    letter-spacing: -0.04em;
+    color: var(--color-white);
+  }
+  .jauge-chiffre small {
+    margin-top: 2px;
+    font: 400 11px/1 var(--font-sans);
+    letter-spacing: 0;
+    color: color-mix(in srgb, var(--color-white) 60%, transparent);
+  }
+
+  /* Un plan d'action proposé par l'IA: a sheet of paper on another, run off the tile's bottom. */
+  :global(.mur .t-finch-plan .tuile-corps) {
+    align-items: stretch;
+  }
+  .papiers {
+    position: relative;
+    flex: 1;
+    margin: 6px 6px -40px;
+  }
+  .feuille {
+    position: relative;
+    height: 100%;
+    padding: 18px 18px 40px;
+    border-radius: 6px;
+    background: var(--color-white);
+    box-shadow:
+      0 0 0 1px var(--color-ligne-claire),
+      0 14px 30px color-mix(in srgb, var(--color-shadow) 14%, transparent);
+    rotate: -1.5deg;
+  }
+  .feuille-dessous {
+    position: absolute;
+    inset: 10px -4px -6px 10px;
+    background: var(--color-galet);
+    rotate: 3deg;
+  }
+  .feuille-tete {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--color-ligne-claire);
+  }
+  .feuille-tete b {
+    font: 700 17px/1.2 var(--font-display);
+    color: var(--color-ink);
+  }
+  .feuille-ia {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    align-self: flex-start;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: var(--color-orange-tint);
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--color-orange-txt);
+  }
+  .feuille ol li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 0;
+    border-bottom: 1px dashed var(--color-ligne-claire);
+    font-size: 13px;
+    color: var(--color-ink);
+  }
+  .rang {
+    font: 400 11px/1 var(--font-mono);
+    color: var(--color-gray-700);
+  }
+  .statut {
+    flex: none;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 10.5px;
+    font-weight: 600;
+  }
+  .statut-rouge {
+    background: var(--color-statut-rouge-tint);
+    color: var(--color-statut-rouge);
+  }
+  .statut-orange {
+    background: var(--color-amber-tint);
+    color: var(--color-amber-txt);
+  }
+  .statut-gris,
+  .statut-bleu,
+  .statut-vert {
+    box-shadow: inset 0 0 0 1px var(--color-ligne-claire);
+    color: var(--color-gray-700);
+  }
+
+  /* Le rapport sur WhatsApp: the franchisee's lock screen, the notification on it. */
+  :global(.mur .tuile.t-finch-rapport) {
+    color: var(--color-white);
+  }
+  :global(.mur .t-finch-rapport .tuile-tete) {
+    position: relative;
+    z-index: 1;
+    padding: 22px 14px 0;
+  }
+  :global(.mur .tuile.t-finch-rapport .tuile-tete h3) {
+    color: var(--color-white);
+    text-shadow: 0 1px 8px color-mix(in srgb, var(--color-shadow) 40%, transparent);
+  }
+  .verrou {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+  .verrou-fond {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(14px) saturate(1.2) brightness(0.72);
+    scale: 1.25;
+  }
+  .verrou-corps {
+    position: relative;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 10px 12px;
+  }
+  .verrou-heure {
+    margin-bottom: 8px;
+    font: 300 26px/1 var(--font-sans);
+    letter-spacing: -0.02em;
+    color: var(--color-white);
+  }
+  .notif {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 100%;
+    padding: 9px 10px;
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--color-white) 78%, transparent);
+    backdrop-filter: blur(12px);
+    font-size: 10px;
+    color: var(--color-ink);
+  }
+  .notif-tete {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 9px;
+    color: var(--color-gray-700);
+  }
+  .notif-app {
+    display: grid;
+    place-items: center;
+    width: 15px;
+    height: 15px;
+    border-radius: 4px;
+    background: var(--color-whatsapp-brand);
+    color: var(--color-white);
+  }
+  .notif b {
+    font-size: 10.5px;
+  }
+  .notif-pdf {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 4px;
+    font-size: 9px;
+    color: var(--color-gray-700);
+  }
+  .pdf {
+    display: grid;
+    place-items: center;
+    width: 15px;
+    height: 18px;
+    border-radius: 2px;
+    background: var(--color-statut-rouge);
+    font-size: 5px;
+    font-weight: 700;
+    color: var(--color-white);
+  }
+
+  /* L'auto-évaluation: a voxel clipboard, the title over its backdrop. */
+  :global(.mur .t-finch-auto .tuile-tete) {
+    position: relative;
+    z-index: 1;
+    padding: 22px 12px 0;
+  }
+  /* Centred by its insets and auto margins: the reveal owns `translate` on `data-c` elements. */
+  .auto-pastille {
+    position: absolute;
+    right: 0;
+    bottom: 12px;
+    left: 0;
+    width: fit-content;
+    max-width: calc(100% - 12px);
+    margin-inline: auto;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-white) 85%, transparent);
+    box-shadow: var(--shadow-1);
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+    color: var(--color-ink);
+  }
+  .auto-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 75%;
+  }
+
+  /* Un tableau de bord réseau: on an iPad, running off the tile's right edge. */
+  :global(.mur .t-finch-tableau .tuile-corps) {
+    align-items: flex-start;
+    justify-content: flex-end;
+    overflow: visible;
+  }
+  /* ~440 px at 1440 (the tile's width + 48 px), scaled down with the tile below. */
+  .tablette {
+    width: min(440px, calc(100% + 48px));
+    margin: 0 -52px -30px 6px;
+  }
+  .tb {
+    display: flex;
+    flex-direction: column;
+    gap: 4cqw;
+    height: 100%;
+    padding: 5cqw 6cqw;
+    background: var(--color-white);
+    font-family: var(--font-sans);
+  }
+  .tb-tete {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8cqw;
+  }
+  .tb-tete b {
+    font-size: 3.4cqw;
+    color: var(--color-ink);
+  }
+  .tb-tete span {
+    font-size: 2.6cqw;
+    color: var(--color-gray-700);
+  }
+  .tb-lignes {
+    display: flex;
+    flex-direction: column;
+    gap: 3.4cqw;
+  }
+  .tb-libelle {
+    display: flex;
+    justify-content: space-between;
+    gap: 2cqw;
+    margin-bottom: 1.2cqw;
+    font-size: 2.7cqw;
+    color: var(--color-ink);
+  }
+  .tb-libelle b {
+    font-weight: 600;
+    color: var(--color-statut-rouge);
+  }
+  .tb-piste {
+    display: block;
+    height: 1.6cqw;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--color-gray-100);
+  }
+  .tb-piste span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: color-mix(in srgb, var(--color-statut-rouge) 70%, var(--color-white));
+    transform-origin: left;
+  }
+  :global(.mur.js) .tb-piste span {
+    scale: 0 1;
+  }
+  :global(.mur.js .vu) .tb-piste span {
+    scale: 1 1;
+    transition: scale 1s var(--ease-doux) calc(0.4s + var(--i) * 0.15s);
+  }
+
+  /* Des preuves de correction: before, after, and the stamp once the photo is approved. */
+  .preuves {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .photo {
+    position: relative;
+    flex: 0 1 200px;
+    min-width: 0;
+    aspect-ratio: 4 / 3;
+    overflow: visible;
+  }
+  .photo-image {
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    object-fit: cover;
+    object-position: 60% 78%;
+    box-shadow: var(--shadow-1);
+  }
+  .photo-etiquette {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-ink) 70%, transparent);
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--color-white);
+  }
+  .tampon {
+    position: absolute;
+    right: -10px;
+    bottom: -8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border: 2px solid var(--color-success-txt);
+    border-radius: 8px;
+    background: var(--color-white);
+    font: 700 12px/1 var(--font-sans);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-success-txt);
+    rotate: -8deg;
+    box-shadow: var(--shadow-2);
+  }
+  :global(.mur.js) .tampon {
+    scale: 1.6;
+    opacity: 0;
+  }
+  :global(.mur.js .vu) .tampon {
+    scale: 1;
+    opacity: 1;
+    transition:
+      scale 0.45s var(--ease-pop) 1.2s,
+      opacity 0.2s 1.2s;
+  }
+  .preuves-legende {
+    flex-basis: 100%;
+    font-size: 12px;
+    color: var(--color-gray-700);
+  }
+  @media (min-width: 64rem) {
+    .preuves {
+      flex-wrap: nowrap;
+    }
+    .preuves-legende {
+      flex: 0 1 120px;
+      min-width: 72px;
+    }
+  }
+  /* 1024–1280: the lock screen's clock and notification tighten under a three-line title, and the
+     iPad runs off the edge by its bezel only. */
+  @media (min-width: 64rem) and (max-width: 79.99rem) {
+    .verrou-heure {
+      margin-bottom: 4px;
+      font-size: 22px;
+    }
+    .notif {
+      padding: 7px 9px;
+    }
+    .tablette {
+      width: calc(100% + 40px);
+    }
+  }
+  @media (max-width: 39.99rem) {
+    .photo {
+      flex-basis: calc(50% - 22px);
+    }
+    .tablette {
+      width: 420px;
+      margin-right: -150px;
+    }
+  }
+</style>

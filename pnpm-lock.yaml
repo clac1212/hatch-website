@@ -14,6 +14,9 @@ importers:
       '@astrojs/vercel':
         specifier: ^10.0.6
         version: 10.0.6(astro@6.1.10(@types/node@24.12.2)(@vercel/functions@3.4.4)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.2))(react@19.2.5)(rollup@4.60.2)
+      '@lucide/astro':
+        specifier: ^1.54.0
+        version: 1.54.0(astro@6.1.10(@types/node@24.12.2)(@vercel/functions@3.4.4)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.2))
       '@tailwindcss/vite':
         specifier: ^4.2.4
         version: 4.2.4(vite@7.3.2(@types/node@24.12.2)(jiti@2.6.1)(lightningcss@1.32.0))
@@ -428,6 +431,11 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@lucide/astro@1.54.0':
+    resolution: {integrity: sha512-ELSAWstVn2pqfZW5OOAtf0sCBdajUwPiivSixLOc09bjFYuGHqey6NP3ThzXkuDSFz3VzgijOpyze8amGNxNiQ==}
+    peerDependencies:
+      astro: ^4 || ^5 || ^6 || ^7
 
   '@mapbox/node-pre-gyp@2.0.3':
     resolution: {integrity: sha512-uwPAhccfFJlsfCxMYTwOdVfOz3xqyj8xYL3zJj8f0pb30tLohnnFPhLuqp4/qoEz8sNxe4SESZedcBojRefIzg==}
@@ -2226,6 +2234,10 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  '@lucide/astro@1.54.0(astro@6.1.10(@types/node@24.12.2)(@vercel/functions@3.4.4)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.2))':
+    dependencies:
+      astro: 6.1.10(@types/node@24.12.2)(@vercel/functions@3.4.4)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.2)
 
   '@mapbox/node-pre-gyp@2.0.3':
     dependencies:

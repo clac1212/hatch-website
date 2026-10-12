@@ -1,0 +1,23 @@
+# "What Owl does for you" wall, after the Pencil mock-up "Page agent — Owl".
+agent: owl
+kiosque:
+  titre: Runs in kiosk mode
+voix:
+  titre: Understands voice
+  question: “How many fries per portion?”
+  pastille: Voice dictation
+documents:
+  titre: Answers from your documents
+  extrait: Fries · 150 g per portion
+  sources:
+    - { texte: Recipe sheets, source: Google Drive, icone: file-text }
+    - { texte: Fryer cleaning, source: Notion, icone: sparkles }
+    - { texte: HACCP plan, source: PDF, icone: shield-check }
+restaurant:
+  titre: Adapts to the restaurant
+  ecran: Tablet profile
+  tablette: Tablet · Lille Centre
+  etiquettes:
+    - Food court
+    - Autumn menu
+    - Hauts-de-France

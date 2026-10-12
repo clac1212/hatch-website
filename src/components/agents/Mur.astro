@@ -1,0 +1,290 @@
+---
+import { getEntry } from 'astro:content';
+import { Picture } from 'astro:assets';
+import type { AgentSlug } from '../../content/schemas/agents';
+import type { Locale } from '../../i18n/ui';
+import { centres } from './visuels';
+import Peep from './bento/Peep.astro';
+import Owl from './bento/Owl.astro';
+import Pecker from './bento/Pecker.astro';
+import Lark from './bento/Lark.astro';
+import Jay from './bento/Jay.astro';
+import Finch from './bento/Finch.astro';
+import Sparrow from './bento/Sparrow.astro';
+
+/**
+ * "Ce que <agent> fait pour vous": the feature wall of the Pencil mock-ups (César 10/10). Six
+ * columns of 200 px and rows of 200 px at 1440, tiles placed by each agent's component
+ * (bento/<Agent>.astro, its copy in src/content/agents-bento/), the agent in a large centre tile.
+ * Two columns below 1024 px. Patrick's lines (the visuals are decorative) are listed for screen
+ * readers. Tiles reveal their content once, when they come on screen (`.vu`): elements marked
+ * `data-c` arrive in turn (`--i`), figures marked `data-compte` count up (hidden until then, so a
+ * figure never shows its value before dropping to 0). Each time a tile comes on screen (`.anime`),
+ * elements marked `data-amb` live for a few iterations, under 5 s each delay included, then rest
+ * (César 11/10; no loop, so no pause control needed): `onde` (a waveform's bars), `sonne` (a bell
+ * buzzing), `tourne` (a sync icon), `pouls` (a button or a dot pulsing), `flotte` (an app icon
+ * bobbing), `flash` (a lightning blink), `balaye` (a scan line). Nothing moves under reduced motion,
+ * and without JS everything shows at once.
+ */
+interface Props {
+  slug: AgentSlug;
+  name: string;
+  locale: Locale;
+  actions: string[];
+}
+const { slug, name, locale, actions } = Astro.props;
+const entry = await getEntry('agentsBento', `${locale}/${slug}`);
+if (!entry) throw new Error(`Missing src/content/agents-bento/${locale}/${slug}.yaml`);
+const data = entry.data;
+const centre = centres[slug];
+const lecture = (s: string) => s.replace(/\*\*/g, '');
+---
+
+<div class="mur" data-mur>
+  <ul class="sr-only">
+    {actions.map((a) => <li>{lecture(a)}</li>)}
+  </ul>
+  <div
+    class="tuile-agent"
+    style={`--c:${centre.place[0]};--r:${centre.place[1]};background-color:${centre.fond}`}
+  >
+    <Picture
+      src={centre.src}
+      alt=""
+      formats={['avif', 'webp']}
+      widths={[420, 640, 840]}
+      sizes="(min-width: 1024px) 416px, 92vw"
+      class="agent-photo"
+    />
+    <p class="agent-nom">{name}</p>
+  </div>
+  {data.agent === 'peep' && <Peep d={data} />}
+  {data.agent === 'owl' && <Owl d={data} />}
+  {data.agent === 'pecker' && <Pecker d={data} />}
+  {data.agent === 'lark' && <Lark d={data} />}
+  {data.agent === 'jay' && <Jay d={data} />}
+  {data.agent === 'finch' && <Finch d={data} />}
+  {data.agent === 'sparrow' && <Sparrow d={data} />}
+</div>
+
+<script>
+  const nombre = new Intl.NumberFormat(document.documentElement.lang || 'fr').format;
+  const calme = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /** A figure counts from 0 to its value (`data-compte`), in 1.2 s. */
+  const compter = (el: HTMLElement) => {
+    const cible = Number(el.dataset.compte);
+    const debut = performance.now();
+    const pas = (t: number) => {
+      const p = Math.min(1, (t - debut) / 1200);
+      el.textContent = nombre(Math.round(cible * (1 - (1 - p) ** 3)));
+      if (p < 1) requestAnimationFrame(pas);
+    };
+    requestAnimationFrame(pas);
+  };
+
+  for (const mur of document.querySelectorAll<HTMLElement>('[data-mur]')) {
+    if (calme) continue;
+    mur.classList.add('js');
+    const tuiles = mur.querySelectorAll<HTMLElement>('.tuile');
+    const vue = new IntersectionObserver(
+      (entrees) => {
+        for (const e of entrees) {
+          if (!e.isIntersecting) continue;
+          const t = e.target as HTMLElement;
+          vue.unobserve(t);
+          t.classList.add('vu');
+          t.querySelectorAll<HTMLElement>('[data-compte]').forEach(compter);
+        }
+      },
+      { threshold: 0.3 },
+    );
+    tuiles.forEach((t) => vue.observe(t));
+
+    // Living details: their few iterations replay each time the tile comes back on screen.
+    const vie = new IntersectionObserver(
+      (entrees) => {
+        for (const e of entrees) e.target.classList.toggle('anime', e.isIntersecting);
+      },
+      { threshold: 0.4 },
+    );
+    tuiles.forEach((t) => vie.observe(t));
+  }
+</script>
+
+<style>
+  .mur {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  @media (min-width: 64rem) {
+    .mur {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      grid-auto-rows: 200px;
+      gap: 16px;
+    }
+  }
+
+  /* The agent's centre tile: its render, its name on top. */
+  .tuile-agent {
+    position: relative;
+    grid-column: span 2;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 24px;
+  }
+  @media (min-width: 64rem) {
+    .tuile-agent {
+      grid-column: var(--c) / span 2;
+      grid-row: var(--r) / span 2;
+      aspect-ratio: auto;
+    }
+  }
+  .agent-photo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .agent-nom {
+    position: relative;
+    padding-top: 32px;
+    text-align: center;
+    font: 700 clamp(48px, 5vw, 72px) / 1 var(--font-sans);
+    letter-spacing: -0.04em;
+    color: var(--color-ink);
+  }
+
+  /* Reveal: each `data-c` element arrives in turn once its tile is on screen. A counter outside any
+     `data-c` fades in as it starts counting. */
+  .mur.js :global([data-c]),
+  .mur.js :global([data-compte]:not([data-c] [data-compte])) {
+    opacity: 0;
+    translate: 0 10px;
+  }
+  .mur.js :global(.vu [data-c]),
+  .mur.js :global(.vu [data-compte]:not([data-c] [data-compte])) {
+    opacity: 1;
+    translate: 0 0;
+    transition:
+      opacity 0.5s var(--ease-doux),
+      translate 0.6s var(--ease-entree);
+    transition-delay: calc(var(--i, 0) * 110ms + 120ms);
+  }
+
+  /* Living details (`data-amb`), on `transform` so they add to the reveal's `translate`. Each one
+     ends before 5 s, delay included (WCAG 2.2.2): delay + duration × iterations, noted per rule. */
+  .mur.js :global(.anime [data-amb='onde'] > *) {
+    /* ≤ 1.02 s + 1.1 s × 3 = 4.3 s */
+    animation: amb-onde 1.1s ease-in-out calc(var(--j, 0) * 60ms) 3;
+  }
+  .mur.js :global(.anime [data-amb='sonne']) {
+    /* 0.6 s + 2 s × 2 = 4.6 s */
+    transform-origin: 50% 15%;
+    animation: amb-sonne 2s ease-in-out 0.6s 2;
+  }
+  .mur.js :global(.anime [data-amb='tourne']) {
+    /* 0.6 s + 2 s × 2 = 4.6 s */
+    animation: amb-tourne 2s var(--ease-camera) 0.6s 2;
+  }
+  .mur.js :global(.anime [data-amb='pouls']) {
+    /* 0.8 s + 2 s × 2 = 4.8 s */
+    animation: amb-pouls 2s ease-in-out 0.8s 2;
+  }
+  .mur.js :global(.anime [data-amb='flotte']) {
+    /* 2.2 s × 2 = 4.4 s */
+    animation: amb-flotte 2.2s ease-in-out 2;
+  }
+  .mur.js :global(.anime [data-amb='flash']) {
+    /* 0.6 s + 2 s × 2 = 4.6 s */
+    animation: amb-flash 2s ease-in-out 0.6s 2;
+  }
+  .mur.js :global(.anime [data-amb='balaye']) {
+    /* 0.4 s + 2.2 s × 2 = 4.8 s */
+    animation: amb-balaye 2.2s ease-in-out 0.4s 2;
+  }
+  @keyframes amb-onde {
+    50% {
+      transform: scaleY(0.3);
+    }
+  }
+  @keyframes amb-sonne {
+    0%,
+    30%,
+    100% {
+      transform: rotate(0);
+    }
+    5% {
+      transform: rotate(18deg);
+    }
+    10% {
+      transform: rotate(-16deg);
+    }
+    15% {
+      transform: rotate(12deg);
+    }
+    20% {
+      transform: rotate(-8deg);
+    }
+    25% {
+      transform: rotate(4deg);
+    }
+  }
+  @keyframes amb-tourne {
+    0%,
+    20% {
+      transform: rotate(0);
+    }
+    55%,
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  @keyframes amb-pouls {
+    0%,
+    60%,
+    100% {
+      transform: scale(1);
+    }
+    30% {
+      transform: scale(1.07);
+    }
+  }
+  @keyframes amb-flotte {
+    50% {
+      transform: translateY(-5px);
+    }
+  }
+  @keyframes amb-flash {
+    0%,
+    40%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    10% {
+      opacity: 0.35;
+      transform: scale(0.9);
+    }
+    20% {
+      opacity: 1;
+      transform: scale(1.15);
+    }
+  }
+  @keyframes amb-balaye {
+    0% {
+      transform: translateY(0);
+      opacity: 0;
+    }
+    15%,
+    85% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(var(--course, 100px));
+      opacity: 0;
+    }
+  }
+</style>

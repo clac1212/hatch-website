@@ -1,0 +1,37 @@
+agent: pecker
+connexion:
+  plateforme: Training portal
+  titre: Sign in
+  identifiant: Username
+  valeur: yanis.lille-centre
+  motDePasse: Password
+  erreur: Incorrect username or password.
+  bouton: Sign in
+  oubli: Forgot your password?
+suivi:
+  titre: Onboarding path
+  onglets:
+    - All (42)
+    - Never logged in (31)
+  colonnes:
+    - Crew member
+    - Restaurant
+    - Last login
+  lignes:
+    - nom: Yanis
+      restaurant: Lille Centre
+      connexion: Never
+    - nom: Inès
+      restaurant: Nantes
+      connexion: Never
+  plus: Show 29 more
+  progression: 0% complete
+# The PDF itself stays in French: the page's problem is a crew that struggles to read French.
+pdf:
+  fichier: Module1_Accueil_client.pdf
+  pages: 1 / 24
+  titre: Module 1 · Accueil client
+  section: 1.1 Principes généraux
+  paragraphes:
+    - "L'accueil de la clientèle constitue un moment déterminant de l'expérience proposée par l'enseigne. Le collaborateur veille à adopter, dès l'entrée du client dans l'établissement, une posture d'ouverture conforme aux standards définis par le réseau, et s'assure de sa prise en charge dans un délai n'excédant pas trente secondes."
+    - "Conformément aux dispositions de la charte qualité, toute sollicitation formulée par le client fait l'objet d'une réponse appropriée, y compris lorsque celle-ci excède le périmètre habituel des attributions du collaborateur concerné."

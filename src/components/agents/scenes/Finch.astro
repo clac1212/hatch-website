@@ -1,0 +1,1274 @@
+---
+import { Image, Picture } from 'astro:assets';
+import type { SceneDe } from '../../../content/schemas/scenes';
+import IphoneReel from '../IphoneReel.astro';
+import Ipad from '../../ui/Ipad.astro';
+import Icone from '../Icone.astro';
+import LogoWhatsapp from '../LogoWhatsapp.astro';
+import { avatars } from '../../pages/agent-visuels';
+import jointAvant from '../../../assets/agents/finch/joint-avant.jpg';
+import jointApres from '../../../assets/agents/finch/joint-apres.jpg';
+import fondBunbun from '../../../assets/probleme/fond-ecran-bunbun.jpg';
+
+interface Props {
+  d: SceneDe<'finch'>;
+}
+const { d } = Astro.props;
+const { audit, franchise, validation } = d;
+const etapes = [
+  { a: 'audit', e: 0, d: 7.4 },
+  { a: 'franchise', e: 0, d: 9 },
+  { a: 'ipad', e: 0, d: 7.2 },
+];
+const ARC = 2 * Math.PI * 16;
+---
+
+<div class="pile" data-etapes={JSON.stringify(etapes)}>
+  <div class="appareil devant" data-appareil="audit">
+    <div class="tel">
+      <IphoneReel>
+        <div class="ecran-tel app on" data-ecran="0">
+          <p class="statut-heure">{audit.heure}</p>
+          <p class="app-tete">
+            <Icone nom="chevron-left" taille={13} />
+            <b class="flex-1">{audit.app}</b>
+            <span>{audit.n} / {audit.total}</span>
+          </p>
+          <span class="progres"
+            ><span style={`--de:${(audit.n - 1) / audit.total};--a:${audit.n / audit.total}`}
+            ></span></span
+          >
+          <p class="rubrique">
+            {audit.rubrique}
+            <span>{audit.poids}</span>
+          </p>
+          <p class="controle">{audit.controle}</p>
+          <p class="historique">
+            <Icone nom="history" taille={10} />
+            {audit.historique}
+          </p>
+          <div class="cliche">
+            <span class="cliche-vide">
+              <Icone nom="camera" taille={16} />
+              {audit.photo}
+            </span>
+            <Image src={jointAvant} alt="" width={420} class="cliche-photo" loading="lazy" />
+            <span class="flash"></span>
+            <span class="doigt"></span>
+          </div>
+          <p class="choix">
+            <span>{audit.conforme}</span>
+            <span class="non">{audit.nonConforme}<span class="doigt"></span></span>
+          </p>
+
+          <span class="voile"></span>
+          <div class="feuille">
+            <span class="poignee"></span>
+            <div class="bilan">
+              <span class="anneau">
+                <svg viewBox="0 0 40 40" aria-hidden="true">
+                  <circle cx="20" cy="20" r="16" class="anneau-fond"></circle>
+                  <circle
+                    cx="20"
+                    cy="20"
+                    r="16"
+                    class="anneau-arc"
+                    style={`--arc:${ARC};--plein:${ARC * (1 - audit.synthese.score / 100)}`}
+                  ></circle>
+                </svg>
+                <span class="anneau-chiffre">
+                  <span class="compteur" style={`--fi-n:${audit.synthese.score}`}></span>
+                  <small>{audit.synthese.sur}</small>
+                </span>
+              </span>
+              <span class="flex-1">
+                <b>{audit.synthese.titre}</b>
+                <span>{audit.synthese.detail}</span>
+              </span>
+            </div>
+            <p class="ia">
+              <Icone nom="sparkles" taille={10} />
+              {audit.synthese.plan}
+            </p>
+            <ul class="ecarts">
+              {
+                d.plan.map((l, i) => (
+                  <li style={`--t:${3.7 + i * 0.25}s`}>
+                    <span class="flex-1">{l.texte}</span>
+                    <span class={`puce puce-${l.ton}`}>{l.criticite}</span>
+                  </li>
+                ))
+              }
+            </ul>
+            <p class="envoi">
+              <span class="envoyer">
+                <Icone nom="send" taille={12} />
+                {audit.synthese.bouton}
+                <span class="doigt"></span>
+              </span>
+              <span class="envoye">
+                <span class="wa"><LogoWhatsapp taille={9} /></span>
+                {audit.synthese.envoye}
+              </span>
+            </p>
+          </div>
+        </div>
+      </IphoneReel>
+    </div>
+  </div>
+
+  <div class="appareil" data-appareil="franchise">
+    <div class="tel">
+      <IphoneReel>
+        <div class="ecran-tel on" data-ecran="0">
+          <div class="verrou">
+            <Picture
+              src={fondBunbun}
+              alt=""
+              formats={['avif', 'webp']}
+              widths={[500]}
+              sizes="250px"
+              class="verrou-fond"
+            />
+            <p class="verrou-heure">{franchise.heure}</p>
+            <p class="verrou-date">{franchise.date}</p>
+            <div class="notif b" style="--t:0.5s">
+              <p class="notif-tete">
+                <span class="wa"><LogoWhatsapp taille={9} /></span>
+                <span class="flex-1">{franchise.notif.app}</span>
+                <span>{franchise.notif.quand}</span>
+              </p>
+              <b>{franchise.notif.titre}</b>
+              <span>{franchise.notif.texte}</span>
+              <span class="doigt"></span>
+            </div>
+          </div>
+          <div class="chat">
+            <p class="chat-tete">
+              <Icone nom="chevron-left" taille={14} />
+              <Image src={avatars.finch} alt="" width={40} densities={[1]} class="chat-av" />
+              <span class="flex flex-col">
+                <b>{franchise.contact}</b>
+                <span>{franchise.statut}</span>
+              </span>
+            </p>
+            <div class="chat-fil">
+              <div class="bulle b" style="--t:2.9s">
+                <p class="pdf">
+                  <span class="pdf-icone">{franchise.document.type}</span>
+                  <span class="flex min-w-0 flex-col">
+                    <b>{franchise.document.nom}</b>
+                    <span>{franchise.document.meta}</span>
+                  </span>
+                </p>
+                <p>{franchise.message}</p>
+                <ol class="actions">
+                  {
+                    d.plan.map((l, i) => (
+                      <li class="b" style={`--t:${3.3 + i * 0.25}s`}>
+                        <span class="rang">{i + 1}</span>
+                        <span class="flex flex-col">
+                          {l.texte}
+                          <span class={`echeance ton-${l.ton}`}>
+                            {l.criticite} · {l.echeance}
+                          </span>
+                        </span>
+                      </li>
+                    ))
+                  }
+                </ol>
+                <span class="heure-bulle">{franchise.heure}</span>
+              </div>
+              <div class="bulle sortante">
+                {franchise.question}
+                <span class="heure-bulle">
+                  {franchise.heureQuestion}
+                  <Icone nom="check-check" taille={11} class="lu" />
+                </span>
+              </div>
+              <div class="zone-reponse">
+                <span class="points"><span></span><span></span><span></span></span>
+                <div class="bulle reponse">
+                  {franchise.reponse}
+                  <span class="heure-bulle">{franchise.heureQuestion}</span>
+                </div>
+              </div>
+            </div>
+            <p class="saisie">
+              <span class="champ">
+                <span class="placeholder">{franchise.saisie}</span>
+                <span class="tape">{franchise.question}</span>
+              </span>
+              <span class="envoi-wa"
+                ><Icone nom="send-horizontal" taille={12} /><span class="doigt"></span></span
+              >
+            </p>
+          </div>
+        </div>
+      </IphoneReel>
+    </div>
+  </div>
+
+  <div class="appareil" data-appareil="ipad">
+    <div class="tablette">
+      <Ipad>
+        <div class="val on" data-ecran="0">
+          <p class="val-barre">
+            <Image src={avatars.finch} alt="" width={40} densities={[1]} class="val-av" />
+            <b class="flex-1">{validation.app}</b>
+            <span>{validation.date}</span>
+          </p>
+          <div class="val-corps">
+            <div class="preuve">
+              <p class="val-rubrique">{validation.rubrique}</p>
+              <p class="val-titre">
+                {validation.controle}
+                <span class="puce puce-rouge">{validation.criticite}</span>
+              </p>
+              <div class="photos">
+                <figure class="photo">
+                  <Image src={jointAvant} alt="" width={360} class="photo-image" loading="lazy" />
+                  <figcaption>{validation.avant}</figcaption>
+                </figure>
+                <figure class="photo apres">
+                  <Image src={jointApres} alt="" width={360} class="photo-image" loading="lazy" />
+                  <figcaption>{validation.apres}</figcaption>
+                  <span class="tampon">
+                    <Icone nom="badge-check" taille={14} />
+                    {validation.tampon}
+                  </span>
+                </figure>
+              </div>
+              <p class="depose">
+                <Icone nom="camera" taille={11} />
+                {validation.depose}
+              </p>
+              <p class="valider">
+                <span class="valider-bouton">
+                  {validation.bouton}
+                  <span class="doigt"></span>
+                </span>
+                <span class="valide">
+                  <Icone nom="check" taille={13} />
+                  {validation.valide}
+                </span>
+              </p>
+            </div>
+            <div class="tableau">
+              <p class="tableau-libelle">
+                <Icone nom="trending-up" taille={11} />
+                {validation.tableau.libelle}
+              </p>
+              <p class="tableau-chiffre">
+                <span class="compteur" style={`--fi-n:${validation.tableau.nombre}`}></span>
+                <span>{validation.tableau.unite}</span>
+              </p>
+              <p class="tableau-point">{validation.controle}</p>
+              <ul class="tableau-lignes">
+                {
+                  validation.tableau.lignes.map((l, i) => (
+                    <li style={`--t:${4 + i * 0.3}s`}>
+                      <span class="flex-1">{l.texte}</span>
+                      <span class={`puce puce-${l.ton}`}>{l.etat}</span>
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+          </div>
+        </div>
+      </Ipad>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* An integer the counters animate (`counter()` prints it): the score, the restaurants. */
+  @property --fi-n {
+    syntax: '<integer>';
+    inherits: false;
+    initial-value: 0;
+  }
+  .compteur {
+    counter-reset: fi-n var(--fi-n);
+  }
+  .compteur::after {
+    content: counter(fi-n);
+  }
+  @keyframes fi-compte {
+    from {
+      --fi-n: 0;
+    }
+  }
+
+  .joue .b {
+    animation: fi-arrive 0.55s var(--ease-entree) var(--t, 0s) both;
+  }
+  @keyframes fi-arrive {
+    from {
+      opacity: 0;
+      translate: 0 10px;
+    }
+  }
+  @keyframes fi-pop {
+    from {
+      scale: 0.4;
+      opacity: 0;
+    }
+  }
+  @keyframes fi-fondu {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes fi-tape {
+    0% {
+      opacity: 0;
+      scale: 1.6;
+    }
+    35% {
+      opacity: 1;
+      scale: 1;
+    }
+    55% {
+      scale: 0.85;
+    }
+    100% {
+      opacity: 0;
+      scale: 1.1;
+    }
+  }
+  .doigt {
+    position: absolute;
+    top: 50%;
+    left: 62%;
+    width: 11cqw;
+    height: 11cqw;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-ink) 22%, transparent);
+    box-shadow: 0 0 0 2cqw color-mix(in srgb, var(--color-ink) 8%, transparent);
+    translate: -50% -50%;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .wa {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 7cqw;
+    height: 7cqw;
+    border-radius: 2cqw;
+    background: var(--color-whatsapp-brand);
+    color: var(--color-white);
+  }
+  .puce {
+    flex: none;
+    padding: 0.5em 0.9em;
+    border-radius: 999px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .puce-rouge {
+    background: var(--color-statut-rouge-tint);
+    color: var(--color-statut-rouge);
+  }
+  .puce-orange {
+    background: var(--color-amber-tint);
+    color: var(--color-amber-txt);
+  }
+  .puce-gris {
+    box-shadow: inset 0 0 0 1px var(--color-ligne-claire);
+    color: var(--color-gray-700);
+  }
+  .puce-vert {
+    background: var(--color-success-tint);
+    color: var(--color-success-txt);
+  }
+
+  /* ---- 1. The coordinator's iPhone: the audit app ---- */
+  .tel {
+    width: 250px;
+  }
+  .ecran-tel {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+  }
+  .app {
+    display: flex;
+    flex-direction: column;
+    gap: 2.4cqw;
+    padding: 4.5cqw 5cqw 5cqw;
+    background: var(--color-white);
+  }
+  .statut-heure {
+    padding: 0 4cqw 4cqw;
+    font-size: 4.6cqw;
+    font-weight: 600;
+  }
+  .app-tete {
+    display: flex;
+    align-items: center;
+    gap: 1.5cqw;
+    font-size: 5cqw;
+  }
+  .app-tete span {
+    font: 400 3.8cqw/1 var(--font-mono);
+    color: var(--color-gray-500);
+  }
+  .progres {
+    display: block;
+    height: 1.4cqw;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--color-gray-100);
+  }
+  .progres span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--color-orange);
+    transform-origin: left;
+    scale: var(--a) 1;
+  }
+  .joue .progres span {
+    animation: fi-avance 0.6s var(--ease-doux) 2.4s both;
+  }
+  @keyframes fi-avance {
+    from {
+      scale: var(--de) 1;
+    }
+  }
+  .rubrique {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1.5cqw;
+    font: 400 3.8cqw/1.2 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-gray-500);
+  }
+  .rubrique span {
+    color: var(--color-orange-txt);
+  }
+  .controle {
+    font-size: 6.2cqw;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+  .historique {
+    display: flex;
+    align-items: center;
+    gap: 1.5cqw;
+    font-size: 3.8cqw;
+    color: var(--color-gray-500);
+  }
+  .cliche {
+    position: relative;
+    aspect-ratio: 2 / 1;
+    margin-top: 1cqw;
+  }
+  .cliche-vide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5cqw;
+    border-radius: 4cqw;
+    box-shadow: inset 0 0 0 1px var(--color-gray-400);
+    font-size: 4cqw;
+    font-weight: 600;
+    color: var(--color-gray-700);
+  }
+  .cliche-photo,
+  .flash {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 4cqw;
+  }
+  .cliche-photo {
+    object-fit: cover;
+    object-position: 60% 80%;
+  }
+  .flash {
+    background: var(--color-white);
+    opacity: 0;
+  }
+  .joue .cliche-photo {
+    animation: fi-fondu 0.01s 1.2s both;
+  }
+  .joue .flash {
+    animation: fi-flash 0.5s var(--ease-doux) 1.2s both;
+  }
+  @keyframes fi-flash {
+    0%,
+    100% {
+      opacity: 0;
+    }
+    8% {
+      opacity: 1;
+    }
+  }
+  .joue .cliche .doigt {
+    animation: fi-tape 0.9s var(--ease-doux) 0.6s both;
+  }
+  .choix {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5cqw;
+  }
+  .choix > span {
+    position: relative;
+    padding: 3cqw 0;
+    border-radius: 3cqw;
+    box-shadow: inset 0 0 0 1px var(--color-ligne-claire);
+    text-align: center;
+    font-size: 4.2cqw;
+    font-weight: 600;
+    color: var(--color-gray-700);
+  }
+  .choix .non {
+    box-shadow: none;
+    background: var(--color-statut-rouge);
+    color: var(--color-white);
+  }
+  .joue .choix .non {
+    animation: fi-coche 0.3s var(--ease-doux) 2.1s both;
+  }
+  @keyframes fi-coche {
+    from {
+      background: var(--color-white);
+      box-shadow: inset 0 0 0 1px var(--color-ligne-claire);
+      color: var(--color-gray-700);
+    }
+  }
+  .joue .choix .doigt {
+    animation: fi-tape 0.9s var(--ease-doux) 1.8s both;
+  }
+
+  .feuille {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2.6cqw;
+    padding: 2.5cqw 5cqw 6cqw;
+    border-radius: 7cqw 7cqw 0 0;
+    background: var(--color-white);
+    box-shadow:
+      0 -1px 0 var(--color-ligne-claire),
+      0 -10px 30px color-mix(in srgb, var(--color-shadow) 18%, transparent);
+  }
+  .voile {
+    position: absolute;
+    inset: 0;
+    background: color-mix(in srgb, var(--color-ink) 28%, transparent);
+  }
+  .joue .voile {
+    animation: fi-fondu 0.5s var(--ease-doux) 2.9s both;
+  }
+  .joue .feuille {
+    animation: fi-monte 0.6s var(--ease-camera) 2.9s both;
+  }
+  @keyframes fi-monte {
+    from {
+      translate: 0 105%;
+    }
+  }
+  .poignee {
+    align-self: center;
+    width: 11cqw;
+    height: 1.2cqw;
+    margin-bottom: 1cqw;
+    border-radius: 999px;
+    background: var(--color-gray-100);
+  }
+  .bilan {
+    display: flex;
+    align-items: center;
+    gap: 3cqw;
+  }
+  .bilan b,
+  .bilan span span {
+    display: block;
+  }
+  .bilan b {
+    font: 700 5.6cqw/1.15 var(--font-display);
+  }
+  .bilan span span {
+    margin-top: 0.8cqw;
+    font-size: 3.6cqw;
+    color: var(--color-gray-500);
+  }
+  .anneau {
+    position: relative;
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 18cqw;
+    height: 18cqw;
+    font: 700 5.6cqw/1 var(--font-sans);
+    letter-spacing: -0.03em;
+  }
+  .anneau-chiffre {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .anneau-chiffre small {
+    margin-top: 0.4cqw;
+    font: 400 2.4cqw/1 var(--font-sans);
+    letter-spacing: 0;
+    color: var(--color-gray-500);
+  }
+  .anneau svg {
+    position: absolute;
+    inset: 0;
+    rotate: -90deg;
+  }
+  .anneau circle {
+    fill: none;
+    stroke-width: 3.6;
+  }
+  .anneau-fond {
+    stroke: var(--color-gray-100);
+  }
+  .anneau-arc {
+    stroke: var(--color-orange);
+    stroke-linecap: round;
+    stroke-dasharray: var(--arc);
+    stroke-dashoffset: var(--plein);
+  }
+  .joue .anneau-arc {
+    animation: fi-arc 1.2s var(--ease-doux) 3.4s both;
+  }
+  @keyframes fi-arc {
+    from {
+      stroke-dashoffset: var(--arc);
+    }
+  }
+  .joue .anneau .compteur {
+    animation: fi-compte 1.2s var(--ease-doux) 3.4s both;
+  }
+  .ia {
+    display: flex;
+    align-items: center;
+    gap: 1.4cqw;
+    font-size: 3.6cqw;
+    font-weight: 600;
+    color: var(--color-orange-txt);
+  }
+  .ecarts li {
+    display: flex;
+    align-items: center;
+    gap: 2cqw;
+    padding: 1.9cqw 0;
+    border-top: 1px solid var(--color-ligne-claire);
+    font-size: 3.9cqw;
+  }
+  .ecarts .puce {
+    font-size: 3.3cqw;
+  }
+  .joue .ecarts li {
+    animation: fi-arrive 0.45s var(--ease-entree) var(--t) both;
+  }
+  .envoi {
+    position: relative;
+    margin-top: 1cqw;
+  }
+  .envoyer,
+  .envoye {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.8cqw;
+    height: 11cqw;
+    border-radius: 3cqw;
+    font-size: 4.2cqw;
+    font-weight: 600;
+  }
+  .envoyer {
+    position: relative;
+    background: var(--color-orange);
+    color: var(--color-ink);
+  }
+  .envoye {
+    position: absolute;
+    inset: 0;
+    background: var(--color-success-tint);
+    font-size: 3.7cqw;
+    color: var(--color-success-txt);
+  }
+  .envoye .wa {
+    width: 5.6cqw;
+    height: 5.6cqw;
+    border-radius: 1.6cqw;
+  }
+  .joue .envoyer .doigt {
+    animation: fi-tape 0.9s var(--ease-doux) 5.2s both;
+  }
+  .joue .envoye {
+    animation: fi-fondu 0.35s var(--ease-doux) 5.7s both;
+  }
+
+  /* ---- 2. The franchisee's iPhone: WhatsApp ---- */
+  .verrou {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20cqw 5cqw 0;
+    background: var(--color-night);
+  }
+  .verrou-fond {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.62);
+  }
+  .verrou-heure {
+    position: relative;
+    font: 300 22cqw/1 var(--font-sans);
+    letter-spacing: -0.02em;
+    color: var(--color-white);
+  }
+  .verrou-date {
+    position: relative;
+    margin: 2cqw 0 8cqw;
+    font-size: 5cqw;
+    color: color-mix(in srgb, var(--color-white) 90%, transparent);
+  }
+  .notif {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8cqw;
+    width: 100%;
+    padding: 4cqw;
+    border-radius: 6cqw;
+    background: color-mix(in srgb, var(--color-white) 86%, transparent);
+    backdrop-filter: blur(12px);
+    font-size: 4.4cqw;
+    line-height: 1.35;
+  }
+  .notif b {
+    font-size: 4.8cqw;
+  }
+  .notif-tete {
+    display: flex;
+    align-items: center;
+    gap: 2cqw;
+    margin-bottom: 1cqw;
+    font-size: 4cqw;
+    color: var(--color-gray-700);
+  }
+  .joue .notif .doigt {
+    animation: fi-tape 0.9s var(--ease-doux) 1.5s both;
+  }
+  .chat {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-whatsapp-wall);
+  }
+  .joue .chat {
+    animation: fi-monte 0.6s var(--ease-camera) 2.2s both;
+  }
+  .chat-tete {
+    display: flex;
+    align-items: center;
+    gap: 2.5cqw;
+    padding: 14cqw 4cqw 3cqw;
+    background: var(--color-white);
+    font-size: 3.8cqw;
+    color: var(--color-gray-500);
+  }
+  .chat-tete b {
+    font-size: 4.6cqw;
+    color: var(--color-ink);
+  }
+  .chat-av {
+    width: 9cqw;
+    height: 9cqw;
+    border-radius: 999px;
+    background: var(--color-mur);
+  }
+  .chat-fil {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 2.6cqw;
+    padding: 4cqw 3.5cqw;
+  }
+  .bulle {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 2cqw;
+    width: 88%;
+    padding: 2.2cqw 2.6cqw 2.6cqw;
+    border-radius: 3.5cqw;
+    background: var(--color-white);
+    box-shadow: 0 1px 1px color-mix(in srgb, var(--color-shadow) 8%, transparent);
+    font-size: 4.2cqw;
+    line-height: 1.38;
+  }
+  .heure-bulle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8cqw;
+    align-self: flex-end;
+    margin-top: -1.2cqw;
+    font-size: 3cqw;
+    color: var(--color-gray-500);
+  }
+  .pdf {
+    display: flex;
+    align-items: center;
+    gap: 2cqw;
+    padding: 2cqw;
+    border-radius: 2.5cqw;
+    background: var(--color-mur);
+    font-size: 3.2cqw;
+    color: var(--color-gray-500);
+  }
+  .pdf b {
+    overflow: hidden;
+    font-size: 3.8cqw;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--color-ink);
+  }
+  .pdf-icone {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 7cqw;
+    height: 9cqw;
+    border-radius: 1cqw;
+    background: var(--color-statut-rouge);
+    font-size: 2.4cqw;
+    font-weight: 700;
+    color: var(--color-white);
+  }
+  .actions {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6cqw;
+  }
+  .actions li {
+    display: flex;
+    gap: 2cqw;
+    line-height: 1.3;
+  }
+  .actions .rang {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 4.6cqw;
+    height: 4.6cqw;
+    margin-top: 0.2cqw;
+    border-radius: 999px;
+    background: var(--color-mur);
+    font-size: 2.8cqw;
+    font-weight: 700;
+    color: var(--color-gray-700);
+  }
+  .echeance {
+    font-size: 3.5cqw;
+    font-weight: 600;
+  }
+  .ton-rouge {
+    color: var(--color-statut-rouge);
+  }
+  .ton-orange {
+    color: var(--color-amber-txt);
+  }
+  .ton-gris {
+    color: var(--color-gray-700);
+  }
+  .actions li:first-child {
+    margin: 0 -1.4cqw;
+    padding: 1.4cqw;
+    border-radius: 2cqw;
+    background: var(--color-statut-rouge-tint);
+  }
+  .actions li:first-child .rang {
+    background: var(--color-statut-rouge);
+    color: var(--color-white);
+  }
+  .sortante {
+    align-self: flex-end;
+    width: auto;
+    max-width: 80%;
+    background: var(--color-whatsapp);
+  }
+  .sortante .heure-bulle {
+    margin-top: -0.6cqw;
+  }
+  .lu {
+    color: var(--color-whatsapp-tick);
+  }
+  .joue .sortante {
+    animation: fi-arrive 0.4s var(--ease-entree) 5.6s both;
+  }
+  .zone-reponse {
+    position: relative;
+  }
+  .points {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    gap: 1.2cqw;
+    padding: 3cqw 3.5cqw;
+    border-radius: 3.5cqw;
+    background: var(--color-white);
+    opacity: 0;
+  }
+  .points span {
+    width: 1.8cqw;
+    height: 1.8cqw;
+    border-radius: 999px;
+    background: var(--color-gray-400);
+  }
+  .joue .points {
+    animation: fi-attente 1.2s linear 6.2s both;
+  }
+  .joue .points span {
+    animation: fi-rebond 0.6s var(--ease-doux) 6.2s 2 both;
+  }
+  .joue .points span:nth-child(2) {
+    animation-delay: 6.35s;
+  }
+  .joue .points span:nth-child(3) {
+    animation-delay: 6.5s;
+  }
+  @keyframes fi-attente {
+    0%,
+    100% {
+      opacity: 0;
+    }
+    10%,
+    90% {
+      opacity: 1;
+    }
+  }
+  @keyframes fi-rebond {
+    50% {
+      translate: 0 -1cqw;
+      background: var(--color-gray-500);
+    }
+  }
+  .joue .reponse {
+    animation: fi-arrive 0.45s var(--ease-entree) 7.4s both;
+  }
+  .saisie {
+    display: flex;
+    align-items: center;
+    gap: 2cqw;
+    padding: 2.5cqw 3cqw 7cqw;
+  }
+  .champ {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    padding: 2.4cqw 3.5cqw;
+    border-radius: 999px;
+    background: var(--color-white);
+    font-size: 3.7cqw;
+    white-space: nowrap;
+  }
+  .placeholder {
+    color: var(--color-gray-500);
+  }
+  .tape {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    padding: inherit;
+    border-radius: inherit;
+    background: var(--color-white);
+    text-overflow: ellipsis;
+    opacity: 0;
+  }
+  .joue .tape {
+    animation: fi-frappe 1.5s linear 4.2s both;
+  }
+  @keyframes fi-frappe {
+    0% {
+      opacity: 1;
+      clip-path: inset(0 100% 0 0);
+    }
+    70% {
+      opacity: 1;
+      clip-path: inset(0 0 0 0);
+    }
+    96% {
+      opacity: 1;
+      clip-path: inset(0 0 0 0);
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  .envoi-wa {
+    position: relative;
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 9cqw;
+    height: 9cqw;
+    border-radius: 999px;
+    background: var(--color-success-txt);
+    color: var(--color-white);
+  }
+  .envoi-wa .doigt {
+    left: 50%;
+  }
+  .joue .envoi-wa .doigt {
+    animation: fi-tape 0.8s var(--ease-doux) 5.2s both;
+  }
+
+  /* ---- 3. The coordinator's iPad: the proof, then the network ---- */
+  .tablette {
+    width: min(560px, 100%);
+  }
+  .val {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--color-white);
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+  }
+  .val-barre {
+    display: flex;
+    align-items: center;
+    gap: 1.6cqw;
+    padding: 2.4cqw 4cqw;
+    border-bottom: 1px solid var(--color-ligne-claire);
+    font-size: 2.2cqw;
+    color: var(--color-gray-500);
+  }
+  .val-barre b {
+    font: 700 2.8cqw/1 var(--font-display);
+    color: var(--color-ink);
+  }
+  .val-av {
+    width: 4.4cqw;
+    height: 4.4cqw;
+    border-radius: 999px;
+    background: var(--color-mur);
+  }
+  .val-corps {
+    display: grid;
+    flex: 1;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 3cqw;
+    padding: 3cqw 4cqw;
+  }
+  .preuve {
+    display: flex;
+    flex-direction: column;
+    gap: 1.8cqw;
+  }
+  .val-rubrique,
+  .tableau-libelle {
+    font: 400 1.8cqw/1.3 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-orange-txt);
+  }
+  .val-titre {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.4cqw;
+    font: 700 3.2cqw/1.15 var(--font-display);
+  }
+  .val-titre .puce {
+    font: 600 1.9cqw/1 var(--font-sans);
+  }
+  .photos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.6cqw;
+    margin-top: 0.6cqw;
+  }
+  .photo {
+    position: relative;
+    aspect-ratio: 1;
+  }
+  .photo-image {
+    width: 100%;
+    height: 100%;
+    border-radius: 1.6cqw;
+    object-fit: cover;
+    object-position: 60% 78%;
+  }
+  .photo figcaption {
+    position: absolute;
+    top: 1cqw;
+    left: 1cqw;
+    padding: 0.4cqw 1.2cqw;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-ink) 70%, transparent);
+    font-size: 1.8cqw;
+    font-weight: 600;
+    color: var(--color-white);
+  }
+  .joue .apres {
+    animation: fi-arrive 0.55s var(--ease-entree) 0.5s both;
+  }
+  .tampon {
+    position: absolute;
+    right: -1cqw;
+    bottom: -1.4cqw;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8cqw;
+    padding: 1cqw 1.8cqw;
+    border: 0.4cqw solid var(--color-success-txt);
+    border-radius: 1.2cqw;
+    background: var(--color-white);
+    font: 700 2.1cqw/1 var(--font-sans);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--color-success-txt);
+    rotate: -8deg;
+    box-shadow: var(--shadow-2);
+  }
+  .joue .tampon {
+    animation: fi-tampon 0.45s var(--ease-pop) 2.3s both;
+  }
+  @keyframes fi-tampon {
+    from {
+      opacity: 0;
+      scale: 1.8;
+    }
+  }
+  .depose {
+    display: flex;
+    align-items: center;
+    gap: 1cqw;
+    margin-top: 1.4cqw;
+    font-size: 1.9cqw;
+    color: var(--color-gray-500);
+  }
+  .joue .depose {
+    animation: fi-fondu 0.4s var(--ease-doux) 0.8s both;
+  }
+  .valider {
+    position: relative;
+    margin-top: auto;
+  }
+  .valider-bouton,
+  .valide {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1cqw;
+    height: 6cqw;
+    border-radius: 1.4cqw;
+    font-size: 2.3cqw;
+    font-weight: 600;
+  }
+  .valider-bouton {
+    position: relative;
+    background: var(--color-ink);
+    color: var(--color-white);
+  }
+  .valider-bouton .doigt {
+    width: 5cqw;
+    height: 5cqw;
+    box-shadow: 0 0 0 1cqw color-mix(in srgb, var(--color-ink) 8%, transparent);
+    background: color-mix(in srgb, var(--color-white) 35%, transparent);
+  }
+  .joue .valider-bouton .doigt {
+    animation: fi-tape 0.9s var(--ease-doux) 1.6s both;
+  }
+  .valide {
+    position: absolute;
+    inset: 0;
+    background: var(--color-success-tint);
+    color: var(--color-success-txt);
+  }
+  .joue .valide {
+    animation: fi-fondu 0.3s var(--ease-doux) 2.1s both;
+  }
+
+  .tableau {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4cqw;
+    padding: 2.8cqw;
+    border-radius: 2cqw;
+    background: var(--color-galet);
+    box-shadow: inset 0 0 0 1px var(--color-ligne-claire);
+  }
+  .joue .tableau {
+    animation: fi-glisse 0.7s var(--ease-camera) 3.3s both;
+  }
+  @keyframes fi-glisse {
+    from {
+      opacity: 0;
+      translate: 30% 0;
+    }
+  }
+  .tableau-libelle {
+    display: flex;
+    align-items: center;
+    gap: 1cqw;
+  }
+  .tableau-chiffre {
+    display: flex;
+    align-items: center;
+    gap: 1.4cqw;
+    margin-top: 0.6cqw;
+    font-size: 2cqw;
+    line-height: 1.25;
+    color: var(--color-gray-700);
+  }
+  .tableau-chiffre .compteur {
+    font: 700 10cqw/0.9 var(--font-display);
+    letter-spacing: -0.03em;
+    color: var(--color-statut-rouge);
+  }
+  .joue .tableau .compteur {
+    animation: fi-compte 0.9s steps(3, start) 4s both;
+  }
+  .tableau-point {
+    margin-top: 0.6cqw;
+    font-size: 2.3cqw;
+    font-weight: 600;
+  }
+  .tableau-lignes li {
+    display: flex;
+    align-items: center;
+    gap: 1.4cqw;
+    padding: 2cqw 0;
+    border-top: 1px solid var(--color-ligne-claire);
+    font-size: 2.2cqw;
+    white-space: nowrap;
+  }
+  .tableau-lignes .puce {
+    font-size: 1.8cqw;
+  }
+  .joue .tableau-lignes li {
+    animation: fi-arrive 0.45s var(--ease-entree) var(--t) both;
+  }
+</style>

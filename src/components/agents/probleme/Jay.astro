@@ -1,0 +1,408 @@
+---
+import type { ProblemeDe } from '../../../content/schemas/agent-probleme';
+import Icone from '../Icone.astro';
+
+interface Props {
+  d: ProblemeDe<'jay'>;
+}
+const { d } = Astro.props;
+---
+
+<div class="panneau">
+  <div class="manuel" data-c style="--i:0">
+    <p class="manuel-barre">
+      <span class="manuel-fichier">{d.manuel.fichier}</span>
+      <span class="manuel-page">{d.manuel.page}</span>
+    </p>
+    <div class="feuille">
+      <p class="feuille-reseau">{d.manuel.reseau}</p>
+      <p class="feuille-titre">{d.manuel.titre}</p>
+      <span class="feuille-filet"></span>
+      <p class="feuille-edition">{d.manuel.edition}</p>
+    </div>
+  </div>
+
+  <div class="dossier" data-c style="--i:1">
+    <p class="dossier-barre">
+      <span class="feux"><i></i><i></i><i></i></span>
+      {
+        d.dossier.chemin.map((c, n) => (
+          <>
+            {n > 0 && <Icone nom="chevron-right" taille={12} class="sep" />}
+            <span class:list={['etape', { derniere: n === d.dossier.chemin.length - 1 }]}>
+              {n === d.dossier.chemin.length - 1 && <Icone nom="folder" taille={14} />}
+              {c}
+            </span>
+          </>
+        ))
+      }
+    </p>
+    <div class="liste">
+      <p class="ligne entete">
+        <span>{d.dossier.colonnes.nom}</span>
+        <span class="col-prop">{d.dossier.colonnes.proprietaire}</span>
+        <span class="col-date">{d.dossier.colonnes.modifie}</span>
+      </p>
+      {
+        d.dossier.fichiers.map((f) => (
+          <p class="ligne">
+            <span class="nom">
+              <span class:list={['type', f.type]}>{f.type}</span>
+              <span class="nom-texte">{f.nom}</span>
+            </span>
+            <span class="col-prop">{f.proprietaire}</span>
+            <span class="col-date">{f.modifie}</span>
+          </p>
+        ))
+      }
+    </div>
+    <span class="compteur" data-final>{d.dossier.compteur}</span>
+  </div>
+
+  <div class="message" data-c style="--i:2">
+    <p class="message-tete">
+      <span class="message-av"><Icone nom="users" taille={14} /></span>
+      <span class="flex min-w-0 flex-col">
+        <b>{d.message.groupe}</b>
+        <span class="message-membres">{d.message.membres}</span>
+      </span>
+    </p>
+    <div class="fil">
+      <p class="bulle">
+        <b class="bulle-de">{d.message.de}</b>
+        <span>
+          {d.message.texte}
+          <span class="bulle-heure">{d.message.heure}</span>
+        </span>
+      </p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .panneau {
+    position: relative;
+    aspect-ratio: 6 / 5;
+    overflow: hidden;
+    border-radius: 28px;
+    background: var(--color-mur);
+    container-type: size;
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+  }
+  .panneau > * {
+    position: absolute;
+    background: var(--color-white);
+  }
+
+  /* The manual, open in a PDF reader on its cover. */
+  .manuel {
+    top: 4cqh;
+    left: 6cqw;
+    width: 42cqw;
+    overflow: hidden;
+    border-radius: 1.6cqw;
+    box-shadow: var(--shadow-1);
+    rotate: -3deg;
+  }
+  .manuel-barre {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.6cqw;
+    padding: 1.6cqw 2.2cqw;
+    background: var(--color-gray-800);
+    font-size: 1.8cqw;
+    color: var(--color-gray-100);
+  }
+  .manuel-fichier {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .manuel-page {
+    flex: none;
+    color: var(--color-gray-400);
+  }
+  .feuille {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4cqw;
+    margin: 3cqw 3cqw 0;
+    padding: 3.6cqw 4cqw 20cqw;
+    box-shadow: 0 0 0 1px var(--color-ligne-claire);
+  }
+  .feuille-reseau {
+    font: 400 1.8cqw/1.3 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-gray-500);
+  }
+  .feuille-titre {
+    font: 700 4.6cqw/1.05 var(--font-display);
+    letter-spacing: -0.01em;
+  }
+  .feuille-filet {
+    width: 8cqw;
+    height: 0.6cqw;
+    margin: 1cqw 0;
+    background: var(--color-orange);
+  }
+  .feuille-edition {
+    font-size: 1.8cqw;
+    color: var(--color-gray-700);
+  }
+
+  /* The shared Drive folder: four versions of the same sheet. */
+  .dossier {
+    top: 48cqh;
+    right: 4cqw;
+    width: 80cqw;
+    border-radius: 2cqw;
+    box-shadow: var(--shadow-2);
+    rotate: -1deg;
+    font-size: 2.2cqw;
+  }
+  .dossier-barre {
+    display: flex;
+    align-items: center;
+    gap: 1cqw;
+    padding: 2.2cqw 2.8cqw;
+    border-bottom: 1px solid var(--color-ligne-claire);
+    color: var(--color-gray-500);
+    white-space: nowrap;
+  }
+  .feux {
+    display: flex;
+    gap: 0.9cqw;
+    margin-right: 1.6cqw;
+  }
+  .feux i {
+    width: 1.5cqw;
+    height: 1.5cqw;
+    border-radius: 999px;
+    background: var(--color-gray-100);
+  }
+  /* The chevron is rendered by Icone (another component): the scoped attribute does not reach it. */
+  .dossier-barre :global(.sep) {
+    flex: none;
+    color: var(--color-gray-400);
+  }
+  .etape {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8cqw;
+  }
+  .derniere {
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+  /* One column grid shared by every row (subgrid), so the columns line up without fixed widths. */
+  .liste {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    column-gap: 3cqw;
+    padding: 0.6cqw 2.8cqw 1.4cqw;
+  }
+  .ligne {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+    align-items: center;
+    padding: 1.5cqw 0;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--color-ligne-claire);
+    color: var(--color-gray-700);
+  }
+  .ligne:last-child {
+    border-bottom: 0;
+  }
+  .entete {
+    padding: 1.4cqw 0;
+    font-size: 1.8cqw;
+    color: var(--color-gray-500);
+  }
+  .nom {
+    display: flex;
+    align-items: center;
+    gap: 1.4cqw;
+    min-width: 0;
+    color: var(--color-ink);
+  }
+  .nom-texte {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .type {
+    flex: none;
+    width: 4.6cqw;
+    padding: 0.5cqw 0;
+    border-radius: 0.6cqw;
+    font-size: 1.5cqw;
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+    color: var(--color-white);
+  }
+  .type.doc {
+    background: var(--color-statut-bleu);
+  }
+  .type.pdf {
+    background: var(--color-statut-rouge);
+  }
+  /* Above the breadcrumb, never over the folder name (« Manuel opératoire » is long). */
+  .compteur {
+    position: absolute;
+    top: -4.4cqw;
+    right: -2.4cqw;
+    padding: 1.2cqw 2.2cqw;
+    border-radius: 999px;
+    background: var(--color-ink);
+    box-shadow: var(--shadow-2);
+    font-size: 2.1cqw;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--color-white);
+    rotate: 3deg;
+  }
+
+  /* A crew member's question in the restaurant's WhatsApp group, before opening. */
+  .message {
+    top: 11cqh;
+    right: 5cqw;
+    width: 42cqw;
+    overflow: hidden;
+    border-radius: 2.4cqw;
+    box-shadow: var(--shadow-3);
+    rotate: 2deg;
+    font-size: 2.2cqw;
+  }
+  .message-tete {
+    display: flex;
+    align-items: center;
+    gap: 1.6cqw;
+    padding: 1.8cqw 2.4cqw;
+    border-bottom: 1px solid var(--color-ligne-claire);
+    line-height: 1.25;
+  }
+  .message-av {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 5cqw;
+    height: 5cqw;
+    border-radius: 999px;
+    background: var(--color-gray-100);
+    color: var(--color-gray-500);
+  }
+  .message-membres {
+    overflow: hidden;
+    font-size: 1.8cqw;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--color-gray-500);
+  }
+  .fil {
+    padding: 2.4cqw 2.4cqw 2.8cqw;
+    background: var(--color-whatsapp-wall);
+  }
+  .bulle {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4cqw;
+    max-width: 90%;
+    padding: 1.4cqw 2cqw;
+    border-radius: 0 1.6cqw 1.6cqw 1.6cqw;
+    background: var(--color-white);
+    box-shadow: var(--shadow-1);
+    line-height: 1.35;
+  }
+  .bulle-de {
+    font-size: 1.9cqw;
+    color: var(--color-trad-magenta);
+  }
+  .bulle-heure {
+    float: right;
+    margin: 1cqw 0 0 2cqw;
+    font-size: 1.6cqw;
+    color: var(--color-gray-500);
+  }
+
+  @media (max-width: 47.99rem) {
+    .panneau {
+      aspect-ratio: 3 / 4;
+    }
+    .manuel {
+      top: 3cqh;
+      left: 5cqw;
+      width: 58cqw;
+    }
+    .manuel-barre,
+    .feuille-reseau,
+    .feuille-edition {
+      font-size: 2.7cqw;
+    }
+    .feuille {
+      padding: 5cqw 5cqw 14cqw;
+    }
+    .feuille-titre {
+      font-size: 6cqw;
+    }
+    .feuille-filet {
+      width: 11cqw;
+      height: 0.9cqw;
+    }
+    .dossier {
+      top: 28cqh;
+      right: 3cqw;
+      width: 94cqw;
+      font-size: 3.2cqw;
+    }
+    .dossier-barre {
+      font-size: 2.9cqw;
+    }
+    .feux {
+      display: none;
+    }
+    .liste {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+    .ligne {
+      padding: 1.9cqw 0;
+    }
+    .col-prop {
+      display: none;
+    }
+    .entete {
+      font-size: 2.7cqw;
+    }
+    .type {
+      width: 6.6cqw;
+      font-size: 2.2cqw;
+    }
+    .compteur {
+      top: -6.2cqw;
+      right: 3cqw;
+      font-size: 3.2cqw;
+    }
+    .message {
+      top: auto;
+      right: 4cqw;
+      bottom: 3cqh;
+      width: 82cqw;
+      font-size: 3.4cqw;
+    }
+    .message-av {
+      width: 7.4cqw;
+      height: 7.4cqw;
+    }
+    .message-membres,
+    .bulle-de {
+      font-size: 2.8cqw;
+    }
+    .bulle-heure {
+      font-size: 2.6cqw;
+    }
+  }
+</style>

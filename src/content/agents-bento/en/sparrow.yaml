@@ -1,0 +1,59 @@
+# "What Sparrow does for you" wall, after the Pencil mock-up "Page agent — Sparrow".
+agent: sparrow
+numero:
+  titre: A WhatsApp number dedicated to your brand
+  entrees:
+    - { texte: QR code, icone: qr-code }
+    - { texte: Form, icone: file-input }
+    - { texte: CSV import, icone: upload }
+relances:
+  titre: Automations and reminders
+  heure: '9:41'
+  app: WhatsApp
+  expediteur: BunBun Franchise
+  message: Hi Thomas, have you been able to complete your application?
+  pastille: Reminder · D+2
+reprise:
+  titre: Head office takes over
+  bouton: Take over
+prequalification:
+  titre: Pre-qualification
+  heure: '10:24'
+  contact: BunBun Franchise
+  question: "Hello, I am the brand's AI assistant. How much personal capital do you have?"
+  reponse: €80,000, for Nantes.
+  criteres:
+    - { texte: Capital, verifie: true }
+    - { texte: Area, verifie: true }
+    - { texte: Experience, verifie: false }
+chantier:
+  titre: Build-out follow-up
+  pieces:
+    - { texte: Floor plan, etat: Received, recu: true }
+    - { texte: Works quote, etat: Missing, recu: false }
+espace:
+  titre: A project owner space
+  faites: 6
+  total: 9
+  legende: tasks done
+pipeline:
+  titre: Your pipeline
+  etapes:
+    - { valeur: 24, libelle: Contact }
+    - { valeur: 9, libelle: Qualified }
+    - { valeur: 4, libelle: Meeting }
+    - { valeur: 1, libelle: Signature }
+tableau:
+  titre: A dashboard
+  valeur: 12
+  legende: candidates this month · 3 openings
+ouverture:
+  titre: The opening project
+  ecran: BunBun Bordeaux
+  pastille: Back-schedule recalculated
+  taches:
+    - { texte: Lease signed, debut: 0, fin: 11, etat: fait }
+    - { texte: Works, debut: 8, fin: 48, etat: en-cours }
+    - { texte: Recruitment, debut: 32, fin: 62, etat: a-venir }
+    - { texte: Training, debut: 51, fin: 73, etat: a-venir }
+    - { texte: Opening · D-18, debut: 72, fin: 78, etat: jalon }

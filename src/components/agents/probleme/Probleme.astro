@@ -1,0 +1,136 @@
+---
+import type { Probleme as ProblemeData } from '../../../content/schemas/agent-probleme';
+import Peep from './Peep.astro';
+import Owl from './Owl.astro';
+import Pecker from './Pecker.astro';
+import Lark from './Lark.astro';
+import Jay from './Jay.astro';
+import Finch from './Finch.astro';
+import Sparrow from './Sparrow.astro';
+
+/**
+ * An agent page's problem (César 12/10), landing-page style: a title naming the pain,
+ * one or two concrete sentences; beside them, the real objects of that pain (the report nobody
+ * answered, the WhatsApp group at 147 unread…), one component per agent in this folder.
+ * Once on screen, the objects arrive in turn (`data-c`, `--i`) and their last beat (`data-final`,
+ * a stamp, a badge) lands; it plays once. Without JS or under reduced motion, all shows at once.
+ */
+interface Props {
+  titre: string;
+  texte: string;
+  objets?: ProblemeData;
+}
+const { titre, texte, objets } = Astro.props;
+---
+
+<section aria-labelledby="agent-probleme" class="probleme" data-probleme>
+  <div class="wrap-agent grille" data-rv-groupe>
+    <div class="flex flex-col gap-5" data-rv>
+      <h2 id="agent-probleme" class="titre font-display font-bold text-ink">{titre}</h2>
+      <p class="texte">{texte}</p>
+    </div>
+    {
+      objets && (
+        <div class="objets" aria-hidden="true">
+          {objets.agent === 'peep' && <Peep d={objets} />}
+          {objets.agent === 'owl' && <Owl d={objets} />}
+          {objets.agent === 'pecker' && <Pecker d={objets} />}
+          {objets.agent === 'lark' && <Lark d={objets} />}
+          {objets.agent === 'jay' && <Jay d={objets} />}
+          {objets.agent === 'finch' && <Finch d={objets} />}
+          {objets.agent === 'sparrow' && <Sparrow d={objets} />}
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<script>
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    for (const bloc of document.querySelectorAll<HTMLElement>('[data-probleme] .objets')) {
+      bloc.classList.add('js');
+      const vue = new IntersectionObserver(
+        ([e]) => {
+          if (!e.isIntersecting) return;
+          vue.disconnect();
+          bloc.classList.add('vu');
+        },
+        { threshold: 0.35 },
+      );
+      vue.observe(bloc);
+    }
+  }
+</script>
+
+<style>
+  .probleme {
+    padding: 80px 0 112px;
+  }
+  .grille {
+    display: grid;
+    gap: 48px;
+    align-items: center;
+  }
+  /* Side by side only from 1280 px: below, the objects' panel would be too narrow to read. */
+  .objets {
+    width: 100%;
+    max-width: 680px;
+  }
+  @media (min-width: 80rem) {
+    .grille {
+      grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr);
+      gap: 72px;
+    }
+    .objets {
+      max-width: none;
+    }
+  }
+  .titre {
+    font-size: clamp(34px, 3.6vw, 52px);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .texte {
+    max-width: 34em;
+    font: 400 19px/1.55 var(--font-sans);
+    color: var(--color-soft);
+  }
+
+  /* Objects arrive in turn, then the last beat lands (a stamp: big, then pressed). */
+  .objets.js :global([data-c]) {
+    opacity: 0;
+    translate: 0 18px;
+  }
+  .objets.js.vu :global([data-c]) {
+    opacity: 1;
+    translate: 0 0;
+    transition:
+      opacity 0.6s var(--ease-doux),
+      translate 0.8s var(--ease-entree);
+    transition-delay: calc(var(--i, 0) * 260ms + 100ms);
+  }
+  .objets.js :global([data-final]) {
+    opacity: 0;
+  }
+  .objets.js.vu :global([data-final]) {
+    animation: pb-final 0.45s var(--ease-pop) 1.5s both;
+  }
+  @keyframes pb-final {
+    from {
+      opacity: 0;
+      scale: 1.8;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @media (max-width: 47.99rem) {
+    .probleme {
+      padding: 56px 0 80px;
+    }
+    .texte {
+      font-size: 17px;
+    }
+  }
+</style>

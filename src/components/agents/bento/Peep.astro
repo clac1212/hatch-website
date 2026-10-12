@@ -1,0 +1,866 @@
+---
+import { Image, Picture } from 'astro:assets';
+import type { BentoDe } from '../../../content/schemas/bento';
+import Tuile from '../Tuile.astro';
+import Icone from '../Icone.astro';
+import IphoneReel from '../IphoneReel.astro';
+import LogoWhatsapp from '../LogoWhatsapp.astro';
+import { avatars } from '../../pages/agent-visuels';
+import { centres } from '../visuels';
+import carte from '../../../assets/agents/peep/carte.jpg';
+import calendrier from '../../../assets/agents/peep/calendrier.jpg';
+import burger from '../../../assets/agents/peep/burger.jpg';
+
+/**
+ * Peep's feature wall (Pencil "Page agent — Peep v4", frame "03 — Ce que Peep fait pour vous"),
+ * tile by tile on the six-column grid; the centre tile (Peep's render) is at column 3, row 2.
+ * Registers mixed on purpose (César 11/10, after Finch): a real phone, a home screen, type, a dark
+ * tile, two voxel objects, a printed poster with a photo; only two tiles are plain interface.
+ */
+interface Props {
+  d: BentoDe<'peep'>;
+}
+const { d } = Astro.props;
+const teinte = centres.peep.fond;
+/** Waveform of the voice note, a speech-like shape (percent of its height). */
+const ONDE = [40, 70, 55, 90, 45, 100, 65, 35, 80, 60, 95, 50, 75, 40, 85, 55, 70, 45];
+const actives = d.ciblage.etiquettes.filter((e) => e.actif);
+---
+
+<Tuile
+  col={1}
+  row={1}
+  w={2}
+  h={2}
+  titre={d.terrain.titre}
+  class="t-peep-terrain"
+  style={`background-color:${teinte}`}
+>
+  <div class="tel" data-c>
+    <IphoneReel>
+      <div class="ecran">
+        <div class="wa-tete">
+          <Icone nom="chevron-left" taille={14} class="wa-retour" />
+          <Image src={avatars.peep} alt="" width={40} densities={[1, 2]} class="wa-avatar" />
+          <span class="flex flex-col">
+            <b>{d.terrain.contact}</b>
+            <span>{d.terrain.statut}</span>
+          </span>
+        </div>
+        <div class="wa-fil">
+          <span class="wa-jour">{d.terrain.jour}</span>
+          {
+            d.terrain.messages.map((m, i) =>
+              m.de === 'equipe' ? (
+                <p class="wa-bulle wa-moi" data-c style={`--i:${i + 1}`}>
+                  {m.texte}
+                  <span class="wa-heure">{m.heure} ✓✓</span>
+                </p>
+              ) : (
+                <div class="wa-bulle wa-agent" data-c style={`--i:${i + 1}`}>
+                  {m.document && (
+                    <span class="wa-doc">
+                      <span class="wa-pdf">PDF</span>
+                      <span class="flex flex-col">
+                        <b>{m.document.titre}</b>
+                        <span>{m.document.meta}</span>
+                      </span>
+                    </span>
+                  )}
+                  <span>{m.texte}</span>
+                  <span class="wa-heure">{m.signature}</span>
+                </div>
+              ),
+            )
+          }
+        </div>
+      </div>
+    </IphoneReel>
+  </div>
+</Tuile>
+
+<Tuile col={3} row={1} w={1} h={1} titre={d.vocal.titre} class="t-peep-vocal">
+  <div class="vocal-pile">
+    <span class="vocal" data-c>
+      <span class="vocal-lecture"><Icone nom="play" taille={11} /></span>
+      <span class="onde" data-amb="onde">
+        {ONDE.map((h, i) => <span style={`height:${h}%;--j:${i}`} />)}
+      </span>
+      <span class="vocal-duree">{d.vocal.duree}</span>
+    </span>
+    <p class="vocal-texte" data-c style="--i:2">{d.vocal.transcription}</p>
+  </div>
+</Tuile>
+
+<Tuile
+  col={4}
+  row={1}
+  w={1}
+  h={1}
+  titre={d.installer.titre}
+  disposition="bas"
+  class="t-peep-installer"
+  plein
+>
+  <div class="accueil" aria-hidden="true">
+    <Picture
+      src={centres.peep.src}
+      alt=""
+      formats={['avif', 'webp']}
+      widths={[400]}
+      sizes="200px"
+      class="accueil-fond"
+    />
+  </div>
+  <div class="accueil-corps">
+    <span class="app-wa" data-c data-amb="flotte">
+      <LogoWhatsapp taille={50} />
+      <span class="app-badge" data-amb="pouls"></span>
+    </span>
+  </div>
+</Tuile>
+
+<Tuile col={5} row={1} w={2} h={2} titre={d.langues.titre} class="t-peep-langues">
+  <div class="langues">
+    {
+      d.langues.phrases.map((p, i) => (
+        <p class={`langue langue-${i}`} lang={p.lang} data-c style={`--i:${i}`}>
+          {p.texte}
+        </p>
+      ))
+    }
+  </div>
+</Tuile>
+
+<Tuile col={1} row={3} w={1} h={1} titre={d.invente.titre} sousTitre={d.invente.texte}>
+  <div class="pile">
+    <span class="pile-dessous" aria-hidden="true"></span>
+    <div class="notif" data-c>
+      <span class="notif-icone">
+        <Icone nom="inbox" taille={14} />
+      </span>
+      <span class="flex flex-col">
+        <b>{d.invente.notif.titre}</b>
+        <span>{d.invente.notif.meta}</span>
+      </span>
+    </div>
+  </div>
+</Tuile>
+
+<Tuile
+  col={2}
+  row={3}
+  w={1}
+  h={1}
+  titre={d.ciblage.titre}
+  class="t-peep-image t-peep-ciblage"
+  plein
+  style={`background-color:${teinte}`}
+>
+  <Picture
+    src={carte}
+    alt=""
+    formats={['avif', 'webp']}
+    widths={[400, 600]}
+    sizes="200px"
+    class="image-fond carte"
+  />
+  <div class="ciblage" data-c>
+    <p class="flex flex-wrap justify-center gap-1">
+      {
+        actives.map((e) => (
+          <span class="etiquette">
+            <Icone nom="check" taille={10} />
+            {e.texte}
+          </span>
+        ))
+      }
+    </p>
+    <span class="pastille">{d.ciblage.total}</span>
+  </div>
+</Tuile>
+
+<Tuile col={5} row={3} w={2} h={2} titre={d.lecture.titre} class="t-peep-lecture">
+  <p class="ratio">
+    <span data-compte={d.lecture.valeur}>{d.lecture.valeur}</span>
+    <span class="ratio-sur">/ {d.lecture.sur}</span>
+  </p>
+  <p class="ratio-legende">{d.lecture.legende}</p>
+  <ul class="lignes">
+    {
+      d.lecture.lignes.map((l, i) => (
+        <li data-c style={`--i:${i + 1}`}>
+          <span class="flex-1">{l.texte}</span>
+          <span class={`lu lu-${l.ton}`}>
+            {l.ton === 'orange' ? (
+              <span class="inline-flex" data-amb="tourne">
+                <Icone nom="refresh-cw" taille={11} />
+              </span>
+            ) : (
+              <Icone nom="check-check" taille={13} />
+            )}
+            {l.etat}
+          </span>
+        </li>
+      ))
+    }
+  </ul>
+</Tuile>
+
+<Tuile
+  col={1}
+  row={4}
+  w={3}
+  h={1}
+  titre={d.redaction.titre}
+  disposition="ligne"
+  empile
+  class="t-peep-redaction"
+>
+  <div class="redaction">
+    <div class="postit" data-c>
+      <span class="postit-libelle">{d.redaction.ideeLibelle}</span>
+      <p>{d.redaction.idee}</p>
+    </div>
+    <span class="inline-flex shrink-0 text-orange-txt" data-amb="pouls">
+      <Icone nom="sparkles" taille={18} />
+    </span>
+    <div class="affiche" data-c style="--i:2">
+      <span class="punaise" aria-hidden="true"></span>
+      <Image src={burger} alt="" width={560} class="affiche-photo" loading="lazy" />
+      <p class="affiche-titre">{d.redaction.banniere}</p>
+      <p class="affiche-texte">{d.redaction.texte}</p>
+      <span class="quiz">
+        <Icone nom="list-checks" taille={11} />
+        {d.redaction.pastille}
+      </span>
+    </div>
+  </div>
+</Tuile>
+
+<Tuile
+  col={4}
+  row={4}
+  w={1}
+  h={1}
+  titre={d.envoi.titre}
+  class="t-peep-image t-peep-envoi"
+  plein
+  seule
+  style={`background-color:${teinte}`}
+>
+  <Picture
+    src={calendrier}
+    alt=""
+    formats={['avif', 'webp']}
+    widths={[400, 600]}
+    sizes="200px"
+    class="image-fond calendrier"
+  />
+  <p class="envoi">
+    <span class="pastille" data-c>
+      <span class="inline-flex" data-amb="sonne"><Icone nom="alarm-clock" taille={12} /></span>
+      {d.envoi.heure}
+    </span>
+  </p>
+</Tuile>
+
+<style>
+  /* Répond au terrain: a real phone on WhatsApp, slightly turned, cut by the tile's bottom edge. */
+  /* Classes given to <Tuile> land outside this component's scope: :global() reaches them. */
+  :global(.mur .t-peep-terrain .tuile-corps) {
+    justify-content: flex-start;
+    overflow: visible;
+  }
+  .tel {
+    width: 222px;
+    margin-top: 4px;
+    rotate: -5deg;
+  }
+  .ecran {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--color-whatsapp-wall);
+    font-family: var(--font-sans);
+  }
+  .wa-tete {
+    display: flex;
+    align-items: center;
+    gap: 2.6cqw;
+    padding: 14cqw 4cqw 3cqw;
+    background: var(--color-white);
+    font-size: 4.2cqw;
+    line-height: 1.25;
+    color: var(--color-gray-700);
+  }
+  .wa-tete b {
+    font-size: 5cqw;
+    color: var(--color-ink);
+  }
+  .wa-tete :global(.wa-retour) {
+    width: 6cqw;
+    height: 6cqw;
+    color: var(--color-success-txt);
+  }
+  .wa-avatar {
+    width: 10cqw;
+    height: 10cqw;
+    border-radius: 999px;
+  }
+  .wa-fil {
+    display: flex;
+    flex-direction: column;
+    gap: 3.2cqw;
+    padding: 3.5cqw 4cqw;
+  }
+  .wa-jour {
+    align-self: center;
+    padding: 1cqw 3cqw;
+    border-radius: 2.4cqw;
+    background: var(--color-white);
+    font-size: 3.6cqw;
+    color: var(--color-gray-700);
+  }
+  .wa-bulle {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6cqw;
+    max-width: 84%;
+    padding: 2.6cqw 3.4cqw;
+    border-radius: 3.6cqw;
+    font-size: 4.5cqw;
+    line-height: 1.35;
+    color: var(--color-ink);
+    box-shadow: 0 1px 1px color-mix(in srgb, var(--color-shadow) 8%, transparent);
+  }
+  .wa-moi {
+    align-self: flex-end;
+    background: var(--color-whatsapp);
+  }
+  .wa-agent {
+    align-self: flex-start;
+    background: var(--color-white);
+  }
+  .wa-heure {
+    align-self: flex-end;
+    font-size: 3.2cqw;
+    color: var(--color-gray-700);
+  }
+  .wa-moi .wa-heure {
+    color: var(--color-whatsapp-tick);
+  }
+  .wa-doc {
+    display: flex;
+    align-items: center;
+    gap: 2.6cqw;
+    padding: 2.2cqw;
+    border-radius: 2.4cqw;
+    background: var(--color-gray-50);
+    font-size: 3.4cqw;
+    color: var(--color-gray-700);
+  }
+  .wa-doc b {
+    font-size: 3.8cqw;
+    color: var(--color-ink);
+  }
+  .wa-pdf {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 7cqw;
+    height: 9cqw;
+    border-radius: 1cqw;
+    background: var(--color-statut-rouge);
+    font-size: 2.4cqw;
+    font-weight: 700;
+    color: var(--color-white);
+  }
+
+  /* Notes vocales: the voice bubble, then what Peep understood, on a card slid under it. */
+  .vocal-pile {
+    position: relative;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+  .vocal {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 12px 9px 9px;
+    border-radius: 14px;
+    background: var(--color-whatsapp);
+    box-shadow: 0 10px 22px color-mix(in srgb, var(--color-shadow) 14%, transparent);
+    rotate: -4deg;
+  }
+  .vocal-lecture {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 999px;
+    background: var(--color-success-txt);
+    color: var(--color-white);
+  }
+  .onde {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    height: 20px;
+  }
+  .onde span {
+    width: 2px;
+    border-radius: 1px;
+    background: var(--color-success-txt);
+    transform-origin: center;
+  }
+  .vocal-duree {
+    font-size: 10px;
+    color: var(--color-gray-700);
+  }
+  .vocal-texte {
+    width: 92%;
+    margin-top: -6px;
+    padding: 16px 12px 10px;
+    border-radius: 10px;
+    background: var(--color-white);
+    box-shadow:
+      0 0 0 1px var(--color-ligne-claire),
+      0 8px 18px color-mix(in srgb, var(--color-shadow) 10%, transparent);
+    text-align: center;
+    font: italic 500 13px/1.35 var(--font-display);
+    color: var(--color-ink);
+    rotate: 2deg;
+  }
+
+  /* Rien à installer: the WhatsApp icon, alone on a blurred home screen. */
+  :global(.mur .tuile.t-peep-installer) {
+    padding: 0;
+  }
+  :global(.mur .tuile.t-peep-installer .tuile-corps) {
+    flex: 1;
+  }
+  :global(.mur .t-peep-installer .tuile-tete) {
+    position: relative;
+    z-index: 1;
+    padding: 0 12px 20px;
+  }
+  :global(.mur .tuile.t-peep-installer .tuile-tete h3) {
+    color: var(--color-white);
+    text-shadow: 0 1px 8px color-mix(in srgb, var(--color-shadow) 40%, transparent);
+  }
+  .accueil {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+  .accueil-fond {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(16px) saturate(1.3) brightness(0.78);
+    scale: 1.3;
+  }
+  .accueil-corps {
+    position: relative;
+    display: grid;
+    flex: 1;
+    place-items: center;
+    padding-top: 10px;
+  }
+  .app-wa {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 88px;
+    height: 88px;
+    border-radius: 22px;
+    background: var(--color-whatsapp-brand);
+    color: var(--color-white);
+    box-shadow:
+      inset 0 2px 0 color-mix(in srgb, var(--color-white) 35%, transparent),
+      inset 0 -3px 0 color-mix(in srgb, var(--color-shadow) 18%, transparent),
+      0 3px 6px color-mix(in srgb, var(--color-shadow) 25%, transparent),
+      0 18px 30px color-mix(in srgb, var(--color-shadow) 30%, transparent);
+  }
+  .app-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--color-white);
+    border-radius: 999px;
+    background: var(--color-statut-rouge);
+  }
+
+  /* Dans la langue de chacun: one sentence, five languages, in decreasing sizes. */
+  .langues {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding-bottom: 12px;
+    text-align: center;
+    letter-spacing: -0.02em;
+  }
+  .langue-0 {
+    font: 600 36px/1.1 var(--font-display);
+    color: var(--color-ink);
+  }
+  .langue-1 {
+    font: 600 30px/1.25 var(--font-sans);
+    color: var(--color-trad-bleu);
+  }
+  .langue-2 {
+    font: 600 27px/1.25 var(--font-sans);
+    color: var(--color-trad-violet);
+  }
+  .langue-3 {
+    font: 600 23px/1.3 var(--font-sans);
+    color: var(--color-trad-magenta);
+  }
+  .langue-4 {
+    font: 600 19px/1.3 var(--font-sans);
+    color: var(--color-trad-lilas);
+  }
+
+  /* N'invente rien: the notification head office receives, on top of the earlier ones. */
+  .pile {
+    position: relative;
+    width: 100%;
+    margin-top: 4px;
+  }
+  .pile-dessous {
+    position: absolute;
+    inset: 8px 8px -8px;
+    border-radius: 12px;
+    background: var(--color-mur);
+    box-shadow: 0 0 0 1px var(--color-ligne-claire);
+    rotate: 3deg;
+  }
+  .notif {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 12px;
+    background: var(--color-white);
+    box-shadow:
+      0 0 0 1px var(--color-ligne-claire),
+      0 10px 22px color-mix(in srgb, var(--color-shadow) 12%, transparent);
+    font-size: 9.5px;
+    color: var(--color-gray-700);
+    rotate: -2deg;
+  }
+  .notif b {
+    font-size: 11px;
+    color: var(--color-ink);
+  }
+  .notif-icone {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    background: var(--color-orange-tint);
+    color: var(--color-orange-txt);
+  }
+
+  /* The two voxel tiles: the render fills the tile, the title on top, a pill at the bottom. */
+  :global(.mur .t-peep-image .tuile-tete) {
+    position: relative;
+    z-index: 1;
+    padding: 22px 12px 0;
+  }
+  .image-fond {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .carte {
+    object-position: 50% 66%;
+  }
+  .calendrier {
+    object-position: 50% 70%;
+  }
+  .pastille {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-white) 88%, transparent);
+    box-shadow: var(--shadow-1);
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--color-ink);
+  }
+  .envoi {
+    position: absolute;
+    right: 0;
+    bottom: 12px;
+    left: 0;
+    display: flex;
+    justify-content: center;
+  }
+
+  /* Ciblé par étiquettes: the picked tags and the reach, over the voxel map. */
+  .ciblage {
+    position: absolute;
+    right: 8px;
+    bottom: 12px;
+    left: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+  .etiquette {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: var(--color-ink);
+    font-size: 9.5px;
+    white-space: nowrap;
+    color: var(--color-white);
+  }
+
+  /* Qui a lu quoi: a dark tile, the ratio large, then restaurant by restaurant (off the tile). */
+  :global(.mur .tuile.t-peep-lecture) {
+    background: var(--color-night);
+  }
+  :global(.mur .tuile.t-peep-lecture .tuile-tete h3) {
+    color: var(--color-white);
+  }
+  :global(.mur .t-peep-lecture .tuile-corps) {
+    padding-top: 6px;
+  }
+  .ratio {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font: 600 72px/1 var(--font-sans);
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-white);
+  }
+  .ratio-sur {
+    font-size: 36px;
+    color: color-mix(in srgb, var(--color-white) 60%, transparent);
+  }
+  .ratio-legende {
+    margin-top: 8px;
+    font-size: 13px;
+    color: color-mix(in srgb, var(--color-white) 75%, transparent);
+  }
+  .lignes {
+    align-self: stretch;
+    margin: 18px 0 -40px;
+    padding: 6px 16px 40px;
+    border-radius: 16px;
+    background: var(--color-night-2);
+    box-shadow: 0 0 0 1px var(--color-line-night);
+  }
+  .lignes li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    font-size: 13px;
+    color: var(--color-white);
+  }
+  .lignes li + li {
+    border-top: 1px solid var(--color-line-night);
+  }
+  .lu {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: color-mix(in srgb, var(--color-white) 60%, transparent);
+  }
+  .lu-vert :global(svg) {
+    color: var(--color-whatsapp-tick);
+  }
+  .lu-orange {
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--color-orange);
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+
+  /* Rédige vos communications: the idea on a sticky note, then the poster Peep drafts, pinned. */
+  .redaction {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    height: 100%;
+  }
+  .postit {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    gap: 6px;
+    width: 128px;
+    padding: 12px 12px 16px;
+    background: var(--color-peach);
+    box-shadow: 0 8px 16px color-mix(in srgb, var(--color-shadow) 14%, transparent);
+    rotate: -4deg;
+  }
+  .postit-libelle {
+    font: 400 10px/1 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-orange-txt);
+  }
+  .postit p {
+    font: italic 500 13px/1.3 var(--font-display);
+    color: var(--color-ink);
+  }
+  .affiche {
+    position: relative;
+    display: flex;
+    flex: 1;
+    min-width: 150px;
+    flex-direction: column;
+    gap: 6px;
+    align-self: flex-start;
+    max-width: 240px;
+    margin: 18px 0 -60px;
+    padding: 10px 10px 40px;
+    background: var(--color-white);
+    box-shadow:
+      0 0 0 1px var(--color-ligne-claire),
+      0 18px 34px color-mix(in srgb, var(--color-shadow) 18%, transparent);
+    rotate: 3deg;
+  }
+  .punaise {
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    z-index: 1;
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    background: var(--color-orange);
+    box-shadow: 0 2px 3px color-mix(in srgb, var(--color-shadow) 35%, transparent);
+    translate: -50% 0;
+  }
+  .affiche-photo {
+    width: 100%;
+    aspect-ratio: 16 / 8;
+    object-fit: cover;
+    object-position: 50% 55%;
+  }
+  .affiche-titre {
+    font: 700 19px/1.1 var(--font-display);
+    letter-spacing: -0.01em;
+    color: var(--color-ink);
+  }
+  .affiche-texte {
+    font-size: 10.5px;
+    line-height: 1.4;
+    color: var(--color-soft);
+  }
+  /* On the photo's corner, never over the poster's headline, whatever the poster's width. */
+  .quiz {
+    position: absolute;
+    top: 22px;
+    right: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--color-ink);
+    box-shadow: var(--shadow-2);
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--color-white);
+    rotate: -6deg;
+  }
+  /* 1024–1280: one-column tiles are ~140 px wide; the voice note, its transcript and the
+     notification shrink to fit; the poster, under its title now, shows a flatter photo so its
+     headline stays on the tile. */
+  @media (min-width: 64rem) and (max-width: 79.99rem) {
+    .vocal {
+      gap: 6px;
+      padding: 7px 9px 7px 7px;
+    }
+    .onde span:nth-child(n + 13) {
+      display: none;
+    }
+    .vocal-texte {
+      width: 100%;
+      padding: 14px 8px 8px;
+      font-size: 12px;
+    }
+    .postit {
+      width: 112px;
+    }
+    .affiche {
+      margin-top: 4px;
+    }
+    .affiche-photo {
+      aspect-ratio: 16 / 6;
+    }
+  }
+  /* Up to 1440 the notification has no room for its icon beside its two lines. */
+  @media (min-width: 64rem) and (max-width: 89.99rem) {
+    .notif {
+      padding: 7px 9px;
+    }
+    .notif-icone {
+      display: none;
+    }
+  }
+  @media (max-width: 39.99rem) {
+    .langue-0 {
+      font-size: 28px;
+    }
+    /* Narrow image tiles are taller than wide: the whole render, sat at the bottom. */
+    .image-fond {
+      object-fit: contain;
+      object-position: 50% 100%;
+    }
+    .carte {
+      scale: 1.15;
+    }
+    /* The send tile is alone on its row (`seule`), wider than tall: the whole render, its sides
+       faded into the tile's tint so the image's own backdrop leaves no seam. */
+    :global(.t-peep-envoi) .calendrier {
+      mask-image: linear-gradient(90deg, transparent 18%, black 32%, black 68%, transparent 82%);
+    }
+    .redaction {
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+    }
+    .redaction > :global(span) {
+      display: none;
+    }
+    .affiche {
+      align-self: center;
+      width: 82%;
+      margin: 0 0 -40px;
+    }
+  }
+</style>

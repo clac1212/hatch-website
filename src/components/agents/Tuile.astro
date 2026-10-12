@@ -1,0 +1,184 @@
+---
+/**
+ * A tile of an agent's feature wall (Mur.astro), placed on its six-column grid: `col`, `row` (1-based)
+ * and its span `w` × `h`, as in the Pencil mock-up. Below 1024 px the wall has two columns: a tile
+ * one column wide stays one column, wider ones take the row, and every tile sizes to its content.
+ * `titre` sits on top, centred; `disposition="ligne"` puts it on the left, the visual on the right
+ * (the wide tiles); `titre="bas"` is for tiles whose title closes them (an app icon above it).
+ * Between 1024 and 1360 px a one-column tile is only 140 to 190 px wide: its padding and title
+ * shrink so the visuals keep room (each visual also caps itself at the tile's width).
+ */
+interface Props {
+  col: number;
+  row: number;
+  w: number;
+  h: number;
+  titre?: string;
+  sousTitre?: string;
+  disposition?: 'colonne' | 'ligne' | 'bas';
+  /** No padding: the visual runs to the tile's edges (phone, render). */
+  plein?: boolean;
+  /** One column wide but alone on its row below 1024 px (the wall's last tile): takes the row. */
+  seule?: boolean;
+  /** `disposition="ligne"` only: between 1024 and 1280 px the title goes above the visual, which
+   * then has the tile's whole width (a three-column tile is ~455 px wide at 1024). */
+  empile?: boolean;
+  class?: string;
+  style?: string;
+}
+const {
+  col,
+  row,
+  w,
+  h,
+  titre,
+  sousTitre,
+  disposition = 'colonne',
+  plein = false,
+  seule = false,
+  empile = false,
+  class: className,
+  style = '',
+} = Astro.props;
+---
+
+<article
+  class:list={[
+    'tuile',
+    `tuile-${disposition}`,
+    { plein, etroite: w === 1, seule, empile },
+    className,
+  ]}
+  style={`--c:${col};--r:${row};--w:${w};--h:${h};${style}`}
+>
+  {
+    titre && disposition !== 'bas' && (
+      <header class="tuile-tete">
+        <h3>{titre}</h3>
+        {sousTitre && <p>{sousTitre}</p>}
+      </header>
+    )
+  }
+  <div class="tuile-corps"><slot /></div>
+  {
+    titre && disposition === 'bas' && (
+      <header class="tuile-tete">
+        <h3>{titre}</h3>
+      </header>
+    )
+  }
+</article>
+
+<style>
+  .tuile {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 200px;
+    overflow: hidden;
+    padding: 28px 16px 16px;
+    border-radius: 24px;
+    background: var(--color-white);
+    grid-column: span 2;
+  }
+  .tuile.etroite {
+    grid-column: span 1;
+  }
+  .tuile.etroite.seule {
+    grid-column: span 2;
+  }
+  @media (min-width: 64rem) {
+    .tuile,
+    .tuile.etroite,
+    .tuile.etroite.seule {
+      min-height: 0;
+      grid-column: var(--c) / span var(--w);
+      grid-row: var(--r) / span var(--h);
+    }
+  }
+  .tuile.plein {
+    padding: 0;
+  }
+  @media (min-width: 64rem) and (max-width: 84.99rem) {
+    .tuile.etroite:not(.plein) {
+      padding-inline: 10px;
+    }
+    .tuile.etroite .tuile-tete h3 {
+      font-size: 15px;
+    }
+    .tuile.etroite .tuile-tete p {
+      font-size: 12px;
+    }
+    .tuile.etroite.plein .tuile-tete {
+      padding-inline: 8px;
+    }
+  }
+  .tuile-tete {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    text-align: center;
+  }
+  .tuile-tete h3 {
+    font: 600 17px/1.2 var(--font-sans);
+    letter-spacing: -0.01em;
+    color: var(--color-ink);
+  }
+  .tuile-tete p {
+    font: 400 13px/1.45 var(--font-sans);
+    color: var(--color-soft);
+  }
+  .tuile-corps {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    min-height: 0;
+  }
+  .plein .tuile-corps {
+    align-items: stretch;
+  }
+
+  /* Wide tiles: the title on the left, the visual on the right. */
+  @media (min-width: 40rem) {
+    .tuile-ligne {
+      flex-direction: row;
+      align-items: center;
+      gap: 24px;
+      padding: 0 24px 0 28px;
+    }
+    .tuile-ligne .tuile-tete {
+      flex: none;
+      width: 170px;
+      text-align: left;
+    }
+    .tuile-ligne .tuile-tete h3 {
+      font-size: 19px;
+      font-weight: 500;
+      line-height: 1.25;
+    }
+    .tuile-ligne .tuile-corps {
+      align-self: stretch;
+      justify-content: center;
+    }
+  }
+  @media (min-width: 64rem) and (max-width: 79.99rem) {
+    .tuile-ligne.empile {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+      padding: 24px 24px 16px;
+    }
+    .tuile-ligne.empile .tuile-tete {
+      width: auto;
+    }
+  }
+  .tuile-bas {
+    justify-content: center;
+    padding-top: 16px;
+  }
+  .tuile-bas .tuile-corps {
+    flex: none;
+  }
+</style>

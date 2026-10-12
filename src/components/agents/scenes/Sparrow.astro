@@ -1,0 +1,1811 @@
+---
+import { Image, Picture } from 'astro:assets';
+import type { SceneDe } from '../../../content/schemas/scenes';
+import IphoneReel from '../IphoneReel.astro';
+import Ipad from '../../ui/Ipad.astro';
+import Icone from '../Icone.astro';
+import LogoWhatsapp from '../LogoWhatsapp.astro';
+import { avatars } from '../../pages/agent-visuels';
+import salon from '../../../assets/agents/sparrow/salon.jpg';
+
+/**
+ * Sparrow's "Exemple d'usage" scene (César 11/10): each step shows the device of whoever acts, the
+ * previous one steps back (Exemple.astro's engine, `data-etapes`: device, screen, seconds).
+ * 1. Thomas's iPhone, camera open on the trade-show stand: the viewfinder locks on the QR code, the
+ *    "WhatsApp" banner pops, a tap; WhatsApp opens with the message pre-filled, a tap on send,
+ *    Sparrow answers.
+ * 2. The same chat: Sparrow's question, Thomas types his answer and sends it, Sparrow's recap ticks
+ *    itself (capital, area, experience), asks for the papers, the proof of capital comes back.
+ * 3. Marc's Hatch OS window: Thomas's card slides from "Contact" to "Qualifié", Marc clicks it, the
+ *    sorted file opens.
+ * 4. Thomas's iPad: Marc's invitation drops in, the opening project, its back-schedule draws
+ *    itself, his first tasks tick.
+ * Each screen's markup is its final state; `.joue` (set by the engine) replays its beats, timed by
+ * `--t` (seconds from the screen's start), or by `--de`/`--a` for what only shows for a while.
+ */
+interface Props {
+  d: SceneDe<'sparrow'>;
+}
+const { d } = Astro.props;
+const etapes = [
+  { a: 'tel', e: 0, d: 7.6 },
+  { a: 'tel', e: 1, d: 9.2 },
+  { a: 'siege', e: 0, d: 7.4 },
+  { a: 'ipad', e: 0, d: 6.8 },
+];
+const w = d.whatsapp;
+const p = d.pipeline;
+const [depart, arrivee, troisieme] = p.colonnes;
+const initiale = (nom: string) => nom.charAt(0);
+/** The ticks of Thomas's tasks, one after the other. */
+let coche = 0;
+const taches = d.espace.etapes.taches.map((t) => ({
+  ...t,
+  t: t.faite ? 2.9 + 0.6 * coche++ : 0,
+}));
+---
+
+<div class="pile" data-etapes={JSON.stringify(etapes)}>
+  <div class="appareil devant" data-appareil="tel">
+    <div class="tel">
+      <IphoneReel>
+        <div class="ecran-tel on" data-ecran="0">
+          <div class="cam">
+            <p class="cam-haut">
+              <Icone nom="zap-off" taille={13} />
+              <Icone nom="chevron-up" taille={13} />
+              <span class="cam-live"></span>
+            </p>
+            <div class="visee">
+              <div class="cam-scene">
+                <Picture
+                  src={salon}
+                  alt=""
+                  formats={['avif', 'webp']}
+                  widths={[500, 900]}
+                  sizes="400px"
+                  class="cam-photo"
+                />
+                <span class="panneau">
+                  <span class="panneau-titre">{d.salon.panneau}</span>
+                  <svg viewBox="0 0 108 108" class="qr">
+                    <g fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round">
+                      <rect x="4.5" y="4.5" width="25" height="25" rx="6"></rect>
+                      <rect x="78.5" y="4.5" width="25" height="25" rx="6"></rect>
+                      <rect x="4.5" y="78.5" width="25" height="25" rx="6"></rect>
+                      <path d="M54 18 V36 a10 10 0 0 1 -10 10 H40"></path>
+                      <path d="M76 52 H84"></path>
+                      <path d="M74 104 V88 a10 10 0 0 1 10 -10 H90"></path>
+                    </g>
+                    <g fill="currentColor">
+                      <circle cx="54" cy="4.5" r="4.5"></circle>
+                      <circle cx="4.5" cy="56" r="4.5"></circle>
+                      <circle cx="30" cy="56" r="4.5"></circle>
+                      <circle cx="103.5" cy="52" r="4.5"></circle>
+                      <circle cx="54" cy="80" r="4.5"></circle>
+                      <circle cx="54" cy="103.5" r="4.5"></circle>
+                      <circle cx="103.5" cy="103.5" r="4.5"></circle>
+                    </g>
+                  </svg>
+                  <span class="panneau-wa"><LogoWhatsapp taille={12} /></span>
+                </span>
+              </div>
+              <span class="accroche"><span></span><span></span><span></span><span></span></span>
+              <span class="banniere-qr">
+                <span class="wa"><LogoWhatsapp taille={9} /></span>
+                <span class="flex flex-col">
+                  <b>{d.salon.banniere.app}</b>
+                  <span>{d.salon.banniere.texte}</span>
+                </span>
+                <span class="doigt" style="--t:2.8s"></span>
+              </span>
+            </div>
+            <div class="cam-bas">
+              <p class="modes">
+                {
+                  d.salon.modes.map((m, i) => (
+                    <span class:list={{ 'mode-actif': i === 1 }}>{m}</span>
+                  ))
+                }
+              </p>
+              <p class="commandes">
+                <span class="vignette"></span>
+                <span class="declencheur"><span></span></span>
+                <span class="retourner"><Icone nom="refresh-ccw" taille={13} /></span>
+              </p>
+            </div>
+          </div>
+
+          <div class="chat chat-monte">
+            <p class="chat-tete">
+              <Icone nom="chevron-left" taille={14} />
+              <span class="chat-av"><Icone nom="store" taille={12} /></span>
+              <span class="flex flex-col">
+                <b>{w.contact}</b>
+                <span>{w.statut}</span>
+              </span>
+            </p>
+            <div class="fil">
+              <span class="jour">{w.jour}</span>
+              <div class="m" style="--t:4.7s">
+                <div class="m-in">
+                  <p class="bulle envoye">
+                    {w.premier.texte}
+                    <span class="heure"
+                      >{w.premier.heure}<Icone nom="check-check" taille={10} /></span
+                    >
+                  </p>
+                </div>
+              </div>
+              <div class="ecrit" style="--t:5.2s">
+                <div class="m-in">
+                  <span class="points"><span></span><span></span><span></span></span>
+                </div>
+              </div>
+              <div class="m" style="--t:6.1s">
+                <div class="m-in">
+                  <p class="bulle recu">
+                    {w.accueil.texte}
+                    <span class="heure">{w.accueil.heure}</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <p class="saisie">
+              <Icone nom="plus" taille={15} />
+              <span class="champ">
+                <span class="champ-vide hors" style="--de:0s;--a:4.7s">{w.champ}</span>
+                <span class="champ-texte pendant" style="--de:0s;--a:4.7s">{w.premier.texte}</span>
+              </span>
+              <span class="envoi">
+                <span class="hors" style="--de:0s;--a:4.7s"><Icone nom="mic" taille={13} /></span>
+                <span class="pendant" style="--de:0s;--a:4.7s"
+                  ><Icone nom="send-horizontal" taille={13} /></span
+                >
+                <span class="doigt" style="--t:4.3s"></span>
+              </span>
+            </p>
+          </div>
+        </div>
+
+        <div class="ecran-tel" data-ecran="1">
+          <div class="chat">
+            <p class="chat-tete">
+              <Icone nom="chevron-left" taille={14} />
+              <span class="chat-av"><Icone nom="store" taille={12} /></span>
+              <span class="flex flex-col">
+                <b>{w.contact}</b>
+                <span>{w.statut}</span>
+              </span>
+            </p>
+            <div class="fil">
+              <span class="jour">{w.jour}</span>
+              <p class="bulle envoye">
+                {w.premier.texte}
+                <span class="heure">{w.premier.heure}<Icone nom="check-check" taille={10} /></span>
+              </p>
+              <div class="m-in">
+                <p class="bulle recu">
+                  {w.accueil.texte}
+                  <span class="heure">{w.accueil.heure}</span>
+                </p>
+              </div>
+              <div class="ecrit" style="--t:0.3s">
+                <div class="m-in">
+                  <span class="points"><span></span><span></span><span></span></span>
+                </div>
+              </div>
+              <div class="m" style="--t:1.1s">
+                <div class="m-in">
+                  <p class="bulle recu">
+                    {w.question.texte}
+                    <span class="heure">{w.question.heure}</span>
+                  </p>
+                </div>
+              </div>
+              <div class="m" style="--t:3.4s">
+                <div class="m-in">
+                  <p class="bulle envoye">
+                    {w.reponse.texte}
+                    <span class="heure"
+                      >{w.reponse.heure}<Icone nom="check-check" taille={10} /></span
+                    >
+                  </p>
+                </div>
+              </div>
+              <div class="ecrit" style="--t:3.9s">
+                <div class="m-in">
+                  <span class="points"><span></span><span></span><span></span></span>
+                </div>
+              </div>
+              <div class="m" style="--t:4.7s">
+                <div class="m-in">
+                  <div class="bulle recu recap">
+                    <b>{w.recap.titre}</b>
+                    <ul>
+                      {
+                        w.recap.lignes.map((l, i) => (
+                          <li>
+                            <span class="coche" style={`--t:${5.1 + i * 0.3}s`}>
+                              <Icone nom="check" taille={9} />
+                            </span>
+                            <span class="flex-1">{l.texte}</span>
+                            <span class="recap-etat">{l.etat}</span>
+                          </li>
+                        ))
+                      }
+                    </ul>
+                    <span class="heure">{w.recap.heure}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="ecrit" style="--t:6.1s">
+                <div class="m-in">
+                  <span class="points"><span></span><span></span><span></span></span>
+                </div>
+              </div>
+              <div class="m" style="--t:6.9s">
+                <div class="m-in">
+                  <p class="bulle recu">
+                    {w.pieces.texte}
+                    <span class="heure">{w.pieces.heure}</span>
+                  </p>
+                </div>
+              </div>
+              <div class="m" style="--t:8s">
+                <div class="m-in">
+                  <div class="bulle envoye doc">
+                    <span class="doc-ligne">
+                      <span class="doc-icone"><Icone nom="file-text" taille={13} /></span>
+                      <span class="flex min-w-0 flex-col">
+                        <b>{w.document.nom}</b>
+                        <span>{w.document.meta}</span>
+                      </span>
+                    </span>
+                    <span class="heure"
+                      >{w.document.heure}<Icone nom="check-check" taille={10} /></span
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p class="saisie">
+              <Icone nom="plus" taille={15} />
+              <span class="champ">
+                <span class="champ-vide hors" style="--de:2s;--a:3.4s">{w.champ}</span>
+                <span class="champ-texte pendant frappe" style="--de:2s;--a:3.4s"
+                  >{w.reponse.texte}</span
+                >
+              </span>
+              <span class="envoi">
+                <span class="hors" style="--de:2s;--a:3.4s"><Icone nom="mic" taille={13} /></span>
+                <span class="pendant" style="--de:2s;--a:3.4s"
+                  ><Icone nom="send-horizontal" taille={13} /></span
+                >
+                <span class="doigt" style="--t:3s"></span>
+              </span>
+            </p>
+          </div>
+        </div>
+      </IphoneReel>
+    </div>
+  </div>
+
+  <div class="appareil" data-appareil="siege">
+    <div class="fenetre on" data-ecran="0">
+      <p class="fen-barre">
+        <span class="feux"><span></span><span></span><span></span></span>
+        <b>{p.app}</b>
+        <span>{p.contexte}</span>
+      </p>
+      <div class="fen-corps">
+        <p class="kanban-tete">
+          <b>{p.titre}</b>
+          <span class="actif">
+            <Image src={avatars.sparrow} alt="" width={36} densities={[1]} class="actif-av" />
+            {p.agent}
+          </span>
+        </p>
+        <div class="kanban">
+          <div class="colonne">
+            <p class="col-tete">
+              {depart.nom}
+              <span class="compte">
+                <span class="pendant" style="--de:0s;--a:2.3s">{depart.total + 1}</span>
+                <span class="hors" style="--de:0s;--a:2.3s">{depart.total}</span>
+              </span>
+            </p>
+            <div class="cartes">
+              <div class="creux creux-depart" aria-hidden="true">
+                <div class="m-in">
+                  <div class="carte carte-thomas">
+                    <span class="nouveau">{p.candidat.badge}</span>
+                    <b>{p.candidat.nom}</b>
+                    <span>{p.candidat.ville}</span>
+                    <span class="note"><span class="note-av"></span>{p.candidat.note}</span>
+                  </div>
+                </div>
+              </div>
+              {
+                depart.cartes.map((c) => (
+                  <div class="carte">
+                    <b>{c.nom}</b>
+                    <span>{c.ville}</span>
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+          <div class="colonne">
+            <p class="col-tete">
+              {arrivee.nom}
+              <span class="compte">
+                <span class="pendant" style="--de:0s;--a:2.2s">{arrivee.total - 1}</span>
+                <span class="hors" style="--de:0s;--a:2.2s">{arrivee.total}</span>
+              </span>
+            </p>
+            <div class="cartes">
+              <div class="creux creux-arrivee" aria-hidden="true">
+                <div class="m-in">
+                  <div class="carte carte-thomas">
+                    <span class="nouveau">{p.candidat.badge}</span>
+                    <b>{p.candidat.nom}</b>
+                    <span>{p.candidat.ville}</span>
+                    <span class="note"><span class="note-av"></span>{p.candidat.note}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="thomas">
+                <div class="carte carte-thomas glisse">
+                  <span class="nouveau">{p.candidat.badge}</span>
+                  <b>{p.candidat.nom}</b>
+                  <span>{p.candidat.ville}</span>
+                  <span class="note">
+                    <Image
+                      src={avatars.sparrow}
+                      alt=""
+                      width={28}
+                      densities={[1]}
+                      class="note-av"
+                    />
+                    {p.candidat.note}
+                  </span>
+                  <span class="curseur"><Icone nom="mouse-pointer-2" taille={20} /></span>
+                </div>
+              </div>
+              {
+                arrivee.cartes.map((c) => (
+                  <div class="carte">
+                    <b>{c.nom}</b>
+                    <span>{c.ville}</span>
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+          <div class="colonne">
+            <p class="col-tete">
+              {troisieme.nom}
+              <span class="compte">{troisieme.total}</span>
+            </p>
+            <div class="cartes">
+              {
+                troisieme.cartes.map((c) => (
+                  <div class="carte">
+                    <b>{c.nom}</b>
+                    <span>{c.ville}</span>
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+        </div>
+        <span class="voile"></span>
+        <div class="dossier">
+          <p class="dossier-libelle"><Icone nom="folder-check" taille={12} />{p.dossier.libelle}</p>
+          <p class="dossier-titre">
+            <span class="pastille-nom">{initiale(p.candidat.nom)}</span>
+            {p.dossier.titre}
+          </p>
+          <span class="statut b" style="--t:4s"
+            ><Icone nom="circle-check" taille={11} />{p.dossier.statut}</span
+          >
+          <ul class="dossier-lignes">
+            {
+              p.dossier.lignes.map((l, i) => (
+                <li class="b" style={`--t:${4.2 + i * 0.18}s`}>
+                  <span class="flex-1">{l.texte}</span>
+                  <span class:list={['dossier-etat', { attente: l.attente }]}>{l.etat}</span>
+                </li>
+              ))
+            }
+          </ul>
+          <span class="piece b" style="--t:5.2s"
+            ><Icone nom="file-text" taille={11} />{p.dossier.piece}</span
+          >
+          <span class="rdv b" style="--t:5.6s"
+            ><Icone nom="calendar" taille={12} />{p.dossier.bouton}</span
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="appareil" data-appareil="ipad">
+    <div class="tablette">
+      <Ipad>
+        <div class="espace on" data-ecran="0">
+          <p class="esp-barre">
+            <span class="esp-logo">{initiale(d.espace.projet)}</span>
+            <span class="flex-1">{d.espace.marque}</span>
+            <span class="esp-moi">{initiale(p.candidat.nom)}</span>
+          </p>
+          <div class="esp-tete b" style="--t:0.6s">
+            <span class="flex flex-col">
+              <span class="esp-bonjour">{d.espace.bonjour}</span>
+              <b>{d.espace.projet}</b>
+            </span>
+            <span class="esp-date"><Icone nom="flag" taille={11} />{d.espace.date}</span>
+          </div>
+          <p class="esp-modele b" style="--t:0.9s">
+            <Icone nom="layout-template" taille={11} />{d.espace.modele}
+          </p>
+          <div class="esp-corps">
+            <div class="gantt b" style="--t:1s">
+              <p class="mois">
+                <span></span>
+                <span class="mois-liste">{d.espace.mois.map((m) => <span>{m}</span>)}</span>
+              </p>
+              <ul class="phases">
+                {
+                  d.espace.phases.map((ph, i) => (
+                    <li>
+                      <span class="phase">{ph.texte}</span>
+                      <span class="piste">
+                        <span
+                          class={`barre barre-${ph.etat}`}
+                          style={`left:${ph.debut}%;width:${ph.fin - ph.debut}%;--t:${1.3 + i * 0.22}s`}
+                        />
+                      </span>
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+            <div class="taches b" style="--t:1.6s">
+              <p class="taches-tete">
+                <b>{d.espace.etapes.titre}</b>
+                <span>{d.espace.etapes.compte}</span>
+              </p>
+              <ul>
+                {
+                  taches.map((t) => (
+                    <li class:list={{ faite: t.faite }}>
+                      <span class="case" style={`--t:${t.t}s`}>
+                        {t.faite && <Icone nom="check" taille={10} />}
+                      </span>
+                      <span class="flex-1">{t.texte}</span>
+                      <span class="tache-etat">{t.etat}</span>
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+          </div>
+          <span class="recalcul b" style="--t:4.8s"
+            ><Icone nom="refresh-cw" taille={11} />{d.espace.recalcul}</span
+          >
+          <div class="invitation">
+            <p class="notif-tete">
+              <span class="inv-app">{initiale(d.espace.invitation.app)}</span>
+              <span class="flex-1">{d.espace.invitation.app}</span>
+              <span>{d.espace.invitation.quand}</span>
+            </p>
+            <b>{d.espace.invitation.titre}</b>
+            <span>{d.espace.invitation.texte}</span>
+          </div>
+        </div>
+      </Ipad>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Generic beat: arrives at `--t` when its screen plays. */
+  .joue .b {
+    animation: sp-arrive 0.55s var(--ease-entree) var(--t, 0s) both;
+  }
+  @keyframes sp-arrive {
+    from {
+      opacity: 0;
+      translate: 0 10px;
+    }
+  }
+  /* Shown only from `--de` to `--a` (`pendant`), or hidden only then (`hors`): a pre-filled field,
+     the send button, a counter before it changes. Their markup state is the final one. */
+  .pendant {
+    opacity: 0;
+  }
+  .joue .pendant {
+    animation: sp-pendant calc(var(--a) - var(--de)) steps(1, end) var(--de) forwards;
+  }
+  @keyframes sp-pendant {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+  .joue .hors {
+    animation: sp-hors calc(var(--a) - var(--de)) steps(1, end) var(--de) forwards;
+  }
+  @keyframes sp-hors {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes sp-pop {
+    from {
+      scale: 0.4;
+      opacity: 0;
+    }
+  }
+  /* A fingertip presses at `--t`, then lifts off. */
+  .doigt {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 11cqw;
+    height: 11cqw;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-ink) 22%, transparent);
+    box-shadow: 0 0 0 2cqw color-mix(in srgb, var(--color-ink) 8%, transparent);
+    translate: -50% -50%;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .joue .doigt {
+    animation: sp-tape 0.9s var(--ease-doux) var(--t) both;
+  }
+  @keyframes sp-tape {
+    0% {
+      opacity: 0;
+      scale: 1.6;
+    }
+    35% {
+      opacity: 1;
+      scale: 1;
+    }
+    55% {
+      scale: 0.85;
+    }
+    100% {
+      opacity: 0;
+      scale: 1.1;
+    }
+  }
+  .wa {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 7cqw;
+    height: 7cqw;
+    border-radius: 2cqw;
+    background: var(--color-whatsapp-brand);
+    color: var(--color-white);
+  }
+
+  /* 1. Thomas's phone, camera open on the stand. The viewfinder is iOS's 4:3 frame; the photo is a
+     square larger than it, centred on the stand's panel (measured on salon.jpg: x 27.5–45.6 %,
+     y 26–50.6 %), and zooms in on it. */
+  .tel {
+    width: 250px;
+  }
+  .ecran-tel {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+  }
+  .cam {
+    position: absolute;
+    inset: 0;
+    background: var(--color-black);
+    color: var(--color-white);
+  }
+  .cam-haut {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 22cqw;
+    padding: 9cqw 7cqw 0;
+  }
+  .cam-live {
+    width: 4cqw;
+    height: 4cqw;
+    border-radius: 999px;
+    background: var(--color-success);
+  }
+  .visee {
+    position: absolute;
+    top: 22cqw;
+    right: 0;
+    left: 0;
+    height: 133cqw;
+    overflow: hidden;
+  }
+  .cam-scene {
+    position: absolute;
+    top: -0.5cqw;
+    left: -14cqw;
+    width: 175cqw;
+    height: 175cqw;
+    transform-origin: 36.55% 38.3%;
+    scale: 1.5;
+  }
+  .joue .cam-scene {
+    animation: sp-zoom 1.5s var(--ease-camera) 0.2s both;
+  }
+  @keyframes sp-zoom {
+    from {
+      scale: 1;
+    }
+  }
+  .cam-photo,
+  .cam-photo :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .panneau {
+    position: absolute;
+    top: 26%;
+    left: 27.5%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5%;
+    width: 18.1%;
+    height: 24.6%;
+    color: var(--color-ink);
+  }
+  .panneau-titre {
+    font: 700 2.6cqw/1.1 var(--font-display);
+    text-align: center;
+  }
+  .qr {
+    width: 66%;
+    height: auto;
+    aspect-ratio: 1;
+  }
+  .panneau-wa {
+    display: grid;
+    place-items: center;
+    width: 16%;
+    aspect-ratio: 1;
+    border-radius: 25%;
+    background: var(--color-whatsapp-brand);
+    color: var(--color-white);
+  }
+  .panneau-wa :global(svg) {
+    width: 70%;
+    height: 70%;
+  }
+  /* The viewfinder's yellow corners close in on the code. */
+  .accroche {
+    position: absolute;
+    top: 30cqw;
+    left: 22cqw;
+    width: 56cqw;
+    height: 72cqw;
+  }
+  .accroche span {
+    position: absolute;
+    width: 9cqw;
+    height: 9cqw;
+    border: 0 solid var(--color-amber-line);
+  }
+  .accroche span:nth-child(1) {
+    top: 0;
+    left: 0;
+    border-width: 0.9cqw 0 0 0.9cqw;
+    border-top-left-radius: 3cqw;
+  }
+  .accroche span:nth-child(2) {
+    top: 0;
+    right: 0;
+    border-width: 0.9cqw 0.9cqw 0 0;
+    border-top-right-radius: 3cqw;
+  }
+  .accroche span:nth-child(3) {
+    bottom: 0;
+    left: 0;
+    border-width: 0 0 0.9cqw 0.9cqw;
+    border-bottom-left-radius: 3cqw;
+  }
+  .accroche span:nth-child(4) {
+    right: 0;
+    bottom: 0;
+    border-width: 0 0.9cqw 0.9cqw 0;
+    border-bottom-right-radius: 3cqw;
+  }
+  .joue .accroche {
+    animation: sp-accroche 0.5s var(--ease-entree) 1.3s both;
+  }
+  @keyframes sp-accroche {
+    from {
+      opacity: 0;
+      scale: 1.35;
+    }
+  }
+  /* iOS's QR banner, under the code. */
+  .banniere-qr {
+    position: absolute;
+    top: 107cqw;
+    left: 50%;
+    display: flex;
+    align-items: center;
+    gap: 2.4cqw;
+    padding: 2cqw 4.5cqw 2cqw 2.4cqw;
+    border-radius: 999px;
+    background: var(--color-amber-line);
+    font-size: 3.6cqw;
+    line-height: 1.2;
+    color: var(--color-ink);
+    white-space: nowrap;
+    translate: -50% 0;
+  }
+  .banniere-qr b {
+    font-size: 3.8cqw;
+  }
+  .joue .banniere-qr {
+    animation: sp-pop 0.45s var(--ease-pop) 1.9s both;
+  }
+  .cam-bas {
+    position: absolute;
+    top: 155cqw;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5cqw;
+    padding-top: 4cqw;
+  }
+  .modes {
+    display: flex;
+    justify-content: center;
+    gap: 5cqw;
+    font-size: 3.4cqw;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--color-white) 75%, transparent);
+  }
+  .modes .mode-actif {
+    color: var(--color-amber-line);
+  }
+  .commandes {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 9cqw;
+  }
+  .vignette {
+    width: 10cqw;
+    height: 10cqw;
+    border-radius: 2cqw;
+    background: var(--color-gray-700);
+  }
+  .declencheur {
+    display: grid;
+    place-items: center;
+    width: 17cqw;
+    height: 17cqw;
+    border: 1cqw solid var(--color-white);
+    border-radius: 999px;
+  }
+  .declencheur span {
+    width: 13cqw;
+    height: 13cqw;
+    border-radius: 999px;
+    background: var(--color-white);
+  }
+  .retourner {
+    display: grid;
+    place-items: center;
+    width: 10cqw;
+    height: 10cqw;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-white) 18%, transparent);
+  }
+
+  /* WhatsApp: the chat slides up over the camera after the tap. New messages push the thread up
+     (each grows from nothing at `--t`); Sparrow types before each answer. */
+  .chat {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-whatsapp-wall);
+  }
+  .joue .chat-monte {
+    animation: sp-monte 0.6s var(--ease-camera) 3.3s both;
+  }
+  @keyframes sp-monte {
+    from {
+      translate: 0 100%;
+    }
+  }
+  .chat-tete {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 2.5cqw;
+    padding: 14cqw 4cqw 3cqw;
+    background: var(--color-white);
+    font-size: 4cqw;
+    color: var(--color-gray-500);
+  }
+  .chat-tete b {
+    font-size: 4.8cqw;
+    color: var(--color-ink);
+  }
+  .chat-av {
+    display: grid;
+    place-items: center;
+    width: 9cqw;
+    height: 9cqw;
+    border-radius: 999px;
+    background: var(--color-orange-tint);
+    color: var(--color-orange-txt);
+  }
+  .fil {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 0;
+    overflow: hidden;
+    padding: 0 3.5cqw 2.5cqw;
+  }
+  .jour {
+    align-self: center;
+    margin-bottom: 1cqw;
+    padding: 1cqw 3cqw;
+    border-radius: 2cqw;
+    background: var(--color-white);
+    font-size: 3.4cqw;
+    color: var(--color-gray-500);
+  }
+  .m,
+  .ecrit {
+    display: grid;
+    grid-template-rows: 1fr;
+  }
+  .m-in {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+    padding-top: 2cqw;
+  }
+  .joue .m {
+    animation: sp-pousse 0.45s var(--ease-entree) var(--t) both;
+  }
+  @keyframes sp-pousse {
+    from {
+      grid-template-rows: 0fr;
+      opacity: 0;
+    }
+  }
+  .ecrit {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+  .joue .ecrit {
+    animation: sp-ecrit 0.9s var(--ease-doux) var(--t) both;
+  }
+  @keyframes sp-ecrit {
+    0%,
+    100% {
+      grid-template-rows: 0fr;
+      opacity: 0;
+    }
+    25%,
+    80% {
+      grid-template-rows: 1fr;
+      opacity: 1;
+    }
+  }
+  .points {
+    display: flex;
+    gap: 1.2cqw;
+    align-self: flex-start;
+    padding: 3cqw 3.6cqw;
+    border-radius: 3.4cqw;
+    background: var(--color-white);
+  }
+  .points span {
+    width: 1.8cqw;
+    height: 1.8cqw;
+    border-radius: 999px;
+    background: var(--color-gray-400);
+  }
+  .bulle {
+    display: flex;
+    flex-direction: column;
+    max-width: 84%;
+    padding: 2.2cqw 3cqw 1.4cqw;
+    border-radius: 3.4cqw;
+    box-shadow: 0 0.4cqw 0 color-mix(in srgb, var(--color-shadow) 8%, transparent);
+    font-size: 4.2cqw;
+    line-height: 1.38;
+  }
+  .bulle.recu {
+    align-self: flex-start;
+    background: var(--color-white);
+  }
+  .bulle.envoye {
+    align-self: flex-end;
+    background: var(--color-whatsapp);
+  }
+  .fil > .bulle,
+  .fil > .m-in {
+    margin-top: 2cqw;
+  }
+  .fil > .m-in {
+    padding-top: 0;
+  }
+  .heure {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8cqw;
+    align-self: flex-end;
+    font-size: 3cqw;
+    color: var(--color-gray-500);
+  }
+  .envoye .heure :global(svg) {
+    width: 3.6cqw;
+    height: 3.6cqw;
+    color: var(--color-whatsapp-tick);
+  }
+  .recap {
+    gap: 1.6cqw;
+    width: 84%;
+  }
+  .recap ul {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4cqw;
+  }
+  .recap li {
+    display: flex;
+    align-items: center;
+    gap: 1.8cqw;
+    font-size: 3.8cqw;
+  }
+  .coche {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 4.4cqw;
+    height: 4.4cqw;
+    border-radius: 999px;
+    background: var(--color-success);
+    color: var(--color-white);
+  }
+  .coche :global(svg) {
+    width: 3cqw;
+    height: 3cqw;
+  }
+  .joue .coche {
+    animation: sp-pop 0.4s var(--ease-pop) var(--t) both;
+  }
+  .recap-etat {
+    font-size: 3.4cqw;
+    font-weight: 600;
+    color: var(--color-success-txt);
+  }
+  .doc {
+    gap: 1cqw;
+    width: 72%;
+  }
+  .doc-ligne {
+    display: flex;
+    align-items: center;
+    gap: 2cqw;
+    padding: 2cqw;
+    border-radius: 2.4cqw;
+    background: color-mix(in srgb, var(--color-white) 55%, transparent);
+    font-size: 3.2cqw;
+    color: var(--color-gray-500);
+  }
+  .doc-ligne b {
+    overflow: hidden;
+    font-size: 3.6cqw;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--color-ink);
+  }
+  .doc-icone {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 8cqw;
+    height: 9.5cqw;
+    border-radius: 1.4cqw;
+    background: var(--color-statut-rouge-tint);
+    color: var(--color-statut-rouge);
+  }
+  /* The input bar: the pre-filled (or typed) text, the send button while there is text. */
+  .saisie {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 2.4cqw;
+    padding: 2.4cqw 3cqw 7cqw;
+    background: var(--color-galet);
+    color: var(--color-gray-500);
+  }
+  .champ {
+    display: grid;
+    flex: 1;
+    min-width: 0;
+    padding: 2.2cqw 3.4cqw;
+    border-radius: 999px;
+    background: var(--color-white);
+    font-size: 3.9cqw;
+  }
+  .champ > span {
+    grid-area: 1 / 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .champ-texte {
+    color: var(--color-ink);
+  }
+  /* Thomas types: his words appear from left to right. */
+  .joue .frappe {
+    animation:
+      sp-pendant calc(var(--a) - var(--de)) steps(1, end) var(--de) forwards,
+      sp-frappe 0.8s linear var(--de) both;
+  }
+  @keyframes sp-frappe {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+  .envoi {
+    position: relative;
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 9cqw;
+    height: 9cqw;
+    border-radius: 999px;
+    background: var(--color-whatsapp-brand);
+    color: var(--color-white);
+  }
+  .envoi > span:not(.doigt) {
+    display: grid;
+    grid-area: 1 / 1;
+    place-items: center;
+  }
+
+  /* 3. Marc's Hatch OS window: the pipeline. Thomas's card slides from the first column to the
+     second (the first closes its gap, the second opens one), then Marc opens the file. */
+  .fenetre {
+    width: min(540px, 100%);
+    overflow: hidden;
+    border-radius: 14px;
+    background: var(--color-galet);
+    box-shadow: var(--shadow-3);
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+    container-type: inline-size;
+  }
+  .fen-barre {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--color-ligne-claire);
+    background: var(--color-white);
+    font-size: 12px;
+    color: var(--color-gray-500);
+  }
+  .fen-barre b {
+    flex: none;
+    font: 700 14px/1 var(--font-display);
+    color: var(--color-ink);
+  }
+  .fen-barre span:last-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .feux {
+    display: flex;
+    gap: 6px;
+    margin-right: 4px;
+  }
+  .feux span {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: var(--color-statut-rouge);
+  }
+  .feux span:nth-child(2) {
+    background: var(--color-amber-line);
+  }
+  .feux span:nth-child(3) {
+    background: var(--color-success);
+  }
+  .fen-corps {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: clamp(340px, 69cqi, 372px);
+    padding: 18px;
+    overflow: hidden;
+    --gap: clamp(6px, 1.8cqi, 10px);
+  }
+  .kanban-tete {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .kanban-tete b {
+    font: 700 clamp(13px, 3cqi, 16px) / 1.2 var(--font-display);
+  }
+  .actif {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 9px 3px 3px;
+    border-radius: 999px;
+    background: var(--color-white);
+    box-shadow: inset 0 0 0 1px var(--color-ligne-claire);
+    font-size: clamp(9.5px, 2.1cqi, 11px);
+    font-weight: 600;
+    color: var(--color-gray-700);
+  }
+  .actif-av {
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+  }
+  .kanban {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--gap);
+    align-items: start;
+  }
+  .colonne {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: var(--gap);
+    border-radius: 12px;
+    background: var(--color-mur);
+  }
+  .col-tete {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    font-size: clamp(9.5px, 2.2cqi, 12px);
+    font-weight: 600;
+    color: var(--color-gray-700);
+  }
+  .compte {
+    display: inline-grid;
+    min-width: 20px;
+    padding: 1px 6px;
+    border-radius: 999px;
+    background: var(--color-white);
+    text-align: center;
+    font: 400 clamp(9px, 2cqi, 11px) / 1.4 var(--font-mono);
+  }
+  .compte span {
+    grid-area: 1 / 1;
+  }
+  .cartes {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  .carte {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 6px;
+    padding: clamp(6px, 1.6cqi, 10px);
+    border-radius: 9px;
+    background: var(--color-white);
+    box-shadow: inset 0 0 0 1px var(--color-ligne-claire);
+    font-size: clamp(8.5px, 2cqi, 11px);
+    color: var(--color-gray-500);
+  }
+  .carte b {
+    font-size: clamp(9.5px, 2.3cqi, 12.5px);
+    color: var(--color-ink);
+  }
+  .creux .m-in {
+    padding: 0;
+  }
+  .creux .carte {
+    visibility: hidden;
+  }
+  /* Thomas's card sits over the gap of the second column. */
+  .thomas {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 2;
+  }
+  .carte-thomas {
+    position: relative;
+  }
+  .glisse {
+    background: var(--color-white);
+    box-shadow:
+      inset 0 0 0 1.5px var(--color-orange),
+      var(--shadow-1);
+  }
+  .nouveau {
+    align-self: flex-start;
+    margin-bottom: 2px;
+    padding: 1px 6px;
+    border-radius: 999px;
+    background: var(--color-orange-tint);
+    font-size: clamp(8px, 1.8cqi, 10px);
+    font-weight: 600;
+    color: var(--color-orange-txt);
+  }
+  .note {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 3px;
+    font-weight: 600;
+    color: var(--color-success-txt);
+  }
+  .note-av {
+    width: 14px;
+    height: 14px;
+    border-radius: 999px;
+  }
+  .creux {
+    display: grid;
+  }
+  .creux-depart {
+    grid-template-rows: 0fr;
+  }
+  .creux-arrivee {
+    grid-template-rows: 1fr;
+  }
+  .joue .creux-depart {
+    animation: sp-ferme 0.5s var(--ease-doux) 2.3s both;
+  }
+  @keyframes sp-ferme {
+    from {
+      grid-template-rows: 1fr;
+    }
+  }
+  .joue .creux-arrivee {
+    animation: sp-ouvre 0.5s var(--ease-doux) 1.4s both;
+  }
+  @keyframes sp-ouvre {
+    from {
+      grid-template-rows: 0fr;
+    }
+  }
+  .joue .thomas {
+    animation: sp-arrive 0.5s var(--ease-entree) 0.4s both;
+  }
+  .joue .glisse {
+    animation: sp-glisse 0.9s var(--ease-camera) 1.4s both;
+  }
+  @keyframes sp-glisse {
+    from {
+      translate: calc(-100% - 3 * var(--gap)) 0;
+      rotate: 0deg;
+    }
+    50% {
+      rotate: 2.5deg;
+      scale: 1.04;
+    }
+    to {
+      translate: 0 0;
+      rotate: 0deg;
+    }
+  }
+  /* Marc's pointer comes to the card and clicks it. */
+  .curseur {
+    position: absolute;
+    right: 18%;
+    bottom: -6px;
+    z-index: 3;
+    color: var(--color-ink);
+    filter: drop-shadow(0 1px 0 var(--color-white)) drop-shadow(0 -1px 0 var(--color-white))
+      drop-shadow(1px 0 0 var(--color-white)) drop-shadow(-1px 0 0 var(--color-white));
+    opacity: 0;
+  }
+  .joue .curseur {
+    animation: sp-curseur 1.5s var(--ease-camera) 2.5s both;
+  }
+  @keyframes sp-curseur {
+    0% {
+      opacity: 0;
+      translate: 70px 70px;
+    }
+    15% {
+      opacity: 1;
+    }
+    55% {
+      translate: 0 0;
+      scale: 1;
+    }
+    65% {
+      scale: 0.8;
+    }
+    75% {
+      scale: 1;
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  .voile {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    background: color-mix(in srgb, var(--color-ink) 18%, transparent);
+  }
+  .joue .voile {
+    animation: sp-fondu 0.4s var(--ease-doux) 3.5s both;
+  }
+  @keyframes sp-fondu {
+    from {
+      opacity: 0;
+    }
+  }
+  /* The sorted file, as a drawer from the right. */
+  .dossier {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: clamp(6px, 1.8cqi, 10px);
+    width: min(84%, 310px);
+    padding: clamp(12px, 3.4cqi, 20px);
+    background: var(--color-white);
+    box-shadow: var(--shadow-3);
+    font-size: clamp(9.5px, 2.2cqi, 12px);
+  }
+  .joue .dossier {
+    animation: sp-tiroir 0.55s var(--ease-camera) 3.5s both;
+  }
+  @keyframes sp-tiroir {
+    from {
+      translate: 105% 0;
+    }
+  }
+  .dossier-libelle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font: 400 clamp(8.5px, 1.9cqi, 10px) / 1.3 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-orange-txt);
+  }
+  .dossier-titre {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font: 700 clamp(12px, 3cqi, 16px) / 1.2 var(--font-display);
+  }
+  .pastille-nom {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 999px;
+    background: var(--color-orange);
+    font: 700 12px/1 var(--font-sans);
+    color: var(--color-ink);
+  }
+  .statut {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: var(--color-success-tint);
+    font-weight: 600;
+    color: var(--color-success-txt);
+  }
+  .dossier-lignes {
+    align-self: stretch;
+  }
+  .dossier-lignes li {
+    display: flex;
+    gap: 8px;
+    padding: clamp(4px, 1.2cqi, 7px) 0;
+    border-top: 1px solid var(--color-ligne-claire);
+  }
+  .dossier-etat {
+    flex: none;
+    font-weight: 600;
+    color: var(--color-success-txt);
+  }
+  .dossier-etat.attente {
+    color: var(--color-amber-txt);
+  }
+  .piece {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: var(--color-mur);
+    font-weight: 600;
+    color: var(--color-gray-700);
+  }
+  .rdv {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: auto;
+    padding: 6px 12px;
+    border-radius: 8px;
+    background: var(--color-orange);
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+
+  /* 4. Thomas's iPad: his project owner space. */
+  .tablette {
+    width: min(560px, 100%);
+  }
+  .espace {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 2.4cqw;
+    height: 100%;
+    padding: 0 4.5cqw 3.5cqw;
+    background: var(--color-galet);
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+  }
+  .esp-barre {
+    display: flex;
+    align-items: center;
+    gap: 1.6cqw;
+    margin: 0 -4.5cqw;
+    padding: 1.8cqw 4.5cqw;
+    border-bottom: 1px solid var(--color-ligne-claire);
+    background: var(--color-white);
+    font-size: 2.4cqw;
+    font-weight: 600;
+    color: var(--color-gray-700);
+  }
+  .esp-logo,
+  .inv-app {
+    display: grid;
+    place-items: center;
+    width: 4.4cqw;
+    height: 4.4cqw;
+    border-radius: 1.2cqw;
+    background: var(--color-orange);
+    font: 700 2.4cqw/1 var(--font-display);
+    color: var(--color-ink);
+  }
+  .esp-moi {
+    display: grid;
+    place-items: center;
+    width: 4.6cqw;
+    height: 4.6cqw;
+    border-radius: 999px;
+    background: var(--color-mur);
+    font-size: 2.3cqw;
+  }
+  .esp-tete {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2cqw;
+  }
+  .esp-bonjour {
+    font-size: 2.5cqw;
+    color: var(--color-soft);
+  }
+  .esp-tete b {
+    font: 700 4.6cqw/1.15 var(--font-display);
+  }
+  .esp-date {
+    display: inline-flex;
+    align-items: center;
+    gap: 1cqw;
+    padding: 1cqw 2.2cqw;
+    border-radius: 999px;
+    background: var(--color-orange-tint);
+    font-size: 2.4cqw;
+    font-weight: 600;
+    color: var(--color-orange-txt);
+  }
+  .esp-modele {
+    display: flex;
+    align-items: center;
+    gap: 1.2cqw;
+    margin-top: -1cqw;
+    font: 400 2.1cqw/1.3 var(--font-mono);
+    color: var(--color-gray-500);
+  }
+  .esp-corps {
+    display: grid;
+    flex: 1;
+    grid-template-columns: 1.35fr 1fr;
+    gap: 2.4cqw;
+    min-height: 0;
+  }
+  .gantt,
+  .taches {
+    display: flex;
+    flex-direction: column;
+    padding: 2.6cqw;
+    border-radius: 2cqw;
+    background: var(--color-white);
+    box-shadow: inset 0 0 0 1px var(--color-ligne-claire);
+  }
+  .gantt {
+    gap: 2.4cqw;
+  }
+  .mois,
+  .phases li {
+    display: grid;
+    grid-template-columns: 14.5cqw 1fr;
+    align-items: center;
+    gap: 1.6cqw;
+  }
+  .mois-liste {
+    display: flex;
+    justify-content: space-between;
+    font: 400 1.9cqw/1 var(--font-mono);
+    color: var(--color-gray-500);
+  }
+  .phases {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: space-around;
+    gap: 2.6cqw;
+  }
+  .phase {
+    overflow: hidden;
+    font-size: 2.2cqw;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+  }
+  .piste {
+    position: relative;
+    height: 2.4cqw;
+    border-radius: 999px;
+    background: var(--color-gray-100);
+  }
+  .barre {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    border-radius: 999px;
+    transform-origin: left center;
+  }
+  .barre-en-cours {
+    background: var(--color-copper);
+  }
+  .barre-a-venir {
+    background: color-mix(in srgb, var(--color-copper) 55%, var(--color-white));
+  }
+  .barre-jalon {
+    background: var(--color-orange);
+  }
+  .joue .barre {
+    animation: sp-trace 0.7s var(--ease-entree) var(--t) both;
+  }
+  @keyframes sp-trace {
+    from {
+      scale: 0 1;
+    }
+  }
+  .taches {
+    gap: 1.6cqw;
+  }
+  .taches-tete {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4cqw;
+    margin-bottom: 0.6cqw;
+  }
+  .taches-tete b {
+    font-size: 2.6cqw;
+  }
+  .taches-tete span {
+    font: 400 2cqw/1.2 var(--font-mono);
+    color: var(--color-gray-500);
+  }
+  .taches li {
+    display: flex;
+    align-items: center;
+    gap: 1.4cqw;
+    padding-top: 1.6cqw;
+    border-top: 1px solid var(--color-ligne-claire);
+    font-size: 2.3cqw;
+    line-height: 1.2;
+  }
+  .case {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 3.2cqw;
+    height: 3.2cqw;
+    border-radius: 0.9cqw;
+    box-shadow: inset 0 0 0 1px var(--color-gray-400);
+  }
+  .faite .case {
+    background: var(--color-success);
+    box-shadow: none;
+    color: var(--color-white);
+  }
+  .case :global(svg) {
+    width: 2.4cqw;
+    height: 2.4cqw;
+  }
+  .joue .faite .case {
+    animation: sp-coche 0.4s var(--ease-pop) var(--t) both;
+  }
+  @keyframes sp-coche {
+    from {
+      background: var(--color-white);
+      box-shadow: inset 0 0 0 1px var(--color-gray-400);
+      color: transparent;
+      scale: 0.7;
+    }
+  }
+  .tache-etat {
+    flex: none;
+    font-size: 2cqw;
+    font-weight: 600;
+    color: var(--color-orange-txt);
+  }
+  .faite .tache-etat {
+    color: var(--color-success-txt);
+  }
+  .joue .faite .tache-etat {
+    animation: sp-fondu 0.3s var(--ease-doux) var(--t) both;
+  }
+  .recalcul {
+    display: inline-flex;
+    align-items: center;
+    gap: 1.2cqw;
+    align-self: flex-start;
+    padding: 1cqw 2.4cqw;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-copper) 12%, var(--color-statut-rouge-tint));
+    font-size: 2.3cqw;
+    font-weight: 500;
+    color: color-mix(in srgb, var(--color-copper) 55%, var(--color-ink));
+  }
+  /* Marc's invitation drops in over the top of the screen, then leaves. */
+  .invitation {
+    position: absolute;
+    top: 2cqw;
+    left: 50%;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4cqw;
+    width: 52cqw;
+    padding: 2cqw 2.6cqw;
+    border-radius: 3cqw;
+    background: color-mix(in srgb, var(--color-white) 94%, transparent);
+    box-shadow: var(--shadow-3);
+    backdrop-filter: blur(12px);
+    font-size: 2.4cqw;
+    line-height: 1.3;
+    opacity: 0;
+    translate: -50% 0;
+  }
+  .invitation b {
+    font-size: 2.6cqw;
+  }
+  .invitation .notif-tete {
+    display: flex;
+    align-items: center;
+    gap: 1.4cqw;
+    margin-bottom: 0.4cqw;
+    font-size: 2cqw;
+    color: var(--color-gray-700);
+  }
+  .inv-app {
+    width: 3.6cqw;
+    height: 3.6cqw;
+    font-size: 2cqw;
+  }
+  .joue .invitation {
+    animation: sp-notifie 2.2s var(--ease-entree) 0.2s both;
+  }
+  @keyframes sp-notifie {
+    0% {
+      opacity: 0;
+      translate: -50% -14cqw;
+    }
+    18%,
+    82% {
+      opacity: 1;
+      translate: -50% 0;
+    }
+    100% {
+      opacity: 0;
+      translate: -50% -14cqw;
+    }
+  }
+  /* On a phone the iPad is small: slightly larger type, the template line and the months go. */
+  @container (max-width: 320px) {
+    .esp-modele,
+    .mois {
+      display: none;
+    }
+    .esp-tete b,
+    .esp-date {
+      white-space: nowrap;
+    }
+    .phases li {
+      grid-template-columns: 16.5cqw 1fr;
+    }
+    .phase,
+    .taches li,
+    .recalcul {
+      font-size: 2.6cqw;
+    }
+    .taches-tete b {
+      font-size: 2.9cqw;
+    }
+    .invitation {
+      width: 62cqw;
+      font-size: 2.8cqw;
+    }
+    .invitation b {
+      font-size: 3cqw;
+    }
+  }
+</style>

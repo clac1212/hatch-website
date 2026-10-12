@@ -1,0 +1,47 @@
+---
+import { Image } from 'astro:assets';
+import cadre from '../../assets/agents/iphone-cadre.png';
+
+/**
+ * A photoreal iPhone (Pencil's generated product shot, screen cut out) for the agent pages' feature
+ * walls: the screen is the default slot, an HTML box placed on the frame's transparent screen area
+ * (measured on the 1353 × 2688 source: x 73–1280, y 63–2618); the frame and its Dynamic Island are
+ * drawn over it. Its content can size itself in `cqw` (the screen is a size container).
+ */
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<div class:list={['reel', className]}>
+  <div class="reel-ecran"><slot /></div>
+  <Image src={cadre} alt="" width={680} densities={[1]} class="reel-cadre" loading="lazy" />
+</div>
+
+<style>
+  .reel {
+    position: relative;
+    aspect-ratio: 1353 / 2688;
+    filter: drop-shadow(0 24px 30px color-mix(in srgb, var(--color-shadow) 24%, transparent))
+      drop-shadow(0 4px 8px color-mix(in srgb, var(--color-shadow) 14%, transparent));
+  }
+  .reel-ecran {
+    position: absolute;
+    top: 2.34%;
+    right: 5.3%;
+    bottom: 2.57%;
+    left: 5.4%;
+    overflow: hidden;
+    border-radius: 13% / 6.2%;
+    background: var(--color-white);
+    container-type: size;
+  }
+  .reel-cadre {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+</style>

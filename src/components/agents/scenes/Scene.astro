@@ -1,0 +1,24 @@
+---
+import type { Scene } from '../../../content/schemas/scenes';
+import Peep from './Peep.astro';
+import Owl from './Owl.astro';
+import Pecker from './Pecker.astro';
+import Lark from './Lark.astro';
+import Jay from './Jay.astro';
+import Finch from './Finch.astro';
+import Sparrow from './Sparrow.astro';
+
+/** An agent's "Exemple d'usage" scene, picked by its `agent` (one component per agent). */
+interface Props {
+  d: Scene;
+}
+const { d } = Astro.props;
+---
+
+{d.agent === 'peep' && <Peep d={d} />}
+{d.agent === 'owl' && <Owl d={d} />}
+{d.agent === 'pecker' && <Pecker d={d} />}
+{d.agent === 'lark' && <Lark d={d} />}
+{d.agent === 'jay' && <Jay d={d} />}
+{d.agent === 'finch' && <Finch d={d} />}
+{d.agent === 'sparrow' && <Sparrow d={d} />}

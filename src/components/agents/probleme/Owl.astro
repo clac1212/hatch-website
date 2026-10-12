@@ -1,0 +1,445 @@
+---
+import type { ProblemeDe } from '../../../content/schemas/agent-probleme';
+import Icone from '../Icone.astro';
+
+interface Props {
+  d: ProblemeDe<'owl'>;
+}
+const { d } = Astro.props;
+const { classeur, drive, whatsapp } = d;
+const extension = (nom: string) => nom.slice(nom.lastIndexOf('.') + 1);
+---
+
+<div class="panneau">
+  <div class="classeur" data-c style="--i:0">
+    <p class="fiche">{classeur.fiche}</p>
+    <ul class="intercalaires">{classeur.intercalaires.map((t) => <li>{t}</li>)}</ul>
+    <div class="couverture">
+      <div class="etiquette">
+        <b>{classeur.titre}</b>
+        <span>{classeur.sousTitre}</span>
+      </div>
+      <p class="postit">{classeur.postit}</p>
+    </div>
+  </div>
+
+  <div class="drive" data-c style="--i:1">
+    <p class="chrome">
+      <span class="feux"><i></i><i></i><i></i></span>
+      <span class="onglet">{drive.onglet}</span>
+    </p>
+    <p class="chemin">
+      {
+        drive.chemin.map((c, n) => (
+          <>
+            {n > 0 && <Icone nom="chevron-right" taille={12} />}
+            <span>{c}</span>
+          </>
+        ))
+      }
+    </p>
+    <p class="ligne entete">
+      <span class="flex-1">{drive.colonnes.nom}</span>
+      <span class="date">{drive.colonnes.modifie}</span>
+    </p>
+    <ul>
+      {
+        drive.fichiers.map((f) => (
+          <li class="ligne">
+            <span class:list={['type', extension(f.nom)]}>{extension(f.nom)}</span>
+            <span class="nom">{f.nom}</span>
+            <span class="date">{f.modifie}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <div class="wa" data-c style="--i:2">
+    <p class="wa-tete">
+      <Icone nom="arrow-left" taille={14} />
+      <span class="wa-av">{whatsapp.contact.charAt(0)}</span>
+      <span class="wa-qui">
+        <b>{whatsapp.contact}</b>
+        <span>{whatsapp.statut}</span>
+      </span>
+      <Icone nom="video" taille={15} />
+      <Icone nom="phone" taille={14} />
+    </p>
+    <div class="wa-mur">
+      <p class="bulle">
+        {whatsapp.message}
+        <span class="meta">{whatsapp.heure}<Icone nom="check-check" taille={12} /></span>
+      </p>
+      <p class="bulle relance" data-final>
+        {whatsapp.relance}
+        <span class="meta">{whatsapp.heureRelance}<Icone nom="check-check" taille={12} /></span>
+      </p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .panneau {
+    position: relative;
+    aspect-ratio: 6 / 5;
+    overflow: hidden;
+    border-radius: 28px;
+    background: var(--color-mur);
+    container-type: size;
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+  }
+  .panneau > * {
+    position: absolute;
+  }
+
+  /* The binder: the cover, a sheet sticking out of the top, divider tabs out of the right edge. */
+  .classeur {
+    top: 9cqh;
+    left: 5cqw;
+    width: 30cqw;
+    height: 50cqh;
+    rotate: -4deg;
+  }
+  .fiche {
+    position: absolute;
+    top: -4.6cqw;
+    left: 5cqw;
+    /* The label must stay on one line in both locales: the sheet grows with it. */
+    width: max-content;
+    min-width: 23cqw;
+    height: 12cqw;
+    padding: 1.2cqw 1.6cqw;
+    border-radius: 0.4cqw;
+    background: var(--color-white);
+    box-shadow: var(--shadow-1);
+    rotate: 3deg;
+    font-size: 1.8cqw;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--color-gray-700);
+  }
+  .intercalaires {
+    position: absolute;
+    top: 4.4cqw;
+    right: -3.6cqw;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8cqw;
+  }
+  .intercalaires li {
+    width: 8cqw;
+    height: 10cqw;
+    padding-right: 0.8cqw;
+    border-radius: 0 0.8cqw 0.8cqw 0;
+    box-shadow: var(--shadow-1);
+    writing-mode: vertical-rl;
+    font-size: 1.8cqw;
+    font-weight: 600;
+    text-align: center;
+    color: var(--color-ink);
+  }
+  .intercalaires li:nth-child(1) {
+    background: var(--color-peach);
+  }
+  .intercalaires li:nth-child(2) {
+    background: color-mix(in srgb, var(--color-statut-bleu) 22%, var(--color-white));
+  }
+  .intercalaires li:nth-child(3) {
+    background: var(--color-amber-line);
+  }
+  .intercalaires li:nth-child(4) {
+    background: var(--color-stone);
+  }
+  .couverture {
+    position: absolute;
+    inset: 0;
+    border-radius: 0.6cqw 1.2cqw 1.2cqw 0.6cqw;
+    background: var(--color-navy);
+    box-shadow:
+      inset 3.2cqw 0 0 color-mix(in srgb, var(--color-navy) 70%, var(--color-black)),
+      inset 3.6cqw 0 0 color-mix(in srgb, var(--color-navy) 85%, var(--color-white)),
+      var(--shadow-2);
+  }
+  .etiquette {
+    position: absolute;
+    top: 4.6cqw;
+    left: 6.2cqw;
+    right: 2.4cqw;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8cqw;
+    padding: 1.8cqw 1.6cqw;
+    border-radius: 0.4cqw;
+    background: var(--color-paper);
+    box-shadow: inset 0 0 0 1px var(--color-stone);
+  }
+  .etiquette b {
+    font: 700 2.3cqw/1.15 var(--font-sans);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .etiquette span {
+    font-size: 1.8cqw;
+    white-space: nowrap;
+    color: var(--color-gray-700);
+  }
+  .postit {
+    position: absolute;
+    top: 19cqw;
+    left: 9cqw;
+    width: 18cqw;
+    padding: 1.8cqw 1.6cqw 2.6cqw;
+    background: var(--color-amber-line);
+    box-shadow: var(--shadow-1);
+    rotate: 5deg;
+    font: italic 600 2.2cqw/1.2 var(--font-display);
+    color: var(--color-ink);
+  }
+
+  /* The Drive folder, in a browser window. */
+  .drive {
+    top: 5cqh;
+    right: 3cqw;
+    width: 55cqw;
+    overflow: hidden;
+    border-radius: 1.6cqw;
+    background: var(--color-white);
+    box-shadow: var(--shadow-2);
+    rotate: 2deg;
+    font-size: 2cqw;
+  }
+  .chrome {
+    display: flex;
+    align-items: center;
+    gap: 2cqw;
+    padding: 1.4cqw 2cqw;
+    background: var(--color-gray-100);
+  }
+  .feux {
+    display: flex;
+    gap: 0.8cqw;
+  }
+  .feux i {
+    width: 1.3cqw;
+    height: 1.3cqw;
+    border-radius: 999px;
+    background: var(--color-gray-400);
+  }
+  .onglet {
+    padding: 0.6cqw 1.6cqw;
+    border-radius: 0.8cqw 0.8cqw 0 0;
+    background: var(--color-white);
+    font-size: 1.8cqw;
+    color: var(--color-gray-700);
+  }
+  .chemin {
+    display: flex;
+    align-items: center;
+    gap: 0.8cqw;
+    padding: 2.6cqw 2.4cqw 1.6cqw;
+    font-size: 2.4cqw;
+    color: var(--color-gray-700);
+  }
+  .chemin span:last-child {
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+  .ligne {
+    display: flex;
+    align-items: center;
+    gap: 1.4cqw;
+    margin: 0 2.4cqw;
+    padding: 1.5cqw 0;
+    border-top: 1px solid var(--color-ligne-claire);
+  }
+  .entete {
+    padding: 0.9cqw 0;
+    border-top: 0;
+    font-size: 1.8cqw;
+    color: var(--color-gray-500);
+  }
+  .nom {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .date {
+    flex: none;
+    min-width: 12.5cqw;
+    white-space: nowrap;
+    color: var(--color-gray-500);
+  }
+  .type {
+    flex: none;
+    width: 6.4cqw;
+    padding: 0.4cqw 0;
+    border-radius: 0.6cqw;
+    background: var(--color-statut-bleu);
+    font-size: 1.8cqw;
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+    color: var(--color-white);
+  }
+  .type.pdf {
+    background: var(--color-statut-rouge);
+  }
+
+  /* The crew member's question to the manager, on WhatsApp. */
+  .wa {
+    bottom: 5cqh;
+    left: 13cqw;
+    width: 58cqw;
+    overflow: hidden;
+    border-radius: 2.4cqw;
+    background: var(--color-white);
+    box-shadow: var(--shadow-3);
+    rotate: 1.5deg;
+  }
+  .wa-tete {
+    display: flex;
+    align-items: center;
+    gap: 1.6cqw;
+    padding: 1.8cqw 2.6cqw;
+    color: var(--color-gray-700);
+  }
+  .wa-av {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 5.4cqw;
+    height: 5.4cqw;
+    border-radius: 999px;
+    background: var(--color-gray-100);
+    font-size: 2.4cqw;
+    font-weight: 700;
+    color: var(--color-gray-500);
+  }
+  .wa-qui {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.3cqw;
+    font-size: 1.8cqw;
+    color: var(--color-gray-500);
+  }
+  .wa-qui b {
+    font-size: 2.5cqw;
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+  .wa-mur {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1cqw;
+    padding: 2.4cqw 2.6cqw 2.6cqw;
+    background: var(--color-whatsapp-wall);
+  }
+  .bulle {
+    max-width: 82%;
+    padding: 1.4cqw 2cqw 1.2cqw;
+    border-radius: 1.6cqw 0.4cqw 1.6cqw 1.6cqw;
+    background: var(--color-whatsapp);
+    box-shadow: var(--shadow-1);
+    font-size: 2.6cqw;
+    line-height: 1.35;
+  }
+  .meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6cqw;
+    float: right;
+    margin: 1.2cqw 0 0 2cqw;
+    font-size: 1.8cqw;
+    color: var(--color-gray-500);
+  }
+  .relance {
+    border-radius: 1.6cqw;
+  }
+
+  @media (max-width: 47.99rem) {
+    .panneau {
+      aspect-ratio: 3 / 4;
+    }
+    .classeur {
+      top: 7cqh;
+      left: 7cqw;
+      width: 42cqw;
+      height: 27cqh;
+    }
+    .fiche {
+      top: -5.4cqw;
+      left: 5cqw;
+      min-width: 34cqw;
+      font-size: 2.6cqw;
+    }
+    .intercalaires {
+      top: 6cqw;
+      right: -4.4cqw;
+    }
+    .intercalaires li {
+      width: 9cqw;
+      height: 14cqw;
+      font-size: 2.6cqw;
+    }
+    .etiquette {
+      top: 4cqw;
+      left: 7.4cqw;
+    }
+    .etiquette b {
+      font-size: 3.1cqw;
+    }
+    .etiquette span {
+      font-size: 2.6cqw;
+    }
+    .postit {
+      top: 20cqw;
+      left: 12cqw;
+      width: 26cqw;
+      font-size: 3cqw;
+    }
+    .drive {
+      top: 32cqh;
+      right: 3cqw;
+      width: 84cqw;
+      font-size: 2.9cqw;
+    }
+    .onglet,
+    .entete,
+    .wa-qui,
+    .meta {
+      font-size: 2.6cqw;
+    }
+    .chemin {
+      font-size: 3.1cqw;
+    }
+    .date {
+      min-width: 18cqw;
+    }
+    .type {
+      width: 9cqw;
+      font-size: 2.6cqw;
+    }
+    .wa {
+      bottom: 3cqh;
+      left: 4cqw;
+      width: 86cqw;
+    }
+    .wa-av {
+      width: 7.4cqw;
+      height: 7.4cqw;
+      font-size: 3.2cqw;
+    }
+    .wa-qui b {
+      font-size: 3.4cqw;
+    }
+    .bulle {
+      font-size: 3.6cqw;
+    }
+  }
+</style>

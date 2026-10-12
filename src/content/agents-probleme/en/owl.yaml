@@ -1,0 +1,33 @@
+agent: owl
+classeur:
+  titre: Kitchen procedures
+  sousTitre: BunBun · Lille Centre
+  fiche: Cooking · Breaded chicken
+  intercalaires:
+    - Cooking
+    - Hygiene
+    - Cleaning
+  postit: Do not take out of the office!
+drive:
+  onglet: Kitchen sheets · Drive
+  chemin:
+    - My Drive
+    - BunBun
+    - Kitchen sheets
+  colonnes:
+    nom: Name
+    modifie: Modified
+  fichiers:
+    - nom: Chicken_cooking_v2.pdf
+      modifie: 4 months ago
+    - nom: Fryer_cleaning.pdf
+      modifie: 4 months ago
+    - nom: Allergens_summer_menu.pdf
+      modifie: 5 months ago
+whatsapp:
+  contact: Léo · Manager
+  statut: last seen today at 10:12
+  message: How many minutes is the chicken in the fryer again?
+  heure: '12:41'
+  relance: '??'
+  heureRelance: '12:47'

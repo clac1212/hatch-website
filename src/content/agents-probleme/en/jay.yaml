@@ -1,0 +1,40 @@
+agent: jay
+manuel:
+  fichier: BunBun_operations_manual.pdf
+  page: Page 1 of 120
+  reseau: BunBun network
+  titre: Operations manual
+  edition: 2023 edition · Internal use only
+dossier:
+  chemin:
+    - Shared drive
+    - BunBun network
+    - Operations manual
+  colonnes:
+    nom: Name
+    proprietaire: Owner
+    modifie: Modified
+  fichiers:
+    - nom: Opening_checklist_v2.docx
+      type: doc
+      proprietaire: Claire
+      modifie: 3 Feb 2025
+    - nom: Opening_checklist_v3.docx
+      type: doc
+      proprietaire: Marc
+      modifie: 18 Sept 2025
+    - nom: Opening_checklist_v3_FINAL.docx
+      type: doc
+      proprietaire: Claire
+      modifie: 2 Mar 2026
+    - nom: Opening checklist (1).pdf
+      type: pdf
+      proprietaire: Karim
+      modifie: 14 Jun 2026
+  compteur: 214 files
+message:
+  groupe: Lille Centre crew
+  membres: Sarah, Yanis and 6 others
+  de: Yanis
+  texte: Which one is the right opening checklist?
+  heure: '06:52'

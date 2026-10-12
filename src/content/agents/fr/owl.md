@@ -1,50 +1,126 @@
 ---
 name: Owl
 job: Établissement
-pitch: Je réponds à voix haute pendant le service, sur la tablette de l'établissement.
+pitch: "Je réponds à voix haute pendant le service, sur la tablette de l'établissement."
 order: 3
-# Page /agents/owl : brouillon rédigé à partir du contenu du site, de Sans Filtre (août 2026) et de la page Notion « Les agents Hatch OS », à relire par Patrick.
+# Page /agents/owl : texte de Patrick (Notion « 08 · Pages agents », 08/10/2026), mis en page d'après la maquette Pencil « Page agent ».
 page:
-  brouillon: true
-  updated: '2026-10-02'
+  brouillon: false
+  updated: '2026-10-08'
   seo:
-    title: "Owl · l'assistant IA sur tablette au restaurant | Hatch OS"
-    description: 'Owl répond à voix haute aux équipes en cuisine et en salle, sur la tablette du restaurant, à partir des procédures et des fiches du réseau.'
-  title: "L'assistant IA sur la tablette du restaurant"
-  lead: "Owl répond à voix haute aux équipiers en cuisine et en salle, sur la tablette du restaurant, à partir des procédures du réseau, pour qu'ils trouvent la bonne étape sans quitter leur poste."
+    title: "Owl · l'assistant IA sur la tablette du restaurant | Hatch OS"
+    description: "Owl s'installe sur la tablette du restaurant. L'équipier pose sa question à la voix ou par écrit et obtient la réponse tirée de vos fiches, sans quitter son poste."
+  title: Un assistant sur la tablette du restaurant pour répondre aux équipiers en service
+  lead: "Owl est l'agent de Hatch OS installé sur la tablette du restaurant : l'équipier pose sa question à la voix ou par écrit et obtient la réponse tirée de vos fiches, sans quitter son poste ni chercher dans un classeur."
   problem:
-    title: "En plein service, personne n'a le temps de chercher la fiche"
-    text: "La fiche cuisson est dans un classeur, le manuel dans un Drive, le manager au passe. Alors l'équipier demande à un collègue, ou fait de mémoire. Et chaque site finit par avoir sa propre version de la recette."
+    titre: 'En plein service, personne ne cherche une fiche.'
+    texte: "Le classeur est au bureau, le Drive n'est pas ouvert, et la question finit chez le manager, quand il est là."
   actions:
-    title: 'Ce que je fais en cuisine et en salle'
-    items:
-      - title: 'Je réponds à la voix'
-        text: 'On me pose la question à voix haute, je réponds à voix haute. Le clavier fonctionne aussi.'
-      - title: 'Je montre la procédure étape par étape'
-        text: "Je lis la fiche et j'affiche chaque étape à l'écran, au rythme de l'équipier."
-      - title: 'Je connais chaque établissement'
-        text: 'Le siège me signale ce qui vaut pour chaque site : je réponds avec les informations propres à votre établissement.'
-      - title: 'Je reste posé toute la journée'
-        text: 'En mode kiosque sur une tablette partagée, en salle ou en cuisine, je réponds aux équipes tout au long du service.'
-  demo: owl
-  scenario: null
-  tools:
-    text: 'Je tourne dans Hatch OS, sur une tablette partagée, avec les mêmes documents que Peep.'
-    items:
-      - { name: Tablette en mode kiosque }
-      - { name: Google Drive, logo: google-drive }
-      - { name: Notion, logo: notion }
-      - { name: Word, logo: word }
-      - { name: PDF, logo: pdf }
-      - { name: Excel, logo: excel }
+    - "**Il tourne en mode kiosque** sur une tablette partagée : l'écran reste sur Owl, rien d'autre."
+    - "**Il comprend la voix** : l'équipier dicte sa question, les mains occupées ou non."
+    - '**Il répond à partir de vos documents**, les mêmes que ceux de Peep et Jay.'
+    - "**Il s'adapte au restaurant** : un profil par tablette et des étiquettes qui définissent ce que chaque établissement voit (format, carte, région)."
+  control:
+    agent:
+      - Répondre aux questions posées sur la tablette
+      - Afficher la réponse adaptée au restaurant
+    you:
+      - Les documents auxquels il a accès
+      - Les étiquettes de chaque tablette
+  exemple:
+    contexte: Tablette · Cuisine
+    etapes:
+      - texte: "Un équipier arrivé la semaine dernière demande à la tablette la température de cuisson d'un produit."
+        demande:
+          qui: Équipier · cuisine
+          texte: Quelle est la température de cuisson du poulet ?
+        carte:
+          icone: file-text
+          libelle: Fiche du réseau · Cuisson
+          titre: 74 °C à cœur
+          texte: Contrôler au thermomètre sonde avant de servir.
+          pastilles:
+            - texte: Fiche Cuisson · PDF
+              icone: book-open
+              sombre: false
+            - texte: Lire à voix haute
+              icone: volume-2
+              sombre: true
+      - texte: Owl répond avec la fiche du réseau.
+        demande:
+          qui: Équipier · cuisine
+          texte: Lis-moi la fiche en entier.
+        carte:
+          icone: volume-2
+          libelle: Lu à voix haute · Fiche Cuisson
+          titre: 'Poulet pané, étape par étape'
+          lignes:
+            - texte: Friteuse préchauffée
+              etat: 170 °C
+              ton: gris
+            - texte: Temps de cuisson
+              etat: 6 min
+              ton: gris
+            - texte: Contrôle à la sonde
+              etat: 74 °C à cœur
+              ton: orange
+          pastilles:
+            - texte: Manuel BunBun · Cuisson v2
+              icone: file-text
+              sombre: false
+            - texte: Profil · Lille Centre
+              icone: tablet
+              sombre: true
+      - texte: "Le manager n'a pas été interrompu."
+        demande:
+          qui: 'Manager · Lille Centre · 15:00'
+          texte: Combien de questions pendant le service de midi ?
+        carte:
+          icone: chart-bar
+          libelle: Tablette cuisine · service de midi
+          titre: '14 questions, 14 réponses tirées des fiches'
+          lignes:
+            - texte: Cuisson du poulet
+              etat: Répondu
+              ton: vert
+            - texte: Nettoyage friteuse
+              etat: Répondu
+              ton: vert
+            - texte: Transmises au manager
+              etat: '0'
+              ton: gris
+          pastilles:
+            - texte: Aucune interruption
+              icone: check
+              sombre: true
+  with:
+    cartes:
+      - titre: Jay
+        texte: "qui tient à jour les documents sur lesquels Owl s'appuie."
+        visuel:
+          agents: [jay]
+      - titre: Peep
+        texte: qui apporte le même savoir sur WhatsApp.
+        visuel:
+          agents: [peep]
+      - titre: Pecker
+        texte: "pour former les équipiers sur ce qu'ils demandent le plus."
+        visuel:
+          agents: [pecker]
   faq:
-    - q: 'Comment installer Owl sur la tablette du restaurant ?'
-      a: "Le siège crée un profil d'accès Owl pour l'établissement, invite une adresse dédiée au site, puis connecte la tablette avec ce compte."
-    - q: 'Owl et Peep, quelle différence ?'
-      a: "C'est le même assistant. Peep répond sur WhatsApp, sur le téléphone de chacun ; Owl répond dans Hatch OS, sur la tablette partagée du site."
-    - q: 'Owl répond-il pareil dans tous les restaurants ?'
-      a: 'Il répond avec les procédures du réseau, et avec ce qui est propre à chaque établissement quand le siège le lui a indiqué.'
-    - q: 'Les conversations sont-elles conservées ?'
-      a: "Oui, l'historique des conversations reste consultable. Vos données sont hébergées en Europe et n'entraînent aucune IA."
-  related: [peep, jay, pecker]
+    - q: Quelle différence entre Owl et Peep ?
+      a: "Peep répond sur WhatsApp, sur le téléphone de chacun. Owl est sur la tablette partagée du restaurant, pour ceux qui n'ont pas leur téléphone en service."
+    - q: Peut-on poser une question à la voix ?
+      a: 'Oui, Owl comprend la dictée vocale.'
+    - q: Chaque restaurant voit-il les mêmes informations ?
+      a: 'Non si vous le souhaitez : les étiquettes adaptent les réponses au format ou à la carte du restaurant.'
+    - q: Mes données sont-elles protégées ?
+      a: "Données hébergées en Europe, chiffrées en transit et au repos, cloisonnées par client. Aucun modèle n'est entraîné sur vos données, c'est écrit au contrat."
+  related:
+    - agent: peep
+      texte: le même savoir sur WhatsApp
+    - agent: jay
+      texte: vos documents
+    - agent: pecker
+      texte: la formation
 ---

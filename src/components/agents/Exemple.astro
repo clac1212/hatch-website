@@ -1,0 +1,634 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Icone from './Icone.astro';
+import Scene from './scenes/Scene.astro';
+import type { Scene as SceneData } from '../../content/schemas/scenes';
+
+/**
+ * "Exemple d'usage" (Pencil "05 — Exemple d'usage (animé)", César 10/10): Patrick's example cut into
+ * steps on the left; on the right, a Hatch OS window where each step shows a request and the
+ * agent's answer card. Once on screen it plays the steps in turn (the step's rule fills, its screen
+ * builds up: request, card, rows), once, and stops on the last; a step can be clicked to show it and
+ * play on from there. No loop, so no pause button. Without JS or under reduced motion, the first
+ * step shows complete and a click shows another one.
+ * An agent with a scene (`scene`, src/components/agents/scenes/, César 11/10) shows the devices
+ * of whoever acts instead of the window: its `data-etapes` give each step's device, screen and
+ * length; the step's device comes forward, the previous one steps back, the others leave.
+ */
+type Ton = 'vert' | 'orange' | 'rouge' | 'gris' | 'bleu';
+interface Etape {
+  texte: string;
+  demande: { qui: string; texte: string };
+  carte: {
+    icone?: string;
+    libelle?: string;
+    titre?: string;
+    banniere?: string;
+    texte?: string;
+    lignes: { texte: string; etat: string; ton: Ton }[];
+    pastilles: { texte: string; icone: string; sombre: boolean }[];
+    boutons?: [string, string];
+  };
+}
+interface Props {
+  titre: string;
+  intro?: string;
+  agent: string;
+  contexte: string;
+  avatar: ImageMetadata;
+  etapes: Etape[];
+  scene?: SceneData;
+}
+const { titre, intro, agent, contexte, avatar, etapes, scene } = Astro.props;
+const rang = (i: number) => String(i + 1).padStart(2, '0');
+---
+
+<section aria-labelledby="agent-exemple" class="exemple">
+  <div class="wrap-agent">
+    <h2 id="agent-exemple" class="font-display text-section font-bold text-white">{titre}</h2>
+    {intro && <p class="intro">{intro}</p>}
+    <div class="corps" data-exemple>
+      <ol class="etapes">
+        {
+          etapes.map((e, i) => (
+            <li>
+              <button type="button" class="etape" aria-current={i === 0 ? 'step' : undefined}>
+                <span class="barre" aria-hidden="true">
+                  <span />
+                </span>
+                <span class="rang">{rang(i)}</span>
+                <span class="etape-texte">{e.texte}</span>
+              </button>
+            </li>
+          ))
+        }
+      </ol>
+      <div class="scene" aria-hidden="true">
+        {
+          scene ? (
+            <Scene d={scene} />
+          ) : (
+            <div class="fenetre">
+              <div class="fenetre-barre">
+                <span class="feux">
+                  <span />
+                  <span />
+                  <span />
+                </span>
+                <Image src={avatar} alt="" width={26} densities={[1, 2]} class="size-[26px]" />
+                <span class="flex flex-col">
+                  <b class="fenetre-nom">{agent}</b>
+                  <span class="fenetre-contexte">{contexte}</span>
+                </span>
+              </div>
+              <div class="ecrans">
+                {etapes.map((e, i) => (
+                  <div class:list={['ecran', { on: i === 0 }]}>
+                    <div class="demande">
+                      <span class="demande-qui">{e.demande.qui}</span>
+                      <span>{e.demande.texte}</span>
+                    </div>
+                    <div class="reponse">
+                      <Image
+                        src={avatar}
+                        alt=""
+                        width={22}
+                        densities={[1, 2]}
+                        class="size-[22px] shrink-0"
+                      />
+                      <div class="flex flex-col gap-3">
+                        <div class="carte">
+                          {e.carte.icone && e.carte.libelle && (
+                            <p class="carte-libelle">
+                              <Icone nom={e.carte.icone} taille={13} />
+                              {e.carte.libelle}
+                            </p>
+                          )}
+                          {e.carte.titre && <p class="carte-titre">{e.carte.titre}</p>}
+                          {e.carte.banniere && <p class="banniere">{e.carte.banniere}</p>}
+                          {e.carte.texte && <p class="carte-texte">{e.carte.texte}</p>}
+                          {e.carte.lignes.length > 0 && (
+                            <ul class="carte-lignes">
+                              {e.carte.lignes.map((l, j) => (
+                                <li style={`--j:${j}`}>
+                                  <span>{l.texte}</span>
+                                  <span class={`etat etat-${l.ton}`}>{l.etat}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                          {e.carte.pastilles.length > 0 && (
+                            <p class="pastilles">
+                              {e.carte.pastilles.map((p) => (
+                                <span class:list={['pastille', { sombre: p.sombre }]}>
+                                  <Icone nom={p.icone} taille={11} />
+                                  {p.texte}
+                                </span>
+                              ))}
+                            </p>
+                          )}
+                        </div>
+                        {e.carte.boutons && (
+                          <p class="boutons">
+                            <span class="bouton">{e.carte.boutons[0]}</span>
+                            <span class="bouton bouton-orange">
+                              {e.carte.boutons[1]}
+                              <Icone nom="arrow-right" taille={12} />
+                            </span>
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  /** Seconds a step stays on screen before the next one. */
+  const DUREE = 4.6;
+
+  for (const racine of document.querySelectorAll<HTMLElement>('[data-exemple]')) {
+    const boutons = [...racine.querySelectorAll<HTMLButtonElement>('.etape')];
+    const ecrans = [...racine.querySelectorAll<HTMLElement>('.ecran')];
+    /** A scene: each step's device (`a`), its screen (`e`) and its length in seconds (`d`). */
+    const pile = racine.querySelector<HTMLElement>('[data-etapes]');
+    const plan: { a: string; e: number; d: number }[] = pile
+      ? JSON.parse(pile.dataset.etapes!)
+      : boutons.map(() => ({ a: '', e: 0, d: DUREE }));
+    const appareils = pile ? [...pile.querySelectorAll<HTMLElement>('[data-appareil]')] : [];
+    let minuterie = 0;
+    // A scene's plan is written in its component, the steps in the copy: if they ever drift apart,
+    // leave the stage in its static first state rather than play a step that does not exist.
+    if (plan.length !== boutons.length) {
+      console.error(`Exemple: ${plan.length} scene steps for ${boutons.length} copy steps`);
+      continue;
+    }
+
+    /** The screen shown at step i: the scene's, or the window's i-th. */
+    const ecranDe = (i: number) =>
+      pile
+        ? pile.querySelector<HTMLElement>(
+            `[data-appareil="${plan[i].a}"] [data-ecran="${plan[i].e}"]`,
+          )!
+        : ecrans[i];
+
+    const montrer = (i: number) => {
+      boutons.forEach((b, j) => {
+        if (j === i) b.setAttribute('aria-current', 'step');
+        else b.removeAttribute('aria-current');
+        b.classList.toggle('passe', j < i);
+      });
+      if (!pile) {
+        ecrans.forEach((e, j) => e.classList.toggle('on', j === i));
+        return;
+      }
+      const { a } = plan[i];
+      // The last device used before this one stays visible, stepped back, on the screen of its last
+      // step (also when a step is clicked out of order).
+      const avant = plan
+        .slice(0, i)
+        .reverse()
+        .find((p) => p.a !== a);
+      for (const el of appareils) {
+        const nom = el.dataset.appareil;
+        const etape = nom === a ? plan[i] : nom === avant?.a ? avant : undefined;
+        el.classList.toggle('devant', nom === a);
+        el.classList.toggle('derriere', nom === avant?.a);
+        if (etape)
+          for (const ec of el.querySelectorAll<HTMLElement>('[data-ecran]'))
+            ec.classList.toggle('on', ec.dataset.ecran === String(etape.e));
+      }
+    };
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      boutons.forEach((b, i) => b.addEventListener('click', () => montrer(i)));
+      continue;
+    }
+
+    racine.classList.add('js');
+    /** Plays step i, then the next ones, and stops on the last. */
+    const jouer = (i: number) => {
+      clearTimeout(minuterie);
+      racine.classList.remove('joue');
+      racine.querySelectorAll('.joue').forEach((el) => el.classList.remove('joue'));
+      montrer(i);
+      racine.style.setProperty('--duree', `${plan[i].d}s`);
+      void racine.offsetWidth;
+      racine.classList.add('joue');
+      if (pile) ecranDe(i).classList.add('joue');
+      if (i < plan.length - 1) minuterie = window.setTimeout(() => jouer(i + 1), plan[i].d * 1000);
+      else racine.classList.add('fini');
+    };
+    racine.classList.add('attente');
+
+    const vue = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting) return;
+        vue.disconnect();
+        racine.classList.remove('attente');
+        jouer(0);
+      },
+      { threshold: 0.45 },
+    );
+    // The stage, not the whole block: below 1024 px the steps make the block taller than the screen.
+    vue.observe(racine.querySelector('.scene')!);
+    boutons.forEach((b, i) =>
+      b.addEventListener('click', () => {
+        vue.disconnect();
+        racine.classList.remove('attente', 'fini');
+        jouer(i);
+      }),
+    );
+  }
+</script>
+
+<style>
+  .exemple {
+    padding: 112px 0 104px;
+    background: var(--color-night);
+    overflow-x: clip;
+  }
+  .intro {
+    margin-top: 20px;
+    font: 400 20px/1.5 var(--font-sans);
+    color: color-mix(in srgb, var(--color-white) 75%, transparent);
+  }
+  .corps {
+    display: grid;
+    gap: 48px;
+    margin-top: 56px;
+    align-items: center;
+  }
+  @media (min-width: 64rem) {
+    .corps {
+      grid-template-columns: 440px minmax(0, 1fr);
+      gap: 64px;
+    }
+  }
+
+  /* Steps: a rule each (it fills orange while the step plays), the number, Patrick's words. */
+  .etape {
+    position: relative;
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    width: 100%;
+    padding: 30px 0 30px;
+    border-top: 2px solid var(--color-line-night);
+    text-align: left;
+    cursor: pointer;
+  }
+  /* The step's rule fills from end to end while the step plays (César 11/10). */
+  .barre {
+    position: absolute;
+    top: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    overflow: hidden;
+  }
+  .barre span {
+    display: block;
+    height: 100%;
+    background: var(--color-orange);
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  .etape[aria-current] .barre span,
+  .etape.passe .barre span {
+    transform: none;
+  }
+  .corps.js.joue .etape[aria-current] .barre span {
+    animation: remplir var(--duree) linear both;
+  }
+  .corps.js.fini .etape[aria-current] .barre span {
+    animation: remplir 1.2s linear both;
+  }
+  @keyframes remplir {
+    from {
+      transform: scaleX(0);
+    }
+  }
+  .rang {
+    padding-top: 4px;
+    font: 400 13px/1.3 var(--font-mono);
+    color: color-mix(in srgb, var(--color-white) 60%, transparent);
+  }
+  .etape[aria-current] .rang {
+    color: var(--color-orange);
+  }
+  .etape-texte {
+    font: 400 19px/1.5 var(--font-sans);
+    color: color-mix(in srgb, var(--color-white) 75%, transparent);
+    transition: color 0.3s var(--ease-doux);
+  }
+  .etape[aria-current] .etape-texte,
+  .etape:hover .etape-texte {
+    color: var(--color-white);
+  }
+  .etape:focus-visible {
+    outline: 2px solid var(--color-orange);
+    outline-offset: 4px;
+    border-radius: 4px;
+  }
+
+  /* The stage: a dark panel lit from below, the Hatch OS window in it. */
+  .scene {
+    display: grid;
+    place-items: center;
+    min-height: 600px;
+    padding: 64px 24px;
+    border-radius: 32px;
+    background:
+      radial-gradient(60% 45% at 50% 100%, rgb(248 122 1 / 0.22), transparent 70%),
+      var(--color-night-2);
+    box-shadow: inset 0 0 0 1px var(--color-line-night);
+  }
+  .fenetre {
+    width: min(100%, 640px);
+    overflow: hidden;
+    border-radius: 16px;
+    background: var(--color-galet);
+    box-shadow: var(--shadow-3);
+  }
+  .fenetre-barre {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--color-ligne-claire);
+    background: var(--color-white);
+  }
+  .feux {
+    display: flex;
+    gap: 6px;
+    margin-right: 6px;
+  }
+  .feux span {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: var(--color-statut-rouge);
+  }
+  .feux span:nth-child(2) {
+    background: var(--color-amber-line);
+  }
+  .feux span:nth-child(3) {
+    background: var(--color-success);
+  }
+  .fenetre-nom {
+    font: 700 15px/1.1 var(--font-display);
+    color: var(--color-ink);
+  }
+  .fenetre-contexte {
+    font-size: 11px;
+    color: var(--color-gray-500);
+  }
+
+  /* The screens share one cell; only the current one shows. */
+  .ecrans {
+    display: grid;
+    min-height: 370px;
+  }
+  .ecran {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    grid-area: 1 / 1;
+    padding: 20px 22px 24px;
+    visibility: hidden;
+    opacity: 0;
+  }
+  .ecran.on {
+    visibility: visible;
+    opacity: 1;
+  }
+  .demande {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-self: flex-end;
+    max-width: 400px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: var(--color-ink);
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--color-white);
+  }
+  .demande-qui {
+    font: 400 10px/1.2 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--color-white) 60%, transparent);
+  }
+  .reponse {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .carte {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: min(380px, 100%);
+    padding: 14px;
+    border-radius: 14px;
+    background: var(--color-white);
+    box-shadow: inset 0 0 0 1px var(--color-ligne-claire);
+  }
+  .carte-libelle {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font: 600 12.5px/1.3 var(--font-sans);
+    color: var(--color-orange-txt);
+  }
+  .carte-titre {
+    font: 600 16px/1.25 var(--font-sans);
+    color: var(--color-ink);
+  }
+  .banniere {
+    padding: 13px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, var(--color-orange), var(--color-peach));
+    text-align: center;
+    font: 700 15px/1.2 var(--font-sans);
+    color: var(--color-ink);
+  }
+  .carte-texte {
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--color-soft);
+  }
+  .carte-lignes li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 7px 0;
+    font-size: 12.5px;
+    color: var(--color-ink);
+  }
+  .carte-lignes li + li {
+    border-top: 1px solid var(--color-ligne-claire);
+  }
+  .etat {
+    flex: none;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .etat-vert {
+    color: var(--color-success-txt);
+  }
+  .etat-orange {
+    color: var(--color-orange-txt);
+  }
+  .etat-rouge {
+    color: var(--color-statut-rouge);
+  }
+  .etat-gris {
+    color: var(--color-gray-500);
+  }
+  .etat-bleu {
+    color: var(--color-statut-bleu);
+  }
+  .pastilles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .pastille {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--color-mur);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-gray-700);
+  }
+  .pastille.sombre {
+    background: var(--color-ink);
+    color: var(--color-white);
+  }
+  .boutons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+  .bouton {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    background: var(--color-white);
+    box-shadow: inset 0 0 0 1px var(--color-ligne-claire);
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+  .bouton-orange {
+    background: var(--color-orange);
+    box-shadow: none;
+  }
+
+  /* Playing: the screen builds up, request first, then the card, then its rows one by one. */
+  .corps.js .ecran.on {
+    transition: opacity 0.35s var(--ease-doux);
+  }
+  .corps.js.attente .ecran.on {
+    opacity: 0;
+  }
+  .corps.js.joue .ecran.on .demande {
+    animation: arrive 0.5s var(--ease-entree) 0.1s both;
+  }
+  .corps.js.joue .ecran.on .reponse {
+    animation: arrive 0.6s var(--ease-entree) 0.75s both;
+  }
+  .corps.js.joue .ecran.on .carte-lignes li {
+    animation: arrive 0.45s var(--ease-entree) calc(1.25s + var(--j) * 0.18s) both;
+  }
+  .corps.js.joue .ecran.on .pastilles,
+  .corps.js.joue .ecran.on .boutons {
+    animation: arrive 0.45s var(--ease-entree) 1.9s both;
+  }
+  @keyframes arrive {
+    from {
+      opacity: 0;
+      translate: 0 10px;
+    }
+  }
+  /* A scene: the devices share one cell; the current one in front, the previous one stepped back
+     to the left, the others gone. A device's screens share its screen, only the current one shows. */
+  .scene {
+    overflow: hidden;
+  }
+  .scene :global(.pile) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
+  }
+  .scene :global([data-appareil]) {
+    display: grid;
+    grid-area: 1 / 1;
+    place-items: center;
+    visibility: hidden;
+    opacity: 0;
+    scale: 0.9;
+    transition:
+      opacity 0.6s var(--ease-doux),
+      scale 0.8s var(--ease-camera),
+      translate 0.8s var(--ease-camera),
+      filter 0.8s var(--ease-doux),
+      visibility 0s 0.8s;
+  }
+  .scene :global([data-appareil].devant),
+  .scene :global([data-appareil].derriere) {
+    visibility: visible;
+    transition-delay: 0s;
+  }
+  .scene :global([data-appareil].devant) {
+    z-index: 2;
+    opacity: 1;
+    scale: 1;
+  }
+  .scene :global([data-appareil].derriere) {
+    z-index: 1;
+    opacity: 0.32;
+    scale: 0.7;
+    translate: -24% 0;
+    filter: blur(1.5px);
+  }
+  .scene :global([data-ecran]:not(.on)) {
+    visibility: hidden;
+  }
+  .corps.js.attente :global(.pile) {
+    opacity: 0;
+  }
+
+  /* Below 1024 px the window comes first, so it plays where the reader is. */
+  @media (max-width: 63.99rem) {
+    .scene {
+      order: -1;
+    }
+  }
+  @media (max-width: 47.99rem) {
+    .scene {
+      min-height: 0;
+      padding: 28px 12px;
+      border-radius: 24px;
+    }
+    .demande {
+      max-width: 85%;
+    }
+  }
+</style>
