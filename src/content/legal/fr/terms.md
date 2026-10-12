@@ -1,6 +1,6 @@
 ---
 seo:
-  title: "Conditions Générales d'Utilisation — Hatch OS"
+  title: "Conditions Générales d'Utilisation | Hatch OS"
   description: "Conditions générales d'utilisation de Hatch OS : compte, accès à la plateforme, usage des agents IA, données personnelles, responsabilité et résiliation."
 title: "Conditions Générales d'Utilisation"
 meta: 'Version 2026-09 · Mise à jour : 25 septembre 2026 · Entrée en vigueur : 22 avril 2026'

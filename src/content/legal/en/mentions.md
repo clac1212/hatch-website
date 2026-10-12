@@ -1,6 +1,6 @@
 ---
 seo:
-  title: 'Legal notice · Hatch OS'
+  title: 'Legal notice | Hatch OS'
   description: 'Legal notice of gethatch.io: published by Hatch OS SAS, headquartered in Paris, Paris Trade and Companies Register 103 890 893, publisher and host Vercel.'
 title: 'Legal notice'
 meta: 'Last updated: October 1, 2026'

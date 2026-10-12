@@ -1,6 +1,6 @@
 ---
 seo:
-  title: 'Conditions Générales de Vente — Hatch OS'
+  title: 'Conditions Générales de Vente | Hatch OS'
   description: 'Conditions générales de vente de Hatch OS : souscription, essai gratuit, prix par établissement, facturation, résiliation, niveau de service et données.'
 title: 'Conditions Générales de Vente'
 meta: 'Version 2026-10 · Mise à jour : 2 octobre 2026 · Entrée en vigueur : 25 septembre 2026'
