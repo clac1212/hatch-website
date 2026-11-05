@@ -1,0 +1,192 @@
+---
+/**
+ * MAQUETTE — nouvelle page d'accueil : un bandeau qui dit ce que fait Hatch OS (phrase à mot
+ * changeant), puis deux portes côte à côte : restaurant indépendant (Robin) et réseau (le site actuel).
+ * Visuel uniquement : textes en dur, rien n'est branché.
+ */
+import { Picture } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import { routes } from '../../i18n/ui';
+import carte from '../../assets/hero/carte-v5-1.jpg';
+import oeuf from '../../assets/robin/robin-oeuf-comptoir.jpg';
+import reseau from '../../assets/tarifs/restaurant.jpg';
+
+const mots = [
+  'répondent à vos équipes',
+  'forment vos recrues',
+  'auditent vos restaurants',
+  'calculent vos marges',
+  'préparent vos ouvertures',
+  'font le point chaque lundi',
+];
+---
+
+<Base
+  locale="fr"
+  paths={routes.home}
+  title="Maquette accueil | Hatch OS"
+  description="Maquette de la nouvelle page d'accueil de Hatch OS : un bandeau qui explique ce que font les agents, puis deux espaces, indépendants et réseaux."
+>
+  <main class="mx-auto flex max-w-[1360px] flex-col gap-4 px-4 pt-24 pb-16 sm:px-6 lg:gap-5 lg:pt-28">
+    <!-- 1 · Le bandeau : ce que fait Hatch OS -->
+    <section
+      class="relative isolate overflow-hidden rounded-[28px] bg-night lg:rounded-[36px]"
+      aria-labelledby="accueil-titre"
+    >
+      <Picture
+        src={carte}
+        alt=""
+        widths={[800, 1400, 2000]}
+        sizes="(min-width: 1360px) 1360px, 100vw"
+        formats={['avif', 'webp']}
+        class="absolute inset-0 -z-1 size-full object-cover object-[50%_40%]"
+        loading="eager"
+      />
+      <div class="flex min-h-[360px] items-center justify-center px-4 py-14 sm:px-8 lg:min-h-[440px]">
+        <div
+          class="vitre flex w-full max-w-[900px] flex-col items-center gap-5 rounded-[28px] px-6 py-9 text-center sm:px-10 lg:rounded-[36px] lg:px-14 lg:py-12"
+        >
+          <span class="font-mono text-[12px] tracking-[0.18em] text-ink/70 uppercase">
+            Hatch OS · agents IA de la restauration
+          </span>
+          <h1
+            id="accueil-titre"
+            class="font-display text-[32px] leading-[1.12] font-semibold tracking-[-0.018em] text-ink sm:text-[42px] lg:text-[56px]"
+          >
+            Des agents IA qui
+            <span class="mots" data-mots aria-live="polite">
+              {mots.map((m, i) => <span class:list={['mot', i === 0 && 'on']}>{m}</span>)}
+            </span>
+          </h1>
+          <p class="max-w-[560px] text-[15px] leading-6 text-soft lg:text-base lg:leading-7">
+            Pour le patron d'un restaurant indépendant comme pour la tête d'un réseau de franchise.
+            Choisissez votre espace.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 · Les deux portes -->
+    <div class="grid gap-4 md:grid-cols-2 lg:gap-5">
+      <!-- Indépendant → Robin -->
+      <a
+        href="/maquettes/robin"
+        class="group flex flex-col overflow-hidden rounded-[28px] bg-surface shadow-1 ring-1 ring-line transition hover:-translate-y-1 hover:shadow-2 lg:rounded-[36px]"
+      >
+        <div class="relative aspect-[16/10] overflow-hidden">
+          <Picture
+            src={oeuf}
+            alt="Robin, un rouge-gorge en voxel, sort de son œuf sur le comptoir d'un bistrot."
+            widths={[600, 1000]}
+            sizes="(min-width: 768px) 50vw, 100vw"
+            formats={['avif', 'webp']}
+            class="size-full object-cover transition duration-700 group-hover:scale-[1.03]"
+          />
+          <span
+            class="absolute top-4 left-4 rounded-full bg-ink px-3 py-1.5 font-mono text-[11px] tracking-[0.16em] text-cream uppercase"
+          >
+            Bêta ouverte
+          </span>
+        </div>
+        <div class="flex flex-1 flex-col gap-3 px-6 pt-6 pb-7 lg:px-9 lg:pt-8 lg:pb-9">
+          <span class="font-mono text-[12px] tracking-[0.16em] text-orange-txt uppercase">
+            Restaurant indépendant
+          </span>
+          <h2 class="font-display text-[28px] leading-[1.1] font-semibold text-ink lg:text-[36px]">
+            Robin, votre associé IA sur WhatsApp
+          </h2>
+          <p class="text-[15px] leading-6 text-soft">
+            Vous tenez un ou deux restaurants et vous faites tout vous-même. Robin connaît votre
+            maison, revient vers vous chaque semaine et vous prépare ce dont vous avez besoin.
+          </p>
+          <span class="mt-auto pt-3">
+            <span
+              class="btn-vif inline-flex items-center gap-2 rounded-full bg-orange px-5 py-3 text-[0.875rem] font-bold text-ink shadow-[0_6px_16px_rgb(248_122_1/0.35)]"
+            >
+              Découvrir Robin <span aria-hidden="true">→</span>
+            </span>
+          </span>
+        </div>
+      </a>
+
+      <!-- Réseau → le site actuel -->
+      <a
+        href="/"
+        class="group flex flex-col overflow-hidden rounded-[28px] bg-night shadow-1 transition hover:-translate-y-1 hover:shadow-2 lg:rounded-[36px]"
+      >
+        <div class="relative aspect-[16/10] overflow-hidden bg-scene">
+          <Picture
+            src={reseau}
+            alt="Un restaurant en coupe, en voxel, où les agents Hatch OS travaillent à chaque étage."
+            widths={[600, 1000]}
+            sizes="(min-width: 768px) 50vw, 100vw"
+            formats={['avif', 'webp']}
+            class="size-full object-cover transition duration-700 group-hover:scale-[1.03]"
+          />
+        </div>
+        <div class="flex flex-1 flex-col gap-3 px-6 pt-6 pb-7 lg:px-9 lg:pt-8 lg:pb-9">
+          <span class="font-mono text-[12px] tracking-[0.16em] text-peach uppercase">
+            Réseau, franchise, succursales
+          </span>
+          <h2 class="font-display text-[28px] leading-[1.1] font-semibold text-cream lg:text-[36px]">
+            Les agents Hatch OS pour piloter votre réseau
+          </h2>
+          <p class="text-[15px] leading-6 text-cream/75">
+            Animation, documentation, audits, formation, ouvertures : une équipe d'agents qui
+            travaille pour le siège et répond à chaque établissement.
+          </p>
+          <span class="mt-auto pt-3">
+            <span
+              class="btn-vif inline-flex items-center gap-2 rounded-full bg-cream px-5 py-3 text-[0.875rem] font-bold text-ink"
+            >
+              Découvrir les agents <span aria-hidden="true">→</span>
+            </span>
+          </span>
+        </div>
+      </a>
+    </div>
+  </main>
+</Base>
+
+<script>
+  // Le mot qui change : un seul visible à la fois, fondu vertical, toutes les 2,6 s.
+  // Mouvement réduit : le premier mot reste affiché.
+  const box = document.querySelector<HTMLElement>('[data-mots]');
+  if (box && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const mots = [...box.querySelectorAll<HTMLElement>('.mot')];
+    let i = 0;
+    setInterval(() => {
+      mots[i].classList.remove('on');
+      i = (i + 1) % mots.length;
+      mots[i].classList.add('on');
+    }, 2600);
+  }
+</script>
+
+<style>
+  /* Tous les mots dans la même case de grille : la largeur est celle du plus long, la phrase ne
+     bouge pas quand le mot change. Surligné pêche, comme les visuels Robin. */
+  .mots {
+    display: inline-grid;
+    vertical-align: bottom;
+  }
+  .mot {
+    grid-area: 1 / 1;
+    color: var(--color-orange-txt);
+    background: linear-gradient(transparent 62%, var(--color-peach) 62% 92%, transparent 92%);
+    opacity: 0;
+    transform: translateY(0.35em);
+    transition:
+      opacity 0.45s ease,
+      transform 0.45s ease;
+  }
+  .mot.on {
+    opacity: 1;
+    transform: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .mot {
+      transition: none;
+    }
+  }
+</style>
