@@ -283,10 +283,14 @@ const mots = [
 
   /* La fin de phrase : toutes empilées dans la même case (sa hauteur est celle de la plus longue),
      mot par mot. Sortie vers le haut, entrée par le bas, décalée de 45 ms par mot. */
-  /* Une seule couleur pour les deux lignes, comme Muse : c'est le mouvement qui attire l'œil. */
+  /* La fin de phrase qui change : gras, italique (le vrai italique de Fraunces) et orange de la
+     marque, en version texte (#a34f00) pour rester lisible sur le crème. */
   .rebus .phrases {
     display: grid;
     justify-items: center;
+    font-weight: 700;
+    font-style: italic;
+    color: var(--color-orange-txt);
   }
   .ph {
     grid-area: 1 / 1;
