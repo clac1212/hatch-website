@@ -10,17 +10,17 @@ import { routes } from '../../i18n/ui';
 import oeuf from '../../assets/robin/robin-oeuf-comptoir.jpg';
 import reseau from '../../assets/tarifs/restaurant.jpg';
 import peep from '../../assets/portraits/peep.jpg';
-import pecker from '../../assets/hero/agents/pecker.webp';
-import finch from '../../assets/hero/agents/finch.webp';
-import jay from '../../assets/hero/agents/jay.webp';
-import sparrow from '../../assets/hero/agents/sparrow.png';
-import owl from '../../assets/hero/agents/owl.webp';
-import lark from '../../assets/hero/agents/lark.webp';
-import robin from '../../assets/robin/robin-face.png';
+import pecker from '../../assets/portraits/pecker.jpg';
+import finch from '../../assets/portraits/finch.jpg';
+import jay from '../../assets/portraits/jay.jpg';
+import sparrow from '../../assets/portraits/sparrow.jpg';
+import owl from '../../assets/portraits/owl.jpg';
+import lark from '../../assets/portraits/lark.jpg';
+import robin from '../../assets/portraits/robin.jpg';
 
 // Chaque fin de phrase est le travail d'un agent : son avatar change avec le texte.
 const mots = [
-  { texte: 'répondent à vos équipes', agent: 'Peep', img: peep, portrait: true },
+  { texte: 'répondent à vos équipes', agent: 'Peep', img: peep },
   { texte: 'forment vos recrues', agent: 'Pecker', img: pecker },
   { texte: 'auditent vos restaurants', agent: 'Finch', img: finch },
   { texte: 'tiennent vos procédures à jour', agent: 'Jay', img: jay },
@@ -58,7 +58,7 @@ const mots = [
             {
               mots.map((m, i) => (
                 <span class:list={['av', i === 0 && 'on']} title={m.agent}>
-                  <Image src={m.img} alt="" width={160} class:list={['av-img', m.portrait && 'portrait']} />
+                  <Image src={m.img} alt="" width={160} class:list={['av-img', 'portrait']} />
                 </span>
               ))
             }
