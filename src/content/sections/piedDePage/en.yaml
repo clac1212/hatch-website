@@ -6,6 +6,10 @@ agents:
     - etage: ATTIC
       metier: On site
       agent: owl
+    - etage: 3rd L
+      metier: On site
+      nom: Robin
+      lien: /maquettes/robin
     - etage: 3rd R
       metier: Management
       agent: lark

@@ -11,10 +11,19 @@ export const schema = z.strictObject({
   cta: z.string(),
   agents: z.strictObject({
     titre: z.string(),
-    /** One resident per floor of the voxel building, top to bottom: its job, and the agent (its page). */
+    /**
+     * One resident per floor of the voxel building, top to bottom: its job, and either a network
+     * agent (its page) or a resident outside the agents collection, named and linked directly
+     * (Robin, the independents' cofounder).
+     */
     residents: z
-      .array(z.strictObject({ etage: z.string(), metier: z.string(), agent: z.enum(agentSlugs) }))
-      .length(7),
+      .array(
+        z.union([
+          z.strictObject({ etage: z.string(), metier: z.string(), agent: z.enum(agentSlugs) }),
+          z.strictObject({ etage: z.string(), metier: z.string(), nom: z.string(), lien: z.string() }),
+        ]),
+      )
+      .length(8),
   }),
   legal: z.strictObject({
     titre: z.string(),

@@ -6,6 +6,10 @@ agents:
     - etage: COMBLES
       metier: Établissement
       agent: owl
+    - etage: 3e G
+      metier: Établissement
+      nom: Robin
+      lien: /maquettes/robin
     - etage: 3e D
       metier: Direction
       agent: lark
