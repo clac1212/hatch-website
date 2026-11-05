@@ -45,23 +45,39 @@ const mots = [
       class="flex flex-col items-center gap-6 px-2 pt-14 pb-12 text-center lg:pt-24 lg:pb-20"
       aria-labelledby="accueil-titre"
     >
+      <!-- Le titre « rébus » de muse.ai : ligne 1 avec l'avatar dans un cercle, ligne 2 la fin de
+           phrase qui change mot par mot. L'avatar change avec elle : c'est l'agent qui fait ce travail. -->
       <h1
         id="accueil-titre"
-        class="max-w-[1100px] font-display text-[40px] leading-[1.08] font-semibold tracking-[-0.025em] text-balance text-ink sm:text-[56px] lg:text-[80px]"
+        class="rebus w-full font-display text-[40px] leading-[1.1] font-semibold tracking-[-0.025em] text-ink sm:text-[56px] lg:text-[80px]"
+        data-rebus
       >
-        Des collaborateurs IA
-        <span class="avatars" aria-hidden="true">
+        <span class="sr-only">Des collaborateurs IA qui {mots[0].texte}</span>
+        <span class="ligne" aria-hidden="true">
+          Des collaborateurs IA<span class="avatars" data-avatars>
+            {
+              mots.map((m, i) => (
+                <span class:list={['av', i === 0 && 'on']} title={m.agent}>
+                  <Image src={m.img} alt="" width={160} class="av-img" />
+                </span>
+              ))
+            }
+          </span>qui
+        </span>
+        <span class="ligne phrases" aria-hidden="true">
           {
             mots.map((m, i) => (
-              <span class:list={['av', i === 0 && 'on']}>
-                <Image src={m.img} alt="" width={160} class="av-img" />
+              <span class:list={['ph', i === 0 && 'on']}>
+                {m.texte.split(' ').map((w, j) => (
+                  <>
+                    <span class="w" style={`--i:${j}`}>
+                      {w}
+                    </span>{' '}
+                  </>
+                ))}
               </span>
             ))
           }
-        </span>
-        qui
-        <span class="mots" data-mots aria-live="polite">
-          {mots.map((m, i) => <span class:list={['mot', i === 0 && 'on']}>{m.texte}</span>)}
         </span>
       </h1>
       <p class="max-w-[560px] text-[16px] leading-7 text-soft lg:text-[18px] lg:leading-8">
@@ -149,62 +165,54 @@ const mots = [
         </div>
       </a>
     </div>
+    <script is:inline data-keep>
+      // Titre « rébus » façon muse.ai. Toutes les 2,8 s : les mots de la fin de phrase sortent vers le
+      // haut l'un après l'autre, ceux de la suivante entrent par le bas ; l'agent du cercle change avec
+      // elle (il arrive en sautillant). Mouvement réduit : la première phrase reste, sans animation.
+      (function () {
+        var root = document.querySelector('[data-rebus]');
+        if (!root || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        var ph = [].slice.call(root.querySelectorAll('.ph'));
+        var av = [].slice.call(root.querySelectorAll('.av'));
+        var sr = root.querySelector('.sr-only');
+        var i = 0;
+        setInterval(function () {
+          var a = ph[i], b = av[i];
+          a.classList.remove('on'); a.classList.add('out');
+          b.classList.remove('on'); b.classList.add('out');
+          i = (i + 1) % ph.length;
+          ph[i].classList.remove('out'); ph[i].classList.add('on');
+          av[i].classList.remove('out'); av[i].classList.add('on');
+          if (sr) sr.textContent = 'Des collaborateurs IA qui ' + ph[i].textContent.replace(/\s+/g, ' ').trim();
+          setTimeout(function () { a.classList.remove('out'); b.classList.remove('out'); }, 900);
+        }, 2800);
+      })();
+    </script>
   </main>
 </Base>
 
-<script>
-  // Le mot et l'avatar de l'agent changent ensemble : un seul visible à la fois, toutes les 2,6 s.
-  // Mouvement réduit : le premier couple reste affiché.
-  const mots = [...document.querySelectorAll<HTMLElement>('.mot')];
-  const avs = [...document.querySelectorAll<HTMLElement>('.av')];
-  if (mots.length && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    let i = 0;
-    setInterval(() => {
-      mots[i].classList.remove('on');
-      avs[i]?.classList.remove('on');
-      i = (i + 1) % mots.length;
-      mots[i].classList.add('on');
-      avs[i]?.classList.add('on');
-    }, 2600);
-  }
-</script>
+
 
 <style>
-  /* Tous les mots dans la même case de grille : la largeur est celle du plus long, la phrase ne
-     bouge pas quand le mot change. Surligné pêche, comme les visuels Robin. */
-  .mots {
-    display: inline-grid;
-    vertical-align: bottom;
+  .rebus .ligne {
+    display: block;
   }
-  .mot {
-    grid-area: 1 / 1;
-    /* collé en haut de la case : sans ça, une phrase plus longue qui passe sur deux lignes
-       étire la case et le surlignage devient un bloc */
-    align-self: start;
-    justify-self: center;
-    color: var(--color-orange-txt);
-    opacity: 0;
-    transform: translateY(0.35em);
-    transition:
-      opacity 0.45s ease,
-      transform 0.45s ease;
-  }
-  .mot.on {
-    opacity: 1;
-    transform: none;
-  }
-  /* L'avatar dans la phrase, façon muse.ai : un cercle à la hauteur des capitales, l'agent posé
-     dedans. Tous empilés dans la même case, un seul visible. */
+
+  /* L'avatar, comme celui de Muse : un cercle un peu plus haut que les capitales, liseré fin,
+     posé dans la ligne. Tous les agents empilés dans la même case, un seul visible. */
   .avatars {
+    position: relative;
     display: inline-grid;
-    width: 0.92em;
-    height: 0.92em;
-    margin-inline: 0.06em;
-    vertical-align: -0.12em;
+    width: 1.06em;
+    height: 1.06em;
+    margin: 0 0.2em 0 0.22em;
+    vertical-align: middle;
+    translate: 0 -0.06em;
     border-radius: 999px;
-    background: var(--color-peach-2);
-    box-shadow: inset 0 0 0 2px var(--color-surface);
+    background: var(--color-cream-2);
+    box-shadow: inset 0 0 0 0.5px color-mix(in srgb, var(--color-ink) 70%, transparent);
     overflow: hidden;
+    cursor: default;
   }
   .av {
     grid-area: 1 / 1;
@@ -212,25 +220,100 @@ const mots = [
     align-items: flex-end;
     justify-content: center;
     opacity: 0;
-    transform: translateY(18%) scale(0.92);
+    translate: 0 60%;
+    scale: 0.7;
     transition:
-      opacity 0.45s ease,
-      transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      opacity 0.3s ease,
+      translate 0.55s cubic-bezier(0.34, 1.56, 0.64, 1),
+      scale 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   .av.on {
     opacity: 1;
-    transform: none;
+    translate: 0 0;
+    scale: 1;
+  }
+  .av.out {
+    opacity: 0;
+    translate: 0 -40%;
+    scale: 0.85;
+    transition-timing-function: ease-in;
+    transition-duration: 0.3s;
   }
   .av :global(.av-img) {
-    width: 82%;
+    width: 80%;
     height: auto;
-    margin-bottom: 4%;
-    image-rendering: auto;
+    margin-bottom: 6%;
+    transform-origin: 50% 100%;
   }
+  /* il respire tant qu'il est affiché, il se dandine au survol (le « working » de Muse) */
+  .av.on :global(.av-img) {
+    animation: respire 2.2s 0.6s ease-in-out infinite;
+  }
+  .avatars:hover .av.on :global(.av-img) {
+    animation: dandine 0.7s ease-in-out infinite;
+  }
+  @keyframes respire {
+    0%,
+    100% {
+      transform: scale(1, 1);
+    }
+    50% {
+      transform: scale(1.04, 0.96);
+    }
+  }
+  @keyframes dandine {
+    0%,
+    100% {
+      transform: rotate(0);
+    }
+    25% {
+      transform: rotate(-8deg) translateY(-3%);
+    }
+    75% {
+      transform: rotate(8deg) translateY(-3%);
+    }
+  }
+
+  /* La fin de phrase : toutes empilées dans la même case (sa hauteur est celle de la plus longue),
+     mot par mot. Sortie vers le haut, entrée par le bas, décalée de 45 ms par mot. */
+  .rebus .phrases {
+    display: grid;
+    justify-items: center;
+    color: var(--color-orange-txt);
+  }
+  .ph {
+    grid-area: 1 / 1;
+    place-self: start center;
+    max-width: 100%;
+  }
+  .w {
+    display: inline-block;
+    opacity: 0;
+    translate: 0 0.3em;
+    transition:
+      opacity 0.35s ease,
+      translate 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: calc(var(--i) * 45ms);
+  }
+  .ph.on .w {
+    opacity: 1;
+    translate: 0 0;
+    transition-delay: calc(180ms + var(--i) * 45ms);
+  }
+  .ph.out .w {
+    opacity: 0;
+    translate: 0 -0.3em;
+    transition-timing-function: ease-in;
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .mot,
-    .av {
+    .av,
+    .w {
       transition: none;
+    }
+    .av.on :global(.av-img),
+    .avatars:hover .av.on :global(.av-img) {
+      animation: none;
     }
   }
 </style>
