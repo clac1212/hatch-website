@@ -23,6 +23,7 @@ import { Font } from 'astro:assets';
 import SpeedInsights from '@vercel/speed-insights/astro';
 import Analytics from '../components/Analytics.astro';
 import Nav from '../components/Nav.astro';
+import NavAccueil from '../components/NavAccueil.astro';
 import Footer from '../components/Footer.astro';
 import { locales, otherLocale, useTranslations, type Locale, type Paths } from '../i18n/ui';
 import { BRAND, organization, serializeJsonLd, type JsonLdNode } from '../seo/jsonld';
@@ -40,6 +41,8 @@ interface Props {
   ogType?: 'website' | 'article';
   jsonLd?: JsonLdNode[];
   noindex?: boolean;
+  /** Which nav to show: the network space's (default) or the home / independents' minimal one. */
+  nav?: 'reseau' | 'accueil';
 }
 
 const {
@@ -51,6 +54,7 @@ const {
   ogType = 'website',
   jsonLd = [],
   noindex = false,
+  nav = 'reseau',
 } = Astro.props;
 const t = useTranslations(locale);
 // `site` is set in astro.config.mjs, so Astro.site is always defined.
@@ -120,7 +124,13 @@ const structuredData = serializeJsonLd([
     >
       {t('a11y.skip')}
     </a>
-    <Nav locale={locale} paths={paths} />
+    {
+      nav === 'accueil' ? (
+        <NavAccueil locale={locale} paths={paths} />
+      ) : (
+        <Nav locale={locale} paths={paths} />
+      )
+    }
     <main id="contenu">
       <slot />
     </main>

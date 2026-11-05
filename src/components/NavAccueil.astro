@@ -1,0 +1,46 @@
+---
+import Logo from './ui/Logo.astro';
+import { appUrls, routes, otherLocale, useTranslations, type Locale, type Paths } from '../i18n/ui';
+
+/**
+ * MAQUETTE — nav de la page d'accueil (le carrefour) et de l'espace indépendant.
+ * Volontairement minimale, façon muse.ai : le logo, la langue, la connexion. Les liens de l'espace
+ * réseau (agents, cas clients, tarifs, sécurité) et la démo restent dans Nav.astro.
+ */
+interface Props {
+  locale: Locale;
+  paths: Paths;
+}
+
+const { locale, paths } = Astro.props;
+const t = useTranslations(locale);
+const other = otherLocale(locale);
+---
+
+<header class="fixed inset-x-0 top-0 z-60 bg-cream/85 backdrop-blur-md">
+  <nav
+    id="nav"
+    aria-label={t('a11y.mainNav')}
+    class="mx-auto flex max-w-[1360px] items-center justify-between px-4 py-4 sm:px-6 lg:py-5"
+  >
+    <a href={routes.home[locale]} aria-label={t('a11y.home')} class="shrink-0">
+      <Logo class="w-[84px] md:w-[96px]" />
+    </a>
+    <div class="flex items-center gap-1">
+      <a
+        href={paths[other]}
+        hreflang={other}
+        lang={other}
+        class="rounded-full px-3 py-2.5 text-[0.875rem] font-semibold text-soft uppercase transition-colors hover:text-orange-hover"
+      >
+        {other}<span class="sr-only"> · {t('lang.switch')}</span>
+      </a>
+      <a
+        href={appUrls.login}
+        class="rounded-full bg-ink px-5 py-2.5 text-[0.875rem] font-semibold whitespace-nowrap text-cream transition-colors hover:bg-orange hover:text-ink"
+      >
+        {t('nav.login')}
+      </a>
+    </div>
+  </nav>
+</header>

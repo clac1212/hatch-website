@@ -4,66 +4,70 @@
  * changeant), puis deux portes côte à côte : restaurant indépendant (Robin) et réseau (le site actuel).
  * Visuel uniquement : textes en dur, rien n'est branché.
  */
-import { Picture } from 'astro:assets';
+import { Image, Picture } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import { routes } from '../../i18n/ui';
-import carte from '../../assets/hero/carte-v5-1.jpg';
 import oeuf from '../../assets/robin/robin-oeuf-comptoir.jpg';
 import reseau from '../../assets/tarifs/restaurant.jpg';
+import peep from '../../assets/hero/agents/peep.webp';
+import pecker from '../../assets/hero/agents/pecker.webp';
+import finch from '../../assets/hero/agents/finch.webp';
+import jay from '../../assets/hero/agents/jay.webp';
+import sparrow from '../../assets/hero/agents/sparrow.png';
+import owl from '../../assets/hero/agents/owl.webp';
+import lark from '../../assets/hero/agents/lark.webp';
+import robin from '../../assets/robin/robin-face.png';
 
+// Chaque fin de phrase est le travail d'un agent : son avatar change avec le texte.
 const mots = [
-  'répondent à vos équipes',
-  'forment vos recrues',
-  'auditent vos restaurants',
-  'calculent vos marges',
-  'préparent vos ouvertures',
-  'font le point chaque lundi',
+  { texte: 'répondent à vos équipes', agent: 'Peep', img: peep },
+  { texte: 'forment vos recrues', agent: 'Pecker', img: pecker },
+  { texte: 'auditent vos restaurants', agent: 'Finch', img: finch },
+  { texte: 'tiennent vos procédures à jour', agent: 'Jay', img: jay },
+  { texte: 'préparent vos ouvertures', agent: 'Sparrow', img: sparrow },
+  { texte: 'répondent en cuisine', agent: 'Owl', img: owl },
+  { texte: 'font le point chaque lundi', agent: 'Lark', img: lark },
+  { texte: 'calculent vos marges', agent: 'Robin', img: robin },
 ];
 ---
 
 <Base
   locale="fr"
   paths={routes.home}
+  nav="accueil"
   title="Maquette accueil | Hatch OS"
   description="Maquette de la nouvelle page d'accueil de Hatch OS : un bandeau qui explique ce que font les agents, puis deux espaces, indépendants et réseaux."
 >
   <main class="mx-auto flex max-w-[1360px] flex-col gap-4 px-4 pt-24 pb-16 sm:px-6 lg:gap-5 lg:pt-28">
     <!-- 1 · Le bandeau : ce que fait Hatch OS -->
+    <!-- Juste le texte, façon muse.ai : pas de cadre, pas d'image, une grande phrase centrée. -->
     <section
-      class="relative isolate overflow-hidden rounded-[28px] bg-night lg:rounded-[36px]"
+      class="flex flex-col items-center gap-6 px-2 pt-14 pb-12 text-center lg:pt-24 lg:pb-20"
       aria-labelledby="accueil-titre"
     >
-      <Picture
-        src={carte}
-        alt=""
-        widths={[800, 1400, 2000]}
-        sizes="(min-width: 1360px) 1360px, 100vw"
-        formats={['avif', 'webp']}
-        class="absolute inset-0 -z-1 size-full object-cover object-[50%_40%]"
-        loading="eager"
-      />
-      <div class="flex min-h-[360px] items-center justify-center px-4 py-14 sm:px-8 lg:min-h-[440px]">
-        <div
-          class="vitre flex w-full max-w-[900px] flex-col items-center gap-5 rounded-[28px] px-6 py-9 text-center sm:px-10 lg:rounded-[36px] lg:px-14 lg:py-12"
-        >
-          <span class="font-mono text-[12px] tracking-[0.18em] text-ink/70 uppercase">
-            Hatch OS · agents IA de la restauration
-          </span>
-          <h1
-            id="accueil-titre"
-            class="font-display text-[32px] leading-[1.12] font-semibold tracking-[-0.018em] text-ink sm:text-[42px] lg:text-[56px]"
-          >
-            Des agents IA qui
-            <span class="mots" data-mots aria-live="polite">
-              {mots.map((m, i) => <span class:list={['mot', i === 0 && 'on']}>{m}</span>)}
-            </span>
-          </h1>
-          <p class="max-w-[560px] text-[15px] leading-6 text-soft lg:text-base lg:leading-7">
-            Pour le patron d'un restaurant indépendant comme pour la tête d'un réseau de franchise.
-            Choisissez votre espace.
-          </p>
-        </div>
-      </div>
+      <h1
+        id="accueil-titre"
+        class="max-w-[1100px] font-display text-[40px] leading-[1.08] font-semibold tracking-[-0.025em] text-balance text-ink sm:text-[56px] lg:text-[80px]"
+      >
+        Des agents IA
+        <span class="avatars" aria-hidden="true">
+          {
+            mots.map((m, i) => (
+              <span class:list={['av', i === 0 && 'on']}>
+                <Image src={m.img} alt="" width={160} class="av-img" />
+              </span>
+            ))
+          }
+        </span>
+        qui
+        <span class="mots" data-mots aria-live="polite">
+          {mots.map((m, i) => <span class:list={['mot', i === 0 && 'on']}>{m.texte}</span>)}
+        </span>
+      </h1>
+      <p class="max-w-[560px] text-[16px] leading-7 text-soft lg:text-[18px] lg:leading-8">
+        Pour le patron d'un restaurant indépendant comme pour la tête d'un réseau de franchise.
+        Choisissez votre espace.
+      </p>
     </section>
 
     <!-- 2 · Les deux portes -->
@@ -149,16 +153,18 @@ const mots = [
 </Base>
 
 <script>
-  // Le mot qui change : un seul visible à la fois, fondu vertical, toutes les 2,6 s.
-  // Mouvement réduit : le premier mot reste affiché.
-  const box = document.querySelector<HTMLElement>('[data-mots]');
-  if (box && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    const mots = [...box.querySelectorAll<HTMLElement>('.mot')];
+  // Le mot et l'avatar de l'agent changent ensemble : un seul visible à la fois, toutes les 2,6 s.
+  // Mouvement réduit : le premier couple reste affiché.
+  const mots = [...document.querySelectorAll<HTMLElement>('.mot')];
+  const avs = [...document.querySelectorAll<HTMLElement>('.av')];
+  if (mots.length && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
     let i = 0;
     setInterval(() => {
       mots[i].classList.remove('on');
+      avs[i]?.classList.remove('on');
       i = (i + 1) % mots.length;
       mots[i].classList.add('on');
+      avs[i]?.classList.add('on');
     }, 2600);
   }
 </script>
@@ -172,6 +178,10 @@ const mots = [
   }
   .mot {
     grid-area: 1 / 1;
+    /* collé en haut de la case : sans ça, une phrase plus longue qui passe sur deux lignes
+       étire la case et le surlignage devient un bloc */
+    align-self: start;
+    justify-self: center;
     color: var(--color-orange-txt);
     background: linear-gradient(transparent 62%, var(--color-peach) 62% 92%, transparent 92%);
     opacity: 0;
@@ -184,8 +194,43 @@ const mots = [
     opacity: 1;
     transform: none;
   }
+  /* L'avatar dans la phrase, façon muse.ai : un cercle à la hauteur des capitales, l'agent posé
+     dedans. Tous empilés dans la même case, un seul visible. */
+  .avatars {
+    display: inline-grid;
+    width: 0.92em;
+    height: 0.92em;
+    margin-inline: 0.06em;
+    vertical-align: -0.12em;
+    border-radius: 999px;
+    background: var(--color-peach-2);
+    box-shadow: inset 0 0 0 2px var(--color-surface);
+    overflow: hidden;
+  }
+  .av {
+    grid-area: 1 / 1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    opacity: 0;
+    transform: translateY(18%) scale(0.92);
+    transition:
+      opacity 0.45s ease,
+      transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .av.on {
+    opacity: 1;
+    transform: none;
+  }
+  .av :global(.av-img) {
+    width: 82%;
+    height: auto;
+    margin-bottom: 4%;
+    image-rendering: auto;
+  }
   @media (prefers-reduced-motion: reduce) {
-    .mot {
+    .mot,
+    .av {
       transition: none;
     }
   }
