@@ -90,7 +90,7 @@ const mots = [
                 </>
               ))}
               <span class="w icone" style={`--i:${m.texte.split(' ').length}`}>
-                <Image src={m.emoji} alt="" width={96} class="icone-img" />
+                <Image src={m.emoji} alt="" width={128} densities={[1, 2]} class="icone-img" />
               </span>
             </span>
           ))
@@ -334,13 +334,19 @@ const mots = [
   }
   /* L'icône 3D en fin de phrase (muse.ai : 1em, posée un peu sous la ligne de base). */
   .icone {
-    vertical-align: -0.13em;
-    padding-inline: 0.06em;
+    /* calé comme muse.ai : boîte de 1em centrée sur la hauteur des minuscules */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 1em;
+    vertical-align: -0.14em;
+    padding-inline: 0.08em;
   }
   .icone :global(.icone-img) {
-    display: inline-block;
-    width: 1em;
-    height: 1em;
+    display: block;
+    width: 1.05em;
+    height: 1.05em;
+    object-fit: contain;
   }
   .ph.out .w {
     opacity: 0;
