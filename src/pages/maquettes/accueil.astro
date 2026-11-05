@@ -71,7 +71,7 @@ const mots = [
                 {m.video ? (
                   <video class="av-img portrait" src={m.video} poster={m.img.src} autoplay muted loop playsinline />
                 ) : (
-                  <Image src={m.img} alt="" width={160} class:list={['av-img', 'portrait']} />
+                  <Image src={m.img} alt="" width={128} densities={[1, 2]} class:list={['av-img', 'portrait']} />
                 )}
               </span>
             ))
@@ -223,9 +223,9 @@ const mots = [
   .avatars {
     position: relative;
     display: inline-grid;
-    width: 1.07em;
-    height: 1.07em;
-    margin: 0 0.19em;
+    width: 1.3em;
+    height: 1.3em;
+    margin: -0.12em 0.19em;
     vertical-align: middle;
     translate: 0 -0.05em;
     border-radius: 999px;
@@ -272,6 +272,9 @@ const mots = [
     height: 100%;
     margin: 0;
     object-fit: cover;
+    /* l'agent un peu plus gros dans son cercle : on zoome sur le portrait, ancré en bas */
+    scale: 1.12;
+    transform-origin: 50% 100%;
   }
   .av.on :global(.av-img) {
     animation: respire 2.2s 0.6s ease-in-out infinite;
