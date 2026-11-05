@@ -7,7 +7,7 @@ agents:
       metier: On site
       agent: owl
     - etage: 3rd L
-      metier: On site
+      metier: Independent
       nom: Robin
       lien: /maquettes/robin
     - etage: 3rd R

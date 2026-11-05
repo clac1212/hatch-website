@@ -7,7 +7,7 @@ agents:
       metier: Établissement
       agent: owl
     - etage: 3e G
-      metier: Établissement
+      metier: Indépendant
       nom: Robin
       lien: /maquettes/robin
     - etage: 3e D
