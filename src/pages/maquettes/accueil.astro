@@ -17,18 +17,27 @@ import sparrow from '../../assets/portraits/sparrow.jpg';
 import owl from '../../assets/portraits/owl.jpg';
 import lark from '../../assets/portraits/lark.jpg';
 import robin from '../../assets/portraits/robin.jpg';
+// Icône 3D en fin de phrase, comme muse.ai : Fluent Emoji 3D de Microsoft (licence MIT).
+import emPeep from '../../assets/emojis/peep.png';
+import emOwl from '../../assets/emojis/owl.png';
+import emJay from '../../assets/emojis/jay.png';
+import emLark from '../../assets/emojis/lark.png';
+import emFinch from '../../assets/emojis/finch.png';
+import emPecker from '../../assets/emojis/pecker.png';
+import emSparrow from '../../assets/emojis/sparrow.png';
+import emRobin from '../../assets/emojis/robin.png';
 
 // Une tâche par agent, tirée de son pitch (src/content/agents/fr/*.md ; Robin : Notion).
 // Son avatar change avec le texte ; quand une boucle vidéo existe (le coucou), elle remplace l'image.
 const mots = [
-  { texte: 'répondent à vos équipes sur WhatsApp', agent: 'Peep', img: peep, video: '/maquettes/anim/peep.mp4' },
-  { texte: 'répondent à voix haute en cuisine', agent: 'Owl', img: owl },
-  { texte: 'retrouvent et rédigent vos documents', agent: 'Jay', img: jay },
-  { texte: 'font le point chaque matin', agent: 'Lark', img: lark },
-  { texte: 'auditent vos établissements', agent: 'Finch', img: finch },
-  { texte: 'forment vos équipes en cinq minutes', agent: 'Pecker', img: pecker },
-  { texte: 'qualifient vos candidats franchisés', agent: 'Sparrow', img: sparrow },
-  { texte: 'surveillent vos factures fournisseurs', agent: 'Robin', img: robin },
+  { texte: 'répondent à vos équipes sur WhatsApp', agent: 'Peep', img: peep, emoji: emPeep, video: '/maquettes/anim/peep.mp4' },
+  { texte: 'répondent à voix haute en cuisine', agent: 'Owl', img: owl, emoji: emOwl },
+  { texte: 'retrouvent et rédigent vos documents', agent: 'Jay', img: jay, emoji: emJay },
+  { texte: 'font le point chaque matin', agent: 'Lark', img: lark, emoji: emLark },
+  { texte: 'auditent vos établissements', agent: 'Finch', img: finch, emoji: emFinch },
+  { texte: 'forment vos équipes en cinq minutes', agent: 'Pecker', img: pecker, emoji: emPecker },
+  { texte: 'qualifient vos candidats franchisés', agent: 'Sparrow', img: sparrow, emoji: emSparrow },
+  { texte: 'surveillent vos factures fournisseurs', agent: 'Robin', img: robin, emoji: emRobin },
 ];
 ---
 
@@ -80,6 +89,9 @@ const mots = [
                   </span>{' '}
                 </>
               ))}
+              <span class="w icone" style={`--i:${m.texte.split(' ').length}`}>
+                <Image src={m.emoji} alt="" width={96} class="icone-img" />
+              </span>
             </span>
           ))
         }
@@ -319,6 +331,16 @@ const mots = [
     opacity: 1;
     translate: 0 0;
     transition-delay: calc(180ms + var(--i) * 45ms);
+  }
+  /* L'icône 3D en fin de phrase (muse.ai : 1em, posée un peu sous la ligne de base). */
+  .icone {
+    vertical-align: -0.13em;
+    padding-inline: 0.06em;
+  }
+  .icone :global(.icone-img) {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
   }
   .ph.out .w {
     opacity: 0;
