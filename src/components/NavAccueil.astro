@@ -10,34 +10,37 @@ import { appUrls, routes, otherLocale, useTranslations, type Locale, type Paths 
 interface Props {
   locale: Locale;
   paths: Paths;
+  /** `night` over a black hero (accueil), `day` on cream (Robin). */
+  tone?: 'day' | 'night';
 }
 
-const { locale, paths } = Astro.props;
+const { locale, paths, tone = 'day' } = Astro.props;
+const nuit = tone === 'night';
 const t = useTranslations(locale);
 const other = otherLocale(locale);
 ---
 
-<header class="fixed inset-x-0 top-0 z-60 bg-cream/85 backdrop-blur-md">
+<header class:list={['fixed inset-x-0 top-0 z-60 backdrop-blur-md', nuit ? 'bg-night/85' : 'bg-cream/85']}>
   <nav
     id="nav"
     aria-label={t('a11y.mainNav')}
     class="mx-auto flex max-w-[1360px] items-center justify-between px-4 py-4 sm:px-6 lg:py-5"
   >
     <a href={routes.home[locale]} aria-label={t('a11y.home')} class="shrink-0">
-      <Logo class="w-[84px] md:w-[96px]" />
+      <Logo tone={nuit ? 'night' : 'day'} class="w-[84px] md:w-[96px]" />
     </a>
     <div class="flex items-center gap-1">
       <a
         href={paths[other]}
         hreflang={other}
         lang={other}
-        class="rounded-full px-3 py-2.5 text-[0.875rem] font-semibold text-soft uppercase transition-colors hover:text-orange-hover"
+        class:list={['rounded-full px-3 py-2.5 text-[0.875rem] font-semibold uppercase transition-colors', nuit ? 'text-cream/70 hover:text-orange' : 'text-soft hover:text-orange-hover']}
       >
         {other}<span class="sr-only"> · {t('lang.switch')}</span>
       </a>
       <a
         href={appUrls.login}
-        class="rounded-full bg-ink px-5 py-2.5 text-[0.875rem] font-semibold whitespace-nowrap text-cream transition-colors hover:bg-orange hover:text-ink"
+        class:list={['rounded-full px-5 py-2.5 text-[0.875rem] font-semibold whitespace-nowrap transition-colors hover:bg-orange hover:text-ink', nuit ? 'bg-cream text-ink' : 'bg-ink text-cream']}
       >
         {t('nav.login')}
       </a>

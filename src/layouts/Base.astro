@@ -43,6 +43,8 @@ interface Props {
   noindex?: boolean;
   /** Which nav to show: the network space's (default) or the home / independents' minimal one. */
   nav?: 'reseau' | 'accueil';
+  /** Tone of the home nav: `night` over a black hero. */
+  navTone?: 'day' | 'night';
 }
 
 const {
@@ -55,6 +57,7 @@ const {
   jsonLd = [],
   noindex = false,
   nav = 'reseau',
+  navTone = 'day',
 } = Astro.props;
 const t = useTranslations(locale);
 // `site` is set in astro.config.mjs, so Astro.site is always defined.
@@ -126,7 +129,7 @@ const structuredData = serializeJsonLd([
     </a>
     {
       nav === 'accueil' ? (
-        <NavAccueil locale={locale} paths={paths} />
+        <NavAccueil locale={locale} paths={paths} tone={navTone} />
       ) : (
         <Nav locale={locale} paths={paths} />
       )

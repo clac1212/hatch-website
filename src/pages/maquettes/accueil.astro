@@ -36,60 +36,63 @@ const mots = [
   locale="fr"
   paths={routes.home}
   nav="accueil"
+  navTone="night"
   title="Maquette accueil | Hatch OS"
   description="Maquette de la nouvelle page d'accueil de Hatch OS : un bandeau qui explique ce que font les agents, puis deux espaces, indépendants et réseaux."
 >
-  <main class="mx-auto flex max-w-[1360px] flex-col gap-4 px-4 pt-24 pb-16 sm:px-6 lg:gap-5 lg:pt-28">
-    <!-- 1 · Le bandeau : ce que fait Hatch OS -->
-    <!-- Juste le texte, façon muse.ai : pas de cadre, pas d'image, une grande phrase centrée. -->
-    <section
-      class="flex flex-col items-center gap-6 px-2 pt-14 pb-12 text-center lg:pt-24 lg:pb-20"
-      aria-labelledby="accueil-titre"
+  <!-- 1 · Le bandeau : ce que fait Hatch OS -->
+  <!-- Juste le texte, façon muse.ai : pas de cadre, pas d'image, une grande phrase centrée. -->
+  <section
+    class="hero-noir flex flex-col items-center gap-6 bg-night px-4 pt-36 pb-20 text-center sm:px-6 lg:pt-44 lg:pb-28"
+    aria-labelledby="accueil-titre"
+  >
+    <!-- Le titre « rébus » de muse.ai : ligne 1 avec l'avatar dans un cercle, ligne 2 la fin de
+         phrase qui change mot par mot. L'avatar change avec elle : c'est l'agent qui fait ce travail. -->
+    <h1
+      id="accueil-titre"
+      class="rebus w-full font-display text-[34px] leading-[1.1] font-medium tracking-[-0.01em] sm:text-[46px] lg:text-[clamp(46px,4.3vw,62px)] text-cream"
+      data-rebus
     >
-      <!-- Le titre « rébus » de muse.ai : ligne 1 avec l'avatar dans un cercle, ligne 2 la fin de
-           phrase qui change mot par mot. L'avatar change avec elle : c'est l'agent qui fait ce travail. -->
-      <h1
-        id="accueil-titre"
-        class="rebus w-full font-display text-[34px] leading-[1.1] font-medium tracking-[-0.01em] text-ink sm:text-[46px] lg:text-[clamp(46px,4.3vw,62px)]"
-        data-rebus
-      >
-        <span class="sr-only">Des collaborateurs IA qui {mots[0].texte}</span>
-        <span class="ligne" aria-hidden="true">
-          Des collaborateurs IA<span class="avatars" data-avatars>
-            {
-              mots.map((m, i) => (
-                <span class:list={['av', i === 0 && 'on']} title={m.agent}>
-                  {m.video ? (
-                    <video class="av-img portrait" src={m.video} poster={m.img.src} autoplay muted loop playsinline />
-                  ) : (
-                    <Image src={m.img} alt="" width={160} class:list={['av-img', 'portrait']} />
-                  )}
-                </span>
-              ))
-            }
-          </span>qui
-        </span>
-        <span class="ligne phrases" aria-hidden="true">
+      <span class="sr-only">Des collaborateurs IA qui {mots[0].texte}</span>
+      <span class="ligne" aria-hidden="true">
+        Des collaborateurs IA<span class="avatars" data-avatars>
           {
             mots.map((m, i) => (
-              <span class:list={['ph', i === 0 && 'on']}>
-                {m.texte.split(' ').map((w, j) => (
-                  <>
-                    <span class="w" style={`--i:${j}`}>
-                      {w}
-                    </span>{' '}
-                  </>
-                ))}
+              <span class:list={['av', i === 0 && 'on']} title={m.agent}>
+                {m.video ? (
+                  <video class="av-img portrait" src={m.video} poster={m.img.src} autoplay muted loop playsinline />
+                ) : (
+                  <Image src={m.img} alt="" width={160} class:list={['av-img', 'portrait']} />
+                )}
               </span>
             ))
           }
-        </span>
-      </h1>
-      <p class="max-w-[560px] text-[16px] leading-7 text-soft lg:text-[18px] lg:leading-8">
-        Pour le patron d'un restaurant indépendant comme pour la tête d'un réseau de franchise.
-        Choisissez votre espace.
-      </p>
-    </section>
+        </span>qui
+      </span>
+      <span class="ligne phrases" aria-hidden="true">
+        {
+          mots.map((m, i) => (
+            <span class:list={['ph', i === 0 && 'on']}>
+              {m.texte.split(' ').map((w, j) => (
+                <>
+                  <span class="w" style={`--i:${j}`}>
+                    {w}
+                  </span>{' '}
+                </>
+              ))}
+            </span>
+          ))
+        }
+      </span>
+    </h1>
+    <p class="max-w-[560px] text-[16px] leading-7 text-cream/70 lg:text-[18px] lg:leading-8">
+      Pour le patron d'un restaurant indépendant comme pour la tête d'un réseau de franchise.
+      Choisissez votre espace.
+    </p>
+  </section>
+
+  <main class="mx-auto flex max-w-[1360px] flex-col gap-4 px-4 pt-6 pb-16 sm:px-6 lg:gap-5 lg:pt-8">
+
 
     <!-- 2 · Les deux portes -->
     <div class="grid gap-4 md:grid-cols-2 lg:gap-5">
@@ -215,7 +218,7 @@ const mots = [
     translate: 0 -0.05em;
     border-radius: 999px;
     background: var(--color-cream-2);
-    box-shadow: inset 0 0 0 0.5px color-mix(in srgb, var(--color-ink) 8%, transparent);
+    box-shadow: 0 0 0 0.5px color-mix(in srgb, var(--color-white) 20%, transparent);
     overflow: hidden;
     cursor: default;
   }
@@ -295,7 +298,8 @@ const mots = [
     justify-items: center;
     font-weight: 700;
     font-style: italic;
-    color: var(--color-orange-txt);
+    /* sur le noir, l'orange vif de la marque est lisible (6,6:1) */
+    color: var(--color-orange);
   }
   .ph {
     grid-area: 1 / 1;
