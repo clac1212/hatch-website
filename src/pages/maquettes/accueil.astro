@@ -49,7 +49,7 @@ const mots = [
            phrase qui change mot par mot. L'avatar change avec elle : c'est l'agent qui fait ce travail. -->
       <h1
         id="accueil-titre"
-        class="rebus w-full font-display text-[40px] leading-[1.1] font-semibold tracking-[-0.025em] text-ink sm:text-[56px] lg:text-[80px]"
+        class="rebus w-full font-display text-[34px] leading-[1.1] font-medium tracking-[-0.01em] text-ink sm:text-[46px] lg:text-[clamp(46px,4.3vw,62px)]"
         data-rebus
       >
         <span class="sr-only">Des collaborateurs IA qui {mots[0].texte}</span>
@@ -203,14 +203,14 @@ const mots = [
   .avatars {
     position: relative;
     display: inline-grid;
-    width: 1.06em;
-    height: 1.06em;
-    margin: 0 0.2em 0 0.22em;
+    width: 1.07em;
+    height: 1.07em;
+    margin: 0 0.19em;
     vertical-align: middle;
-    translate: 0 -0.06em;
+    translate: 0 -0.05em;
     border-radius: 999px;
     background: var(--color-cream-2);
-    box-shadow: inset 0 0 0 0.5px color-mix(in srgb, var(--color-ink) 70%, transparent);
+    box-shadow: inset 0 0 0 0.5px color-mix(in srgb, var(--color-ink) 8%, transparent);
     overflow: hidden;
     cursor: default;
   }
@@ -276,10 +276,10 @@ const mots = [
 
   /* La fin de phrase : toutes empilées dans la même case (sa hauteur est celle de la plus longue),
      mot par mot. Sortie vers le haut, entrée par le bas, décalée de 45 ms par mot. */
+  /* Une seule couleur pour les deux lignes, comme Muse : c'est le mouvement qui attire l'œil. */
   .rebus .phrases {
     display: grid;
     justify-items: center;
-    color: var(--color-orange-txt);
   }
   .ph {
     grid-area: 1 / 1;
