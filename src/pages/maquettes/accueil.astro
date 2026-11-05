@@ -19,9 +19,9 @@ import lark from '../../assets/portraits/lark.jpg';
 import robin from '../../assets/portraits/robin.jpg';
 
 // Une tâche par agent, tirée de son pitch (src/content/agents/fr/*.md ; Robin : Notion).
-// Son avatar change avec le texte.
+// Son avatar change avec le texte ; quand une boucle vidéo existe (le coucou), elle remplace l'image.
 const mots = [
-  { texte: 'répondent à vos équipes sur WhatsApp', agent: 'Peep', img: peep },
+  { texte: 'répondent à vos équipes sur WhatsApp', agent: 'Peep', img: peep, video: '/maquettes/anim/peep.mp4' },
   { texte: 'répondent à voix haute en cuisine', agent: 'Owl', img: owl },
   { texte: 'retrouvent et rédigent vos documents', agent: 'Jay', img: jay },
   { texte: 'font le point chaque matin', agent: 'Lark', img: lark },
@@ -59,7 +59,11 @@ const mots = [
             {
               mots.map((m, i) => (
                 <span class:list={['av', i === 0 && 'on']} title={m.agent}>
-                  <Image src={m.img} alt="" width={160} class:list={['av-img', 'portrait']} />
+                  {m.video ? (
+                    <video class="av-img portrait" src={m.video} poster={m.img.src} autoplay muted loop playsinline />
+                  ) : (
+                    <Image src={m.img} alt="" width={160} class:list={['av-img', 'portrait']} />
+                  )}
                 </span>
               ))
             }
