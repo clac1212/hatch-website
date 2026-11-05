@@ -44,7 +44,6 @@ const residents = await Promise.all(
 );
 const other = otherLocale(locale);
 const produit = [
-  { href: `${home}#agents`, label: t('nav.agents') },
   { href: `${home}#cas-clients`, label: t('nav.cases') },
   { href: `${home}#tarifs`, label: t('nav.pricing') },
   { href: routes.security[locale], label: t('nav.security') },
