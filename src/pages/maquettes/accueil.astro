@@ -8,7 +8,7 @@ import { Image, Picture } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import { routes } from '../../i18n/ui';
 import oeuf from '../../assets/robin/independant.jpg';
-import reseau from '../../assets/tarifs/restaurant.jpg';
+import reseau from '../../assets/tarifs/reseau-flotte.jpg';
 import peep from '../../assets/portraits/peep.jpg';
 import pecker from '../../assets/portraits/pecker.jpg';
 import finch from '../../assets/portraits/finch.jpg';
@@ -157,7 +157,7 @@ const mots = [
         <div class="relative aspect-[16/10] overflow-hidden bg-scene">
           <Picture
             src={reseau}
-            alt="Un restaurant en coupe, en voxel, où les agents Hatch OS travaillent à chaque étage."
+            alt="Un réseau en voxels : le siège au centre, trois restaurants autour, et les sept agents Hatch OS au travail du siège au terrain."
             widths={[600, 1000]}
             sizes="(min-width: 768px) 50vw, 100vw"
             formats={['avif', 'webp']}
