@@ -18,16 +18,17 @@ import owl from '../../assets/portraits/owl.jpg';
 import lark from '../../assets/portraits/lark.jpg';
 import robin from '../../assets/portraits/robin.jpg';
 
-// Chaque fin de phrase est le travail d'un agent : son avatar change avec le texte.
+// Une tâche par agent, tirée de son pitch (src/content/agents/fr/*.md ; Robin : Notion).
+// Son avatar change avec le texte.
 const mots = [
-  { texte: 'répondent à vos équipes', agent: 'Peep', img: peep },
-  { texte: 'forment vos recrues', agent: 'Pecker', img: pecker },
-  { texte: 'auditent vos restaurants', agent: 'Finch', img: finch },
-  { texte: 'tiennent vos procédures à jour', agent: 'Jay', img: jay },
-  { texte: 'préparent vos ouvertures', agent: 'Sparrow', img: sparrow },
-  { texte: 'répondent en cuisine', agent: 'Owl', img: owl },
-  { texte: 'font le point chaque lundi', agent: 'Lark', img: lark },
-  { texte: 'calculent vos marges', agent: 'Robin', img: robin },
+  { texte: 'répondent à vos équipes sur WhatsApp', agent: 'Peep', img: peep },
+  { texte: 'répondent à voix haute en cuisine', agent: 'Owl', img: owl },
+  { texte: 'retrouvent et rédigent vos documents', agent: 'Jay', img: jay },
+  { texte: 'font le point chaque matin', agent: 'Lark', img: lark },
+  { texte: 'auditent vos établissements', agent: 'Finch', img: finch },
+  { texte: 'forment vos équipes en cinq minutes', agent: 'Pecker', img: pecker },
+  { texte: 'qualifient vos candidats franchisés', agent: 'Sparrow', img: sparrow },
+  { texte: 'surveillent vos factures fournisseurs', agent: 'Robin', img: robin },
 ];
 ---
 
