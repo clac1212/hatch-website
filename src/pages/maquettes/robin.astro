@@ -4,7 +4,7 @@
  * Inspiration : muse.ai (sobriété, fond nuit, une grande phrase) et la page « dots » de ChatGPT :
  * le personnage qui flotte au-dessus du titre, la pilule de navigation collante, les rangées
  * alternées texte / carte de couleur avec une conversation dedans, « une semaine avec Robin » en
- * frise, les onglets de canal (WhatsApp aujourd'hui, l'application demain), trois cartes de confiance.
+ * frise, le téléphone WhatsApp, trois cartes de confiance.
  * Contenu tiré de Notion (« Robin — le cofondateur des restaurants indépendants ») et de la
  * maquette précédente. Visuel uniquement : textes en dur, le formulaire n'envoie rien.
  */
@@ -110,7 +110,7 @@ const soiree = [
   },
 ];
 
-/** Le fil du lundi, affiché dans les deux canaux (WhatsApp aujourd'hui, l'application demain). */
+/** Le fil du lundi, dans le téléphone WhatsApp. */
 const lundi = [
   {
     qui: 'robin',
@@ -303,7 +303,7 @@ const lundi = [
       </div>
     </section>
 
-    <!-- 5 · Où le trouver : onglets de canal, le téléphone change (les canaux des dots) -->
+    <!-- 5 · Où le trouver : le téléphone WhatsApp (pas encore d application) -->
     <section id="canaux" class="border-t border-line-night px-4 py-20 sm:px-6 lg:py-28" data-canaux>
       <div class="mx-auto flex max-w-[980px] flex-col items-center text-center">
         <span class="font-mono text-kicker text-cream/60 uppercase">Où le trouver</span>
@@ -311,18 +311,9 @@ const lundi = [
           Là où vous êtes déjà.
         </h2>
         <p class="mt-4 max-w-[520px] text-[16px] leading-7 text-cream/75">
-          Pendant la bêta, Robin vit dans WhatsApp. Ensuite, il aura sa propre conversation, pensée
-          pour lui, toujours à portée de main.
+          Robin vit dans WhatsApp. Rien à installer : écrivez-lui, envoyez-lui un vocal, une photo ou
+          un document, comme à un associé.
         </p>
-
-        <div class="canaux mt-8" role="tablist" aria-label="Canaux">
-          <button type="button" role="tab" class="canal" aria-selected="true" data-c="0">
-            WhatsApp <span>aujourd'hui</span>
-          </button>
-          <button type="button" role="tab" class="canal" aria-selected="false" data-c="1">
-            Application Robin <span>bientôt</span>
-          </button>
-        </div>
 
         <div class="telephone mt-10 w-full max-w-[320px]">
           <Iphone>
@@ -349,32 +340,6 @@ const lundi = [
                     </div>
                   ))
                 }
-              </div>
-            </div>
-            <!-- L'application Robin, façon Muse : une conversation épurée -->
-            <div class="ecran app" data-c="1" aria-hidden="true">
-              <div class="app-statut" aria-hidden="true"><span>8:31</span><span>●●● ▮</span></div>
-              <header class="app-tete">
-                <Image src={robin} alt="" width={56} densities={[1, 2]} class="app-av" />
-                <b>Robin</b>
-              </header>
-              <div class="app-fil">
-                {
-                  lundi.map((m) => (
-                    <div class:list={['app-msg', m.qui]}>
-                      {m.doc && (
-                        <span class="app-fichier">
-                          <b>{m.doc}</b>
-                        </span>
-                      )}
-                      {m.txt}
-                    </div>
-                  ))
-                }
-              </div>
-              <div class="app-saisie" aria-hidden="true">
-                <span>Écrire à Robin…</span>
-                <span class="app-micro" />
               </div>
             </div>
           </Iphone>
@@ -485,7 +450,6 @@ const lundi = [
         });
       }
       onglets(document.querySelector('[data-semaine]'), 'data-j');
-      onglets(document.querySelector('[data-canaux]'), 'data-c');
     })();
   </script>
 </Base>

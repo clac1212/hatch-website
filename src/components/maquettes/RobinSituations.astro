@@ -1,12 +1,14 @@
 ---
 /**
- * MAQUETTE — « Ce que fait Robin », façon dots de ChatGPT : quatre situations où Robin agit sous vos
- * yeux, dans une petite interface vivante, avec son curseur.
- *   1. Il se branche à vos outils : il connecte Gmail, Drive, WhatsApp, et trouve factures et documents.
- *   2. Il vérifie chaque facture : la facture Metro passée ligne à ligne contre le bon de livraison.
- *   3. Il éclaire vos décisions : le tableau de bord en fond, la question « on reste ouvert de 14 h
- *      à 18 h ? », et le graphique qui s'éclaire avec la réponse.
- *   4. Il prépare le travail : le contrat d'extra rempli depuis le modèle du patron.
+ * MAQUETTE — « Ce que fait Robin » : quatre situations, chacune jouée dans une conversation
+ * WhatsApp (l'interface de Robin pendant la bêta, il n'y a pas encore d'application). Ce qui bouge
+ * se passe dans des éléments que WhatsApp sait afficher : un lien, une photo, un document, un
+ * graphique envoyé en image, des boutons de réponse rapide. Le pouce du patron tape dessus.
+ *   1. Il se branche à vos outils : un lien pour connecter la boîte mail, puis ce qu'il a trouvé.
+ *   2. Il vérifie chaque facture : la photo du bon de livraison, la facture vérifiée ligne à ligne,
+ *      l'écart, l'avoir préparé sur un « oui ».
+ *   3. Il éclaire vos décisions : « on reste ouvert de 14 h à 18 h ? », la réponse avec un graphique.
+ *   4. Il prépare le travail : un vocal, le contrat d'extra rempli depuis le modèle, envoyé sur accord.
  * Situations tirées de l'entretien Bilal (Discovery Robin, 05/11). Chaque scène se joue une fois
  * quand elle arrive à l'écran et s'arrête sur son état final (pas de boucle, donc pas de pause
  * nécessaire) ; « Rejouer » la relance. Sans JS ou en mouvement réduit : l'état final, directement.
@@ -15,13 +17,7 @@
 import { Image } from 'astro:assets';
 import portrait from '../../assets/portraits/robin.jpg';
 
-const outils = [
-  { id: 'gmail', lettre: 'G', nom: 'Gmail', desc: 'Factures, fournisseurs, administratif' },
-  { id: 'drive', lettre: 'D', nom: 'Google Drive', desc: 'Vos documents et vos modèles' },
-  { id: 'whatsapp', lettre: 'W', nom: 'WhatsApp', desc: 'Vos commandes fournisseurs' },
-  { id: 'caisse', lettre: 'C', nom: 'Caisse', desc: 'Vos ventes, service par service' },
-];
-const trouves = ['3 factures Metro', '1 avoir Promocash', 'Plan de maîtrise sanitaire', 'Modèle de contrat'];
+const trouves = ['3 factures Metro', '1 avoir Promocash', 'Plan de maîtrise sanitaire', "Modèle de contrat d'extra"];
 
 const lignes = [
   { nom: 'Beurre doux', fact: '5 kg', bl: '5 kg' },
@@ -31,12 +27,12 @@ const lignes = [
 
 /** Ventes du créneau 14 h – 18 h, en part de la hauteur du graphique ; le trait = coût du personnel. */
 const jours = [
-  { j: 'Lun', h: 30 },
-  { j: 'Mar', h: 26 },
-  { j: 'Mer', h: 36 },
-  { j: 'Jeu', h: 32 },
-  { j: 'Ven', h: 44 },
-  { j: 'Sam', h: 82, au: true },
+  { j: 'L', h: 30 },
+  { j: 'M', h: 26 },
+  { j: 'M', h: 36 },
+  { j: 'J', h: 32 },
+  { j: 'V', h: 44 },
+  { j: 'S', h: 82, au: true },
 ];
 
 const champs = [
@@ -44,20 +40,19 @@ const champs = [
   { k: 'Poste', v: 'Serveuse en salle' },
   { k: 'Date', v: 'Samedi, service du soir' },
   { k: 'Horaires', v: '18 h – minuit' },
-  { k: 'Rémunération', v: 'Selon ton modèle' },
 ];
 
 const situations = [
   {
     titre: 'Il se branche à vos outils',
     texte:
-      'Gmail, Drive, WhatsApp, votre caisse : vous choisissez ce que Robin voit. Il retrouve tout seul vos factures et vos documents.',
+      "Tout se passe dans WhatsApp. Robin vous envoie un lien, vous lui ouvrez votre boîte mail ou votre Drive, et il retrouve tout seul vos factures et vos documents.",
     teinte: 'bg-peach',
   },
   {
     titre: 'Il vérifie chaque facture',
     texte:
-      "Commande, bon de livraison, facture : il rapproche les trois et vous montre l'écart, preuve à l'appui. Il prépare l'avoir, vous validez.",
+      "Prenez le bon de livraison en photo. Robin le rapproche de la commande et de la facture, et vous montre l'écart. Il prépare l'avoir, vous dites oui.",
     teinte: 'bg-sand',
   },
   {
@@ -69,7 +64,7 @@ const situations = [
   {
     titre: 'Il prépare le travail',
     texte:
-      'Contrats, mails, dossiers : il part de vos modèles et de vos données. Vous relisez, il a fait le reste.',
+      "Un vocal suffit. Il part de vos modèles et de vos données, vous envoie le document prêt à relire, et rien ne part sans votre accord.",
     teinte: 'bg-cream-2',
   },
 ];
@@ -86,142 +81,174 @@ const situations = [
         </div>
 
         <div class:list={['situ', s.teinte]} data-situ={i}>
-          {/* 1 · Les outils */}
-          {i === 0 && (
-            <div class="ui">
-              <p class="ui-titre">Connecter vos outils</p>
-              <ul class="outils">
-                {outils.map((o) => (
-                  <li class="outil" data-etat={o.id}>
-                    <span class="outil-ico">{o.lettre}</span>
-                    <span class="outil-txt">
-                      <b>{o.nom}</b>
-                      <span>{o.desc}</span>
-                    </span>
-                    <span class="bascule" data-cible={o.id}>
-                      <span class="b-off">Connecter</span>
-                      <span class="b-on">Connecté</span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-              <div class="trouve" data-etat="trouve">
-                <span class="ui-mini">Robin a trouvé</span>
-                <div class="puces">
-                  {trouves.map((t, k) => (
-                    <span class="puce" style={`--k:${k}`}>
-                      {t}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* 2 · La facture vérifiée en direct */}
-          {i === 1 && (
-            <div class="ui">
-              <div class="doc-tete">
-                <b>Facture Metro</b>
-                <span>reçue par mail · mardi</span>
-              </div>
-              <ul class="lignes">
-                <li class="ligne-tete">
-                  <span>Article</span>
-                  <span>Facturé</span>
-                  <span>Livré (BL)</span>
-                </li>
-                {lignes.map((l, k) => (
-                  <li class:list={['ligne', l.ecart && 'a-ecart']} data-etat={`l${k}`}>
-                    <span>{l.nom}</span>
-                    <span>{l.fact}</span>
-                    <span class="bl">
-                      {l.bl} <b class="coche" aria-hidden="true">{l.ecart ? '≠' : '✓'}</b>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-              <div class="robin-dit" data-etat="ditfacture">
-                <p>12 kg facturés, 10 livrés. Je prépare la demande d'avoir ?</p>
-                <span class="bascule large" data-cible="avoir">
-                  <span class="b-off">Préparer l'avoir</span>
-                  <span class="b-on">Brouillon prêt · à valider</span>
-                </span>
-              </div>
-            </div>
-          )}
-
-          {/* 3 · Le tableau de bord en fond, la question au premier plan */}
-          {i === 2 && (
-            <div class="dash-scene">
-              <div class="ui dash" data-etat="dash">
-                <div class="doc-tete">
-                  <b>Le Petit Comptoir · tableau de bord</b>
-                  <span>Créneau 14 h – 18 h, ventes par jour</span>
-                </div>
-                <div class="graph">
-                  <span class="seuil" aria-hidden="true">
-                    <span>coût du personnel</span>
-                  </span>
-                  {jours.map((d) => (
-                    <span class:list={['barre', d.au && 'au-dessus']} style={`--h:${d.h}`}>
-                      <i />
-                      <span>{d.j}</span>
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <div class="chat">
-                <p class="c-patron" data-etat="q">On reste ouvert de 14 h à 18 h ?</p>
-                <p class="c-ecrit" data-etat="ecrit" aria-hidden="true">
-                  <i />
-                  <i />
-                  <i />
-                </p>
-                <p class="c-robin" data-etat="r">
-                  En semaine, le créneau ne couvre pas les salaires. Le samedi, si. On ferme l'après-midi du
-                  lundi au vendredi ?
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* 4 · Le contrat rempli depuis le modèle */}
-          {i === 3 && (
-            <div class="ui contrat">
-              <div class="doc-tete">
-                <b>Contrat d'extra</b>
-                <span>à partir de ton modèle</span>
-              </div>
-              <dl class="champs">
-                {champs.map((c, k) => (
-                  <div class="champ-c" data-etat={`c${k}`}>
-                    <dt>{c.k}</dt>
-                    <dd data-cible={`f${k}`}>
-                      <span class="vide" aria-hidden="true" />
-                      <span class="val">{c.v}</span>
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-              <span class="tampon" data-etat="tampon">
-                Prêt à signer
+          <div class="wa" aria-label="Conversation WhatsApp avec Robin (exemple)">
+            <header class="wa-tete" data-etat="tete">
+              <Image src={portrait} alt="" width={36} densities={[1, 2]} class="wa-av" />
+              <span class="wa-qui">
+                <b>Robin</b>
+                <span class="st-ligne">en ligne</span>
+                <span class="st-ecrit">écrit…</span>
               </span>
-              <p class="robin-dit seul" data-etat="ditcontrat">
-                Je l'envoie à Lina dès que tu valides.
-              </p>
-            </div>
-          )}
+            </header>
 
-          {/* Le curseur de Robin (comme celui du dot) */}
-          {i !== 2 && (
-            <span class="curseur" aria-hidden="true">
-              <svg viewBox="0 0 24 24" class="fleche">
-                <path d="M4 2l15 9-6.5 1.6L10 19z" />
-              </svg>
-              <Image src={portrait} alt="" width={30} densities={[1, 2]} class="curseur-av" />
-            </span>
-          )}
+            <div class="wa-fil">
+              {/* 1 · Le lien pour connecter la boîte mail */}
+              {i === 0 && (
+                <>
+                  <div class="m robin" data-etat="a">
+                    Pour retrouver tes factures, il me faut ta boîte mail. Tu peux me l'ouvrir ici :
+                    <span class="carte-lien" data-cible="lien">
+                      <span class="cl-ico">G</span>
+                      <span class="cl-txt">
+                        <b>Connecter ta boîte mail</b>
+                        <span>Lien sécurisé Hatch OS</span>
+                      </span>
+                      <span class="cl-ok" data-etat="ok">✓</span>
+                    </span>
+                  </div>
+                  <p class="m sys" data-etat="b">Boîte mail connectée</p>
+                  <div class="m robin" data-etat="c">
+                    C'est bon. J'ai déjà trouvé :
+                    <span class="puces">
+                      {trouves.map((t, k) => (
+                        <span class="puce" style={`--k:${k}`}>
+                          {t}
+                        </span>
+                      ))}
+                    </span>
+                  </div>
+                </>
+              )}
+
+              {/* 2 · La photo du BL, la facture vérifiée, l'avoir sur un « oui » */}
+              {i === 1 && (
+                <>
+                  <div class="m patron photo" data-etat="a">
+                    <span class="bl-photo" aria-hidden="true">
+                      <b>BON DE LIVRAISON</b>
+                      <i />
+                      <i />
+                      <i />
+                      <i />
+                    </span>
+                    Le BL Metro de ce matin
+                  </div>
+                  <div class="m robin" data-etat="b">
+                    <span class="doc-tete">Facture Metro · reçue par mail</span>
+                    <span class="lignes">
+                      {lignes.map((l, k) => (
+                        <span class:list={['ligne', l.ecart && 'a-ecart']} data-etat={`l${k}`}>
+                          <span>{l.nom}</span>
+                          <span>{l.fact}</span>
+                          <span class="bl">
+                            BL {l.bl} <b class="coche" aria-hidden="true">{l.ecart ? '≠' : '✓'}</b>
+                          </span>
+                        </span>
+                      ))}
+                    </span>
+                  </div>
+                  <div class="m robin avec-boutons" data-etat="c">
+                    12 kg de bœuf facturés, 10 livrés. Je prépare la demande d'avoir ?
+                  </div>
+                  <div class="boutons" data-etat="d">
+                    <span data-cible="oui">Oui, prépare-la</span>
+                    <span>Pas maintenant</span>
+                  </div>
+                  <p class="m patron" data-etat="e">Oui, prépare-la</p>
+                  <div class="m robin" data-etat="f">
+                    <span class="fichier">
+                      <span class="f-ico">PDF</span>
+                      <span class="f-txt">
+                        <b>Demande d'avoir · Metro.pdf</b>
+                        <span>Brouillon, à valider</span>
+                      </span>
+                    </span>
+                  </div>
+                </>
+              )}
+
+              {/* 3 · La question, la réponse avec le graphique */}
+              {i === 2 && (
+                <>
+                  <p class="m patron" data-etat="a">On reste ouvert de 14 h à 18 h ?</p>
+                  <div class="m robin image" data-etat="b">
+                    <span class="graphe" data-etat="g">
+                      <span class="g-titre">Créneau 14 h – 18 h · ventes par jour</span>
+                      <span class="graph">
+                        <span class="seuil" aria-hidden="true">
+                          <span>coût du personnel</span>
+                        </span>
+                        {jours.map((d) => (
+                          <span class:list={['barre', d.au && 'au-dessus']} style={`--h:${d.h}`}>
+                            <i />
+                            <span>{d.j}</span>
+                          </span>
+                        ))}
+                      </span>
+                    </span>
+                    <span class="leg">
+                      En semaine, le créneau ne couvre pas les salaires. Le samedi, si. On ferme l'après-midi
+                      du lundi au vendredi ?
+                    </span>
+                  </div>
+                </>
+              )}
+
+              {/* 4 · Un vocal, le contrat rempli depuis le modèle, envoyé sur accord */}
+              {i === 3 && (
+                <>
+                  <div class="m patron vocal" data-etat="a">
+                    <span class="v-lecture" aria-hidden="true">▶</span>
+                    <span class="v-onde" aria-hidden="true">
+                      {Array.from({ length: 22 }, (_, k) => (
+                        <i style={`--v:${[4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7, 9, 5][k]}`} />
+                      ))}
+                    </span>
+                    <span class="v-duree">0:04</span>
+                    <span class="v-transcrit">« Fais le contrat de Lina pour samedi soir. »</span>
+                  </div>
+                  <div class="m robin" data-etat="b">
+                    <span class="contrat">
+                      <span class="doc-tete c-tete">
+                        Contrat d'extra · ton modèle
+                        <span class="tampon" data-etat="tampon">
+                          Prêt à signer
+                        </span>
+                      </span>
+                      <span class="champs">
+                        {champs.map((c, k) => (
+                          <span class="champ-c" data-etat={`c${k}`}>
+                            <span class="ck">{c.k}</span>
+                            <span class="cv">
+                              <span class="vide" aria-hidden="true" />
+                              <span class="val">{c.v}</span>
+                            </span>
+                          </span>
+                        ))}
+                      </span>
+                    </span>
+                    Je l'envoie à Lina ?
+                  </div>
+                  <div class="boutons" data-etat="d">
+                    <span data-cible="envoyer">Envoie-le</span>
+                    <span>Je relis d'abord</span>
+                  </div>
+                  <p class="m patron" data-etat="e">Envoie-le</p>
+                  <p class="m robin" data-etat="f">
+                    Envoyé à Lina. Je prépare sa fiche de paie pour la fin du mois.
+                  </p>
+                </>
+              )}
+            </div>
+
+            <div class="wa-saisie" aria-hidden="true">
+              <span>Message</span>
+              <span class="micro" />
+            </div>
+          </div>
+
+          {/* Le pouce du patron, qui tape sur le lien ou le bouton */}
+          <span class="doigt" aria-hidden="true" />
 
           <button type="button" class="rejouer" data-rejouer>
             <span aria-hidden="true">↻</span> Rejouer
@@ -233,41 +260,53 @@ const situations = [
 </div>
 
 <script is:inline data-keep>
-  // Les scénarios : une suite d'étapes { t: ms, cible: le bouton où va le curseur, clic, on: [états à
-  // allumer], lu / ok : marquage des lignes de facture }. Chaque scène se joue une fois à l'écran.
+  // Les scénarios : une suite d'étapes { t: ms, on: [états à allumer, 'nom' ou 'nom:classe'],
+  // off: [états à éteindre], tap: la cible où le pouce tape }. Chaque scène se joue une fois.
   (function () {
     var SCENARIOS = {
       0: [
-        { t: 500, cible: 'gmail' },
-        { t: 1300, clic: true, on: ['gmail'] },
-        { t: 1900, cible: 'drive' },
-        { t: 2700, clic: true, on: ['drive'] },
-        { t: 3300, cible: 'whatsapp' },
-        { t: 4100, clic: true, on: ['whatsapp', 'trouve'] },
+        { t: 300, on: ['tete:ecrit'] },
+        { t: 1300, on: ['a'], off: ['tete:ecrit'] },
+        { t: 2400, tap: 'lien' },
+        { t: 2700, on: ['ok'] },
+        { t: 3400, on: ['b'] },
+        { t: 3800, on: ['tete:ecrit'] },
+        { t: 4800, on: ['c'], off: ['tete:ecrit'] },
       ],
       1: [
-        { t: 300, on: ['l0:lu'] },
-        { t: 1100, on: ['l0:ok', 'l1:lu'] },
-        { t: 1900, on: ['l1:ok', 'l2:lu'] },
-        { t: 2800, on: ['l2:ecart'] },
-        { t: 3400, on: ['ditfacture'] },
-        { t: 4300, cible: 'avoir' },
-        { t: 5100, clic: true, on: ['avoir'] },
+        { t: 300, on: ['a'] },
+        { t: 900, on: ['tete:ecrit'] },
+        { t: 1800, on: ['b'], off: ['tete:ecrit'] },
+        { t: 2300, on: ['l0:lu'] },
+        { t: 2900, on: ['l0:ok', 'l1:lu'] },
+        { t: 3500, on: ['l1:ok', 'l2:lu'] },
+        { t: 4200, on: ['l2:ecart'] },
+        { t: 4900, on: ['c', 'd'] },
+        { t: 6100, tap: 'oui' },
+        { t: 6900, on: ['e'] },
+        { t: 7300, on: ['tete:ecrit'] },
+        { t: 8300, on: ['f'], off: ['tete:ecrit'] },
       ],
       2: [
-        { t: 300, on: ['q'] },
-        { t: 1000, on: ['ecrit'] },
-        { t: 2600, on: ['r', 'dash:lu'], off: ['ecrit'] },
+        { t: 300, on: ['a'] },
+        { t: 900, on: ['tete:ecrit'] },
+        { t: 2600, on: ['b'], off: ['tete:ecrit'] },
+        { t: 3300, on: ['g:lu'] },
       ],
       3: [
-        { t: 300, cible: 'f0' },
-        { t: 900, on: ['c0'], cible: 'f1' },
-        { t: 1500, on: ['c1'], cible: 'f2' },
-        { t: 2100, on: ['c2'], cible: 'f3' },
-        { t: 2700, on: ['c3'], cible: 'f4' },
-        { t: 3300, on: ['c4'] },
-        { t: 3900, on: ['tampon'] },
-        { t: 4500, on: ['ditcontrat'] },
+        { t: 300, on: ['a'] },
+        { t: 1100, on: ['tete:ecrit'] },
+        { t: 2100, on: ['b'], off: ['tete:ecrit'] },
+        { t: 2500, on: ['c0'] },
+        { t: 3000, on: ['c1'] },
+        { t: 3500, on: ['c2'] },
+        { t: 4000, on: ['c3'] },
+        { t: 4600, on: ['tampon'] },
+        { t: 5200, on: ['d'] },
+        { t: 6300, tap: 'envoyer' },
+        { t: 7100, on: ['e'] },
+        { t: 7500, on: ['tete:ecrit'] },
+        { t: 8400, on: ['f'], off: ['tete:ecrit'] },
       ],
     };
     var reduit = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -275,12 +314,12 @@ const situations = [
     function scene(root) {
       var id = root.getAttribute('data-situ');
       var etapes = SCENARIOS[id] || [];
-      var curseur = root.querySelector('.curseur');
+      var doigt = root.querySelector('.doigt');
       var minuteries = [];
       var allumes = [];
 
       function el(nom) {
-        return root.querySelector('[data-etat="' + nom + '"]') || root.querySelector('[data-cible="' + nom + '"]');
+        return root.querySelector('[data-etat="' + nom + '"]');
       }
       function allumer(spec) {
         var p = spec.split(':');
@@ -295,25 +334,23 @@ const situations = [
         var e = el(p[0]);
         if (e) e.classList.remove(p[1] || 'on');
       }
-      function viser(nom) {
+      function taper(nom) {
         var c = root.querySelector('[data-cible="' + nom + '"]');
-        if (!c || !curseur) return;
+        if (!c || !doigt) return;
         var r = root.getBoundingClientRect();
         var b = c.getBoundingClientRect();
-        curseur.style.setProperty('--x', b.left - r.left + b.width * 0.55 + 'px');
-        curseur.style.setProperty('--y', b.top - r.top + b.height * 0.6 + 'px');
-        curseur.classList.add('visible');
+        doigt.style.setProperty('--x', b.left - r.left + b.width / 2 + 'px');
+        doigt.style.setProperty('--y', b.top - r.top + b.height / 2 + 'px');
+        c.classList.add('presse');
+        allumes.push([c, 'presse']);
+        doigt.classList.remove('tape');
+        void doigt.offsetWidth;
+        doigt.classList.add('tape');
       }
-      function appliquer(e) {
-        if (e.cible) viser(e.cible);
-        if (e.clic && curseur) {
-          curseur.classList.add('clic');
-          setTimeout(function () {
-            curseur.classList.remove('clic');
-          }, 220);
-        }
+      function appliquer(e, sansDoigt) {
         (e.on || []).forEach(allumer);
         (e.off || []).forEach(eteindre);
+        if (e.tap && !sansDoigt) taper(e.tap);
       }
       function remettre() {
         minuteries.forEach(clearTimeout);
@@ -322,22 +359,22 @@ const situations = [
           a[0].classList.remove(a[1]);
         });
         allumes = [];
-        if (curseur) {
-          curseur.classList.remove('visible');
-          curseur.style.setProperty('--x', '88%');
-          curseur.style.setProperty('--y', '92%');
-        }
+        if (doigt) doigt.classList.remove('tape');
       }
       function jouer() {
         remettre();
         if (reduit) {
           etapes.forEach(function (e) {
-            appliquer(Object.assign({}, e, { clic: false }));
+            appliquer(e, true);
           });
           return;
         }
         etapes.forEach(function (e) {
-          minuteries.push(setTimeout(function () { appliquer(e); }, e.t));
+          minuteries.push(
+            setTimeout(function () {
+              appliquer(e);
+            }, e.t),
+          );
         });
       }
       root.querySelector('[data-rejouer]').addEventListener('click', jouer);
@@ -375,8 +412,7 @@ const situations = [
     position: relative;
     display: grid;
     place-items: center;
-    min-height: 420px;
-    padding: 36px 28px 64px;
+    padding: 32px 24px 64px;
     border-radius: 28px;
     overflow: hidden;
     color: var(--color-ink);
@@ -384,171 +420,266 @@ const situations = [
   @media (min-width: 64rem) {
     .situ {
       border-radius: 36px;
-      padding: 48px 48px 72px;
+      padding: 44px 48px 68px;
     }
   }
-  .ui {
+
+  /* La conversation WhatsApp : en-tête, fil, barre de saisie. */
+  .wa {
     position: relative;
+    display: flex;
+    flex-direction: column;
     width: 100%;
-    max-width: 400px;
-    padding: 18px;
-    border-radius: 20px;
-    background: var(--color-surface);
-    box-shadow: var(--shadow-2);
+    max-width: 380px;
+    border-radius: 22px;
+    overflow: hidden;
+    background: var(--color-whatsapp-wall);
+    box-shadow: var(--shadow-3);
     font: 400 13.5px/1.4 var(--font-sans);
     text-align: left;
   }
-  .ui-titre {
-    margin-bottom: 12px;
-    font: 600 14px/1.2 var(--font-sans);
-  }
-  .ui-mini {
-    font: 400 11px/1.4 var(--font-mono);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--color-soft);
-  }
-  .doc-tete {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    margin-bottom: 12px;
-  }
-  .doc-tete b {
-    font: 600 14px/1.25 var(--font-sans);
-  }
-  .doc-tete span {
-    font-size: 12px;
-    color: var(--color-soft);
-  }
-
-  /* Bouton « Connecter » / « Connecté » (et « Préparer l'avoir »). */
-  .bascule {
-    display: inline-grid;
-    flex-shrink: 0;
-    padding: 6px 11px;
-    border-radius: 999px;
-    background: var(--color-night);
-    color: var(--color-cream);
-    font: 600 12px/1.2 var(--font-sans);
-    transition:
-      background-color 0.3s,
-      color 0.3s;
-  }
-  .bascule > span {
-    grid-area: 1 / 1;
-    transition: opacity 0.25s;
-  }
-  .bascule .b-on {
-    opacity: 0;
-  }
-  .bascule.on,
-  :global(.situ-js) .outil.on .bascule {
-    background: var(--color-orange-tint);
-    color: var(--color-orange-txt);
-  }
-  .bascule.on .b-off,
-  .outil.on .b-off {
-    opacity: 0;
-  }
-  .bascule.on .b-on,
-  .outil.on .b-on {
-    opacity: 1;
-  }
-
-  /* 1 · Les outils */
-  .outils {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .outil {
+  .wa-tete {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 9px 10px;
-    border-radius: 14px;
-    box-shadow: 0 0 0 1px var(--color-line);
+    padding: 10px 14px;
+    background: var(--color-surface);
+    box-shadow: 0 1px 0 var(--color-line);
   }
-  .outil-ico {
+  .wa-tete :global(.wa-av) {
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    object-fit: cover;
+    background: var(--color-cream);
+  }
+  .wa-qui {
+    display: grid;
+    line-height: 1.2;
+  }
+  .wa-qui b {
+    font-size: 14.5px;
+  }
+  .wa-qui > span {
+    grid-area: 2 / 1;
+    font-size: 11.5px;
+    color: var(--color-soft);
+    transition: opacity 0.2s;
+  }
+  .st-ecrit {
+    opacity: 0;
+  }
+  .wa-tete.ecrit .st-ligne {
+    opacity: 0;
+  }
+  .wa-tete.ecrit .st-ecrit {
+    opacity: 1;
+  }
+
+  /* Le fil garde sa hauteur : les nouveaux messages arrivent en bas et poussent les anciens. */
+  .wa-fil {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 6px;
+    height: 372px;
+    padding: 12px 10px;
+    overflow: hidden;
+  }
+  .m {
+    max-width: 86%;
+    padding: 7px 10px;
+    border-radius: 10px;
+    box-shadow: 0 1px 0.5px color-mix(in srgb, var(--color-black) 13%, transparent);
+  }
+  :global(.situ-js) .m,
+  :global(.situ-js) .boutons {
+    display: none;
+  }
+  :global(.situ-js) .m.on,
+  :global(.situ-js) .boutons.on {
+    display: block;
+    animation: arrive 0.35s var(--ease-doux, ease-out) both;
+  }
+  :global(.situ-js) .boutons.on {
+    display: flex;
+  }
+  @keyframes arrive {
+    from {
+      opacity: 0;
+      translate: 0 8px;
+    }
+  }
+  .m.robin {
+    align-self: flex-start;
+    background: var(--color-surface);
+    border-top-left-radius: 0;
+  }
+  .m.patron {
+    align-self: flex-end;
+    background: var(--color-whatsapp);
+    border-top-right-radius: 0;
+  }
+  .m.sys {
+    align-self: center;
+    padding: 4px 10px;
+    border-radius: 8px;
+    background: var(--color-surface);
+    font-size: 11.5px;
+    color: var(--color-soft);
+  }
+
+  /* Boutons de réponse rapide, collés sous le message de Robin. */
+  .m.avec-boutons {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  .boutons {
+    display: flex;
+    gap: 2px;
+    align-self: flex-start;
+    width: 86%;
+    margin-top: -4px;
+  }
+  .boutons > span {
+    flex: 1;
+    padding: 8px 6px;
+    background: var(--color-surface);
+    text-align: center;
+    font-weight: 600;
+    font-size: 12.5px;
+    color: var(--color-orange-txt);
+    box-shadow: 0 1px 0.5px color-mix(in srgb, var(--color-black) 13%, transparent);
+    transition: background-color 0.2s;
+  }
+  .boutons > span:first-child {
+    border-bottom-left-radius: 10px;
+  }
+  .boutons > span:last-child {
+    border-bottom-right-radius: 10px;
+  }
+  .presse {
+    background: var(--color-cream-2) !important;
+  }
+
+  /* 1 · La carte du lien et les trouvailles. */
+  .carte-lien {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+    padding: 9px 10px;
+    border-radius: 8px;
+    background: var(--color-cream-2);
+    transition: background-color 0.2s;
+  }
+  .cl-ico {
     display: grid;
     place-items: center;
     width: 30px;
     height: 30px;
     flex-shrink: 0;
-    border-radius: 9px;
-    background: var(--color-cream-2);
+    border-radius: 8px;
+    background: var(--color-surface);
     font: 700 13px/1 var(--font-sans);
   }
-  .outil-txt {
+  .cl-txt {
     display: flex;
     flex: 1;
     flex-direction: column;
-    min-width: 0;
+    line-height: 1.25;
   }
-  .outil-txt span {
+  .cl-txt span {
     font-size: 11.5px;
     color: var(--color-soft);
   }
-  .outil.on .bascule {
-    background: var(--color-orange-tint);
-    color: var(--color-orange-txt);
-  }
-  .trouve {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 12px;
+  .cl-ok {
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    background: var(--color-night);
+    color: var(--color-cream);
+    font: 700 11px/1 var(--font-sans);
     opacity: 0;
-    translate: 0 6px;
+    scale: 0.5;
     transition:
-      opacity 0.4s,
-      translate 0.4s;
+      opacity 0.25s,
+      scale 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
-  .trouve.on {
+  .cl-ok.on {
     opacity: 1;
-    translate: 0 0;
+    scale: 1;
   }
   .puces {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 5px;
+    margin-top: 8px;
   }
   .puce {
-    padding: 5px 9px;
+    padding: 4px 8px;
     border-radius: 999px;
     background: var(--color-cream-2);
     font-size: 12px;
-    opacity: 0;
-    transition: opacity 0.3s calc(0.15s + var(--k) * 0.15s);
   }
-  .trouve.on .puce {
-    opacity: 1;
+  .m.on .puce {
+    animation: arrive 0.3s calc(0.2s + var(--k) * 0.18s) both;
   }
 
-  /* 2 · La facture */
+  /* 2 · La photo du BL, la facture. */
+  .m.photo {
+    padding: 4px 4px 7px;
+  }
+  .bl-photo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 180px;
+    margin-bottom: 6px;
+    padding: 12px 12px 16px;
+    border-radius: 7px;
+    background: var(--color-surface);
+    rotate: -1.5deg;
+    box-shadow: inset 0 0 0 1px var(--color-line);
+  }
+  .bl-photo b {
+    font: 400 9px/1 var(--font-mono);
+    letter-spacing: 0.08em;
+  }
+  .bl-photo i {
+    height: 5px;
+    border-radius: 3px;
+    background: var(--color-stone);
+  }
+  .bl-photo i:nth-child(odd) {
+    width: 70%;
+  }
+  .m.photo {
+    font-size: 13px;
+  }
+  .doc-tete {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 12.5px;
+  }
   .lignes {
     display: flex;
     flex-direction: column;
+    min-width: 260px;
   }
-  .ligne,
-  .ligne-tete {
+  .ligne {
     display: grid;
-    grid-template-columns: 1.3fr 0.8fr 1fr;
-    gap: 8px;
+    grid-template-columns: 1.25fr 0.7fr 1fr;
+    gap: 6px;
     align-items: center;
-    padding: 9px 8px;
+    padding: 6px 6px;
     border-top: 1px solid var(--color-line);
-    border-radius: 8px;
+    border-radius: 6px;
+    font-size: 12.5px;
     transition: background-color 0.3s;
-  }
-  .ligne-tete {
-    border-top: 0;
-    padding-top: 0;
-    font: 400 10.5px/1.3 var(--font-mono);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--color-soft);
   }
   .ligne.lu {
     background: var(--color-cream-2);
@@ -557,15 +688,16 @@ const situations = [
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 6px;
+    gap: 4px;
+    color: var(--color-soft);
   }
   .coche {
     display: grid;
     place-items: center;
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border-radius: 999px;
-    font: 700 11px/1 var(--font-sans);
+    font: 700 10px/1 var(--font-sans);
     opacity: 0;
     scale: 0.5;
     transition:
@@ -592,66 +724,83 @@ const situations = [
     font-weight: 700;
     color: var(--color-orange-txt);
   }
-  .robin-dit {
+  .fichier {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: var(--color-cream-2);
+  }
+  .f-ico {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 38px;
+    flex-shrink: 0;
+    border-radius: 5px;
+    background: var(--color-night);
+    color: var(--color-cream);
+    font: 400 9px/1 var(--font-mono);
+  }
+  .f-txt {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-    margin-top: 12px;
-    padding: 12px 14px;
-    border-radius: 16px;
-    border-bottom-left-radius: 6px;
-    background: var(--color-cream-2);
-    opacity: 0;
-    translate: 0 8px;
-    transition:
-      opacity 0.4s,
-      translate 0.4s;
+    line-height: 1.25;
   }
-  .robin-dit.on {
-    opacity: 1;
-    translate: 0 0;
-  }
-  .bascule.large {
-    padding: 8px 13px;
+  .f-txt span {
+    font-size: 11.5px;
+    color: var(--color-soft);
   }
 
-  /* 3 · Le tableau de bord en fond, la conversation devant. */
-  .dash-scene {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    max-width: 460px;
+  /* 3 · Le graphique envoyé en image. */
+  .m.image {
+    padding: 4px 4px 7px;
   }
-  .dash {
-    max-width: none;
+  .leg {
+    display: block;
+    padding: 0 6px;
+  }
+  .graphe {
+    display: block;
+    margin-bottom: 7px;
+    padding: 10px 12px 8px;
+    border-radius: 7px;
+    background: var(--color-cream);
+  }
+  .g-titre {
+    display: block;
+    margin-bottom: 4px;
+    font: 400 10px/1.3 var(--font-mono);
+    letter-spacing: 0.04em;
+    color: var(--color-soft);
   }
   .graph {
     position: relative;
     display: grid;
     grid-template-columns: repeat(6, 1fr);
     align-items: end;
-    gap: 10px;
-    height: 150px;
-    padding-top: 10px;
+    gap: 8px;
+    width: 250px;
+    max-width: 100%;
+    height: 118px;
+    padding-top: 6px;
   }
   .seuil {
     position: absolute;
     left: 0;
     right: 0;
-    bottom: calc(55 * 1.32px + 18px);
+    bottom: calc(55 * 1px + 16px);
     border-top: 1.5px dashed var(--color-ink);
     opacity: 0.55;
   }
   .seuil span {
     position: absolute;
     left: 0;
-    bottom: 4px;
-    padding: 0 4px 0 0;
-    background: var(--color-surface);
-    font: 400 10px/1 var(--font-mono);
-    letter-spacing: 0.04em;
+    bottom: 3px;
+    padding-right: 4px;
+    background: var(--color-cream);
+    font: 400 9px/1 var(--font-mono);
     color: var(--color-ink);
   }
   .barre {
@@ -659,98 +808,74 @@ const situations = [
     flex-direction: column;
     align-items: center;
     justify-content: flex-end;
-    gap: 6px;
+    gap: 4px;
     height: 100%;
   }
   .barre i {
     display: block;
     width: 100%;
-    height: calc(var(--h) * 1.32px);
-    border-radius: 6px 6px 2px 2px;
+    height: calc(var(--h) * 1px);
+    border-radius: 4px 4px 1px 1px;
     background: color-mix(in srgb, var(--color-ink) 18%, transparent);
     transition: background-color 0.5s;
   }
   .barre span {
-    height: 12px;
-    font: 400 11px/1 var(--font-sans);
+    height: 10px;
+    font: 400 10px/1 var(--font-sans);
     color: var(--color-soft);
   }
-  .dash.lu .barre i {
+  .graphe.lu .barre i {
     background: var(--color-stone);
   }
-  .dash.lu .barre.au-dessus i {
+  .graphe.lu .barre.au-dessus i {
     background: var(--color-orange);
   }
-  /* La conversation passe sous le tableau de bord, en le chevauchant juste un peu. */
-  .chat {
-    position: relative;
-    z-index: 2;
-    margin: -16px -10px 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 8px;
-    width: min(300px, 80%);
-  }
-  .chat p {
-    padding: 10px 13px;
-    border-radius: 16px;
-    font: 400 13px/1.4 var(--font-sans);
-    box-shadow: var(--shadow-2);
-    opacity: 0;
-    translate: 0 8px;
-    transition:
-      opacity 0.35s,
-      translate 0.35s;
-  }
-  .chat p.on {
-    opacity: 1;
-    translate: 0 0;
-  }
-  .c-patron {
-    background: var(--color-night);
-    color: var(--color-cream);
-    border-bottom-right-radius: 6px;
-  }
-  .c-robin {
-    align-self: flex-start;
-    background: var(--color-surface);
-    border-bottom-left-radius: 6px;
-  }
-  .c-ecrit {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    display: flex;
-    gap: 4px;
-    background: var(--color-surface);
-  }
-  .c-ecrit i {
-    width: 6px;
-    height: 6px;
-    border-radius: 999px;
-    background: var(--color-soft);
-    animation: ecrit 1s infinite;
-  }
-  .c-ecrit i:nth-child(2) {
-    animation-delay: 0.15s;
-  }
-  .c-ecrit i:nth-child(3) {
-    animation-delay: 0.3s;
-  }
-  @keyframes ecrit {
-    0%,
-    100% {
-      opacity: 0.3;
-    }
-    50% {
-      opacity: 1;
-    }
-  }
 
-  /* 4 · Le contrat */
+  /* 4 · Le vocal et le contrat. */
+  .m.vocal {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 8px;
+    width: 250px;
+  }
+  :global(.situ-js) .m.vocal.on {
+    display: grid;
+  }
+  .v-lecture {
+    font-size: 13px;
+    color: var(--color-soft);
+  }
+  .v-onde {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    height: 18px;
+  }
+  .v-onde i {
+    width: 3px;
+    height: calc(var(--v) * 1.2px);
+    border-radius: 2px;
+    background: color-mix(in srgb, var(--color-ink) 45%, transparent);
+  }
+  .v-duree {
+    font-size: 11px;
+    color: var(--color-soft);
+  }
+  .v-transcrit {
+    grid-column: 1 / -1;
+    font-size: 12px;
+    font-style: italic;
+    color: var(--color-soft);
+  }
   .contrat {
-    padding-bottom: 22px;
+    position: relative;
+    display: block;
+    min-width: 250px;
+    margin: -3px -6px 8px;
+    padding: 10px 12px 6px;
+    border-radius: 7px;
+    background: var(--color-cream);
   }
   .champs {
     display: flex;
@@ -758,109 +883,138 @@ const situations = [
   }
   .champ-c {
     display: grid;
-    grid-template-columns: 7.2rem 1fr;
-    gap: 10px;
+    grid-template-columns: 5.6rem 1fr;
+    gap: 8px;
     align-items: center;
-    padding: 9px 0;
+    padding: 6px 0;
     border-top: 1px solid var(--color-line);
   }
-  .champ-c dt {
-    font: 400 11px/1.3 var(--font-mono);
+  .ck {
+    font: 400 9.5px/1.3 var(--font-mono);
     letter-spacing: 0.04em;
     text-transform: uppercase;
     color: var(--color-soft);
   }
-  .champ-c dd {
+  .cv {
     display: grid;
     font-weight: 600;
+    font-size: 12.5px;
   }
-  .champ-c dd > span {
+  .cv > span {
     grid-area: 1 / 1;
   }
   .vide {
     align-self: center;
-    height: 9px;
+    height: 8px;
     width: 70%;
     border-radius: 4px;
-    background: var(--color-cream-2);
+    background: var(--color-stone);
     transition: opacity 0.2s;
   }
-  .val {
+  :global(.situ-js) .val {
     clip-path: inset(0 100% 0 0);
-    transition: clip-path 0.5s steps(14);
+    transition: clip-path 0.45s steps(14);
   }
-  .champ-c.on .vide {
+  .vide {
     opacity: 0;
   }
-  .champ-c.on .val {
+  :global(.situ-js) .vide {
+    opacity: 1;
+  }
+  :global(.situ-js) .champ-c.on .vide {
+    opacity: 0;
+  }
+  :global(.situ-js) .champ-c.on .val {
     clip-path: inset(0 0 0 0);
   }
+  .c-tete {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
   .tampon {
-    position: absolute;
-    right: 16px;
-    top: 14px;
-    padding: 6px 10px;
+    flex-shrink: 0;
+    padding: 4px 7px;
     border: 2px solid var(--color-orange-txt);
-    border-radius: 8px;
-    font: 400 11px/1 var(--font-mono);
+    border-radius: 6px;
+    font: 400 9.5px/1 var(--font-mono);
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--color-orange-txt);
     rotate: -8deg;
+  }
+  :global(.situ-js) .tampon {
     opacity: 0;
     scale: 1.6;
     transition:
       opacity 0.2s,
       scale 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
-  .tampon.on {
+  :global(.situ-js) .tampon.on {
     opacity: 1;
     scale: 1;
   }
-  .robin-dit.seul {
-    display: block;
+
+  .wa-saisie {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 10px 10px;
+    color: var(--color-soft);
+  }
+  .wa-saisie > span:first-child {
+    flex: 1;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: var(--color-surface);
+  }
+  .micro {
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    background: var(--color-whatsapp-brand);
   }
 
-  /* Le curseur de Robin : une flèche et son portrait, qui glissent d'un bouton à l'autre. */
-  .curseur {
-    --x: 88%;
-    --y: 92%;
+  /* Le pouce du patron : un rond qui se pose et s'efface sur ce qu'il tape. */
+  .doigt {
+    --x: 50%;
+    --y: 50%;
     position: absolute;
     left: 0;
     top: 0;
     z-index: 3;
-    display: flex;
-    align-items: flex-start;
+    width: 34px;
+    height: 34px;
+    margin: -17px 0 0 -17px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-night) 35%, transparent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-surface) 80%, transparent);
     translate: var(--x) var(--y);
     opacity: 0;
     pointer-events: none;
-    transition:
-      translate 0.8s cubic-bezier(0.65, 0, 0.35, 1),
-      opacity 0.3s;
   }
-  .curseur.visible {
-    opacity: 1;
+  .doigt.tape {
+    animation: tape 0.9s ease-out both;
   }
-  .fleche {
-    width: 22px;
-    height: 22px;
-    fill: var(--color-night);
-    stroke: var(--color-cream);
-    stroke-width: 1.5;
-    transition: scale 0.15s;
-  }
-  .curseur.clic .fleche {
-    scale: 0.8;
-  }
-  .curseur :global(.curseur-av) {
-    width: 30px;
-    height: 30px;
-    margin: 14px 0 0 -4px;
-    border-radius: 999px;
-    object-fit: cover;
-    box-shadow:
-      0 0 0 2px var(--color-surface),
-      var(--shadow-2);
+  @keyframes tape {
+    0% {
+      opacity: 0;
+      scale: 1.5;
+    }
+    30% {
+      opacity: 1;
+      scale: 0.85;
+    }
+    55% {
+      opacity: 1;
+      scale: 1;
+    }
+    100% {
+      opacity: 0;
+      scale: 1.3;
+    }
   }
 
   /* Rejouer */
@@ -882,36 +1036,26 @@ const situations = [
     outline: 2px solid var(--color-night);
     outline-offset: 2px;
   }
-
-  /* Sans JS : l'état final de chaque scène, directement. */
-  :global(html:not(.situ-js)) .trouve,
-  :global(html:not(.situ-js)) .robin-dit,
-  :global(html:not(.situ-js)) .chat p:not(.c-ecrit),
-  :global(html:not(.situ-js)) .tampon {
-    opacity: 1;
-    translate: 0 0;
-    scale: 1;
-  }
-  :global(html:not(.situ-js)) .val {
-    clip-path: none;
-  }
-  :global(html:not(.situ-js)) .vide,
   :global(html:not(.situ-js)) .rejouer {
     display: none;
   }
+  :global(html:not(.situ-js)) .cl-ok {
+    opacity: 1;
+    scale: 1;
+  }
 
   @media (prefers-reduced-motion: reduce) {
-    .curseur,
-    .trouve,
-    .robin-dit,
-    .chat p,
-    .val,
-    .tampon,
-    .coche {
-      transition: none;
-    }
-    .c-ecrit i {
+    :global(.situ-js) .m.on,
+    :global(.situ-js) .boutons.on,
+    .m.on .puce {
       animation: none;
+    }
+    .cl-ok,
+    .coche,
+    .barre i,
+    :global(.situ-js) .val,
+    :global(.situ-js) .tampon {
+      transition: none;
     }
   }
 </style>
