@@ -138,18 +138,30 @@ const lundi = [
   <div class="nuit bg-night text-cream">
     <!-- 1 · Hero : Robin flotte au-dessus du titre (dots), une grande phrase centrée (muse.ai) -->
     <section id="robin" class="flex flex-col items-center px-4 pt-36 pb-14 text-center sm:px-6 lg:pt-44 lg:pb-20">
-      <!-- Robin fait coucou dans son cercle (le portrait animé de l'accueil), et flotte. -->
-      <div class="flotte mb-8 size-[132px] overflow-hidden rounded-full bg-cream-2 lg:size-[156px]">
-        <video
-          class="size-full object-cover"
-          src="/maquettes/anim/robin.mp4"
-          poster={portrait.src}
-          autoplay
-          muted
-          loop
-          playsinline
-          aria-label="Robin, un rouge-gorge en voxel, fait coucou."
-        ></video>
+      <!-- Robin arrive en volant dans son cercle, fait coucou, note, vérifie un ticket, lève le pouce,
+           puis repart (boucle de 15 s, avec un bouton pause : WCAG 2.2.2). -->
+      <div class="mb-8 flex flex-col items-center gap-2" data-vol>
+        <div class="flotte size-[132px] overflow-hidden rounded-full bg-cream-2 lg:size-[156px]">
+          <video
+            class="size-full object-cover"
+            src="/maquettes/anim/robin-vol.mp4"
+            poster={portrait.src}
+            muted
+            loop
+            playsinline
+            preload="auto"
+            aria-label="Robin, un rouge-gorge en voxel, arrive en volant, fait coucou, prend des notes, vérifie un ticket, lève le pouce et repart."
+          ></video>
+        </div>
+        <button type="button" class="vol-pause" data-vol-pause aria-pressed="false">
+          <span class="sr-only" data-vol-label>Mettre l'animation de Robin en pause</span>
+          <svg viewBox="0 0 24 24" class="ico-pause size-3.5" fill="currentColor" aria-hidden="true">
+            <path d="M7 5h4v14H7zm6 0h4v14h-4z"></path>
+          </svg>
+          <svg viewBox="0 0 24 24" class="ico-lecture size-3.5" fill="currentColor" aria-hidden="true">
+            <path d="M8 5v14l11-7z"></path>
+          </svg>
+        </button>
       </div>
       <h1
         class="font-display text-[40px] leading-[1.04] font-medium tracking-[-0.02em] sm:text-[54px] lg:text-[64px]"
@@ -408,6 +420,26 @@ const lundi = [
   </div>
 
   <script is:inline data-keep>
+    // Robin en vol dans le hero : la boucle démarre seule (sauf mouvement réduit : le portrait reste
+    // fixe), le petit bouton la met en pause.
+    (function () {
+      var root = document.querySelector('[data-vol]');
+      if (!root) return;
+      var video = root.querySelector('video');
+      var bouton = root.querySelector('[data-vol-pause]');
+      var label = root.querySelector('[data-vol-label]');
+      function regler(pause) {
+        root.classList.toggle('pause', pause);
+        bouton.setAttribute('aria-pressed', pause ? 'true' : 'false');
+        label.textContent = pause ? "Relancer l'animation de Robin" : "Mettre l'animation de Robin en pause";
+        if (pause) video.pause();
+        else video.play().catch(function () {});
+      }
+      bouton.addEventListener('click', function () {
+        regler(!root.classList.contains('pause'));
+      });
+      regler(matchMedia('(prefers-reduced-motion: reduce)').matches);
+    })();
     // La scène du soir : la vidéo démarre seule (sauf mouvement réduit), le bouton met en pause la
     // vidéo et l'arrivée des messages (WCAG 2.2.2 : tout ce qui tourne en boucle se met en pause).
     (function () {
@@ -457,6 +489,32 @@ const lundi = [
 
 <style>
   /* Robin flotte doucement, comme le dot au-dessus du titre. */
+  /* Le bouton pause de Robin en vol : discret, sous le cercle. */
+  .vol-pause {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    color: color-mix(in srgb, var(--color-cream) 75%, transparent);
+    box-shadow: 0 0 0 1px var(--color-line-night);
+    cursor: pointer;
+  }
+  .vol-pause:hover,
+  .vol-pause:focus-visible {
+    color: var(--color-cream);
+  }
+  .vol-pause:focus-visible {
+    outline: 2px solid var(--color-cream);
+    outline-offset: 2px;
+  }
+  .vol-pause .ico-lecture,
+  [data-vol].pause .vol-pause .ico-pause {
+    display: none;
+  }
+  [data-vol].pause .vol-pause .ico-lecture {
+    display: block;
+  }
   .flotte {
     filter: drop-shadow(0 18px 24px color-mix(in srgb, var(--color-black) 45%, transparent));
     animation: flotte 5s ease-in-out infinite;
