@@ -9,6 +9,7 @@
  * maquette précédente. Visuel uniquement : textes en dur, le formulaire n'envoie rien.
  */
 import { Image } from 'astro:assets';
+import immeubleAttente from '../../assets/footer/immeuble.jpg';
 import Base from '../../layouts/Base.astro';
 import Iphone from '../../components/ui/Iphone.astro';
 import RobinSituations from '../../components/maquettes/RobinSituations.astro';
@@ -96,6 +97,21 @@ const champs = [
   { id: 'whatsapp', label: 'Numéro WhatsApp', type: 'tel', placeholder: '06 12 34 56 78', auto: 'tel' },
   { id: 'email', label: 'Email', type: 'email', placeholder: 'karim@lepetitcomptoir.fr', auto: 'email' },
 ];
+
+/** Le pied de page propre à Robin : le marché de Rungis et ce que Robin suit, pavillon par pavillon.
+ * Pas encore branché (`pied={pied}` sur <Base>) : l'image de Rungis reste à générer. */
+const pied = {
+  image: immeubleAttente,
+  alt: "Le marché de Rungis en voxels, au petit matin : Robin accompagne le patron entre les pavillons.",
+  titre: 'Robin au marché',
+  liste: [
+    { repere: 'MARÉE', texte: 'Il compare les prix · Commandes', href: '#fait' },
+    { repere: 'FRUITS', texte: 'Il ajuste les quantités · Stock', href: '#fait' },
+    { repere: 'VIANDE', texte: 'Il vérifie les pesées · Factures', href: '#fait' },
+    { repere: 'CRÈMERIE', texte: 'Il suit les avoirs · Fournisseurs', href: '#fait' },
+    { repere: 'BUREAU', texte: 'Il prépare les contrats · Équipe', href: '#semaine' },
+  ],
+};
 
 /** La scène du soir : les messages de Robin qui arrivent l'un après l'autre, en bulles, sur la vidéo. */
 const soiree = [
