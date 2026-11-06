@@ -36,9 +36,11 @@ interface Props {
   locale: Locale;
   /** Another backdrop instead of the map (mockups): the map's pings, birds and task cards are dropped. */
   fond?: ImageMetadata;
+  /** Mockup: the camera closer on the map, so the agents (Lark, Peep, Sparrow) read at a glance. */
+  proche?: boolean;
 }
 
-const { locale, fond } = Astro.props;
+const { locale, fond, proche = false } = Astro.props;
 const data = await section('hero', locale);
 const t = useTranslations(locale);
 const { status, events } = data.tasks;
@@ -90,7 +92,10 @@ const tick =
 ---
 
 <section
-  class="hero relative h-dvh min-h-[640px] overflow-hidden bg-night [container-type:size]"
+  class:list={[
+    'hero relative h-dvh min-h-[640px] overflow-hidden bg-night [container-type:size]',
+    proche && 'hero-proche',
+  ]}
   aria-labelledby="hero-titre"
   data-rv-groupe
 >
@@ -444,6 +449,16 @@ const tick =
   @media (min-width: 64rem) {
     .hero {
       --fx: 1;
+    }
+    /* Mockup « caméra plus proche » : the frame 1.57× bigger, framed on the agents' area (x 360–1280,
+       y 90+ of the 1440 × 804 frame) so Lark, Peep and Sparrow sit right of the glass card. */
+    .hero.hero-proche {
+      --sw: calc(max(100cqw, calc(100cqh * 1440 / 804)) * 1.57);
+      --fx: 0.694;
+    }
+    .hero-proche .h-decor,
+    .hero-proche .h-piles {
+      top: calc(var(--sh) * -0.09);
     }
     .h-piles {
       position: absolute;
