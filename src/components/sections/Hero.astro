@@ -36,17 +36,17 @@ import oiseauxPos from './hero-oiseaux.json';
 interface Props {
   locale: Locale;
   /**
-   * Mockup: the wider map (France and its neighbours). It is the France map zoomed out (×0.8, offset
-   * 144, 80.4 in the 1440 × 804 frame), so every anchor below goes through `cadre`.
+   * Mockup: the wider map (all of Iberia, England, the Alps). It is the France map zoomed out (×0.44,
+   * offset 491.7, 198.2 in the 1440 × 804 frame), so every anchor below goes through `cadre`.
    */
   europe?: boolean;
 }
 
 const { locale, europe = false } = Astro.props;
 const carte = europe ? carteEurope : carteFrance;
-const K = europe ? 0.8 : 1;
+const K = europe ? 0.44 : 1;
 const cadre = (x: number, y: number): [number, number] =>
-  europe ? [144 + x * K, 80.4 + y * K] : [x, y];
+  europe ? [491.7 + x * K, 198.2 + y * K] : [x, y];
 const data = await section('hero', locale);
 const t = useTranslations(locale);
 const { status, events } = data.tasks;
