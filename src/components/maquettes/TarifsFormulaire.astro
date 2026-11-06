@@ -13,10 +13,11 @@ import pecker from '../../assets/portraits/pecker.jpg';
 import sparrow from '../../assets/portraits/sparrow.jpg';
 
 /** Chaque agent face à nous, dans son cercle ; la vidéo du coucou se joue une fois quand on le coche. */
-const a = (nom: string, role: string, img: ImageMetadata) => ({
+const a = (nom: string, role: string, img: ImageMetadata, miroir = false) => ({
   nom,
   role,
   img,
+  miroir,
   video: `/maquettes/anim/${nom.toLowerCase()}.mp4`,
 });
 
@@ -29,9 +30,9 @@ const offres = [
       'Peep répond à vos équipes sur WhatsApp, Owl en cuisine sur tablette, Jay tient vos documents à jour, Lark pilote le réseau.',
     agents: [
       a('Peep', 'Vos équipes', peep),
-      a('Owl', 'La cuisine', owl),
+      a('Owl', 'La cuisine', owl, true),
       a('Jay', 'Vos documents', jay),
-      a('Lark', 'Le pilotage', lark),
+      a('Lark', 'Le pilotage', lark, true),
     ],
     coche: true,
   },
@@ -40,7 +41,7 @@ const offres = [
     nom: 'Finch',
     tag: 'Qualité et audits',
     texte: "Prépare les grilles d'audit, suit chaque plan d'action jusqu'à la preuve.",
-    agents: [a('Finch', 'Qualité', finch)],
+    agents: [a('Finch', 'Qualité', finch, true)],
   },
   {
     id: 'pecker',
@@ -54,7 +55,7 @@ const offres = [
     nom: 'Sparrow',
     tag: 'Développement et ouvertures',
     texte: 'Pré-qualifie vos candidats à la franchise et suit chaque ouverture jusqu\'au jour J.',
-    agents: [a('Sparrow', 'Développement', sparrow)],
+    agents: [a('Sparrow', 'Développement', sparrow, true)],
   },
 ];
 
@@ -95,7 +96,7 @@ const etapes = [
                   <span class="troupe" aria-hidden="true">
                     {o.agents.map((ag, k) => (
                       <span class="membre" style={`--k:${k}`}>
-                        <span class="rond">
+                        <span class:list={['rond', ag.miroir && 'miroir']}>
                           <video src={ag.video} poster={ag.img.src} muted playsinline preload="none" />
                         </span>
                         {o.id === 'socle' && (
@@ -306,6 +307,10 @@ const etapes = [
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+  /* Un agent sur deux est vu en miroir : il salue de l'autre aile, les coucous ne se ressemblent pas tous. */
+  .rond.miroir video {
+    scale: -1 1;
   }
   .agent:has(input:checked) .rond {
     translate: 0 -4px;
