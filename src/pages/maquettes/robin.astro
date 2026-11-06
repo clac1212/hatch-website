@@ -9,7 +9,7 @@
  * maquette précédente. Visuel uniquement : textes en dur, le formulaire n'envoie rien.
  */
 import { Image } from 'astro:assets';
-import immeubleAttente from '../../assets/footer/immeuble.jpg';
+import rungis from '../../assets/footer/rungis.jpg';
 import Base from '../../layouts/Base.astro';
 import Iphone from '../../components/ui/Iphone.astro';
 import RobinSituations from '../../components/maquettes/RobinSituations.astro';
@@ -98,11 +98,10 @@ const champs = [
   { id: 'email', label: 'Email', type: 'email', placeholder: 'karim@lepetitcomptoir.fr', auto: 'email' },
 ];
 
-/** Le pied de page propre à Robin : le marché de Rungis et ce que Robin suit, pavillon par pavillon.
- * Pas encore branché (`pied={pied}` sur <Base>) : l'image de Rungis reste à générer. */
+/** Le pied de page propre à Robin : le marché de Rungis et ce que Robin suit, pavillon par pavillon. */
 const pied = {
-  image: immeubleAttente,
-  alt: "Le marché de Rungis en voxels, au petit matin : Robin accompagne le patron entre les pavillons.",
+  image: rungis,
+  alt: "Un pavillon du marché de Rungis en voxels, vu en coupe au petit matin : marée, fruits, viande, crèmerie et un bureau à l'étage. Robin, perché sur les cagettes du chariot, fait les courses avec le patron.",
   titre: 'Robin au marché',
   liste: [
     { repere: 'MARÉE', texte: 'Il compare les prix · Commandes', href: '#fait' },
@@ -148,6 +147,7 @@ const lundi = [
   paths={routes.home}
   nav="accueil"
   navTone="night"
+  pied={pied}
   title="Maquette Robin | Hatch OS"
   description="Maquette de la page Robin, l'associé IA des restaurateurs indépendants sur WhatsApp, avec l'inscription à la liste d'attente de la bêta."
 >
