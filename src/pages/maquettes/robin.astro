@@ -25,86 +25,102 @@ import poseDim from '../../assets/robin/semaine/dim.jpg';
 /** Robin, une tenue par jour de la frise (même ordre que `semaine`). */
 const poses = [poseLun, poseMar, poseMer, poseJeu, poseVen, poseDim];
 
-/** Ce que fait Robin : une rangée par pilier, une conversation d'exemple dans une carte teintée. */
+/**
+ * Ce que fait Robin : une rangée par pilier, une conversation d'exemple dans une carte teintée.
+ * Les exemples reprennent les usages réels décrits par Bilal (Discovery Robin, entretien du 05/11) :
+ * le contrôle sanitaire et ses pièces, le rapprochement commande / bon de livraison / facture, les
+ * contrats faits à partir des modèles du patron.
+ */
 const piliers = [
   {
     ancre: 'connait',
     titre: 'Il connaît votre restaurant',
     texte:
-      "Votre carte, votre équipe, vos fournisseurs, vos décisions, vos documents. Il retient tout et s'en sert pour vous répondre.",
+      "Votre carte, votre équipe, vos fournisseurs, vos documents. Il retient tout, retrouve la bonne pièce et repère celle qui manque.",
     teinte: 'bg-peach',
     fil: [
-      { qui: 'patron', txt: 'Quel fournisseur on avait pris pour le beurre en septembre ?' },
-      { qui: 'robin', txt: "Metro. Tu avais changé après la hausse chez ton grossiste. Je te retrouve la facture ?" },
+      { qui: 'patron', txt: "Le contrôle d'hygiène, c'est jeudi. On a tout ?" },
+      {
+        qui: 'robin',
+        txt: "Presque : plan de maîtrise sanitaire, relevés de température et attestations de formation sont prêts. Il manque le certificat de dératisation, je le demande au prestataire ?",
+      },
     ],
   },
   {
     ancre: 'revient',
     titre: 'Il revient vers vous',
     texte:
-      "Le point du lundi, le bilan du mois, une alerte quand une facture dérape. C'est lui qui écrit en premier.",
+      "Il rapproche vos commandes, vos bons de livraison et vos factures, et vous écrit dès qu'une ligne ne colle pas. C'est lui qui écrit en premier.",
     teinte: 'bg-sand',
     fil: [
-      { qui: 'robin', txt: 'Le beurre a pris 14 % chez Metro, je te montre ?' },
-      { qui: 'patron', txt: 'Oui, et trouve-moi une alternative.' },
+      {
+        qui: 'robin',
+        txt: 'La facture Metro compte 12 kg de bœuf, le bon de livraison de mardi 10. Je prépare la demande d’avoir ?',
+      },
+      { qui: 'patron', txt: 'Oui, montre-la-moi avant de l’envoyer.' },
     ],
   },
   {
     ancre: 'prepare',
     titre: 'Il prépare le travail',
     texte:
-      'Des fiches prêtes à afficher, des checklists, des mails, le dossier pour la banque. Vous relisez, il a fait le reste.',
+      'Contrats, mails, dossiers, process pour vos managers : il part de vos modèles et de vos données. Vous relisez, il a fait le reste.',
     teinte: 'bg-orange-tint',
     fil: [
-      { qui: 'patron', txt: 'Fais-moi la fiche allergènes du plat du jour.' },
-      { qui: 'robin', txt: "C'est fait, elle est prête à afficher.", doc: 'Allergènes · Plat du jour.pdf' },
+      { qui: 'patron', txt: 'Fais le contrat de Lina pour l’extra de samedi.' },
+      {
+        qui: 'robin',
+        txt: "C'est fait, à partir de ton modèle. Relis-le, je l'envoie à Lina quand tu valides.",
+        doc: "Contrat d'extra · Lina.pdf",
+        meta: 'Ton modèle · prêt à signer',
+      },
     ],
   },
 ];
 
-/** Une semaine avec Robin : la frise, un moment par jour. */
+/** Une semaine avec Robin : la frise, un moment par jour (mêmes sources que les piliers). */
 const semaine = [
   {
     jour: 'Lun',
     heure: '8 h 30',
     titre: 'Le point de la semaine',
-    texte: "Votre chiffre, ce qui a bougé dans vos factures, ce qu'il ne faut pas oublier. Vous répondez comme à un associé.",
-    bulle: 'Bonjour Karim, voici le point de la semaine. Je te prépare le planning ?',
+    texte: 'Ventes, achats, coût du personnel : votre semaine en un coup d’œil, établissement par établissement.',
+    bulle: 'Bonjour Karim, ta semaine est prête : ventes, achats et coût du personnel. Le samedi midi a été ton meilleur service.',
   },
   {
     jour: 'Mar',
     heure: '10 h',
-    titre: 'Les commandes',
-    texte: 'Il prépare la commande fournisseurs à partir de la semaine passée et de ce qui reste en réserve.',
-    bulle: 'Ta commande Metro est prête, avec moins de beurre que la semaine dernière. Je te la montre ?',
+    titre: 'Les livraisons',
+    texte: 'Il rapproche ce que vous avez commandé, ce qui est arrivé et ce qui est facturé. Il vous montre les écarts, preuves à l’appui.',
+    bulle: 'J’ai rapproché commandes, bons de livraison et factures. Une ligne cloche chez Metro, je te montre ?',
   },
   {
     jour: 'Mer',
     heure: '15 h',
     titre: "L'équipe",
-    texte: 'Contrats, plannings, absences : il garde les dates en tête et vous prévient avant.',
-    bulle: 'Le contrat de Lina se termine vendredi. Je prépare de quoi le prolonger ?',
+    texte: "Il répond à vos salariés sans rien promettre à votre place, et vous fait un récap de ce qui demande votre avis.",
+    bulle: 'Thomas voudrait poser samedi. Je lui ai dit que tu revenais vers lui, sans rien promettre.',
   },
   {
     jour: 'Jeu',
     heure: '11 h',
-    titre: 'Le plat du jour',
-    texte: 'Fiche allergènes, fiche technique, affichage : vous donnez la recette, il fait les documents.',
-    bulle: 'La fiche allergènes du plat du jour est prête à afficher.',
+    titre: 'Le coût des plats',
+    texte: "Quand un prix d'achat bouge, il recalcule le coût de vos plats et vous prévient si une marge passe sous votre seuil.",
+    bulle: 'Avec la hausse du bœuf, ton tartare passe sous ta marge cible. Je te propose deux pistes ?',
   },
   {
     jour: 'Ven',
     heure: '18 h',
     titre: 'Avant le service',
     texte: "Il vous rappelle ce qui compte pour le week-end, sans que vous ayez à le lui demander.",
-    bulle: 'Samedi soir est presque complet. Je préviens l’équipe ?',
+    bulle: 'Samedi soir est presque complet. Lina est confirmée en extra, son contrat est signé.',
   },
   {
     jour: 'Dim',
     heure: '21 h',
-    titre: 'Le bilan',
-    texte: 'La semaine résumée en quelques lignes, à lire tranquillement le lundi matin.',
-    bulle: 'Belle semaine. Je t’ai préparé le récap pour demain matin.',
+    titre: 'Une question pour lundi',
+    texte: 'Il part de vos décisions, pas de tableaux : faut-il rester ouvert l’après-midi, ajouter un service, revoir une carte ?',
+    bulle: 'Tu me demandais si on reste ouvert de 14 h à 18 h : en semaine, le créneau ne couvre pas les salaires. On en parle demain ?',
   },
 ];
 
@@ -116,7 +132,7 @@ const confiance = [
   },
   {
     titre: 'Il propose, vous décidez',
-    texte: "Robin prépare, vous validez. Rien ne part chez un fournisseur ou un salarié sans votre accord.",
+    texte: "Robin prépare, vous validez. Il ne promet rien à votre place, et rien ne part chez un fournisseur ou un salarié sans votre accord.",
   },
   {
     titre: 'Dans une appli que vous connaissez',
@@ -148,9 +164,17 @@ const soiree = [
 
 /** Le fil du lundi, affiché dans les deux canaux (WhatsApp aujourd'hui, l'application demain). */
 const lundi = [
-  { qui: 'robin', txt: 'Bonjour Karim, voici le point de la semaine. Le beurre a pris 14 % chez Metro, et le contrat de Lina se termine vendredi. Je te prépare le planning ?' },
-  { qui: 'patron', txt: 'Oui. Et fais-moi la fiche allergènes du plat du jour' },
-  { qui: 'robin', txt: "C'est fait. Le planning arrive dans 5 minutes.", doc: 'Allergènes · Plat du jour.pdf' },
+  {
+    qui: 'robin',
+    txt: 'Bonjour Karim, voici le point de la semaine. J’ai rapproché les livraisons et les factures : il manque 2 kg de bœuf chez Metro, la demande d’avoir est prête.',
+  },
+  { qui: 'patron', txt: 'Envoie-la. Et fais le contrat de Lina pour samedi' },
+  {
+    qui: 'robin',
+    txt: "C'est fait, à partir de ton modèle. Relis-le avant que je l'envoie.",
+    doc: "Contrat d'extra · Lina.pdf",
+    meta: 'Ton modèle · prêt à signer',
+  },
 ];
 ---
 
@@ -276,7 +300,7 @@ const lundi = [
                       {m.doc && (
                         <span class="msg-doc">
                           <b>{m.doc}</b>
-                          <span>1 page · prête à afficher</span>
+                          <span>{m.meta}</span>
                         </span>
                       )}
                       {m.txt}
@@ -399,7 +423,7 @@ const lundi = [
                       {m.doc && (
                         <span class="wa-fichier">
                           <b>{m.doc}</b>
-                          <span>1 page · prête à afficher</span>
+                          <span>{m.meta}</span>
                         </span>
                       )}
                       {m.txt}
