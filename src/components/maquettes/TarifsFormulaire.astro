@@ -108,14 +108,16 @@ const etapes = [
                     ))}
                   </span>
                   <span class="flex flex-col gap-1">
+                    {(o.id === 'finch' || o.id === 'pecker') && (
+                      <span class="avec-socle">
+                        <span aria-hidden="true">+</span> S'ajoute au socle
+                      </span>
+                    )}
                     <span class="flex flex-wrap items-baseline gap-x-3">
                       <b class="font-display text-[20px] text-ink">{o.nom}</b>
                       <span class="font-mono text-[11px] tracking-[0.14em] text-orange-txt uppercase">{o.tag}</span>
                     </span>
                     <span class="text-[14px] leading-5 text-soft">{o.texte}</span>
-                    {(o.id === 'finch' || o.id === 'pecker') && (
-                      <span class="avec-socle">S'ajoute au socle</span>
-                    )}
                     {o.id === 'socle' && (
                       <span class="requis" data-requis>
                         Inclus d'office avec Finch ou Pecker
@@ -396,13 +398,25 @@ const etapes = [
     }
   }
   /* Finch et Pecker s'ajoutent au socle ; le socle verrouillé le dit. */
-  .avec-socle,
+  .avec-socle {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    align-self: flex-start;
+    margin-bottom: 4px;
+    padding: 5px 9px;
+    border-radius: 999px;
+    background: var(--color-orange-tint);
+    box-shadow: inset 0 0 0 1px var(--color-orange);
+    font: 700 12px/1 var(--font-sans);
+    color: var(--color-orange-txt);
+    white-space: nowrap;
+  }
   .requis {
     margin-top: 4px;
     font: 400 11px/1.3 var(--font-mono);
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--color-soft);
   }
   .requis {
     display: none;
