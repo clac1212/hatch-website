@@ -1,7 +1,8 @@
 ---
 /**
  * MAQUETTE — la page réseau complète (le site actuel, qui passera à /reseaux), avec la nouvelle
- * section Tarifs en formulaire à la place des trois offres chiffrées.
+ * section Tarifs en formulaire à la place des trois offres chiffrées. Sans le bloc Sécurité, qui vit
+ * désormais sur l'accueil.
  */
 import Base from '../../layouts/Base.astro';
 import Hero from '../../components/sections/Hero.astro';
@@ -11,7 +12,6 @@ import Demo from '../../components/sections/Demo.astro';
 import Equipe from '../../components/sections/Equipe.astro';
 import Cas from '../../components/sections/Cas.astro';
 import MiseEnPlace from '../../components/sections/MiseEnPlace.astro';
-import Securite from '../../components/sections/Securite.astro';
 import TarifsFormulaire from '../../components/maquettes/TarifsFormulaire.astro';
 import { routes } from '../../i18n/ui';
 import siege from '../../assets/footer/siege.jpg';
@@ -49,6 +49,5 @@ const pied = {
   <Equipe locale={locale} />
   <Cas locale={locale} />
   <MiseEnPlace locale={locale} />
-  <Securite locale={locale} />
   <TarifsFormulaire />
 </Base>
