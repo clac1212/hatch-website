@@ -8,12 +8,12 @@
  * Contenu tiré de Notion (« Robin — le cofondateur des restaurants indépendants ») et de la
  * maquette précédente. Visuel uniquement : textes en dur, le formulaire n'envoie rien.
  */
-import { Image, Picture } from 'astro:assets';
+import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import Iphone from '../../components/ui/Iphone.astro';
 import { routes } from '../../i18n/ui';
 import robin from '../../assets/portraits/robin.jpg';
-import bistrot from '../../assets/robin/independant.jpg';
+import soir from '../../assets/robin/soir.jpg';
 import portrait from '../../assets/portraits/robin.jpg';
 
 /** Ce que fait Robin : une rangée par pilier, une conversation d'exemple dans une carte teintée. */
@@ -123,6 +123,13 @@ const champs = [
   { id: 'email', label: 'Email', type: 'email', placeholder: 'karim@lepetitcomptoir.fr', auto: 'email' },
 ];
 
+/** La scène du soir : les messages de Robin qui arrivent l'un après l'autre sur la vidéo. */
+const notifs = [
+  { heure: '23:04', txt: 'Le service est fini ? Je te fais le point de la soirée.' },
+  { heure: '23:05', txt: 'La commande Metro de demain est prête, il ne manque que ton accord.' },
+  { heure: '23:06', txt: 'Lina a confirmé pour samedi. Bonne nuit, Karim.' },
+];
+
 /** Le fil du lundi, affiché dans les deux canaux (WhatsApp aujourd'hui, l'application demain). */
 const lundi = [
   { qui: 'robin', txt: 'Bonjour Karim, voici le point de la semaine. Le beurre a pris 14 % chez Metro, et le contrat de Lina se termine vendredi. Je te prépare le planning ?' },
@@ -173,16 +180,46 @@ const lundi = [
         </a>
       </div>
 
-      <!-- La grande image sous le hero, comme la vidéo des dots -->
-      <div class="mt-14 w-full max-w-[1100px] overflow-hidden rounded-[28px] lg:mt-20 lg:rounded-[36px]">
-        <Picture
-          src={bistrot}
-          alt="Un petit bistrot indépendant en voxels : derrière le comptoir, le patron consulte son téléphone, Robin perché à côté de lui."
-          widths={[700, 1100, 1600]}
-          sizes="(min-width: 1140px) 1100px, 100vw"
-          formats={['avif', 'webp']}
-          class="block w-full"
-        />
+      <!-- La scène sous le hero, comme la vidéo des dots : le bistrot à la fermeture, Robin parle au
+           patron (vidéo en boucle), et ses messages arrivent sur l'écran comme des notifications. -->
+      <div class="soiree mt-14 w-full max-w-[1100px] lg:mt-20" data-soiree>
+        <div class="soiree-cadre">
+          <video
+            class="soiree-video"
+            src="/maquettes/anim/robin-soir.mp4"
+            poster={soir.src}
+            muted
+            loop
+            playsinline
+            preload="auto"
+            aria-label="Le soir, à la fermeture d'un petit bistrot en voxels : Robin, perché sur le comptoir, fait le point avec le patron, qui regarde son téléphone."
+          ></video>
+          <ol class="notifs" aria-label="Les messages de Robin ce soir">
+            {
+              notifs.map((n, i) => (
+                <li class="notif" style={`--i:${i}`}>
+                  <Image src={robin} alt="" width={36} densities={[1, 2]} class="notif-av" />
+                  <span class="notif-txt">
+                    <span class="notif-tete">
+                      <b>Robin</b>
+                      <span>{n.heure}</span>
+                    </span>
+                    {n.txt}
+                  </span>
+                </li>
+              ))
+            }
+          </ol>
+          <button type="button" class="soiree-pause" data-pause aria-pressed="false">
+            <span class="sr-only" data-pause-label>Mettre l'animation en pause</span>
+            <svg viewBox="0 0 24 24" class="ico-pause size-4" fill="currentColor" aria-hidden="true">
+              <path d="M7 5h4v14H7zm6 0h4v14h-4z"></path>
+            </svg>
+            <svg viewBox="0 0 24 24" class="ico-lecture size-4" fill="currentColor" aria-hidden="true">
+              <path d="M8 5v14l11-7z"></path>
+            </svg>
+          </button>
+        </div>
       </div>
     </section>
 
@@ -436,6 +473,27 @@ const lundi = [
   </div>
 
   <script is:inline data-keep>
+    // La scène du soir : la vidéo démarre seule (sauf mouvement réduit), le bouton met en pause la
+    // vidéo et l'arrivée des messages (WCAG 2.2.2 : tout ce qui tourne en boucle se met en pause).
+    (function () {
+      var root = document.querySelector('[data-soiree]');
+      if (!root) return;
+      var video = root.querySelector('video');
+      var bouton = root.querySelector('[data-pause]');
+      var label = root.querySelector('[data-pause-label]');
+      var reduit = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function regler(pause) {
+        root.classList.toggle('pause', pause);
+        bouton.setAttribute('aria-pressed', pause ? 'true' : 'false');
+        label.textContent = pause ? "Relancer l'animation" : "Mettre l'animation en pause";
+        if (pause) video.pause();
+        else video.play().catch(function () {});
+      }
+      bouton.addEventListener('click', function () {
+        regler(!root.classList.contains('pause'));
+      });
+      regler(reduit);
+    })();
     // Une semaine avec Robin : un clic sur un jour change la bulle et le détail. Les canaux : un clic
     // sur un onglet change l'écran du téléphone. Sans JS : le lundi et WhatsApp restent affichés.
     (function () {
@@ -476,6 +534,131 @@ const lundi = [
     }
     50% {
       transform: translateY(-10px) rotate(2deg);
+    }
+  }
+
+
+  /* La scène du soir : la vidéo en grand, les messages de Robin qui arrivent en haut à gauche (sur les fenêtres, pour ne cacher personne). */
+  .soiree-cadre {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    border-radius: 28px;
+    background: var(--color-night-2);
+    box-shadow: 0 0 0 1px var(--color-line-night);
+  }
+  @media (min-width: 64rem) {
+    .soiree-cadre {
+      border-radius: 36px;
+    }
+  }
+  .soiree-video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .notifs {
+    position: absolute;
+    top: 22px;
+    left: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: min(340px, 46%);
+    text-align: left;
+  }
+  .notif {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 11px 14px 12px 11px;
+    border-radius: 18px;
+    background: color-mix(in srgb, var(--color-cream) 90%, transparent);
+    backdrop-filter: blur(14px);
+    box-shadow: var(--shadow-2);
+    font: 400 13.5px/1.4 var(--font-sans);
+    color: var(--color-ink);
+    opacity: 0;
+    animation: notif 12s var(--ease-doux) infinite;
+    animation-delay: calc(0.8s + var(--i) * 1.5s);
+  }
+  .notif :global(.notif-av) {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    border-radius: 999px;
+    object-fit: cover;
+  }
+  .notif-txt {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .notif-tete {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 12.5px;
+  }
+  .notif-tete span {
+    font: 400 11px/1.5 var(--font-mono);
+    color: var(--color-soft);
+  }
+  /* Entrée par le haut, quelques secondes à l'écran, sortie, puis on recommence. */
+  @keyframes notif {
+    0% {
+      opacity: 0;
+      transform: translateY(-14px) scale(0.96);
+    }
+    5%,
+    68% {
+      opacity: 1;
+      transform: none;
+    }
+    76%,
+    100% {
+      opacity: 0;
+      transform: translateY(-6px) scale(0.98);
+    }
+  }
+  .soiree.pause .notif {
+    animation-play-state: paused;
+  }
+  .soiree-pause {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-night) 70%, transparent);
+    backdrop-filter: blur(8px);
+    color: var(--color-cream);
+    cursor: pointer;
+  }
+  .soiree-pause:focus-visible {
+    outline: 2px solid var(--color-cream);
+    outline-offset: 2px;
+  }
+  .soiree-pause .ico-lecture,
+  .soiree.pause .soiree-pause .ico-pause {
+    display: none;
+  }
+  .soiree.pause .soiree-pause .ico-lecture {
+    display: block;
+  }
+  @media (max-width: 40rem) {
+    .notifs {
+      top: auto;
+      bottom: 64px;
+      left: 12px;
+      width: calc(100% - 24px);
+    }
+    .notif:not(:last-child) {
+      display: none;
     }
   }
 
@@ -932,6 +1115,10 @@ const lundi = [
     .detail,
     .ecran {
       transition: none;
+    }
+    .notif {
+      animation: none;
+      opacity: 1;
     }
   }
 </style>
