@@ -6,6 +6,7 @@ import { section } from '../../content/section';
 import { appUrls, routes, useTranslations, type Locale } from '../../i18n/ui';
 import carteFrance from '../../assets/hero/carte-v5-1.jpg';
 import carteEurope from '../../assets/hero/carte-europe.jpg';
+import carteEuropeNuit from '../../assets/hero/carte-europe-nuit.jpg';
 import grain from '../../assets/hero/grain.png';
 import boutiques from './hero-boutiques.json';
 import peep from '../../assets/hero/agents/peep.webp';
@@ -94,6 +95,18 @@ const steps = events.map((e, i) => {
 /** Seconds per event (wave, card running, card done, exit). */
 const STEP = 5.6;
 
+/** Mockup carte Europe : les trois chantiers (cadre 3840 × 2143 de l'image) et les nuages. */
+const GRUES = [
+  { id: 'de', x: `${(2640 / 3840) * 100}%`, y: `${(180 / 2143) * 100}%` },
+  { id: 'fr', x: `${(2400 / 3840) * 100}%`, y: `${(960 / 2143) * 100}%` },
+  { id: 'es', x: `${(1280 / 3840) * 100}%`, y: `${(1320 / 2143) * 100}%` },
+];
+const NUAGES = [
+  { id: 1, y: '8%', w: '11%', d: 95, t: 10 },
+  { id: 2, y: '34%', w: '9%', d: 120, t: 55 },
+  { id: 3, y: '62%', w: '12%', d: 105, t: 80 },
+];
+
 const tick =
   'M10 18H8v-2h2v2Zm-2-2H6v-2h2v2Zm4-2v2h-2v-2h2Zm-6 0H4v-2h2v2Zm8 0h-2v-2h2v2Zm2-2h-2v-2h2v2Zm2-2h-2V8h2v2Zm2-2h-2V6h2v2Z';
 ---
@@ -118,6 +131,43 @@ const tick =
       fetchpriority="high"
       class="absolute inset-0 size-full object-cover"
     />
+    {
+      /* Mockup « carte Europe » : la nuit tombe puis le jour revient (fondu vers l'image de nuit, où
+         seuls les agents restent dehors), les grues des trois chantiers pivotent (vidéos en boucle
+         posées sur l'image) et des nuages traversent la carte. Un bouton met tout en pause. */
+      europe && (
+        <>
+          <div class="h-grues">
+            {GRUES.map((g) => (
+              <video
+                class="h-grue"
+                src={`/maquettes/anim/grue-${g.id}.mp4`}
+                style={`left:${g.x};top:${g.y}`}
+                autoplay
+                muted
+                loop
+                playsinline
+              />
+            ))}
+          </div>
+          <Picture
+            src={carteEuropeNuit}
+            formats={['avif', 'webp']}
+            widths={[1200, 2000, 2880, 3840]}
+            quality={78}
+            sizes="max(100vw, 179.1vh, 1146px)"
+            alt=""
+            loading="eager"
+            class="h-nuit absolute inset-0 size-full object-cover"
+          />
+          <div class="h-nuages">
+            {NUAGES.map((n) => (
+              <img class="h-nuage" src={`/maquettes/anim/nuage-${n.id}.webp`} alt="" style={`top:${n.y};width:${n.w};animation-duration:${n.d}s;animation-delay:-${n.t}s`} />
+            ))}
+          </div>
+        </>
+      )
+    }
     {
       !europe && steps.map((e) => (
         <div class="h-ping" style={`left:${pct(e.x, W)};top:${pct(e.y, H)}`}>
@@ -239,7 +289,41 @@ const tick =
       </div>
     </div>
   </div>
+  {
+    europe && (
+      <button type="button" class="h-pause" data-hero-pause aria-pressed="false">
+        <span class="sr-only" data-hero-pause-label>Mettre l'animation de la carte en pause</span>
+        <span class="h-pause-ico" aria-hidden="true"></span>
+      </button>
+    )
+  }
 </section>
+{
+  europe && (
+    <script is:inline data-keep>
+      (function () {
+        var hero = document.querySelector('.hero-europe');
+        if (!hero) return;
+        var bouton = hero.querySelector('[data-hero-pause]');
+        var label = hero.querySelector('[data-hero-pause-label]');
+        var videos = [].slice.call(hero.querySelectorAll('.h-grue'));
+        function regler(pause) {
+          hero.classList.toggle('h-en-pause', pause);
+          bouton.setAttribute('aria-pressed', pause ? 'true' : 'false');
+          label.textContent = pause ? "Relancer l'animation de la carte" : "Mettre l'animation de la carte en pause";
+          videos.forEach(function (v) {
+            if (pause) v.pause();
+            else v.play().catch(function () {});
+          });
+        }
+        bouton.addEventListener('click', function () {
+          regler(!hero.classList.contains('h-en-pause'));
+        });
+        regler(matchMedia('(prefers-reduced-motion: reduce)').matches);
+      })();
+    </script>
+  )
+}
 
 <script>
   /**
@@ -315,6 +399,122 @@ const tick =
 </script>
 
 <style>
+  /* Mockup carte Europe : cycle jour / nuit (32 s), grues, nuages, pause. */
+  .h-nuit {
+    opacity: 0;
+    animation: h-nuit 32s ease-in-out infinite;
+  }
+  @keyframes h-nuit {
+    0%,
+    38% {
+      opacity: 0;
+    }
+    50%,
+    88% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  .h-grue {
+    position: absolute;
+    width: 12.5%;
+    height: 22.4%;
+    object-fit: cover;
+    -webkit-mask-image: radial-gradient(circle at 55% 45%, #000 38%, transparent 62%);
+    mask-image: radial-gradient(circle at 55% 45%, #000 38%, transparent 62%);
+  }
+  .h-nuages {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    animation: h-nuages-nuit 32s ease-in-out infinite;
+  }
+  @keyframes h-nuages-nuit {
+    0%,
+    38% {
+      opacity: 0.92;
+      filter: none;
+    }
+    50%,
+    88% {
+      opacity: 0.45;
+      filter: brightness(0.55) saturate(0.7);
+    }
+    100% {
+      opacity: 0.92;
+      filter: none;
+    }
+  }
+  .h-nuage {
+    position: absolute;
+    left: 0;
+    height: auto;
+    animation-name: h-nuage;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    filter: drop-shadow(0 30px 24px color-mix(in srgb, var(--color-navy) 35%, transparent));
+  }
+  @keyframes h-nuage {
+    from {
+      transform: translateX(-120%);
+      left: 0;
+    }
+    to {
+      transform: translateX(0);
+      left: 100%;
+    }
+  }
+  .h-pause {
+    position: absolute;
+    right: max(16px, 2vw);
+    bottom: 28px;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-night) 70%, transparent);
+    color: var(--color-cream);
+    cursor: pointer;
+  }
+  .h-pause:focus-visible {
+    outline: 2px solid var(--color-cream);
+    outline-offset: 2px;
+  }
+  .h-pause-ico {
+    width: 10px;
+    height: 12px;
+    border-left: 3px solid currentColor;
+    border-right: 3px solid currentColor;
+  }
+  .h-en-pause .h-pause-ico {
+    width: 0;
+    height: 0;
+    border-left: 11px solid currentColor;
+    border-right: 0;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+  }
+  .h-en-pause .h-nuit,
+  .h-en-pause .h-nuages,
+  .h-en-pause .h-nuage {
+    animation-play-state: paused;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .h-nuit,
+    .h-nuages,
+    .h-nuage {
+      animation: none;
+    }
+    .h-nuage {
+      display: none;
+    }
+  }
+
   /* The scene: the image's 1440 × 804 frame, covering the section (container units), pinned right. */
   .hero {
     --sw: max(100cqw, calc(100cqh * 1440 / 804));
