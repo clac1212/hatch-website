@@ -461,7 +461,11 @@ const tick =
     }
     /* Mockup « carte Europe » : the scene pinned left (the Atlantic under the card), the card narrower. */
     .hero.hero-europe {
-      --fx: 0;
+      --sw: calc(max(100cqw, calc(100cqh * 1440 / 804)) * 1.3);
+      --fx: 0.3;
+    }
+    .hero-europe .h-decor {
+      top: calc((100cqh - var(--sh)) * 0.35);
     }
     .hero-europe .carte-hero {
       width: clamp(500px, 38vw, 580px);
