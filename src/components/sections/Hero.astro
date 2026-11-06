@@ -4,7 +4,8 @@ import Button from '../ui/Button.astro';
 import LisierePixel from '../ui/LisierePixel.astro';
 import { section } from '../../content/section';
 import { appUrls, routes, useTranslations, type Locale } from '../../i18n/ui';
-import carte from '../../assets/hero/carte-v5-1.jpg';
+import carteFrance from '../../assets/hero/carte-v5-1.jpg';
+import carteEurope from '../../assets/hero/carte-europe.jpg';
 import grain from '../../assets/hero/grain.png';
 import boutiques from './hero-boutiques.json';
 import peep from '../../assets/hero/agents/peep.webp';
@@ -34,9 +35,18 @@ import oiseauxPos from './hero-oiseaux.json';
  */
 interface Props {
   locale: Locale;
+  /**
+   * Mockup: the wider map (France and its neighbours). It is the France map zoomed out (×0.8, offset
+   * 144, 80.4 in the 1440 × 804 frame), so every anchor below goes through `cadre`.
+   */
+  europe?: boolean;
 }
 
-const { locale } = Astro.props;
+const { locale, europe = false } = Astro.props;
+const carte = europe ? carteEurope : carteFrance;
+const K = europe ? 0.8 : 1;
+const cadre = (x: number, y: number): [number, number] =>
+  europe ? [144 + x * K, 80.4 + y * K] : [x, y];
 const data = await section('hero', locale);
 const t = useTranslations(locale);
 const { status, events } = data.tasks;
@@ -76,8 +86,8 @@ if (SHOPS.length !== events.length) {
 const ROOF = 30;
 const steps = events.map((e, i) => {
   const at = SHOPS[i];
-  const [x, y] = 'shop' in at ? (boutiques.shops[at.shop] as [number, number]) : [at.x, at.y];
-  const roof = 'shop' in at ? ROOF : at.roof;
+  const [x, y] = cadre(...('shop' in at ? (boutiques.shops[at.shop] as [number, number]) : [at.x, at.y]));
+  const roof = ('shop' in at ? ROOF : at.roof) * K;
   return { ...e, x, y, roof, anchor: at.anchor, avatar: avatars[e.agent] };
 });
 /** Seconds per event (wave, card running, card done, exit). */
@@ -114,7 +124,9 @@ const tick =
     }
     {
       (Object.keys(OISEAUX) as Oiseau[]).map((agent) => {
-        const b = OISEAUX[agent];
+        const o = OISEAUX[agent];
+        const [bl, bt] = cadre(o.left, o.top);
+        const b = { left: bl, top: bt, width: o.width * K, height: o.height * K };
         return (
           <div
             class="h-oiseau"
