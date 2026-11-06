@@ -585,7 +585,7 @@ const lundi = [
     object-fit: cover;
   }
   /* Les bulles partent du Robin du comptoir : ouvertes vers la gauche, la pointe qui descend juste à sa gauche.
-     Une seule à la fois, dans la même case, chacune son tour (5 s), puis la soirée recommence.
+     Une seule à la fois, dans la même case, chacune son tour (9 s, le temps de lire), puis la soirée recommence.
      Robin est à ~55 % de la largeur et ~42 % de la hauteur de la vidéo. */
   .bulles-soir {
     position: absolute;
@@ -601,8 +601,8 @@ const lundi = [
     grid-area: 1 / 1;
     opacity: 0;
     transform-origin: 88% 100%;
-    animation: bulle-soir 15s var(--ease-doux) infinite;
-    animation-delay: calc(0.6s + var(--i) * 5s);
+    animation: bulle-soir 27s var(--ease-doux) infinite;
+    animation-delay: calc(0.6s + var(--i) * 9s);
   }
   .bs-bulle {
     position: relative;
