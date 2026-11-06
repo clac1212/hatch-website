@@ -36,9 +36,9 @@ import oiseauxPos from './hero-oiseaux.json';
 interface Props {
   locale: Locale;
   /**
-   * Mockup: the wider map (Iberia, England, the Alps), without the little crates. It is the France
-   * map zoomed out (×0.5176, offset 358.2, 157.5 in the 1440 × 804 frame), so every anchor below goes
-   * through `cadre`. The scene is pinned left so the Atlantic sits under the (narrower) glass card.
+   * Mockup: a new map of Western Europe (relief, an established network, the agents at work). Its
+   * places differ from the France map, so the map-anchored pings, bubbles and task cards are left out
+   * until they are re-anchored. The scene is pinned left so the Atlantic sits under the glass card.
    */
   europe?: boolean;
 }
@@ -119,7 +119,7 @@ const tick =
       class="absolute inset-0 size-full object-cover"
     />
     {
-      steps.map((e) => (
+      !europe && steps.map((e) => (
         <div class="h-ping" style={`left:${pct(e.x, W)};top:${pct(e.y, H)}`}>
           <span />
           <span />
@@ -127,7 +127,7 @@ const tick =
       ))
     }
     {
-      (Object.keys(OISEAUX) as Oiseau[]).map((agent) => {
+      !europe && (Object.keys(OISEAUX) as Oiseau[]).map((agent) => {
         const o = OISEAUX[agent];
         const [bl, bt] = cadre(o.left, o.top);
         const b = { left: bl, top: bt, width: o.width * K, height: o.height * K };
@@ -163,7 +163,7 @@ const tick =
   >
     <div class="h-piles" aria-hidden="true" data-pas={STEP}>
       {
-        steps.map((e) => (
+        !europe && steps.map((e) => (
           <div
             class="h-pile"
             data-agent={e.agent}
