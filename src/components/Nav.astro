@@ -1,7 +1,7 @@
 ---
 import Logo from './ui/Logo.astro';
 import Button from './ui/Button.astro';
-import { appUrls, routes, otherLocale, useTranslations, type Locale, type Paths } from '../i18n/ui';
+import { routes, otherLocale, useTranslations, type Locale, type Paths } from '../i18n/ui';
 
 /**
  * v4 nav: liquid-glass pill, centred and fixed at the top; a drop shadow appears once the page scrolls.
@@ -64,15 +64,7 @@ const other = otherLocale(locale);
       </ul>
     </div>
 
-    <!-- Two calls to action, the classic SaaS pair (César 06/10): sign-in, a text link (the app's
-         /auth page also lets a newcomer create an account), and the demo, the one filled button.
-         Below lg the menu carries sign-in; the pill keeps the demo. -->
-    <a
-      href={appUrls.login}
-      class="hidden rounded-full px-3.5 py-2.5 text-[0.875rem] font-semibold whitespace-nowrap transition-colors duration-300 hover:bg-orange/14 hover:text-orange-hover lg:block"
-    >
-      {t('nav.login')}
-    </a>
+    <!-- The demo alone: sign-in now lives on the home page's nav (NavAccueil). -->
     <Button href={routes.demo[locale]} class="max-sm:px-4 max-sm:text-[0.8125rem]">
       {t('cta.demo')}
     </Button>
@@ -119,14 +111,6 @@ const other = otherLocale(locale);
               class="block rounded-btn px-3 py-2.5 font-semibold hover:bg-orange-tint"
             >
               {t('lang.switch')}
-            </a>
-          </li>
-          <li class="mt-1 border-t border-line pt-1">
-            <a
-              href={appUrls.login}
-              class="block rounded-btn px-3 py-2.5 font-semibold hover:bg-orange-tint"
-            >
-              {t('nav.login')}
             </a>
           </li>
         </ul>
