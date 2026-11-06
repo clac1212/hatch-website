@@ -12,13 +12,13 @@ import finch from '../../assets/portraits/finch.jpg';
 import pecker from '../../assets/portraits/pecker.jpg';
 import sparrow from '../../assets/portraits/sparrow.jpg';
 
-/** Chaque agent face à nous, dans son cercle ; la vidéo du coucou se joue une fois quand on le coche. */
+/** Chaque agent face à nous, dans son cercle ; quand on le coche, il fait le geste de son métier (une fois). */
 const a = (nom: string, role: string, img: ImageMetadata, miroir = false) => ({
   nom,
   role,
   img,
   miroir,
-  video: `/maquettes/anim/${nom.toLowerCase()}.mp4`,
+  video: `/maquettes/anim/${nom.toLowerCase()}-geste.mp4`,
 });
 
 const offres = [
@@ -30,9 +30,9 @@ const offres = [
       'Peep répond à vos équipes sur WhatsApp, Owl en cuisine sur tablette, Jay tient vos documents à jour, Lark pilote le réseau.',
     agents: [
       a('Peep', 'Vos équipes', peep),
-      a('Owl', 'La cuisine', owl, true),
+      a('Owl', 'La cuisine', owl),
       a('Jay', 'Vos documents', jay),
-      a('Lark', 'Le pilotage', lark, true),
+      a('Lark', 'Le pilotage', lark),
     ],
     coche: true,
   },
@@ -41,7 +41,7 @@ const offres = [
     nom: 'Finch',
     tag: 'Qualité et audits',
     texte: "Prépare les grilles d'audit, suit chaque plan d'action jusqu'à la preuve.",
-    agents: [a('Finch', 'Qualité', finch, true)],
+    agents: [a('Finch', 'Qualité', finch)],
   },
   {
     id: 'pecker',
@@ -55,7 +55,7 @@ const offres = [
     nom: 'Sparrow',
     tag: 'Développement et ouvertures',
     texte: 'Pré-qualifie vos candidats à la franchise et suit chaque ouverture jusqu\'au jour J.',
-    agents: [a('Sparrow', 'Développement', sparrow, true)],
+    agents: [a('Sparrow', 'Développement', sparrow)],
   },
 ];
 
@@ -113,6 +113,14 @@ const etapes = [
                       <span class="font-mono text-[11px] tracking-[0.14em] text-orange-txt uppercase">{o.tag}</span>
                     </span>
                     <span class="text-[14px] leading-5 text-soft">{o.texte}</span>
+                    {(o.id === 'finch' || o.id === 'pecker') && (
+                      <span class="avec-socle">S'ajoute au socle</span>
+                    )}
+                    {o.id === 'socle' && (
+                      <span class="requis" data-requis>
+                        Inclus d'office avec Finch ou Pecker
+                      </span>
+                    )}
                   </span>
                   <span class="coche" aria-hidden="true">✓</span>
                 </label>
@@ -196,6 +204,38 @@ const etapes = [
     </div>
   </div>
 </section>
+<script is:inline data-keep>
+  // Le socle est obligatoire pour prendre Finch ou Pecker : dès que l'un des deux est coché, le socle
+  // se coche et se verrouille (on ne peut plus le décocher) ; il se libère quand aucun des deux ne l'est.
+  (function () {
+    var socle = document.getElementById('a-socle');
+    if (!socle) return;
+    var lies = ['a-finch', 'a-pecker']
+      .map(function (id) {
+        return document.getElementById(id);
+      })
+      .filter(Boolean);
+    var carte = socle.closest('.agent');
+    function regler() {
+      var verrou = lies.some(function (i) {
+        return i.checked;
+      });
+      if (verrou && !socle.checked) {
+        socle.checked = true;
+        socle.dispatchEvent(new Event('change'));
+      }
+      carte.classList.toggle('verrou', verrou);
+      socle.setAttribute('aria-disabled', verrou ? 'true' : 'false');
+    }
+    socle.addEventListener('click', function (e) {
+      if (carte.classList.contains('verrou')) e.preventDefault();
+    });
+    lies.forEach(function (i) {
+      i.addEventListener('change', regler);
+    });
+    regler();
+  })();
+</script>
 <script is:inline data-keep>
   // Cocher un agent le fait sortir de son cercle et dire coucou : la vidéo se joue une fois, puis
   // s'arrête (pas de boucle, donc pas de pause nécessaire). Survol : même coucou. Mouvement réduit : rien.
@@ -354,6 +394,25 @@ const etapes = [
     .rond {
       transition: none;
     }
+  }
+  /* Finch et Pecker s'ajoutent au socle ; le socle verrouillé le dit. */
+  .avec-socle,
+  .requis {
+    margin-top: 4px;
+    font: 400 11px/1.3 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-soft);
+  }
+  .requis {
+    display: none;
+    color: var(--color-orange-txt);
+  }
+  .agent.verrou .requis {
+    display: block;
+  }
+  .agent.verrou {
+    cursor: default;
   }
   .coche {
     position: absolute;
