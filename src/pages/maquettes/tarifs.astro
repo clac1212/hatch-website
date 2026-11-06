@@ -156,10 +156,16 @@ const etapes = [
           <fieldset class="flex flex-col gap-4">
             <legend class="etape"><span>3</span>Vos coordonnées</legend>
             <div class="grid gap-3 sm:grid-cols-2">
-              <label class="champ sm:col-span-2"><span>Prénom et nom</span><input placeholder="Camille Martin" autocomplete="name" /></label>
+              <label class="champ"><span>Prénom et nom</span><input placeholder="Camille Martin" autocomplete="name" /></label>
+              <label class="champ"><span>Votre rôle</span><input placeholder="Directrice des opérations" autocomplete="organization-title" /></label>
               <label class="champ"><span>Email professionnel</span><input type="email" placeholder="camille@bunbun.fr" autocomplete="email" /></label>
               <label class="champ"><span>Téléphone</span><input type="tel" placeholder="06 12 34 56 78" autocomplete="tel" /></label>
             </div>
+            <label class="decide">
+              <input type="checkbox" name="decisionnaire" class="sr-only" />
+              <span class="decide-case" aria-hidden="true">✓</span>
+              <span>Je suis décisionnaire pour ce projet</span>
+            </label>
           </fieldset>
 
           <div class="flex flex-col items-start gap-3 border-t border-line pt-7 sm:flex-row sm:items-center sm:justify-between">
@@ -399,6 +405,38 @@ const etapes = [
     box-shadow: none;
   }
 
+  /* La coche « décisionnaire » : même case que les cartes d'agents. */
+  .decide {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    align-self: flex-start;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-ink);
+    cursor: pointer;
+  }
+  .decide-case {
+    display: flex;
+    width: 22px;
+    height: 22px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    box-shadow: inset 0 0 0 1.5px var(--color-stone);
+    color: transparent;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .decide input:checked + .decide-case {
+    background: var(--color-orange);
+    box-shadow: none;
+    color: var(--color-ink);
+  }
+  .decide input:focus-visible + .decide-case {
+    outline: 3px solid var(--color-orange-txt);
+    outline-offset: 2px;
+  }
   .champ {
     display: flex;
     flex-direction: column;
