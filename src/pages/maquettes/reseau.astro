@@ -15,6 +15,7 @@ import MiseEnPlace from '../../components/sections/MiseEnPlace.astro';
 import TarifsFormulaire from '../../components/maquettes/TarifsFormulaire.astro';
 import { routes } from '../../i18n/ui';
 import siege from '../../assets/footer/siege.jpg';
+import siegeMonde from '../../assets/hero/siege-monde.jpg';
 
 const locale = 'fr';
 
@@ -42,7 +43,7 @@ const pied = {
   description="Maquette de la page réseau de Hatch OS avec la nouvelle section tarifs en formulaire."
   pied={pied}
 >
-  <Hero locale={locale} />
+  <Hero locale={locale} fond={siegeMonde} />
   <Clients locale={locale} />
   <Probleme locale={locale} />
   <Demo locale={locale} />

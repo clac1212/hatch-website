@@ -34,9 +34,11 @@ import oiseauxPos from './hero-oiseaux.json';
  */
 interface Props {
   locale: Locale;
+  /** Another backdrop instead of the map (mockups): the map's pings, birds and task cards are dropped. */
+  fond?: ImageMetadata;
 }
 
-const { locale } = Astro.props;
+const { locale, fond } = Astro.props;
 const data = await section('hero', locale);
 const t = useTranslations(locale);
 const { status, events } = data.tasks;
@@ -94,7 +96,7 @@ const tick =
 >
   <div class="h-decor" aria-hidden="true">
     <Picture
-      src={carte}
+      src={fond ?? carte}
       formats={['avif', 'webp']}
       widths={[800, 1200, 1600, 2000, 2400, 2880, 3840]}
       quality={80}
@@ -102,10 +104,10 @@ const tick =
       alt=""
       loading="eager"
       fetchpriority="high"
-      class="absolute inset-0 size-full object-cover"
+      class:list={['absolute inset-0 size-full object-cover', fond && 'object-[85%_center]']}
     />
     {
-      steps.map((e) => (
+      !fond && steps.map((e) => (
         <div class="h-ping" style={`left:${pct(e.x, W)};top:${pct(e.y, H)}`}>
           <span />
           <span />
@@ -113,7 +115,7 @@ const tick =
       ))
     }
     {
-      (Object.keys(OISEAUX) as Oiseau[]).map((agent) => {
+      !fond && (Object.keys(OISEAUX) as Oiseau[]).map((agent) => {
         const b = OISEAUX[agent];
         return (
           <div
@@ -147,7 +149,7 @@ const tick =
   >
     <div class="h-piles" aria-hidden="true" data-pas={STEP}>
       {
-        steps.map((e) => (
+        !fond && steps.map((e) => (
           <div
             class="h-pile"
             data-agent={e.agent}
