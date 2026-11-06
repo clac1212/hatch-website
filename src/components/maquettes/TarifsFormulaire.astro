@@ -81,12 +81,14 @@ const etapes = [
 
     <div class="grid items-start gap-5 lg:grid-cols-[1fr_340px]">
       <form
+      data-tarifs
+      novalidate
         class="flex flex-col gap-9 rounded-[28px] bg-surface p-6 shadow-1 ring-1 ring-line sm:p-8 lg:rounded-[36px] lg:p-10"
         onsubmit="event.preventDefault()"
       >
         <!-- 1 · Agents -->
         <fieldset class="flex flex-col gap-4">
-          <legend class="etape"><span>1</span>Quels agents vous intéressent ?</legend>
+          <legend class="etape" data-etape="1"><span>1</span>Quels agents vous intéressent ?</legend>
           <button type="button" class="anim-pause" data-anim-pause aria-pressed="false" hidden>
             <span class="ap-ico" aria-hidden="true"></span>
             <span data-anim-label>Mettre les animations en pause</span>
@@ -150,21 +152,21 @@ const etapes = [
 
         <!-- 2 · Réseau -->
         <fieldset class="flex flex-col gap-4">
-          <legend class="etape"><span>2</span>Votre réseau</legend>
+          <legend class="etape" data-etape="2"><span>2</span>Votre réseau</legend>
           <div class="grid gap-3 sm:grid-cols-[1fr_220px]">
-            <label class="champ"><span>Nom de l'enseigne</span><input placeholder="BunBun" autocomplete="organization" /></label>
-            <label class="champ"><span>Nombre d'établissements</span><input type="number" min="1" placeholder="24" /></label>
+            <label class="champ"><span>Nom de l'enseigne</span><input id="t-enseigne" name="enseigne" required data-e="2" placeholder="BunBun" autocomplete="organization" /></label>
+            <label class="champ"><span>Nombre d'établissements</span><input id="t-etablissements" name="etablissements" type="number" min="1" required data-e="2" placeholder="24" /></label>
           </div>
         </fieldset>
 
         <!-- 3 · Contact -->
         <fieldset class="flex flex-col gap-4">
-          <legend class="etape"><span>3</span>Vos coordonnées</legend>
+          <legend class="etape" data-etape="3"><span>3</span>Vos coordonnées</legend>
           <div class="grid gap-3 sm:grid-cols-2">
-            <label class="champ"><span>Prénom et nom</span><input placeholder="Camille Martin" autocomplete="name" /></label>
-            <label class="champ"><span>Votre rôle</span><input placeholder="Directrice des opérations" autocomplete="organization-title" /></label>
-            <label class="champ"><span>Email professionnel</span><input type="email" placeholder="camille@bunbun.fr" autocomplete="email" /></label>
-            <label class="champ"><span>Téléphone</span><input type="tel" placeholder="06 12 34 56 78" autocomplete="tel" /></label>
+            <label class="champ"><span>Prénom et nom</span><input id="t-nom" name="nom" required data-e="3" placeholder="Camille Martin" autocomplete="name" /></label>
+            <label class="champ"><span>Votre rôle</span><input id="t-role" name="role" required data-e="3" placeholder="Directrice des opérations" autocomplete="organization-title" /></label>
+            <label class="champ"><span>Email professionnel</span><input id="t-email" name="email" type="email" required data-e="3" placeholder="camille@bunbun.fr" autocomplete="email" /></label>
+            <label class="champ"><span>Téléphone</span><input id="t-tel" name="telephone" type="tel" required data-e="3" placeholder="06 12 34 56 78" autocomplete="tel" /></label>
           </div>
           <label class="decide">
             <input type="checkbox" name="decisionnaire" class="sr-only" />
@@ -174,12 +176,13 @@ const etapes = [
         </fieldset>
 
         <div class="flex flex-col items-start gap-3 border-t border-line pt-7 sm:flex-row sm:items-center sm:justify-between">
-          <p class="max-w-[380px] text-[13.5px] leading-5 text-soft">
+          <p class="max-w-[380px] text-[13.5px] leading-5 text-soft" data-reste aria-live="polite">
             Étape suivante : vous choisissez un créneau, vos réponses sont jointes à la réservation.
           </p>
           <button
             type="submit"
-            class="btn-vif inline-flex items-center gap-2 rounded-full bg-orange px-6 py-4 text-base font-bold text-ink shadow-[0_10px_24px_rgb(248_122_1/0.4)]"
+            data-envoi
+            class="envoi btn-vif inline-flex items-center gap-2 rounded-full bg-orange px-6 py-4 text-base font-bold text-ink shadow-[0_10px_24px_rgb(248_122_1/0.4)]"
           >
             Choisir un créneau de démo <span aria-hidden="true">→</span>
           </button>
@@ -209,6 +212,58 @@ const etapes = [
     </div>
   </div>
 </section>
+<script is:inline data-keep>
+  // Les trois étapes sont obligatoires : au moins un agent, l'enseigne et sa taille, les coordonnées
+  // (la case décisionnaire reste libre). Tant qu'il manque quelque chose, le bouton est inactif et la
+  // ligne à côté dit ce qui reste ; chaque étape complète passe sa pastille en coche.
+  (function () {
+    var form = document.querySelector('[data-tarifs]');
+    if (!form) return;
+    var bouton = form.querySelector('[data-envoi]');
+    var reste = form.querySelector('[data-reste]');
+    var noms = { 1: 'choisir au moins un agent', 2: 'votre réseau', 3: 'vos coordonnées' };
+    function ok(e) {
+      if (e === 1) return !!form.querySelector('input[name="agents"]:checked');
+      return [].slice.call(form.querySelectorAll('[data-e="' + e + '"]')).every(function (i) {
+        return i.value.trim() !== '' && i.checkValidity();
+      });
+    }
+    function regler() {
+      var manque = [];
+      [1, 2, 3].forEach(function (e) {
+        var bon = ok(e);
+        form.querySelector('[data-etape="' + e + '"]').classList.toggle('faite', bon);
+        if (!bon) manque.push(e);
+      });
+      var pret = manque.length === 0;
+      bouton.setAttribute('aria-disabled', pret ? 'false' : 'true');
+      reste.textContent = pret
+        ? 'Tout est prêt : vous choisissez un créneau, vos réponses sont jointes à la réservation.'
+        : 'Encore à compléter : ' +
+          manque
+            .map(function (e) {
+              return noms[e] + ' (étape ' + e + ')';
+            })
+            .join(', ') +
+          '.';
+    }
+    form.addEventListener('input', regler);
+    form.addEventListener('change', regler);
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (bouton.getAttribute('aria-disabled') === 'true') {
+        [].slice.call(form.querySelectorAll('[data-e]')).some(function (i) {
+          if (i.value.trim() === '' || !i.checkValidity()) {
+            i.focus();
+            return true;
+          }
+          return false;
+        });
+      }
+    });
+    regler();
+  })();
+</script>
 <script is:inline data-keep>
   // Le socle est obligatoire pour prendre Finch ou Pecker : dès que l'un des deux est coché, le socle
   // se coche et se verrouille (on ne peut plus le décocher) ; il se libère quand aucun des deux ne l'est.
@@ -331,6 +386,28 @@ const etapes = [
     font-size: 22px;
     font-weight: 600;
     color: var(--color-ink);
+  }
+  /* Étape complète : la pastille passe en orange avec une coche. */
+  .etape.faite span {
+    background: var(--color-orange);
+    color: transparent;
+    position: relative;
+  }
+  .etape.faite span::after {
+    content: '✓';
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: var(--color-ink);
+    font: 700 14px/1 var(--font-sans);
+  }
+  /* Bouton inactif tant que les trois étapes ne sont pas complètes. */
+  .envoi[aria-disabled='true'] {
+    background: var(--color-stone);
+    box-shadow: none;
+    color: var(--color-soft);
+    cursor: not-allowed;
   }
   .etape span {
     display: inline-flex;
