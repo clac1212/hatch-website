@@ -1,34 +1,117 @@
 ---
 /**
  * MAQUETTE — landing Robin (espace indépendant) avec inscription à la liste d'attente de la bêta.
- * Contenu tiré de Notion (« Robin — le cofondateur des restaurants indépendants »).
- * Visuel uniquement : textes en dur, le formulaire n'envoie rien.
+ * Inspiration : muse.ai (sobriété, fond nuit, une grande phrase) et la page « dots » de ChatGPT :
+ * le personnage qui flotte au-dessus du titre, la pilule de navigation collante, les rangées
+ * alternées texte / carte de couleur avec une conversation dedans, « une semaine avec Robin » en
+ * frise, les onglets de canal (WhatsApp aujourd'hui, l'application demain), trois cartes de confiance.
+ * Contenu tiré de Notion (« Robin — le cofondateur des restaurants indépendants ») et de la
+ * maquette précédente. Visuel uniquement : textes en dur, le formulaire n'envoie rien.
  */
 import { Image, Picture } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import Iphone from '../../components/ui/Iphone.astro';
 import { routes } from '../../i18n/ui';
-import robin from '../../assets/robin/robin-face.png';
-import oeuf from '../../assets/robin/robin-oeuf-comptoir.jpg';
+import robin from '../../assets/portraits/robin.jpg';
+import bistrot from '../../assets/robin/independant.jpg';
+import portrait from '../../assets/portraits/robin.jpg';
 
+/** Ce que fait Robin : une rangée par pilier, une conversation d'exemple dans une carte teintée. */
 const piliers = [
   {
+    ancre: 'connait',
     titre: 'Il connaît votre restaurant',
     texte:
       "Votre carte, votre équipe, vos fournisseurs, vos décisions, vos documents. Il retient tout et s'en sert pour vous répondre.",
-    exemple: '« Quel fournisseur on avait pris pour le beurre en septembre ? »',
+    teinte: 'bg-peach',
+    fil: [
+      { qui: 'patron', txt: 'Quel fournisseur on avait pris pour le beurre en septembre ?' },
+      { qui: 'robin', txt: "Metro. Tu avais changé après la hausse chez ton grossiste. Je te retrouve la facture ?" },
+    ],
   },
   {
+    ancre: 'revient',
     titre: 'Il revient vers vous',
     texte:
       "Le point du lundi, le bilan du mois, une alerte quand une facture dérape. C'est lui qui écrit en premier.",
-    exemple: '« Le beurre a pris 14 % chez Metro, je te montre ? »',
+    teinte: 'bg-sand',
+    fil: [
+      { qui: 'robin', txt: 'Le beurre a pris 14 % chez Metro, je te montre ?' },
+      { qui: 'patron', txt: 'Oui, et trouve-moi une alternative.' },
+    ],
   },
   {
+    ancre: 'prepare',
     titre: 'Il prépare le travail',
     texte:
       'Des fiches prêtes à afficher, des checklists, des mails, le dossier pour la banque. Vous relisez, il a fait le reste.',
-    exemple: '« Fais-moi la fiche allergènes du plat du jour. »',
+    teinte: 'bg-orange-tint',
+    fil: [
+      { qui: 'patron', txt: 'Fais-moi la fiche allergènes du plat du jour.' },
+      { qui: 'robin', txt: "C'est fait, elle est prête à afficher.", doc: 'Allergènes · Plat du jour.pdf' },
+    ],
+  },
+];
+
+/** Une semaine avec Robin : la frise, un moment par jour. */
+const semaine = [
+  {
+    jour: 'Lun',
+    heure: '8 h 30',
+    titre: 'Le point de la semaine',
+    texte: "Votre chiffre, ce qui a bougé dans vos factures, ce qu'il ne faut pas oublier. Vous répondez comme à un associé.",
+    bulle: 'Bonjour Karim, voici le point de la semaine. Je te prépare le planning ?',
+  },
+  {
+    jour: 'Mar',
+    heure: '10 h',
+    titre: 'Les commandes',
+    texte: 'Il prépare la commande fournisseurs à partir de la semaine passée et de ce qui reste en réserve.',
+    bulle: 'Ta commande Metro est prête, avec moins de beurre que la semaine dernière. Je te la montre ?',
+  },
+  {
+    jour: 'Mer',
+    heure: '15 h',
+    titre: "L'équipe",
+    texte: 'Contrats, plannings, absences : il garde les dates en tête et vous prévient avant.',
+    bulle: 'Le contrat de Lina se termine vendredi. Je prépare de quoi le prolonger ?',
+  },
+  {
+    jour: 'Jeu',
+    heure: '11 h',
+    titre: 'Le plat du jour',
+    texte: 'Fiche allergènes, fiche technique, affichage : vous donnez la recette, il fait les documents.',
+    bulle: 'La fiche allergènes du plat du jour est prête à afficher.',
+  },
+  {
+    jour: 'Ven',
+    heure: '18 h',
+    titre: 'Avant le service',
+    texte: "Il vous rappelle ce qui compte pour le week-end, sans que vous ayez à le lui demander.",
+    bulle: 'Samedi soir est presque complet. Je préviens l’équipe ?',
+  },
+  {
+    jour: 'Dim',
+    heure: '21 h',
+    titre: 'Le bilan',
+    texte: 'La semaine résumée en quelques lignes, à lire tranquillement le lundi matin.',
+    bulle: 'Belle semaine. Je t’ai préparé le récap pour demain matin.',
+  },
+];
+
+/** Confiance : trois cartes sobres, comme celles des dots. */
+const confiance = [
+  {
+    titre: 'Vos données restent les vôtres',
+    texte: 'Hébergées en Europe, jamais utilisées pour entraîner une IA. Vous choisissez ce que Robin voit.',
+  },
+  {
+    titre: 'Il propose, vous décidez',
+    texte: "Robin prépare, vous validez. Rien ne part chez un fournisseur ou un salarié sans votre accord.",
+  },
+  {
+    titre: 'Dans une appli que vous connaissez',
+    texte: "Pas de logiciel à installer pendant la bêta : Robin vous écrit sur WhatsApp, à l'écrit ou en vocal.",
   },
 ];
 
@@ -39,61 +122,300 @@ const champs = [
   { id: 'whatsapp', label: 'Numéro WhatsApp', type: 'tel', placeholder: '06 12 34 56 78', auto: 'tel' },
   { id: 'email', label: 'Email', type: 'email', placeholder: 'karim@lepetitcomptoir.fr', auto: 'email' },
 ];
+
+/** Le fil du lundi, affiché dans les deux canaux (WhatsApp aujourd'hui, l'application demain). */
+const lundi = [
+  { qui: 'robin', txt: 'Bonjour Karim, voici le point de la semaine. Le beurre a pris 14 % chez Metro, et le contrat de Lina se termine vendredi. Je te prépare le planning ?' },
+  { qui: 'patron', txt: 'Oui. Et fais-moi la fiche allergènes du plat du jour' },
+  { qui: 'robin', txt: "C'est fait. Le planning arrive dans 5 minutes.", doc: 'Allergènes · Plat du jour.pdf' },
+];
 ---
 
 <Base
   locale="fr"
   paths={routes.home}
   nav="accueil"
+  navTone="night"
   title="Maquette Robin | Hatch OS"
   description="Maquette de la page Robin, l'associé IA des restaurateurs indépendants sur WhatsApp, avec l'inscription à la liste d'attente de la bêta."
 >
-  <!-- 1 · Hero + liste d'attente -->
-  <section class="points relative overflow-hidden bg-cream pt-28 pb-16 lg:pt-36 lg:pb-24">
-    <div class="mx-auto grid max-w-[1240px] items-center gap-12 px-4 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
-      <div class="flex flex-col items-start gap-6">
-        <span
-          class="rounded-full bg-surface px-4 py-2 font-mono text-[12px] tracking-[0.16em] text-ink uppercase ring-1 ring-line"
-        >
-          Nouvel agent · Restaurants indépendants · Bêta
-        </span>
-        <h1
-          class="font-display text-[44px] leading-[1.02] font-semibold tracking-[-0.025em] text-ink sm:text-[58px] lg:text-[76px]"
-        >
-          Robin, votre associé IA <span class="surligne">sur WhatsApp.</span>
-        </h1>
-        <p class="max-w-[540px] text-[16px] leading-7 text-soft lg:text-[18px] lg:leading-8">
-          Vous faites tout, tout seul : la cuisine, l'équipe, les fournisseurs, les chiffres,
-          l'administratif. Robin est le bras droit que vous n'avez pas, dans l'application que vous
-          ouvrez déjà cent fois par jour.
-        </p>
-        <ul class="flex flex-wrap gap-x-6 gap-y-2 text-[14px] font-medium text-ink">
-          <li class="flex items-center gap-2"><span class="puce"></span>1 ou 2 établissements</li>
-          <li class="flex items-center gap-2"><span class="puce"></span>À l'écrit ou en vocal</li>
-          <li class="flex items-center gap-2"><span class="puce"></span>Gratuit pendant la bêta</li>
-        </ul>
+  <div class="nuit bg-night text-cream">
+    <!-- 1 · Hero : Robin flotte au-dessus du titre (dots), une grande phrase centrée (muse.ai) -->
+    <section id="robin" class="flex flex-col items-center px-4 pt-36 pb-14 text-center sm:px-6 lg:pt-44 lg:pb-20">
+      <!-- Robin fait coucou dans son cercle (le portrait animé de l'accueil), et flotte. -->
+      <div class="flotte mb-8 size-[132px] overflow-hidden rounded-full bg-cream-2 lg:size-[156px]">
+        <video
+          class="size-full object-cover"
+          src="/maquettes/anim/robin.mp4"
+          poster={portrait.src}
+          autoplay
+          muted
+          loop
+          playsinline
+          aria-label="Robin, un rouge-gorge en voxel, fait coucou."
+        ></video>
+      </div>
+      <span class="mb-6 rounded-full px-4 py-2 font-mono text-[11px] tracking-[0.16em] text-cream/75 uppercase ring-1 ring-line-night">
+        Bêta · Restaurants indépendants
+      </span>
+      <h1
+        class="font-display text-[40px] leading-[1.04] font-medium tracking-[-0.02em] sm:text-[54px] lg:text-[64px]"
+      >
+        Robin, votre associé IA.
+      </h1>
+      <p class="mt-5 max-w-[520px] text-[16px] leading-7 text-cream/75 lg:text-[18px] lg:leading-8">
+        Vous faites tout, tout seul. Robin est le bras droit que vous n'avez pas : il connaît la
+        maison, revient vers vous et prépare le travail.
+      </p>
+      <div class="mt-8 flex flex-wrap justify-center gap-3">
+        <a href="#beta" class="btn-vif rounded-full bg-cream px-6 py-3 text-[0.9rem] font-bold text-ink">
+          Rejoindre la bêta
+        </a>
+        <a href="#semaine" class="rounded-full px-6 py-3 text-[0.9rem] font-semibold text-cream ring-1 ring-line-night transition-colors hover:bg-night-2">
+          Une semaine avec Robin
+        </a>
       </div>
 
-      <!-- Le formulaire de la liste d'attente, Robin perché dessus -->
-      <div class="relative pt-16" id="liste">
-        <Image
-          src={robin}
-          alt="Robin, un rouge-gorge en voxel."
-          widths={[160, 320]}
-          sizes="160px"
-          class="perche absolute -top-2 right-8 z-2 w-[150px] drop-shadow-[0_12px_18px_rgb(42_16_3/0.18)]"
+      <!-- La grande image sous le hero, comme la vidéo des dots -->
+      <div class="mt-14 w-full max-w-[1100px] overflow-hidden rounded-[28px] lg:mt-20 lg:rounded-[36px]">
+        <Picture
+          src={bistrot}
+          alt="Un petit bistrot indépendant en voxels : derrière le comptoir, le patron consulte son téléphone, Robin perché à côté de lui."
+          widths={[700, 1100, 1600]}
+          sizes="(min-width: 1140px) 1100px, 100vw"
+          formats={['avif', 'webp']}
+          class="block w-full"
         />
+      </div>
+    </section>
+
+    <!-- 2 · La pilule de navigation collante (dots) -->
+    <nav class="pilule-zone" aria-label="Sur cette page">
+      <div class="pilule">
+        <a href="#robin" class="pilule-nom">
+          <Image src={robin} alt="" width={28} densities={[1, 2]} class="size-7 rounded-full object-cover" />
+          Robin
+        </a>
+        <a href="#fait">Ce qu'il fait</a>
+        <a href="#semaine">Une semaine</a>
+        <a href="#canaux">Où le trouver</a>
+        <a href="#beta" class="pilule-cta">Rejoindre la bêta</a>
+      </div>
+    </nav>
+
+    <!-- 3 · Ce que fait Robin : rangées alternées, une conversation dans une carte teintée -->
+    <section id="fait" class="mx-auto flex max-w-[1180px] flex-col gap-16 px-4 py-20 sm:px-6 lg:gap-24 lg:py-28">
+      <div class="flex max-w-[640px] flex-col gap-4">
+        <span class="font-mono text-kicker text-cream/60 uppercase">Ce que fait Robin</span>
+        <h2 class="font-display text-[34px] leading-[1.08] font-medium tracking-[-0.02em] lg:text-[48px]">
+          Pas un logiciel de plus. Un associé qui connaît la maison.
+        </h2>
+      </div>
+      {
+        piliers.map((p, i) => (
+          <div class:list={['rangee grid items-center gap-8 md:grid-cols-2 lg:gap-16', i % 2 === 1 && 'inverse']}>
+            <div class="flex flex-col items-start gap-4">
+              <h3 class="font-display text-[28px] leading-tight font-medium lg:text-[36px]">{p.titre}</h3>
+              <p class="max-w-[420px] text-[16px] leading-7 text-cream/75">{p.texte}</p>
+            </div>
+            <div class:list={['carte-couleur grid place-items-center rounded-[28px] p-6 sm:p-10 lg:rounded-[36px] lg:p-14', p.teinte]}>
+              <div class="fil w-full max-w-[380px]">
+                {p.fil.map((m) => (
+                  <div class:list={['msg', m.qui]}>
+                    {m.qui === 'robin' && (
+                      <Image src={robin} alt="" width={28} densities={[1, 2]} class="msg-av" />
+                    )}
+                    <div class="msg-bulle">
+                      {m.doc && (
+                        <span class="msg-doc">
+                          <b>{m.doc}</b>
+                          <span>1 page · prête à afficher</span>
+                        </span>
+                      )}
+                      {m.txt}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ))
+      }
+    </section>
+
+    <!-- 4 · Une semaine avec Robin : la frise des jours (la « journée » des dots) -->
+    <section id="semaine" class="border-t border-line-night px-4 py-20 sm:px-6 lg:py-28" data-semaine>
+      <div class="mx-auto flex max-w-[980px] flex-col items-center text-center">
+        <span class="font-mono text-kicker text-cream/60 uppercase">Une semaine avec Robin</span>
+        <h2 class="mt-4 max-w-[18ch] font-display text-[34px] leading-[1.08] font-medium tracking-[-0.02em] lg:text-[48px]">
+          Du lundi matin au dimanche soir.
+        </h2>
+
+        <!-- Robin et sa bulle, qui changent avec le jour -->
+        <div class="scene mt-12">
+          <div class="flotte size-[104px] overflow-hidden rounded-full bg-cream-2">
+            <video class="size-full object-cover" src="/maquettes/anim/robin.mp4" poster={portrait.src} autoplay muted loop playsinline aria-hidden="true"></video>
+          </div>
+          <div class="bulles">
+            {
+              semaine.map((j, i) => (
+                <p class:list={['bulle', i === 0 && 'on']} data-j={i}>
+                  {j.bulle}
+                </p>
+              ))
+            }
+          </div>
+        </div>
+
+        <!-- La frise -->
+        <div class="frise mt-10 w-full" role="tablist" aria-label="Jours de la semaine">
+          {
+            semaine.map((j, i) => (
+              <button
+                type="button"
+                role="tab"
+                class="jour"
+                aria-selected={i === 0 ? 'true' : 'false'}
+                aria-controls="semaine-detail"
+                data-j={i}
+              >
+                <span class="jour-point" aria-hidden="true" />
+                <span class="jour-nom">{j.jour}</span>
+                <span class="jour-heure">{j.heure}</span>
+              </button>
+            ))
+          }
+        </div>
+
+        <div id="semaine-detail" class="details mt-10" aria-live="polite">
+          {
+            semaine.map((j, i) => (
+              <div class:list={['detail', i === 0 && 'on']} data-j={i}>
+                <h3 class="font-display text-[26px] leading-tight font-medium lg:text-[32px]">{j.titre}</h3>
+                <p class="mx-auto mt-3 max-w-[520px] text-[16px] leading-7 text-cream/75">{j.texte}</p>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 · Où le trouver : onglets de canal, le téléphone change (les canaux des dots) -->
+    <section id="canaux" class="border-t border-line-night px-4 py-20 sm:px-6 lg:py-28" data-canaux>
+      <div class="mx-auto flex max-w-[980px] flex-col items-center text-center">
+        <span class="font-mono text-kicker text-cream/60 uppercase">Où le trouver</span>
+        <h2 class="mt-4 font-display text-[34px] leading-[1.08] font-medium tracking-[-0.02em] lg:text-[48px]">
+          Là où vous êtes déjà.
+        </h2>
+        <p class="mt-4 max-w-[520px] text-[16px] leading-7 text-cream/75">
+          Pendant la bêta, Robin vit dans WhatsApp. Ensuite, il aura sa propre conversation, pensée
+          pour lui, toujours à portée de main.
+        </p>
+
+        <div class="canaux mt-8" role="tablist" aria-label="Canaux">
+          <button type="button" role="tab" class="canal" aria-selected="true" data-c="0">
+            WhatsApp <span>aujourd'hui</span>
+          </button>
+          <button type="button" role="tab" class="canal" aria-selected="false" data-c="1">
+            Application Robin <span>bientôt</span>
+          </button>
+        </div>
+
+        <div class="telephone mt-10 w-full max-w-[320px]">
+          <Iphone>
+            <!-- WhatsApp -->
+            <div class="ecran wa on" data-c="0">
+              <div class="wa-statut" aria-hidden="true"><span>8:31</span><span>●●● ▮</span></div>
+              <header class="wa-barre">
+                <span class="wa-retour" aria-hidden="true">‹</span>
+                <Image src={robin} alt="" width={40} densities={[1, 2]} class="wa-av" />
+                <span class="wa-contact"><b>Robin</b><span>en ligne</span></span>
+              </header>
+              <div class="wa-fil">
+                <p class="wa-jour">Lundi</p>
+                {
+                  lundi.map((m) => (
+                    <div class:list={['wa-msg', m.qui, m.doc && 'wa-doc']}>
+                      {m.doc && (
+                        <span class="wa-fichier">
+                          <b>{m.doc}</b>
+                          <span>1 page · prête à afficher</span>
+                        </span>
+                      )}
+                      {m.txt}
+                    </div>
+                  ))
+                }
+              </div>
+            </div>
+            <!-- L'application Robin, façon Muse : une conversation épurée -->
+            <div class="ecran app" data-c="1" aria-hidden="true">
+              <div class="app-statut" aria-hidden="true"><span>8:31</span><span>●●● ▮</span></div>
+              <header class="app-tete">
+                <Image src={robin} alt="" width={56} densities={[1, 2]} class="app-av" />
+                <b>Robin</b>
+              </header>
+              <div class="app-fil">
+                {
+                  lundi.map((m) => (
+                    <div class:list={['app-msg', m.qui]}>
+                      {m.doc && (
+                        <span class="app-fichier">
+                          <b>{m.doc}</b>
+                        </span>
+                      )}
+                      {m.txt}
+                    </div>
+                  ))
+                }
+              </div>
+              <div class="app-saisie" aria-hidden="true">
+                <span>Écrire à Robin…</span>
+                <span class="app-micro" />
+              </div>
+            </div>
+          </Iphone>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 · Confiance : trois cartes sobres -->
+    <section class="border-t border-line-night px-4 py-20 sm:px-6 lg:py-28">
+      <div class="mx-auto flex max-w-[1180px] flex-col items-center">
+        <h2 class="max-w-[20ch] text-center font-display text-[34px] leading-[1.08] font-medium tracking-[-0.02em] lg:text-[48px]">
+          À vos côtés, sous votre contrôle.
+        </h2>
+        <div class="mt-12 grid w-full gap-4 md:grid-cols-3">
+          {
+            confiance.map((c, i) => (
+              <article class="flex flex-col gap-3 rounded-[24px] bg-night-2 p-7 ring-1 ring-line-night lg:p-8">
+                <span class="font-mono text-[12px] tracking-[0.08em] text-cream/60">0{i + 1}</span>
+                <h3 class="font-display text-[22px] leading-tight font-medium">{c.titre}</h3>
+                <p class="text-[15px] leading-6 text-cream/75">{c.texte}</p>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 · La bêta : la liste d'attente -->
+    <section id="beta" class="border-t border-line-night px-4 py-20 sm:px-6 lg:py-28">
+      <div class="mx-auto grid max-w-[1100px] items-center gap-12 lg:grid-cols-[1fr_0.95fr] lg:gap-16">
+        <div class="flex flex-col items-start gap-5">
+          <span class="font-mono text-kicker text-cream/60 uppercase">Bêta</span>
+          <h2 class="font-display text-[34px] leading-[1.06] font-medium tracking-[-0.02em] lg:text-[48px]">
+            On cherche nos premiers restaurateurs pour le tester et l'améliorer avec nous.
+          </h2>
+          <p class="max-w-[440px] text-[16px] leading-7 text-cream/75">
+            On ouvre Robin à quelques restaurateurs à la fois. Laissez vos coordonnées, on vous écrit
+            sur WhatsApp quand c'est votre tour.
+          </p>
+        </div>
         <form
-          class="relative z-1 flex flex-col gap-4 rounded-[28px] bg-surface p-6 shadow-2 ring-1 ring-line sm:p-8 lg:rounded-[36px] lg:p-10"
+          class="flex flex-col gap-4 rounded-[28px] bg-cream p-6 text-ink sm:p-8 lg:rounded-[36px] lg:p-10"
           onsubmit="event.preventDefault()"
         >
-          <div class="flex flex-col gap-2">
-            <h2 class="font-display text-[28px] leading-tight font-semibold text-ink">Rejoignez la bêta</h2>
-            <p class="text-[14px] leading-6 text-soft">
-              On ouvre Robin à quelques restaurateurs à la fois. Laissez vos coordonnées, on vous
-              écrit sur WhatsApp quand c'est votre tour.
-            </p>
-          </div>
           <div class="grid gap-3 sm:grid-cols-2">
             {
               champs.map((c, i) => (
@@ -106,204 +428,326 @@ const champs = [
           </div>
           <button
             type="submit"
-            class="btn-vif mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full bg-orange px-6 py-4 text-base font-bold text-ink shadow-[0_10px_24px_rgb(248_122_1/0.4)]"
+            class="btn-vif mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full bg-orange px-6 py-4 text-base font-bold text-ink"
           >
             Rejoindre la liste d'attente <span aria-hidden="true">→</span>
           </button>
           <p class="text-center text-[12.5px] text-soft">Gratuit pendant la bêta. Aucun engagement.</p>
         </form>
       </div>
-    </div>
-  </section>
+    </section>
+  </div>
 
-  <!-- 2 · Les trois piliers -->
-  <section class="bg-cream-2 py-16 lg:py-24">
-    <div class="mx-auto max-w-[1240px] px-4 sm:px-6">
-      <div class="mb-10 flex max-w-[720px] flex-col gap-4 lg:mb-14">
-        <span class="font-mono text-[12px] tracking-[0.16em] text-orange-txt uppercase">Ce que fait Robin</span>
-        <h2 class="font-display text-[34px] leading-[1.08] font-semibold tracking-[-0.02em] text-ink lg:text-[48px]">
-          Pas un logiciel de plus. Un associé qui connaît la maison.
-        </h2>
-      </div>
-      <div class="grid gap-4 md:grid-cols-3 lg:gap-5">
-        {
-          piliers.map((p, i) => (
-            <article class="flex flex-col gap-4 rounded-[28px] bg-surface p-7 shadow-1 ring-1 ring-line lg:p-9">
-              <span class="font-mono text-[13px] text-orange-txt">0{i + 1}</span>
-              <h3 class="font-display text-[24px] leading-tight font-semibold text-ink">{p.titre}</h3>
-              <p class="text-[15px] leading-6 text-soft">{p.texte}</p>
-              <p class="mt-auto rounded-2xl bg-whatsapp px-4 py-3 text-[14px] leading-5 text-ink">{p.exemple}</p>
-            </article>
-          ))
-        }
-      </div>
-    </div>
-  </section>
-
-  <!-- 3 · Dans WhatsApp, aujourd'hui -->
-  <section class="bg-cream py-16 lg:py-24">
-    <div class="mx-auto grid max-w-[1240px] items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:gap-20">
-      <div class="flex flex-col items-start gap-5">
-        <span class="font-mono text-[12px] tracking-[0.16em] text-orange-txt uppercase">Le lundi, 8 h 30</span>
-        <h2 class="font-display text-[34px] leading-[1.08] font-semibold tracking-[-0.02em] text-ink lg:text-[48px]">
-          C'est lui qui écrit en premier.
-        </h2>
-        <p class="max-w-[480px] text-[16px] leading-7 text-soft">
-          Chaque semaine, Robin fait le point : votre chiffre, ce qui a bougé dans vos factures, ce
-          qu'il ne faut pas oublier. Vous répondez comme à un associé, il s'occupe du reste.
-        </p>
-        <p class="max-w-[480px] text-[16px] leading-7 text-soft">
-          Pendant la bêta, Robin vit dans WhatsApp. Ensuite, il aura sa propre conversation, pensée
-          pour lui, toujours à portée de main.
-        </p>
-      </div>
-
-      <div class="mx-auto w-full max-w-[340px]">
-        <Iphone>
-          <div class="wa">
-            <div class="wa-statut" aria-hidden="true"><span>8:31</span><span>●●● ▮</span></div>
-            <header class="wa-barre">
-              <span class="wa-retour" aria-hidden="true">‹</span>
-              <Image src={robin} alt="" width={40} densities={[1, 2]} class="wa-av" />
-              <span class="wa-contact"><b>Robin</b><span>en ligne</span></span>
-            </header>
-            <div class="wa-fil">
-              <p class="wa-jour">Lundi</p>
-              <div class="wa-msg robin">
-                Bonjour Karim 👋 Le point de la semaine :
-                <br />• 18 420 € de CA, +6 % sur la semaine d'avant
-                <br />• le beurre a pris 14 % chez Metro
-                <br />• le contrat de Lina se termine vendredi
-                <br /><br />Je te prépare le planning ?
-              </div>
-              <div class="wa-msg patron">Oui. Et fais-moi la fiche allergènes du plat du jour</div>
-              <div class="wa-msg robin wa-doc">
-                <span class="wa-fichier"><b>Allergènes · Plat du jour.pdf</b><span>1 page · prête à afficher</span></span>
-                C'est fait. Le planning arrive dans 5 minutes.
-              </div>
-            </div>
-          </div>
-        </Iphone>
-      </div>
-    </div>
-  </section>
-
-  <!-- 4 · Le bandeau orange, comme l'affiche -->
-  <section class="bandeau bg-orange py-16 lg:py-20">
-    <div class="mx-auto grid max-w-[1240px] items-center gap-10 px-4 sm:px-6 lg:grid-cols-[1.2fr_0.8fr]">
-      <div class="flex flex-col items-start gap-6">
-        <h2 class="font-display text-[34px] leading-[1.06] font-semibold tracking-[-0.02em] text-ink lg:text-[52px]">
-          On cherche nos premiers restaurateurs pour le tester et l'améliorer avec nous.
-        </h2>
-        <a
-          href="#liste"
-          class="btn-vif inline-flex items-center gap-2 rounded-full bg-ink px-6 py-4 font-mono text-[14px] tracking-[0.12em] text-cream uppercase"
-        >
-          Rejoindre la bêta <span aria-hidden="true">→</span>
-        </a>
-      </div>
-      <Picture
-        src={oeuf}
-        alt="Robin sort de son œuf sur le comptoir d'un bistrot."
-        widths={[500, 900]}
-        sizes="(min-width: 1024px) 480px, 100vw"
-        formats={['avif', 'webp']}
-        class="w-full rotate-[2deg] rounded-[24px] shadow-3 ring-8 ring-white"
-      />
-    </div>
-  </section>
+  <script is:inline data-keep>
+    // Une semaine avec Robin : un clic sur un jour change la bulle et le détail. Les canaux : un clic
+    // sur un onglet change l'écran du téléphone. Sans JS : le lundi et WhatsApp restent affichés.
+    (function () {
+      function onglets(root, attr) {
+        if (!root) return;
+        var tabs = [].slice.call(root.querySelectorAll('[role="tab"]'));
+        var panneaux = [].slice.call(root.querySelectorAll('[' + attr + ']:not([role="tab"])'));
+        tabs.forEach(function (t) {
+          t.addEventListener('click', function () {
+            var v = t.getAttribute(attr);
+            tabs.forEach(function (u) {
+              u.setAttribute('aria-selected', u === t ? 'true' : 'false');
+            });
+            panneaux.forEach(function (p) {
+              var on = p.getAttribute(attr) === v;
+              p.classList.toggle('on', on);
+              p.setAttribute('aria-hidden', on ? 'false' : 'true');
+            });
+          });
+        });
+      }
+      onglets(document.querySelector('[data-semaine]'), 'data-j');
+      onglets(document.querySelector('[data-canaux]'), 'data-c');
+    })();
+  </script>
 </Base>
 
 <style>
-  /* Grille de points, comme le fond des visuels Robin. */
-  .points {
-    background-image: radial-gradient(color-mix(in srgb, var(--color-ink) 12%, transparent) 1px, transparent 1.4px);
-    background-size: 22px 22px;
+  /* Robin flotte doucement, comme le dot au-dessus du titre. */
+  .flotte {
+    filter: drop-shadow(0 18px 24px color-mix(in srgb, var(--color-black) 45%, transparent));
+    animation: flotte 5s ease-in-out infinite;
   }
-  .surligne {
-    background: linear-gradient(transparent 60%, var(--color-peach) 60% 92%, transparent 92%);
-  }
-  .puce {
-    width: 7px;
-    height: 7px;
-    border-radius: 2px;
-    background: var(--color-orange);
-  }
-  .champ {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--color-ink);
-  }
-  .champ input {
-    height: 48px;
-    padding: 0 16px;
-    border-radius: 14px;
-    border: 1px solid var(--color-line);
-    background: var(--color-surface-2);
-    font: 400 15px var(--font-sans);
-    color: var(--color-ink);
-    outline: none;
-    transition:
-      border-color 0.2s,
-      box-shadow 0.2s;
-  }
-  .champ input::placeholder {
-    color: var(--color-muted);
-  }
-  .champ input:focus {
-    border-color: var(--color-orange-txt);
-    box-shadow: 0 0 0 4px var(--color-orange-tint);
-  }
-  .perche {
-    animation: perche 5s ease-in-out infinite;
-  }
-  @keyframes perche {
+  @keyframes flotte {
     0%,
     100% {
       transform: translateY(0) rotate(-2deg);
     }
     50% {
-      transform: translateY(-6px) rotate(2deg);
+      transform: translateY(-10px) rotate(2deg);
     }
   }
-  @media (prefers-reduced-motion: reduce) {
-    .perche {
-      animation: none;
+
+  /* La pilule collante : sous la nav fixe, elle suit le défilement. */
+  .pilule-zone {
+    position: sticky;
+    top: 84px;
+    z-index: 50;
+    display: flex;
+    justify-content: center;
+    padding: 0 16px;
+    pointer-events: none;
+  }
+  .pilule {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-night-2) 88%, transparent);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 0 0 1px var(--color-line-night);
+    font-size: 13.5px;
+    pointer-events: auto;
+    overflow-x: auto;
+    max-width: 100%;
+  }
+  .pilule a {
+    padding: 8px 14px;
+    border-radius: 999px;
+    color: color-mix(in srgb, var(--color-cream) 75%, transparent);
+    white-space: nowrap;
+    transition: color 0.2s;
+  }
+  .pilule a:hover {
+    color: var(--color-cream);
+  }
+  .pilule .pilule-nom {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding-left: 6px;
+    font-weight: 700;
+    color: var(--color-cream);
+  }
+  .pilule .pilule-cta {
+    background: var(--color-cream);
+    color: var(--color-ink);
+    font-weight: 700;
+  }
+
+  /* Rangées alternées : la carte à droite, puis à gauche. */
+  @media (min-width: 48rem) {
+    .rangee.inverse > :first-child {
+      order: 2;
     }
   }
-  /* Motif « PILOTE GRATUIT » en filigrane, comme l'affiche orange. */
-  .bandeau {
-    background-image: repeating-linear-gradient(
-      -12deg,
-      transparent 0 34px,
-      color-mix(in srgb, var(--color-white) 10%, transparent) 34px 36px
-    );
+  .carte-couleur {
+    min-height: 340px;
+  }
+  .fil {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .msg {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+  }
+  .msg.patron {
+    justify-content: flex-end;
+  }
+  .msg :global(.msg-av) {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    border-radius: 999px;
+    background: var(--color-cream);
+    object-fit: cover;
+  }
+  .msg-bulle {
+    max-width: 82%;
+    padding: 12px 15px;
+    border-radius: 18px;
+    font: 400 15px/1.45 var(--font-sans);
+    color: var(--color-ink);
+    box-shadow: var(--shadow-1);
+  }
+  .msg.robin .msg-bulle {
+    background: var(--color-surface);
+    border-bottom-left-radius: 6px;
+  }
+  .msg.patron .msg-bulle {
+    background: var(--color-night);
+    color: var(--color-cream);
+    border-bottom-right-radius: 6px;
+  }
+  .msg-doc {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 8px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: var(--color-cream-2);
+  }
+  .msg-doc span {
+    font-size: 12px;
+    color: var(--color-soft);
+  }
+
+  /* Une semaine : la scène (Robin + bulle), la frise, le détail. */
+  .scene {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .bulles {
+    display: grid;
+    min-height: 74px;
+  }
+  .bulle {
+    grid-area: 1 / 1;
+    max-width: 380px;
+    padding: 14px 18px;
+    border-radius: 18px;
+    background: var(--color-cream);
+    color: var(--color-ink);
+    font: 500 15px/1.45 var(--font-sans);
+    opacity: 0;
+    translate: 0 8px;
+    transition:
+      opacity 0.3s var(--ease-doux),
+      translate 0.4s var(--ease-doux);
+  }
+  .bulle.on {
+    opacity: 1;
+    translate: 0 0;
+  }
+  .frise {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+  }
+  .frise::before {
+    content: '';
+    position: absolute;
+    top: 7px;
+    left: 8%;
+    right: 8%;
+    height: 1px;
+    background: var(--color-line-night);
+  }
+  .jour {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 6px;
+    cursor: pointer;
+  }
+  .jour-point {
+    width: 15px;
+    height: 15px;
+    border-radius: 999px;
+    background: var(--color-night);
+    box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--color-cream) 45%, transparent);
+    transition:
+      background-color 0.2s,
+      box-shadow 0.2s;
+  }
+  .jour-nom {
+    font: 600 14px/1 var(--font-sans);
+    color: color-mix(in srgb, var(--color-cream) 70%, transparent);
+  }
+  .jour-heure {
+    font: 400 11px/1 var(--font-mono);
+    letter-spacing: 0.06em;
+    color: color-mix(in srgb, var(--color-cream) 60%, transparent);
+  }
+  .jour[aria-selected='true'] .jour-point {
+    background: var(--color-orange);
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-orange) 25%, transparent);
+  }
+  .jour[aria-selected='true'] .jour-nom {
+    color: var(--color-cream);
+  }
+  .jour:focus-visible,
+  .canal:focus-visible {
+    outline: 2px solid var(--color-cream);
+    outline-offset: 4px;
+    border-radius: 8px;
+  }
+  .details {
+    display: grid;
+  }
+  .detail {
+    grid-area: 1 / 1;
+    opacity: 0;
+    transition: opacity 0.3s var(--ease-doux);
+  }
+  .detail.on {
+    opacity: 1;
+  }
+
+  /* Les canaux : deux onglets, deux écrans dans le même téléphone. */
+  .canaux {
+    display: inline-flex;
+    gap: 4px;
+    padding: 5px;
+    border-radius: 999px;
+    box-shadow: 0 0 0 1px var(--color-line-night);
+  }
+  .canal {
+    padding: 9px 16px;
+    border-radius: 999px;
+    font: 600 14px/1 var(--font-sans);
+    color: color-mix(in srgb, var(--color-cream) 75%, transparent);
+    cursor: pointer;
+    transition:
+      background-color 0.2s,
+      color 0.2s;
+  }
+  .canal span {
+    margin-left: 4px;
+    font: 400 11px/1 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+  .canal[aria-selected='true'] {
+    background: var(--color-cream);
+    color: var(--color-ink);
+  }
+  .ecran {
+    --pt: calc(100cqw / 370);
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.35s var(--ease-doux);
+    text-align: left;
+  }
+  .ecran.on {
+    opacity: 1;
   }
 
   /* WhatsApp dans l'iPhone, mêmes proportions que les maquettes de la démo. */
   .wa {
-    --pt: calc(100cqw / 370);
-    position: absolute;
-    inset: 0;
     container-type: inline-size;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
     background: var(--color-whatsapp-wall);
     font: 400 calc(15 * var(--pt)) / 1.35 var(--font-sans);
     color: var(--color-ink);
   }
-  .wa-statut {
+  .wa-statut,
+  .app-statut {
     display: flex;
     justify-content: space-between;
     align-items: center;
     height: calc(54 * var(--pt));
     padding: calc(4 * var(--pt)) calc(34 * var(--pt)) 0 calc(48 * var(--pt));
-    background: var(--color-surface);
     font: 600 calc(16 * var(--pt)) / 1 var(--font-sans);
+  }
+  .wa-statut {
+    background: var(--color-surface);
   }
   .wa-barre {
     display: flex;
@@ -320,7 +764,7 @@ const champs = [
   .wa-barre :global(.wa-av) {
     width: calc(38 * var(--pt));
     height: calc(38 * var(--pt));
-    object-fit: contain;
+    object-fit: cover;
     border-radius: 999px;
     background: var(--color-cream);
   }
@@ -382,5 +826,115 @@ const champs = [
   .wa-fichier span {
     font-size: calc(12 * var(--pt));
     color: var(--color-soft);
+  }
+
+  /* L'application Robin, façon Muse : fond crème, Robin en tête, bulles sans fioriture. */
+  .app {
+    container-type: inline-size;
+    background: var(--color-cream);
+    font: 400 calc(15 * var(--pt)) / 1.4 var(--font-sans);
+    color: var(--color-ink);
+  }
+  .app-tete {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: calc(6 * var(--pt));
+    padding: calc(8 * var(--pt)) 0 calc(14 * var(--pt));
+    font-size: calc(16 * var(--pt));
+  }
+  .app-tete :global(.app-av) {
+    width: calc(56 * var(--pt));
+    height: calc(56 * var(--pt));
+    border-radius: 999px;
+    background: var(--color-cream-2);
+    object-fit: cover;
+  }
+  .app-fil {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: calc(10 * var(--pt));
+    padding: 0 calc(16 * var(--pt)) calc(12 * var(--pt));
+  }
+  .app-msg {
+    max-width: 86%;
+  }
+  .app-msg.robin {
+    align-self: flex-start;
+  }
+  .app-msg.patron {
+    align-self: flex-end;
+    padding: calc(9 * var(--pt)) calc(13 * var(--pt));
+    border-radius: calc(18 * var(--pt));
+    background: var(--color-night);
+    color: var(--color-cream);
+  }
+  .app-fichier {
+    display: block;
+    margin-bottom: calc(6 * var(--pt));
+    padding: calc(10 * var(--pt)) calc(12 * var(--pt));
+    border-radius: calc(12 * var(--pt));
+    background: var(--color-surface);
+    box-shadow: 0 0 0 1px var(--color-line);
+  }
+  .app-saisie {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 calc(12 * var(--pt)) calc(22 * var(--pt));
+    padding: calc(12 * var(--pt)) calc(10 * var(--pt)) calc(12 * var(--pt)) calc(16 * var(--pt));
+    border-radius: 999px;
+    background: var(--color-surface);
+    box-shadow: 0 0 0 1px var(--color-line);
+    color: var(--color-soft);
+  }
+  .app-micro {
+    width: calc(26 * var(--pt));
+    height: calc(26 * var(--pt));
+    border-radius: 999px;
+    background: var(--color-orange);
+  }
+
+  /* Formulaire de la bêta. */
+  .champ {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+  .champ input {
+    height: 48px;
+    padding: 0 16px;
+    border-radius: 14px;
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
+    font: 400 15px var(--font-sans);
+    color: var(--color-ink);
+    outline: none;
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s;
+  }
+  .champ input::placeholder {
+    color: var(--color-muted);
+  }
+  .champ input:focus {
+    border-color: var(--color-orange-txt);
+    box-shadow: 0 0 0 4px var(--color-orange-tint);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .flotte {
+      animation: none;
+    }
+    .bulle,
+    .detail,
+    .ecran {
+      transition: none;
+    }
   }
 </style>
