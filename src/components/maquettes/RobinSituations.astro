@@ -4,7 +4,8 @@
  * WhatsApp (l'interface de Robin pendant la bêta, il n'y a pas encore d'application). Ce qui bouge
  * se passe dans des éléments que WhatsApp sait afficher : un lien, une photo, un document, un
  * graphique envoyé en image, des boutons de réponse rapide. Le pouce du patron tape dessus.
- *   1. Il se branche à vos outils : un lien pour connecter la boîte mail, puis ce qu'il a trouvé.
+ *   1. Il se branche à vos outils : un lien pour connecter la boîte mail, ce qu'il a trouvé, et la
+ *      compta du mois préparée dans un Excel, à relire avant de l'envoyer à l'expert-comptable.
  *   2. Il vérifie chaque facture : la photo du bon de livraison, la facture vérifiée ligne à ligne,
  *      l'écart, l'avoir préparé sur un « oui ».
  *   3. Il éclaire vos décisions : « on reste ouvert de 14 h à 18 h ? », la réponse avec un graphique.
@@ -121,6 +122,17 @@ const situations = [
                           {t}
                         </span>
                       ))}
+                    </span>
+                  </div>
+                  <div class="m robin" data-etat="d">
+                    Je prépare la compta du mois avec. Tout sera dans un fichier Excel : tu le relis, puis tu
+                    l'envoies à Sylvain, ton expert-comptable.
+                    <span class="fichier xls">
+                      <span class="f-ico">XLS</span>
+                      <span class="f-txt">
+                        <b>Compta octobre · Le Petit Comptoir.xlsx</b>
+                        <span>Brouillon, à relire</span>
+                      </span>
                     </span>
                   </div>
                 </>
@@ -280,6 +292,8 @@ const situations = [
         { t: 3400, on: ['b'] },
         { t: 3800, on: ['tete:ecrit'] },
         { t: 4800, on: ['c'], off: ['tete:ecrit'] },
+        { t: 6000, on: ['tete:ecrit'] },
+        { t: 7200, on: ['d'], off: ['tete:ecrit'] },
       ],
       1: [
         { t: 300, on: ['a'] },
@@ -786,6 +800,12 @@ const situations = [
     background: var(--color-night);
     color: var(--color-cream);
     font: 400 9px/1 var(--font-mono);
+  }
+  .fichier.xls {
+    margin-top: 8px;
+  }
+  .xls .f-ico {
+    background: var(--color-whatsapp-teal);
   }
   .f-txt {
     display: flex;
