@@ -11,6 +11,7 @@
 import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import Iphone from '../../components/ui/Iphone.astro';
+import RobinSituations from '../../components/maquettes/RobinSituations.astro';
 import { routes } from '../../i18n/ui';
 import robin from '../../assets/portraits/robin.jpg';
 import soir from '../../assets/robin/soir.jpg';
@@ -24,59 +25,6 @@ import poseDim from '../../assets/robin/semaine/dim.jpg';
 
 /** Robin, une tenue par jour de la frise (même ordre que `semaine`). */
 const poses = [poseLun, poseMar, poseMer, poseJeu, poseVen, poseDim];
-
-/**
- * Ce que fait Robin : une rangée par pilier, une conversation d'exemple dans une carte teintée.
- * Les exemples reprennent les usages réels décrits par Bilal (Discovery Robin, entretien du 05/11) :
- * le contrôle sanitaire et ses pièces, le rapprochement commande / bon de livraison / facture, les
- * contrats faits à partir des modèles du patron.
- */
-const piliers = [
-  {
-    ancre: 'connait',
-    titre: 'Il connaît votre restaurant',
-    texte:
-      "Votre carte, votre équipe, vos fournisseurs, vos documents. Il retient tout, retrouve la bonne pièce et repère celle qui manque.",
-    teinte: 'bg-peach',
-    fil: [
-      { qui: 'patron', txt: "Le contrôle d'hygiène, c'est jeudi. On a tout ?" },
-      {
-        qui: 'robin',
-        txt: "Presque : plan de maîtrise sanitaire, relevés de température et attestations de formation sont prêts. Il manque le certificat de dératisation, je le demande au prestataire ?",
-      },
-    ],
-  },
-  {
-    ancre: 'revient',
-    titre: 'Il revient vers vous',
-    texte:
-      "Il rapproche vos commandes, vos bons de livraison et vos factures, et vous écrit dès qu'une ligne ne colle pas. C'est lui qui écrit en premier.",
-    teinte: 'bg-sand',
-    fil: [
-      {
-        qui: 'robin',
-        txt: 'La facture Metro compte 12 kg de bœuf, le bon de livraison de mardi 10. Je prépare la demande d’avoir ?',
-      },
-      { qui: 'patron', txt: 'Oui, montre-la-moi avant de l’envoyer.' },
-    ],
-  },
-  {
-    ancre: 'prepare',
-    titre: 'Il prépare le travail',
-    texte:
-      'Contrats, mails, dossiers, process pour vos managers : il part de vos modèles et de vos données. Vous relisez, il a fait le reste.',
-    teinte: 'bg-orange-tint',
-    fil: [
-      { qui: 'patron', txt: 'Fais le contrat de Lina pour l’extra de samedi.' },
-      {
-        qui: 'robin',
-        txt: "C'est fait, à partir de ton modèle. Relis-le, je l'envoie à Lina quand tu valides.",
-        doc: "Contrat d'extra · Lina.pdf",
-        meta: 'Ton modèle · prêt à signer',
-      },
-    ],
-  },
-];
 
 /** Une semaine avec Robin : la frise, un moment par jour (mêmes sources que les piliers). */
 const semaine = [
@@ -275,43 +223,14 @@ const lundi = [
     </nav>
 
     <!-- 3 · Ce que fait Robin : rangées alternées, une conversation dans une carte teintée -->
-    <section id="fait" class="mx-auto flex max-w-[1180px] flex-col gap-16 px-4 py-20 sm:px-6 lg:gap-24 lg:py-28">
+    <section id="fait" class="mx-auto flex max-w-[1180px] flex-col gap-12 px-4 py-20 sm:px-6 lg:gap-16 lg:py-28">
       <div class="flex max-w-[640px] flex-col gap-4">
         <span class="font-mono text-kicker text-cream/60 uppercase">Ce que fait Robin</span>
         <h2 class="font-display text-[34px] leading-[1.08] font-medium tracking-[-0.02em] lg:text-[48px]">
           Pas un logiciel de plus. Un associé qui connaît la maison.
         </h2>
       </div>
-      {
-        piliers.map((p, i) => (
-          <div class:list={['rangee grid items-center gap-8 md:grid-cols-2 lg:gap-16', i % 2 === 1 && 'inverse']}>
-            <div class="flex flex-col items-start gap-4">
-              <h3 class="font-display text-[28px] leading-tight font-medium lg:text-[36px]">{p.titre}</h3>
-              <p class="max-w-[420px] text-[16px] leading-7 text-cream/75">{p.texte}</p>
-            </div>
-            <div class:list={['carte-couleur grid place-items-center rounded-[28px] p-6 sm:p-10 lg:rounded-[36px] lg:p-14', p.teinte]}>
-              <div class="fil w-full max-w-[380px]">
-                {p.fil.map((m) => (
-                  <div class:list={['msg', m.qui]}>
-                    {m.qui === 'robin' && (
-                      <Image src={robin} alt="" width={28} densities={[1, 2]} class="msg-av" />
-                    )}
-                    <div class="msg-bulle">
-                      {m.doc && (
-                        <span class="msg-doc">
-                          <b>{m.doc}</b>
-                          <span>{m.meta}</span>
-                        </span>
-                      )}
-                      {m.txt}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        ))
-      }
+      <RobinSituations />
     </section>
 
     <!-- 4 · Une semaine avec Robin : la frise des jours (la « journée » des dots) -->
