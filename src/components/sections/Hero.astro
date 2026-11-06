@@ -34,13 +34,9 @@ import oiseauxPos from './hero-oiseaux.json';
  */
 interface Props {
   locale: Locale;
-  /** Another backdrop instead of the map (mockups): the map's pings, birds and task cards are dropped. */
-  fond?: ImageMetadata;
-  /** Mockup: the camera closer on the map, so the agents (Lark, Peep, Sparrow) read at a glance. */
-  proche?: boolean;
 }
 
-const { locale, fond, proche = false } = Astro.props;
+const { locale } = Astro.props;
 const data = await section('hero', locale);
 const t = useTranslations(locale);
 const { status, events } = data.tasks;
@@ -92,16 +88,13 @@ const tick =
 ---
 
 <section
-  class:list={[
-    'hero relative h-dvh min-h-[640px] overflow-hidden bg-night [container-type:size]',
-    proche && 'hero-proche',
-  ]}
+  class="hero relative h-dvh min-h-[640px] overflow-hidden bg-night [container-type:size]"
   aria-labelledby="hero-titre"
   data-rv-groupe
 >
   <div class="h-decor" aria-hidden="true">
     <Picture
-      src={fond ?? carte}
+      src={carte}
       formats={['avif', 'webp']}
       widths={[800, 1200, 1600, 2000, 2400, 2880, 3840]}
       quality={80}
@@ -109,10 +102,10 @@ const tick =
       alt=""
       loading="eager"
       fetchpriority="high"
-      class:list={['absolute inset-0 size-full object-cover', fond && 'object-[85%_center]']}
+      class="absolute inset-0 size-full object-cover"
     />
     {
-      !fond && steps.map((e) => (
+      steps.map((e) => (
         <div class="h-ping" style={`left:${pct(e.x, W)};top:${pct(e.y, H)}`}>
           <span />
           <span />
@@ -120,7 +113,7 @@ const tick =
       ))
     }
     {
-      !fond && (Object.keys(OISEAUX) as Oiseau[]).map((agent) => {
+      (Object.keys(OISEAUX) as Oiseau[]).map((agent) => {
         const b = OISEAUX[agent];
         return (
           <div
@@ -154,7 +147,7 @@ const tick =
   >
     <div class="h-piles" aria-hidden="true" data-pas={STEP}>
       {
-        !fond && steps.map((e) => (
+        steps.map((e) => (
           <div
             class="h-pile"
             data-agent={e.agent}
@@ -449,16 +442,6 @@ const tick =
   @media (min-width: 64rem) {
     .hero {
       --fx: 1;
-    }
-    /* Mockup « caméra plus proche » : the frame 1.57× bigger, framed on the agents' area (x 360–1280,
-       y 90+ of the 1440 × 804 frame) so Lark, Peep and Sparrow sit right of the glass card. */
-    .hero.hero-proche {
-      --sw: calc(max(100cqw, calc(100cqh * 1440 / 804)) * 1.57);
-      --fx: 0.694;
-    }
-    .hero-proche .h-decor,
-    .hero-proche .h-piles {
-      top: calc(var(--sh) * -0.09);
     }
     .h-piles {
       position: absolute;
