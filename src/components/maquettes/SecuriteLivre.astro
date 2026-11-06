@@ -1,0 +1,501 @@
+---
+/**
+ * MAQUETTE — la sécurité sur la page d'accueil (le carrefour), sous les deux espaces.
+ * Le bandeau orange de la page Sécurité (sur-titre, titre, promesse), puis ses quatre thèmes réunis
+ * dans un seul bloc, un « livre » : une page à la fois, elle bascule vers la gauche comme une page
+ * qu'on tourne. Les quatre vignettes du bandeau servent d'onglets, des flèches tournent page par page.
+ * Sans JS (ou dans l'aperçu), les quatre pages s'empilent simplement. Reduced motion : pas de rotation,
+ * la page change sur place.
+ * Contenu : celui de la page Sécurité (src/content/pages/security/fr.yaml), rien de nouveau.
+ */
+import { getEntry } from 'astro:content';
+import { Picture, getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Ipad from '../ui/Ipad.astro';
+import fond from '../../assets/securite/fond-orange-grain.jpg';
+import jay from '../../assets/securite/jay.png';
+import owl from '../../assets/securite/owl.png';
+import finch from '../../assets/securite/finch.png';
+import { routes, type Locale } from '../../i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const entry = await getEntry('securityPage', locale);
+if (!entry) throw new Error(`Missing src/content/pages/security/${locale}.yaml`);
+const { hero, sections, screen } = entry.data;
+const bg = await getImage({ src: fond, format: 'webp', width: 1600, quality: 70 });
+const AGENTS: Record<'jay' | 'owl' | 'finch', ImageMetadata> = { jay, owl, finch };
+const TEINTES = { jay: 'bg-sand', owl: 'bg-stone', finch: 'bg-peach' };
+const num = (i: number) => String(i + 1).padStart(2, '0');
+---
+
+<section
+  id="securite"
+  aria-labelledby="secu-livre-titre"
+  class="overflow-hidden rounded-[28px] bg-orange bg-cover bg-center px-5 pt-12 pb-5 sm:px-8 lg:rounded-[36px] lg:px-12 lg:pt-16 lg:pb-8"
+  style={`background-image:url(${bg.src})`}
+  data-livre
+>
+  <div class="flex flex-col items-start gap-5">
+    <p class="font-mono text-kicker text-night uppercase">{hero.kicker}</p>
+    <h2
+      id="secu-livre-titre"
+      class="max-w-[18ch] font-display text-[34px] leading-[1.05] font-bold tracking-[-0.02em] text-night lg:text-[52px]"
+    >
+      {hero.title}
+    </h2>
+    <p class="max-w-[36rem] text-body text-night">{hero.lead}</p>
+
+    <!-- Les quatre promesses : onglets du livre. -->
+    <div
+      class="onglets mt-2 grid w-full gap-px overflow-hidden rounded-card bg-night/15 sm:grid-cols-2 lg:grid-cols-4"
+      role="tablist"
+      aria-label={hero.kicker}
+    >
+      {
+        hero.proofs.map((p, i) => (
+          <button
+            type="button"
+            role="tab"
+            class="onglet"
+            id={`secu-onglet-${p.section}`}
+            aria-controls={`secu-page-${p.section}`}
+            aria-selected={i === 0 ? 'true' : 'false'}
+            data-aller={p.section}
+          >
+            <span class="font-mono text-kicker text-night/70 uppercase">{num(p.section)}</span>
+            <span class="font-display text-card font-bold text-night">{p.label}</span>
+          </button>
+        ))
+      }
+    </div>
+  </div>
+
+  <!-- Le livre : les quatre thèmes empilés dans un seul bloc. -->
+  <div class="livre mt-5" data-pages={sections.length}>
+    {
+      sections.map((sec, i) => (
+        <article
+          id={`secu-page-${i}`}
+          role="tabpanel"
+          aria-labelledby={`secu-${i}`}
+          class:list={['page', sec.visual === 'ecran' ? 'page-nuit' : 'page-jour', i === 0 && 'actuelle']}
+          style={`--n:${i}`}
+          data-page={i}
+        >
+          {sec.visual === 'ecran' ? (
+            <div class="grid h-full items-center gap-10 p-8 md:grid-cols-[0.9fr_1.1fr] md:p-12">
+              <div class="flex flex-col items-start gap-4">
+                <p class="font-mono text-kicker text-white/60 uppercase">
+                  {num(i)} · {sec.kicker}
+                </p>
+                <h3 id={`secu-${i}`} class="font-display text-section font-bold text-white">
+                  {sec.title}
+                </h3>
+                <p class="text-body text-white/75">{sec.subtitle}</p>
+                <ol class="points points-nuit mt-2 flex w-full flex-col">
+                  {sec.items.map((it, j) => (
+                    <li>
+                      <span class="rang">{num(j)}</span>
+                      <span>
+                        <b>{it.title}</b>
+                        {it.text}
+                      </span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+              <Ipad>
+                <div class="ac" data-role="0">
+                  <header class="ac-barre">
+                    <b>{screen.app}</b>
+                    <span class="ac-vu">{screen.viewing}</span>
+                    <div class="ac-roles" aria-hidden="true">
+                      <span class="ac-curseur" />
+                      {screen.roles.map((r, j) => (
+                        <span class:list={['ac-role', j === 0 && 'on']}>{r}</span>
+                      ))}
+                    </div>
+                  </header>
+                  <ul class="ac-lignes">
+                    {screen.rows.map((row) => (
+                      <li class:list={{ 'non-partage': !row.access }}>
+                        <span class="ac-txt">
+                          <b>{row.label}</b>
+                          <span>{row.meta}</span>
+                        </span>
+                        <span class:list={['ac-etat', row.access ? row.access[0] : 'np']}>
+                          {row.access ? screen.states[row.access[0]] : screen.states.nonPartage}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </Ipad>
+            </div>
+          ) : (
+            <div class="grid h-full md:grid-cols-2">
+              <div class:list={['tuile grid place-items-center', TEINTES[sec.visual]]}>
+                <Picture
+                  src={AGENTS[sec.visual]}
+                  alt={hero.alts[sec.visual]}
+                  height={400}
+                  densities={[1, 2]}
+                  formats={['avif', 'webp']}
+                  loading="lazy"
+                />
+              </div>
+              <div class="flex flex-col items-start gap-4 p-8 md:p-12">
+                <p class="font-mono text-kicker text-orange-txt uppercase">
+                  {num(i)} · {sec.kicker}
+                </p>
+                <h3 id={`secu-${i}`} class="font-display text-section font-bold text-ink">
+                  {sec.title}
+                </h3>
+                <p class="text-body text-soft">{sec.subtitle}</p>
+                <ol class="points mt-2 flex w-full flex-col">
+                  {sec.items.map((it, j) => (
+                    <li>
+                      <span class="rang">{num(j)}</span>
+                      <span>
+                        <b>{it.title}</b>
+                        {it.text}
+                      </span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </div>
+          )}
+        </article>
+      ))
+    }
+  </div>
+
+  <!-- Feuilleter : précédent, position, suivant ; et le lien vers la page complète. -->
+  <div class="mt-4 flex flex-wrap items-center justify-between gap-4">
+    <a
+      href={routes.security[locale]}
+      class="inline-flex items-center gap-2 border-b-[1.5px] border-night pb-[3px] text-[15px] font-semibold text-night"
+    >
+      Lire notre politique de sécurité
+    </a>
+    <div class="feuilleter flex items-center gap-3">
+      <button type="button" class="fleche" data-precedent aria-label="Page précédente">
+        <svg viewBox="0 0 24 24" class="size-4 rotate-180" fill="currentColor" aria-hidden="true">
+          <path d="M4 11v2h16v-2zm12 2v2h2v-2zm-2 2v2h2v-2zm-2 2v2h2v-2zm4-6V9h2v2zm-2 4V7h2v8zm-2 2V5h2v12z"
+          ></path>
+        </svg>
+      </button>
+      <span class="font-mono text-[13px] tracking-[0.08em] text-night" aria-live="polite" data-position>
+        01 / {num(sections.length - 1)}
+      </span>
+      <button type="button" class="fleche" data-suivant aria-label="Page suivante">
+        <svg viewBox="0 0 24 24" class="size-4" fill="currentColor" aria-hidden="true">
+          <path d="M4 11v2h16v-2zm12 2v2h2v-2zm-2 2v2h2v-2zm-2 2v2h2v-2zm4-6V9h2v2zm-2 4V7h2v8zm-2 2V5h2v12z"
+          ></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+<script is:inline data-keep>
+  (function () {
+    var root = document.querySelector('[data-livre]');
+    if (!root) return;
+    root.classList.add('anime');
+    var pages = [].slice.call(root.querySelectorAll('.page'));
+    var onglets = [].slice.call(root.querySelectorAll('[data-aller]'));
+    var position = root.querySelector('[data-position]');
+    var n = pages.length;
+    var courante = 0;
+    var pad = function (i) {
+      return (i < 9 ? '0' : '') + (i + 1);
+    };
+    function aller(cible) {
+      cible = Math.max(0, Math.min(n - 1, cible));
+      courante = cible;
+      pages.forEach(function (p, i) {
+        p.classList.toggle('tournee', i < cible);
+        p.classList.toggle('actuelle', i === cible);
+        p.setAttribute('aria-hidden', i === cible ? 'false' : 'true');
+        p.inert = i !== cible;
+      });
+      onglets.forEach(function (o) {
+        o.setAttribute('aria-selected', Number(o.dataset.aller) === cible ? 'true' : 'false');
+      });
+      position.textContent = pad(cible) + ' / ' + pad(n - 1);
+      root.querySelector('[data-precedent]').disabled = cible === 0;
+      root.querySelector('[data-suivant]').disabled = cible === n - 1;
+    }
+    onglets.forEach(function (o) {
+      o.addEventListener('click', function () {
+        aller(Number(o.dataset.aller));
+      });
+    });
+    root.querySelector('[data-precedent]').addEventListener('click', function () {
+      aller(courante - 1);
+    });
+    root.querySelector('[data-suivant]').addEventListener('click', function () {
+      aller(courante + 1);
+    });
+    aller(0);
+  })();
+</script>
+
+<style>
+  /* Onglets : les vignettes de la page Sécurité, la page ouverte en blanc plein. */
+  .onglet {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 18px 22px 20px;
+    text-align: left;
+    background: color-mix(in srgb, var(--color-white) 60%, transparent);
+    cursor: pointer;
+    transition: background-color 0.3s var(--ease-doux);
+  }
+  .onglet:hover,
+  .onglet[aria-selected='true'] {
+    background: var(--color-white);
+  }
+  .onglet:focus-visible,
+  .fleche:focus-visible {
+    outline: 2px solid var(--color-night);
+    outline-offset: -2px;
+  }
+
+  /* Sans JS : les pages s'empilent. Avec JS : un seul bloc, les pages superposées. */
+  .livre {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .anime .livre {
+    display: grid;
+    perspective: 2600px;
+    perspective-origin: 0% 50%;
+  }
+  .page {
+    overflow: hidden;
+    border-radius: var(--radius-card);
+    box-shadow:
+      inset 0 0 0 1px var(--color-line),
+      var(--shadow-2);
+  }
+  .page-jour {
+    background: var(--color-surface);
+  }
+  .page-nuit {
+    background: var(--color-night);
+  }
+  .anime .page {
+    grid-area: 1 / 1;
+    z-index: calc(10 - var(--n));
+    transform-origin: 0% 50%;
+    backface-visibility: hidden;
+    transition:
+      transform 1s cubic-bezier(0.645, 0.045, 0.355, 1),
+      opacity 0.2s linear 0.55s;
+  }
+  /* La page tournée bascule vers la gauche autour de sa reliure, puis s'efface. */
+  .anime .page.tournee {
+    transform: rotateY(-178deg);
+    opacity: 0;
+    pointer-events: none;
+  }
+  /* En revenant en arrière, la page réapparaît tout de suite et se rabat. */
+  .anime .page:not(.tournee) {
+    transition:
+      transform 1s cubic-bezier(0.645, 0.045, 0.355, 1),
+      opacity 0s;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .anime .page {
+      transition: opacity 0.2s linear !important;
+    }
+    .anime .page.tournee {
+      transform: none;
+    }
+  }
+
+  .fleche {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    background: var(--color-night);
+    color: var(--color-cream);
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .fleche:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+
+  /* Repris de la page Sécurité : l'agent sur sa teinte, les points numérotés. */
+  .tuile {
+    min-height: 320px;
+    padding: 40px;
+  }
+  .tuile :global(img) {
+    height: clamp(200px, 24vw, 340px);
+    width: auto;
+    max-width: 85%;
+    object-fit: contain;
+    filter: drop-shadow(0 22px 26px color-mix(in srgb, var(--color-shadow) 22%, transparent));
+  }
+  .points li {
+    display: grid;
+    grid-template-columns: 2.4rem 1fr;
+    padding: 14px 0;
+    border-top: 1px solid var(--color-line);
+    font: 400 15px/1.5 var(--font-sans);
+    color: var(--color-soft);
+  }
+  .points li b {
+    display: block;
+    margin-bottom: 2px;
+    font: 700 16px/1.3 var(--font-sans);
+    color: var(--color-ink);
+  }
+  .rang {
+    padding-top: 2px;
+    font: 400 13px/1.3 var(--font-mono);
+    letter-spacing: 0.06em;
+    color: var(--color-orange-txt);
+  }
+  .points-nuit li {
+    border-color: var(--color-line-night);
+    color: color-mix(in srgb, var(--color-white) 78%, transparent);
+  }
+  .points-nuit li b {
+    color: var(--color-white);
+  }
+  .points-nuit .rang {
+    color: color-mix(in srgb, var(--color-white) 60%, transparent);
+  }
+
+  /* L'écran d'accès (iPad), figé sur la vue du siège. */
+  .ac {
+    position: absolute;
+    inset: 0;
+    container-type: inline-size;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-cream);
+    font: 500 2.1cqw/1.35 var(--font-sans);
+    color: var(--color-ink);
+  }
+  .ac-barre {
+    display: flex;
+    align-items: center;
+    gap: 2cqw;
+    padding: 3cqw 3.4cqw 2.4cqw;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .ac-barre b {
+    font: 700 2.8cqw/1 var(--font-display);
+  }
+  .ac-vu {
+    margin-left: auto;
+    font: 400 1.5cqw/1 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-soft);
+  }
+  .ac-roles {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    padding: 0.5cqw;
+    border-radius: 999px;
+    background: var(--color-cream-2);
+    box-shadow: inset 0 0 0 1px var(--color-line);
+  }
+  .ac-curseur {
+    position: absolute;
+    top: 0.5cqw;
+    bottom: 0.5cqw;
+    left: 0.5cqw;
+    width: calc((100% - 1cqw) / 3);
+    border-radius: 999px;
+    background: var(--color-surface);
+    box-shadow: var(--shadow-1);
+  }
+  .ac-role {
+    position: relative;
+    padding: 1cqw 2cqw;
+    font: 600 1.7cqw/1 var(--font-sans);
+    color: var(--color-soft);
+    white-space: nowrap;
+    text-align: center;
+  }
+  .ac-role.on {
+    color: var(--color-ink);
+  }
+  .ac-lignes {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4cqw;
+    padding: 2.8cqw 3.4cqw;
+  }
+  .ac-lignes li {
+    display: flex;
+    align-items: center;
+    gap: 2cqw;
+    padding: 2cqw 2.4cqw;
+    border-radius: 1.6cqw;
+    background: var(--color-surface);
+    box-shadow: 0 0 0 1px var(--color-line);
+  }
+  .ac-txt {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.4cqw;
+    min-width: 0;
+  }
+  .ac-txt b {
+    font-size: 2.2cqw;
+  }
+  .ac-txt span {
+    font-size: 1.6cqw;
+    color: var(--color-soft);
+  }
+  .ac-etat {
+    padding: 0.7cqw 1.5cqw;
+    border-radius: 999px;
+    font: 600 1.6cqw/1.2 var(--font-sans);
+    white-space: nowrap;
+  }
+  .ac-etat.visible {
+    background: var(--color-orange-tint);
+    color: var(--color-orange-txt);
+  }
+  .ac-etat.perimetre {
+    background: var(--color-sand);
+    color: var(--color-ink);
+  }
+  .ac-etat.masque {
+    background: var(--color-cream-2);
+    color: var(--color-muted);
+  }
+  .ac-etat.np {
+    background: transparent;
+    box-shadow: inset 0 0 0 1px var(--color-stone);
+    color: var(--color-soft);
+  }
+  .ac-lignes li.non-partage {
+    background: transparent;
+  }
+  .ac-lignes li.non-partage .ac-txt b {
+    color: var(--color-soft);
+  }
+</style>
