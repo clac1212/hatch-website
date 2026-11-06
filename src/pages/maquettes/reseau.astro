@@ -1,0 +1,36 @@
+---
+/**
+ * MAQUETTE — la page réseau complète (le site actuel, qui passera à /reseaux), avec la nouvelle
+ * section Tarifs en formulaire à la place des trois offres chiffrées.
+ */
+import Base from '../../layouts/Base.astro';
+import Hero from '../../components/sections/Hero.astro';
+import Clients from '../../components/sections/Clients.astro';
+import Probleme from '../../components/sections/Probleme.astro';
+import Demo from '../../components/sections/Demo.astro';
+import Equipe from '../../components/sections/Equipe.astro';
+import Cas from '../../components/sections/Cas.astro';
+import MiseEnPlace from '../../components/sections/MiseEnPlace.astro';
+import Securite from '../../components/sections/Securite.astro';
+import TarifsFormulaire from '../../components/maquettes/TarifsFormulaire.astro';
+import { routes } from '../../i18n/ui';
+
+const locale = 'fr';
+---
+
+<Base
+  locale={locale}
+  paths={routes.home}
+  title="Maquette réseau | Hatch OS"
+  description="Maquette de la page réseau de Hatch OS avec la nouvelle section tarifs en formulaire."
+>
+  <Hero locale={locale} />
+  <Clients locale={locale} />
+  <Probleme locale={locale} />
+  <Demo locale={locale} />
+  <Equipe locale={locale} />
+  <Cas locale={locale} />
+  <MiseEnPlace locale={locale} />
+  <Securite locale={locale} />
+  <TarifsFormulaire />
+</Base>
