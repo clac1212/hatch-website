@@ -47,11 +47,11 @@ tasks:
       done:
         title: 'Owl answered BunBun Huesca'
         detail: 'Out loud, in Spanish'
-      # Europe map (mockup): Owl is with the chef of BunBun Bordeaux.
+      # Europe map (mockup): Owl, on BunBun Bordeaux's tablet, answers the chef out loud.
       europe:
         running:
-          title: 'Owl is training BunBun Bordeaux'
+          title: 'Owl is answering BunBun Bordeaux'
           detail: '“How do we clean the fryer?”'
         done:
-          title: 'Owl trained BunBun Bordeaux'
-          detail: 'Fryer how-to in 3 steps'
+          title: 'Owl answered BunBun Bordeaux'
+          detail: 'Out loud, from the fryer sheet'

@@ -48,11 +48,11 @@ tasks:
       done:
         title: 'Owl a répondu à BunBun Huesca'
         detail: 'À voix haute, en espagnol'
-      # Carte Europe (maquette) : Owl est avec le chef de BunBun Bordeaux.
+      # Carte Europe (maquette) : Owl, sur la tablette de BunBun Bordeaux, répond au chef à voix haute.
       europe:
         running:
-          title: "Owl forme l'équipe de BunBun Bordeaux"
+          title: 'Owl répond à BunBun Bordeaux'
           detail: '« Comment on nettoie la friteuse ? »'
         done:
-          title: "Owl a formé l'équipe de BunBun Bordeaux"
-          detail: 'Tuto friteuse en 3 étapes'
+          title: 'Owl a répondu à BunBun Bordeaux'
+          detail: 'À voix haute, depuis la fiche friteuse'
