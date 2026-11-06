@@ -7,13 +7,21 @@
 import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import { routes } from '../../i18n/ui';
-import peep from '../../assets/tarifs/agents/peep.png';
-import owl from '../../assets/tarifs/agents/owl.png';
-import jay from '../../assets/tarifs/agents/jay.png';
-import lark from '../../assets/tarifs/agents/lark.png';
-import finch from '../../assets/tarifs/agents/finch.png';
-import pecker from '../../assets/tarifs/agents/pecker.png';
-import sparrow from '../../assets/tarifs/agents/sparrow.png';
+import peep from '../../assets/portraits/peep.jpg';
+import owl from '../../assets/portraits/owl.jpg';
+import jay from '../../assets/portraits/jay.jpg';
+import lark from '../../assets/portraits/lark.jpg';
+import finch from '../../assets/portraits/finch.jpg';
+import pecker from '../../assets/portraits/pecker.jpg';
+import sparrow from '../../assets/portraits/sparrow.jpg';
+
+/** Chaque agent face à nous, dans son cercle ; la vidéo du coucou se joue une fois quand on le coche. */
+const a = (nom: string, role: string, img: ImageMetadata) => ({
+  nom,
+  role,
+  img,
+  video: `/maquettes/anim/${nom.toLowerCase()}.mp4`,
+});
 
 const offres = [
   {
@@ -22,7 +30,12 @@ const offres = [
     tag: 'Base de chaque équipe',
     texte:
       'Peep répond à vos équipes sur WhatsApp, Owl en cuisine sur tablette, Jay tient vos documents à jour, Lark pilote le réseau.',
-    images: [peep, owl, jay, lark],
+    agents: [
+      a('Peep', 'Vos équipes', peep),
+      a('Owl', 'La cuisine', owl),
+      a('Jay', 'Vos documents', jay),
+      a('Lark', 'Le pilotage', lark),
+    ],
     coche: true,
   },
   {
@@ -30,21 +43,21 @@ const offres = [
     nom: 'Finch',
     tag: 'Qualité et audits',
     texte: "Prépare les grilles d'audit, suit chaque plan d'action jusqu'à la preuve.",
-    images: [finch],
+    agents: [a('Finch', 'Qualité', finch)],
   },
   {
     id: 'pecker',
     nom: 'Pecker',
     tag: 'Formation',
     texte: 'Transforme vos procédures en parcours courts et relance ceux qui ne les ont pas faits.',
-    images: [pecker],
+    agents: [a('Pecker', 'Formation', pecker)],
   },
   {
     id: 'sparrow',
     nom: 'Sparrow',
     tag: 'Développement et ouvertures',
     texte: 'Pré-qualifie vos candidats à la franchise et suit chaque ouverture jusqu\'au jour J.',
-    images: [sparrow],
+    agents: [a('Sparrow', 'Développement', sparrow)],
   },
 ];
 
@@ -83,14 +96,23 @@ const etapes = [
           <!-- 1 · Agents -->
           <fieldset class="flex flex-col gap-4">
             <legend class="etape"><span>1</span>Quels agents vous intéressent ?</legend>
-            <div class="grid gap-3 sm:grid-cols-2">
+            <div class="grid gap-3 sm:grid-cols-3" data-equipe>
               {
                 offres.map((o) => (
-                  <label class:list={['agent', o.id === 'socle' && 'sm:col-span-2']}>
+                  <label class:list={['agent', o.id === 'socle' && 'socle sm:col-span-3']}>
                     <input type="checkbox" id={`a-${o.id}`} name="agents" value={o.id} checked={o.coche} class="sr-only" />
-                    <span class="avatars" aria-hidden="true">
-                      {o.images.map((img) => (
-                        <Image src={img} alt="" width={64} densities={[1, 2]} />
+                    <span class="troupe" aria-hidden="true">
+                      {o.agents.map((ag, k) => (
+                        <span class="membre" style={`--k:${k}`}>
+                          <span class="rond">
+                            <video src={ag.video} poster={ag.img.src} muted playsinline preload="none" />
+                          </span>
+                          {o.id === 'socle' && (
+                            <span class="membre-nom">
+                              <b>{ag.nom}</b> {ag.role}
+                            </span>
+                          )}
+                        </span>
                       ))}
                     </span>
                     <span class="flex flex-col gap-1">
@@ -176,6 +198,42 @@ const etapes = [
       </div>
     </div>
   </section>
+  <script is:inline data-keep>
+    // Cocher un agent le fait sortir de son cercle et dire coucou : la vidéo se joue une fois, puis
+    // s'arrête (pas de boucle, donc pas de pause nécessaire). Survol : même coucou. Mouvement réduit : rien.
+    (function () {
+      var root = document.querySelector('[data-equipe]');
+      if (!root || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      function coucou(label) {
+        [].slice.call(label.querySelectorAll('video')).forEach(function (v, k) {
+          setTimeout(function () {
+            v.currentTime = 0;
+            v.play().catch(function () {});
+          }, k * 220);
+        });
+      }
+      [].slice.call(root.querySelectorAll('.agent')).forEach(function (label) {
+        var input = label.querySelector('input');
+        input.addEventListener('change', function () {
+          if (input.checked) coucou(label);
+        });
+        label.addEventListener('mouseenter', function () {
+          coucou(label);
+        });
+      });
+      // À l'arrivée sur la page, le socle (coché d'office) salue une fois.
+      var socle = root.querySelector('.socle');
+      if (socle && 'IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (e) {
+          if (e[0].isIntersecting) {
+            io.disconnect();
+            coucou(socle);
+          }
+        }, { threshold: 0.6 });
+        io.observe(socle);
+      }
+    })();
+  </script>
 </Base>
 
 <style>
@@ -201,13 +259,14 @@ const etapes = [
     font: 400 13px var(--font-mono);
   }
 
-  /* Carte d'agent sélectionnable : un vrai checkbox caché, l'état se lit sur la carte. */
+  /* Carte d'agent sélectionnable : un vrai checkbox caché, l'état se lit sur la carte. Les agents
+     sont face à nous, chacun dans son cercle ; cochés, ils se lèvent un peu et font coucou. */
   .agent {
     position: relative;
     display: flex;
-    gap: 16px;
-    align-items: center;
-    padding: 18px 48px 18px 18px;
+    flex-direction: column;
+    gap: 14px;
+    padding: 20px 18px 18px;
     border-radius: 20px;
     background: var(--color-surface-2);
     box-shadow: inset 0 0 0 1px var(--color-line);
@@ -227,17 +286,73 @@ const etapes = [
     outline: 3px solid var(--color-orange-txt);
     outline-offset: 2px;
   }
-  .avatars {
+  .troupe {
     display: flex;
-    flex: none;
+    gap: 18px;
   }
-  .avatars :global(img) {
-    width: 56px;
-    height: 56px;
-    object-fit: contain;
+  .membre {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
   }
-  .avatars :global(img + img) {
-    margin-left: -18px;
+  .rond {
+    display: block;
+    width: 84px;
+    height: 84px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--color-cream-2);
+    box-shadow: 0 0 0 3px var(--color-surface);
+    transition: translate 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--k) * 60ms);
+  }
+  .rond video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .agent:has(input:checked) .rond {
+    translate: 0 -4px;
+  }
+  .membre-nom {
+    font-size: 12.5px;
+    line-height: 1.25;
+    text-align: center;
+    color: var(--color-soft);
+  }
+  .membre-nom b {
+    display: block;
+    font-size: 14px;
+    color: var(--color-ink);
+  }
+  /* Le socle : les quatre en rang, le texte à côté sur très grand écran, dessous sinon. */
+  .socle {
+    gap: 18px;
+  }
+  @media (min-width: 80rem) {
+    .socle {
+      flex-direction: row;
+      align-items: center;
+      gap: 32px;
+      padding: 22px 56px 22px 24px;
+    }
+    .socle .troupe {
+      flex: none;
+    }
+  }
+  @media (max-width: 30rem) {
+    .socle .troupe {
+      gap: 10px;
+    }
+    .socle .rond {
+      width: 64px;
+      height: 64px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rond {
+      transition: none;
+    }
   }
   .coche {
     position: absolute;
