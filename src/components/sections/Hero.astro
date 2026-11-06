@@ -36,17 +36,18 @@ import oiseauxPos from './hero-oiseaux.json';
 interface Props {
   locale: Locale;
   /**
-   * Mockup: the wider map (all of Iberia, England, the Alps). It is the France map zoomed out (×0.44,
-   * offset 491.7, 198.2 in the 1440 × 804 frame), so every anchor below goes through `cadre`.
+   * Mockup: the wider map (Iberia, England, the Alps), without the little crates. It is the France
+   * map zoomed out (×0.5176, offset 358.2, 157.5 in the 1440 × 804 frame), so every anchor below goes
+   * through `cadre`. The scene is pinned left so the Atlantic sits under the (narrower) glass card.
    */
   europe?: boolean;
 }
 
 const { locale, europe = false } = Astro.props;
 const carte = europe ? carteEurope : carteFrance;
-const K = europe ? 0.44 : 1;
+const K = europe ? 0.5176 : 1;
 const cadre = (x: number, y: number): [number, number] =>
-  europe ? [491.7 + x * K, 198.2 + y * K] : [x, y];
+  europe ? [358.2 + x * K, 157.5 + y * K] : [x, y];
 const data = await section('hero', locale);
 const t = useTranslations(locale);
 const { status, events } = data.tasks;
@@ -98,7 +99,10 @@ const tick =
 ---
 
 <section
-  class="hero relative h-dvh min-h-[640px] overflow-hidden bg-night [container-type:size]"
+  class:list={[
+    'hero relative h-dvh min-h-[640px] overflow-hidden bg-night [container-type:size]',
+    europe && 'hero-europe',
+  ]}
   aria-labelledby="hero-titre"
   data-rv-groupe
 >
@@ -454,6 +458,14 @@ const tick =
   @media (min-width: 64rem) {
     .hero {
       --fx: 1;
+    }
+    /* Mockup « carte Europe » : the scene pinned left (the Atlantic under the card), the card narrower. */
+    .hero.hero-europe {
+      --fx: 0;
+    }
+    .hero-europe .carte-hero {
+      width: clamp(500px, 38vw, 580px);
+      margin-bottom: auto;
     }
     .h-piles {
       position: absolute;
