@@ -15,6 +15,15 @@ import { routes } from '../../i18n/ui';
 import robin from '../../assets/portraits/robin.jpg';
 import soir from '../../assets/robin/soir.jpg';
 import portrait from '../../assets/portraits/robin.jpg';
+import poseLun from '../../assets/robin/semaine/lun.jpg';
+import poseMar from '../../assets/robin/semaine/mar.jpg';
+import poseMer from '../../assets/robin/semaine/mer.jpg';
+import poseJeu from '../../assets/robin/semaine/jeu.jpg';
+import poseVen from '../../assets/robin/semaine/ven.jpg';
+import poseDim from '../../assets/robin/semaine/dim.jpg';
+
+/** Robin, une tenue par jour de la frise (même ordre que `semaine`). */
+const poses = [poseLun, poseMar, poseMer, poseJeu, poseVen, poseDim];
 
 /** Ce que fait Robin : une rangée par pilier, une conversation d'exemple dans une carte teintée. */
 const piliers = [
@@ -231,8 +240,8 @@ const lundi = [
     <nav class="pilule-zone" aria-label="Sur cette page">
       <div class="pilule">
         <a href="#robin" class="pilule-nom">
-          <Image src={robin} alt="" width={28} densities={[1, 2]} class="size-7 rounded-full object-cover" />
-          Robin
+          <span class="pastille" aria-hidden="true"></span>
+          Robin <span class="pilule-statut">en ligne</span>
         </a>
         <a href="#fait">Ce qu'il fait</a>
         <a href="#semaine">Une semaine</a>
@@ -291,8 +300,21 @@ const lundi = [
 
         <!-- Robin et sa bulle, qui changent avec le jour -->
         <div class="scene mt-12">
-          <div class="flotte size-[104px] overflow-hidden rounded-full bg-cream-2">
-            <video class="size-full object-cover" src="/maquettes/anim/robin.mp4" poster={portrait.src} autoplay muted loop playsinline aria-hidden="true"></video>
+          <!-- Robin change de tenue avec le jour : café le lundi, cagette le mardi, calendrier le
+               mercredi, toque le jeudi, cloche le vendredi, bonnet de nuit le dimanche. -->
+          <div class="flotte jour-av">
+            {
+              poses.map((src, i) => (
+                <Image
+                  src={src}
+                  alt=""
+                  widths={[120, 240]}
+                  sizes="120px"
+                  class:list={['pose', i === 0 && 'on']}
+                  data-j={i}
+                />
+              ))
+            }
           </div>
           <div class="bulles">
             {
@@ -718,6 +740,39 @@ const lundi = [
     font-weight: 700;
     color: var(--color-cream);
   }
+  /* Le point « en ligne » de Robin : un rond orange qui respire, comme le dot de ChatGPT. */
+  .pastille {
+    position: relative;
+    width: 10px;
+    height: 10px;
+    margin: 0 2px 0 4px;
+    border-radius: 999px;
+    background: var(--color-orange);
+  }
+  .pastille::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    background: var(--color-orange);
+    animation: pastille 2.4s ease-out infinite;
+  }
+  @keyframes pastille {
+    0% {
+      transform: scale(1);
+      opacity: 0.6;
+    }
+    70%,
+    100% {
+      transform: scale(2.6);
+      opacity: 0;
+    }
+  }
+  .pilule-statut {
+    font: 400 11px/1 var(--font-mono);
+    letter-spacing: 0.06em;
+    color: color-mix(in srgb, var(--color-cream) 60%, transparent);
+  }
   .pilule .pilule-cta {
     background: var(--color-cream);
     color: var(--color-ink);
@@ -790,6 +845,29 @@ const lundi = [
     flex-direction: column;
     align-items: center;
     gap: 16px;
+  }
+  .jour-av {
+    display: grid;
+    width: 120px;
+    height: 120px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--color-cream-2);
+  }
+  .jour-av :global(.pose) {
+    grid-area: 1 / 1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    scale: 0.92;
+    transition:
+      opacity 0.3s var(--ease-doux),
+      scale 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .jour-av :global(.pose.on) {
+    opacity: 1;
+    scale: 1;
   }
   .bulles {
     display: grid;
@@ -1122,7 +1200,8 @@ const lundi = [
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .flotte {
+    .flotte,
+    .pastille::after {
       animation: none;
     }
     .bulle,
