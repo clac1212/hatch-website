@@ -154,9 +154,13 @@ const tick =
 
   <!-- Pixel edge into the clients band below (white): over the map and the grain, under the piles
        and the glass card. -->
-  <div class="absolute inset-x-0 bottom-0 z-0">
-    <LisierePixel color="var(--color-white)" />
-  </div>
+  {
+    !europe && (
+      <div class="absolute inset-x-0 bottom-0 z-0">
+        <LisierePixel color="var(--color-white)" />
+      </div>
+    )
+  }
 
   <div
     class="relative z-1 mx-auto flex h-full max-w-[1440px] flex-col justify-end gap-2 px-4 pt-24 pb-4 sm:px-6 sm:pb-6 lg:static lg:justify-center lg:gap-0 lg:px-14 lg:pt-36 lg:pb-12"
