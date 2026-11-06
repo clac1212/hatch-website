@@ -90,8 +90,9 @@ const confiance = [
 
 const champs = [
   { id: 'prenom', label: 'Prénom', type: 'text', placeholder: 'Karim', auto: 'given-name' },
+  { id: 'nom', label: 'Nom', type: 'text', placeholder: 'Benali', auto: 'family-name' },
   { id: 'restaurant', label: 'Nom du restaurant', type: 'text', placeholder: 'Le Petit Comptoir', auto: 'organization' },
-  { id: 'ville', label: 'Ville', type: 'text', placeholder: 'Lyon', auto: 'address-level2' },
+  { id: 'site', label: 'Site web', type: 'url', placeholder: 'lepetitcomptoir.fr', auto: 'url' },
   { id: 'whatsapp', label: 'Numéro WhatsApp', type: 'tel', placeholder: '06 12 34 56 78', auto: 'tel' },
   { id: 'email', label: 'Email', type: 'email', placeholder: 'karim@lepetitcomptoir.fr', auto: 'email' },
 ];
@@ -387,7 +388,7 @@ const lundi = [
           <div class="grid gap-3 sm:grid-cols-2">
             {
               champs.map((c, i) => (
-                <label class:list={['champ', i >= 3 && 'sm:col-span-2']} for={`r-${c.id}`}>
+                <label class="champ" for={`r-${c.id}`}>
                   <span>{c.label}</span>
                   <input id={`r-${c.id}`} name={c.id} type={c.type} placeholder={c.placeholder} autocomplete={c.auto} />
                 </label>
