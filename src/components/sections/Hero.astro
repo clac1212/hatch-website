@@ -360,12 +360,37 @@ const tick =
             pile.querySelector('.h-tache').classList.toggle('fait', actif && r >= 3.2);
           });
         }
+        // Garde chaque carte dans l'écran, à droite de la carte de titre : on la décale, sa pointe
+        // reste sur l'agent. Recalculé au redimensionnement.
+        var titre = hero.querySelector('.carte-hero');
+        function caler() {
+          var large = matchMedia('(min-width: 64rem)').matches;
+          var zone = hero.getBoundingClientRect();
+          if (!zone.width) return; // page de la maquette pas encore affichée
+          var gauche = zone.left + 16 + (large ? titre.getBoundingClientRect().right - zone.left : 0);
+          var droite = zone.right - 16;
+          piles.forEach(function (pile) {
+            pile.style.setProperty('--decal', '0px');
+            if (!large) return;
+            var c = pile.querySelector('.h-tache').getBoundingClientRect();
+            var d = 0;
+            if (c.right > droite) d = droite - c.right;
+            if (c.left + d < gauche) d = gauche - c.left;
+            var max = c.width / 2 - 24;
+            d = Math.max(-max, Math.min(max, d));
+            pile.style.setProperty('--decal', d + 'px');
+          });
+        }
+        caler();
+        addEventListener('resize', caler);
+        addEventListener('hashchange', function () { setTimeout(caler, 50); });
         if (matchMedia('(prefers-reduced-motion: reduce)').matches) { rendu(2); return; }
-        var t = 0, avant = null;
+        var t = 0, avant = null, images = 0;
         function boucle(maintenant) {
           if (avant !== null && !hero.classList.contains('h-en-pause')) t += Math.min(maintenant - avant, 100) / 1000;
           avant = maintenant;
           rendu(t);
+          if (++images % 30 === 0) caler();
           requestAnimationFrame(boucle);
         }
         requestAnimationFrame(boucle);
@@ -702,7 +727,8 @@ const tick =
       bottom: auto;
       width: max-content;
       max-width: none;
-      transform: translate(var(--dx), -100%);
+      /* --decal: mockup Europe only, slides a card back inside the screen (its tail stays on the agent) */
+      transform: translate(calc(var(--dx) + var(--decal, 0px)), -100%);
     }
   }
   .h-slot {
@@ -887,7 +913,7 @@ const tick =
     .h-tache::after {
       content: '';
       position: absolute;
-      left: var(--ax);
+      left: calc(var(--ax) - var(--decal, 0px));
       bottom: -6px;
       width: 12px;
       height: 12px;
