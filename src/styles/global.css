@@ -68,6 +68,7 @@
   --color-glass: #050506;
   --color-whatsapp-wall: #efeae2; /* chat background */
   --color-whatsapp-tick: #53bdeb; /* read receipts */
+  --color-whatsapp-teal: #008069; /* app bar and reply buttons */
 
   /* Agent pages (Pencil "Page agent" v3/v4, César 10/10): light greys of the feature wall and the
      cards, and the status colours of the product mock-ups (rows, chips, translations). */
