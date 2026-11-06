@@ -88,6 +88,10 @@ const etapes = [
         <!-- 1 · Agents -->
         <fieldset class="flex flex-col gap-4">
           <legend class="etape"><span>1</span>Quels agents vous intéressent ?</legend>
+          <button type="button" class="anim-pause" data-anim-pause aria-pressed="false" hidden>
+            <span class="ap-ico" aria-hidden="true"></span>
+            <span data-anim-label>Mettre les animations en pause</span>
+          </button>
           <div class="grid gap-3 sm:grid-cols-3" data-equipe>
             {
               offres.map((o) => (
@@ -239,38 +243,81 @@ const etapes = [
   })();
 </script>
 <script is:inline data-keep>
-  // Cocher un agent le fait sortir de son cercle et dire coucou : la vidéo se joue une fois, puis
-  // s'arrête (pas de boucle, donc pas de pause nécessaire). Survol : même coucou. Mouvement réduit : rien.
+  // Les agents de l'équipe vivent : cocher un agent (ou le survoler) lui fait faire le geste de son
+  // métier, puis chaque agent coché le refait de temps en temps, chacun à son rythme (6 à 10 s), pour
+  // que l'équipe choisie bouge et que les autres restent immobiles. Comme ça tourne en continu, un
+  // bouton met tout en pause (WCAG 2.2.2). Mouvement réduit : aucun geste, pas de bouton.
   (function () {
     var root = document.querySelector('[data-equipe]');
     if (!root || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    function coucou(label) {
-      [].slice.call(label.querySelectorAll('video')).forEach(function (v, k) {
-        setTimeout(function () {
-          v.currentTime = 0;
-          v.play().catch(function () {});
+    var bouton = document.querySelector('[data-anim-pause]');
+    var label = document.querySelector('[data-anim-label]');
+    var pause = false;
+    var cartes = [].slice.call(root.querySelectorAll('.agent'));
+    var n = 0;
+    function jouer(v) {
+      if (pause) return;
+      clearTimeout(v._t);
+      v.currentTime = 0;
+      v.play().catch(function () {});
+    }
+    function geste(carte) {
+      [].slice.call(carte.querySelectorAll('video')).forEach(function (v, k) {
+        clearTimeout(v._t);
+        v._t = setTimeout(function () {
+          jouer(v);
         }, k * 220);
       });
     }
-    [].slice.call(root.querySelectorAll('.agent')).forEach(function (label) {
-      var input = label.querySelector('input');
-      input.addEventListener('change', function () {
-        if (input.checked) coucou(label);
+    cartes.forEach(function (carte) {
+      var input = carte.querySelector('input');
+      [].slice.call(carte.querySelectorAll('video')).forEach(function (v) {
+        var rythme = 6000 + (n++ % 5) * 900;
+        // Fin du geste : s'il est coché, l'agent le refera un peu plus tard.
+        v.addEventListener('ended', function () {
+          clearTimeout(v._t);
+          if (!input.checked || pause) return;
+          v._t = setTimeout(function () {
+            if (input.checked) jouer(v);
+          }, rythme + Math.random() * 1500);
+        });
       });
-      label.addEventListener('mouseenter', function () {
-        coucou(label);
+      input.addEventListener('change', function () {
+        if (input.checked) geste(carte);
+      });
+      carte.addEventListener('mouseenter', function () {
+        geste(carte);
       });
     });
-    // À l'arrivée sur la page, le socle (coché d'office) salue une fois.
-    var socle = root.querySelector('.socle');
-    if (socle && 'IntersectionObserver' in window) {
-      var io = new IntersectionObserver(function (e) {
-        if (e[0].isIntersecting) {
-          io.disconnect();
-          coucou(socle);
-        }
-      }, { threshold: 0.6 });
-      io.observe(socle);
+    if (bouton) {
+      bouton.hidden = false;
+      bouton.addEventListener('click', function () {
+        pause = !pause;
+        bouton.setAttribute('aria-pressed', pause ? 'true' : 'false');
+        label.textContent = pause ? 'Relancer les animations' : 'Mettre les animations en pause';
+        cartes.forEach(function (carte) {
+          [].slice.call(carte.querySelectorAll('video')).forEach(function (v) {
+            clearTimeout(v._t);
+            if (pause) v.pause();
+          });
+          if (!pause && carte.querySelector('input').checked) geste(carte);
+        });
+      });
+    }
+    // À l'arrivée sur la page, l'équipe cochée salue une première fois, puis vit sa vie.
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(
+        function (e) {
+          if (e[0].isIntersecting) {
+            io.disconnect();
+            cartes.forEach(function (c) {
+              if (c.querySelector('input').checked) geste(c);
+            });
+          }
+        },
+        { threshold: 0.4 },
+      );
+      io.observe(root);
     }
   })();
 </script>
@@ -396,6 +443,45 @@ const etapes = [
     .rond {
       transition: none;
     }
+  }
+  /* Le bouton pause des animations, discret, aligné à droite au-dessus de la grille. */
+  .anim-pause {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    align-self: flex-end;
+    margin-top: -8px;
+    padding: 6px 11px;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1px var(--color-line);
+    font: 600 12px/1 var(--font-sans);
+    color: var(--color-soft);
+    cursor: pointer;
+  }
+  .anim-pause[hidden] {
+    display: none;
+  }
+  .anim-pause:hover,
+  .anim-pause:focus-visible {
+    color: var(--color-ink);
+  }
+  .anim-pause:focus-visible {
+    outline: 2px solid var(--color-orange-txt);
+    outline-offset: 2px;
+  }
+  .ap-ico {
+    width: 8px;
+    height: 9px;
+    border-left: 3px solid currentColor;
+    border-right: 3px solid currentColor;
+  }
+  .anim-pause[aria-pressed='true'] .ap-ico {
+    width: 0;
+    height: 0;
+    border-left: 8px solid currentColor;
+    border-right: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
   }
   /* Finch et Pecker s'ajoutent au socle ; le socle verrouillé le dit. */
   .avec-socle {
