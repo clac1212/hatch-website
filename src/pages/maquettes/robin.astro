@@ -188,7 +188,7 @@ const lundi = [
       </div>
 
       <!-- La scène sous le hero, comme la vidéo des dots : le bistrot à la fermeture, Robin parle au
-           patron (vidéo en boucle), et ses messages arrivent en bulles de conversation, l'un après l'autre. -->
+           patron (vidéo en boucle), et ses messages sortent de son bec, en bulles de BD, l'un après l'autre. -->
       <div class="soiree mt-14 w-full max-w-[860px] lg:mt-16" data-soiree>
         <div class="soiree-cadre">
           <video
@@ -205,7 +205,6 @@ const lundi = [
             {
               soiree.map((m, i) => (
                 <li class="bs" style={`--i:${i}`}>
-                  <Image src={robin} alt="" width={36} densities={[1, 2]} class="bs-av" />
                   <span class="bs-bulle">
                     {m.txt}
                     {m.lien && (
@@ -566,68 +565,72 @@ const lundi = [
     height: 100%;
     object-fit: cover;
   }
+  /* Les bulles partent du Robin du comptoir : posées au-dessus de lui, la pointe vers son bec.
+     Une seule à la fois, dans la même case, chacune son tour (5 s), puis la soirée recommence.
+     Robin est à ~55 % de la largeur et ~42 % de la hauteur de la vidéo. */
   .bulles-soir {
     position: absolute;
-    top: 24px;
-    left: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: min(340px, 42%);
+    left: 49%;
+    bottom: 66%;
+    display: grid;
+    align-items: end;
+    width: min(330px, 40%);
     text-align: left;
+    container-type: inline-size;
   }
-  /* Une bulle de Robin : l'avatar en bas à gauche, la bulle blanche avec sa pointe vers lui. */
   .bs {
-    display: flex;
-    align-items: flex-end;
-    gap: 8px;
+    grid-area: 1 / 1;
     opacity: 0;
-    animation: bulle-soir 16s var(--ease-doux) infinite;
-    animation-delay: calc(0.8s + var(--i) * 2.8s);
-  }
-  .bs :global(.bs-av) {
-    width: 30px;
-    height: 30px;
-    flex-shrink: 0;
-    border-radius: 999px;
-    object-fit: cover;
-    box-shadow: 0 0 0 2px var(--color-surface);
+    transform-origin: 12% 100%;
+    animation: bulle-soir 15s var(--ease-doux) infinite;
+    animation-delay: calc(0.6s + var(--i) * 5s);
   }
   .bs-bulle {
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: 8px;
-    padding: 11px 14px 12px;
-    border-radius: 18px;
-    border-bottom-left-radius: 6px;
+    padding: 12px 15px 13px;
+    border-radius: 20px;
     background: var(--color-surface);
     box-shadow: var(--shadow-2);
-    font: 400 12.5px/1.45 var(--font-sans);
+    font: 400 13px/1.45 var(--font-sans);
     color: var(--color-ink);
+  }
+  /* La pointe de la bulle, en bas à gauche, qui descend vers Robin. */
+  .bs-bulle::after {
+    content: '';
+    position: absolute;
+    left: 26px;
+    bottom: -13px;
+    width: 22px;
+    height: 16px;
+    background: var(--color-surface);
+    clip-path: polygon(0 0, 100% 0, 18% 100%);
   }
   .bs-lien {
     align-self: flex-start;
     padding: 6px 10px;
     border-radius: 10px;
     background: var(--color-orange-tint);
-    font: 600 12.5px/1.2 var(--font-sans);
+    font: 600 12px/1.2 var(--font-sans);
     color: var(--color-orange-txt);
   }
-  /* La bulle monte en apparaissant, reste à l'écran, puis toutes s'effacent et la soirée recommence. */
+  /* La bulle « pop » depuis Robin, reste le temps de la lire, puis laisse la place à la suivante. */
   @keyframes bulle-soir {
     0% {
       opacity: 0;
-      transform: translateY(10px) scale(0.97);
+      transform: scale(0.85);
     }
-    4%,
-    70% {
+    3%,
+    29% {
       opacity: 1;
       transform: none;
     }
-    76%,
+    33%,
     100% {
       opacity: 0;
-      transform: translateY(-4px);
+      transform: scale(0.96);
     }
   }
   .soiree.pause .bs {
@@ -658,28 +661,21 @@ const lundi = [
   .soiree.pause .soiree-pause .ico-lecture {
     display: block;
   }
-  /* Sous 1024 px, la vidéo est trop basse pour porter trois bulles : elles passent dessous. */
-  @media (max-width: 63.99rem) {
-    .soiree-cadre {
-      aspect-ratio: auto;
-      overflow: visible;
-      background: none;
-      box-shadow: none;
-    }
-    .soiree-video {
-      aspect-ratio: 16 / 9;
-      height: auto;
-      border-radius: 24px;
-    }
-    .soiree-pause {
-      top: 12px;
-      bottom: auto;
-      left: 12px;
-    }
+  /* Sur petit écran, la bulle garde sa place au-dessus de Robin, en plus petit. */
+  @media (max-width: 47.99rem) {
     .bulles-soir {
-      position: static;
-      width: 100%;
-      padding: 16px 0 0;
+      left: 40%;
+      width: 56%;
+    }
+    .bs-bulle {
+      padding: 8px 10px 9px;
+      border-radius: 14px;
+      font-size: 10.5px;
+      gap: 5px;
+    }
+    .bs-lien {
+      padding: 4px 7px;
+      font-size: 10px;
     }
   }
 
