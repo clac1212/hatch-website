@@ -1,0 +1,1132 @@
+---
+/**
+ * MOCKUP (EN): "What Robin does", four situations, each played out in a WhatsApp conversation
+ * (Robin's interface during the beta, there is no app yet). Everything that moves happens in
+ * elements WhatsApp can display: a link, a photo, a document, a chart sent as an image, quick
+ * reply buttons. The owner's thumb taps on them.
+ *   1. Plugs into your tools: a link to connect the inbox, what it found, and the month's books
+ *      prepared in an Excel file, to review before sending to the accountant.
+ *   2. Checks every invoice: the delivery note photo, the invoice checked line by line, the gap,
+ *      the credit request drafted on a "yes".
+ *   3. Helps you decide: "worth staying open 2 to 6?", the answer with a chart.
+ *   4. Does the prep work: a voice note, the temp contract filled from the template, sent on approval.
+ * Situations taken from the Bilal interview (Robin discovery, 05/11). Each scene plays once when it
+ * scrolls into view and stops on its final state (no loop, so no pause needed); "Replay" restarts
+ * it. Without JS or with reduced motion: the final state, straight away.
+ * The numbers are illustrative.
+ */
+import { Image } from 'astro:assets';
+import portrait from '../../../assets/portraits/robin.jpg';
+
+const trouves = ['3 Metro invoices', '1 Promocash credit note', 'Food safety plan', 'Temp contract template'];
+
+const lignes = [
+  { nom: 'Unsalted butter', fact: '5 kg', bl: '5 kg' },
+  { nom: 'Batavia lettuce', fact: '3 crates', bl: '3 crates' },
+  { nom: 'Ground beef', fact: '12 kg', bl: '10 kg', ecart: true },
+];
+
+/** Sales in the 14:00–18:00 slot, as a share of the chart height; the line = staff cost. */
+const jours = [
+  { j: 'M', h: 30 },
+  { j: 'T', h: 26 },
+  { j: 'W', h: 36 },
+  { j: 'T', h: 32 },
+  { j: 'F', h: 44 },
+  { j: 'S', h: 82, au: true },
+];
+
+const champs = [
+  { k: 'Employee', v: 'Lina Moreau' },
+  { k: 'Role', v: 'Floor server' },
+  { k: 'Date', v: 'Saturday, dinner service' },
+  { k: 'Hours', v: '18:00 – 00:00' },
+];
+
+const situations = [
+  {
+    titre: 'It plugs into your tools',
+    texte:
+      'It all happens in WhatsApp. Robin sends you a link, you give it access to your inbox or your Drive, and it finds your invoices and documents on its own.',
+    teinte: 'bg-peach',
+  },
+  {
+    titre: 'It checks every invoice',
+    texte:
+      'Snap a photo of the delivery note. Robin matches it against the order and the invoice, and shows you the gap. It drafts the credit request, you say yes.',
+    teinte: 'bg-sand',
+  },
+  {
+    titre: 'It helps you decide',
+    texte:
+      'Ask it a real owner’s question. It cross-checks your sales, your purchases and your staff costs, and answers with the numbers to back it up.',
+    teinte: 'bg-orange-tint',
+  },
+  {
+    titre: 'It does the prep work',
+    texte:
+      'A voice note is enough. It starts from your templates and your data, sends you the document ready to review, and nothing goes out without your OK.',
+    teinte: 'bg-cream-2',
+  },
+];
+---
+
+<div class="flex flex-col gap-16 lg:gap-24">
+  {
+    situations.map((s, i) => (
+      <div class:list={['rangee grid items-center gap-8 md:grid-cols-[0.85fr_1.15fr] lg:gap-16', i % 2 === 1 && 'inverse']}>
+        <div class="flex flex-col items-start gap-4">
+          <span class="font-mono text-[12px] tracking-[0.08em] text-cream/60">0{i + 1}</span>
+          <h3 class="font-display text-[28px] leading-tight font-medium lg:text-[36px]">{s.titre}</h3>
+          <p class="max-w-[420px] text-[16px] leading-7 text-cream/75">{s.texte}</p>
+        </div>
+
+        <div class:list={['situ', s.teinte]} data-situ={i}>
+          <div class="wa" aria-label="WhatsApp conversation with Robin (example)">
+            <header class="wa-tete" data-etat="tete">
+              <span class="wa-retour" aria-hidden="true">←</span>
+              <Image src={portrait} alt="" width={36} densities={[1, 2]} class="wa-av" />
+              <span class="wa-qui">
+                <b>Robin</b>
+                <span class="st-ligne">online</span>
+                <span class="st-ecrit">typing…</span>
+              </span>
+              <span class="wa-icones" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M3 7h12v10H3zM16 10l5-3v10l-5-3z" /></svg>
+                <svg viewBox="0 0 24 24"><path d="M6.6 10.8a15 15 0 006.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 013 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1z" /></svg>
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="12" cy="19" r="2" /></svg>
+              </span>
+            </header>
+
+            <div class="wa-fil">
+              {/* 1 · The link to connect the inbox */}
+              {i === 0 && (
+                <>
+                  <div class="m robin" data-etat="a">
+                    To find your invoices, I need access to your inbox. You can connect it here:
+                    <span class="carte-lien" data-cible="lien">
+                      <span class="cl-ico">G</span>
+                      <span class="cl-txt">
+                        <b>Connect your inbox</b>
+                        <span>Secure Hatch OS link</span>
+                      </span>
+                      <span class="cl-ok" data-etat="ok">✓</span>
+                    </span>
+                  </div>
+                  <p class="m sys" data-etat="b">Inbox connected</p>
+                  <div class="m robin" data-etat="c">
+                    All set ✅ Here's what I found so far:
+                    <span class="puces">
+                      {trouves.map((t, k) => (
+                        <span class="puce" style={`--k:${k}`}>
+                          {t}
+                        </span>
+                      ))}
+                    </span>
+                  </div>
+                  <div class="m robin" data-etat="d">
+                    I'm doing this month's books with these 📊 It'll all be in one Excel file: you give it a
+                    look, then send it to Sylvain, your accountant.
+                    <span class="fichier xls">
+                      <span class="f-ico">XLS</span>
+                      <span class="f-txt">
+                        <b>October books · Le Petit Comptoir.xlsx</b>
+                        <span>Draft, for you to review</span>
+                      </span>
+                    </span>
+                  </div>
+                </>
+              )}
+
+              {/* 2 · The delivery note photo, the checked invoice, the credit request on a "yes" */}
+              {i === 1 && (
+                <>
+                  <div class="m patron photo" data-etat="a">
+                    <span class="bl-photo" aria-hidden="true">
+                      <b>DELIVERY NOTE</b>
+                      <i />
+                      <i />
+                      <i />
+                      <i />
+                    </span>
+                    This morning's Metro delivery note
+                  </div>
+                  <div class="m robin" data-etat="b">
+                    <span class="doc-tete">Metro invoice · from your inbox</span>
+                    <span class="lignes">
+                      {lignes.map((l, k) => (
+                        <span class:list={['ligne', l.ecart && 'a-ecart']} data-etat={`l${k}`}>
+                          <span>{l.nom}</span>
+                          <span>{l.fact}</span>
+                          <span class="bl">
+                            DN {l.bl} <b class="coche" aria-hidden="true">{l.ecart ? '≠' : '✓'}</b>
+                          </span>
+                        </span>
+                      ))}
+                    </span>
+                  </div>
+                  <div class="m robin avec-boutons" data-etat="c">
+                    Billed for 12 kg of beef, only 10 delivered ⚠️ Want me to draft a credit request?
+                  </div>
+                  <div class="boutons" data-etat="d">
+                    <span data-cible="oui">Yes, draft it</span>
+                    <span>Not now</span>
+                  </div>
+                  <p class="m patron" data-etat="e">Yes, draft it 👍</p>
+                  <div class="m robin" data-etat="f">
+                    <span class="fichier">
+                      <span class="f-ico">PDF</span>
+                      <span class="f-txt">
+                        <b>Credit request · Metro.pdf</b>
+                        <span>Draft, needs your OK</span>
+                      </span>
+                    </span>
+                  </div>
+                </>
+              )}
+
+              {/* 3 · The question, the answer with the chart */}
+              {i === 2 && (
+                <>
+                  <p class="m patron" data-etat="a">Is it worth staying open from 2 to 6?</p>
+                  <div class="m robin image" data-etat="b">
+                    <span class="graphe" data-etat="g">
+                      <span class="g-titre">14:00–18:00 slot · sales by day</span>
+                      <span class="graph">
+                        <span class="seuil" aria-hidden="true">
+                          <span>staff cost</span>
+                        </span>
+                        {jours.map((d) => (
+                          <span class:list={['barre', d.au && 'au-dessus']} style={`--h:${d.h}`}>
+                            <i />
+                            <span>{d.j}</span>
+                          </span>
+                        ))}
+                      </span>
+                    </span>
+                    <span class="leg">
+                      On weekdays, that slot doesn't cover wages. Saturdays it does 💪 Close afternoons Monday to
+                      Friday?
+                    </span>
+                  </div>
+                </>
+              )}
+
+              {/* 4 · A voice note, the contract filled from the template, sent on approval */}
+              {i === 3 && (
+                <>
+                  <div class="m patron vocal" data-etat="a">
+                    <span class="v-lecture" aria-hidden="true">▶</span>
+                    <span class="v-onde" aria-hidden="true">
+                      {Array.from({ length: 22 }, (_, k) => (
+                        <i style={`--v:${[4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7, 9, 5][k]}`} />
+                      ))}
+                    </span>
+                    <span class="v-duree">0:04</span>
+                    <span class="v-transcrit">“Do Lina's contract for Saturday night.”</span>
+                  </div>
+                  <div class="m robin" data-etat="b">
+                    <span class="contrat">
+                      <span class="doc-tete c-tete">
+                        Temp contract · your template
+                        <span class="tampon" data-etat="tampon">
+                          Ready to sign
+                        </span>
+                      </span>
+                      <span class="champs">
+                        {champs.map((c, k) => (
+                          <span class="champ-c" data-etat={`c${k}`}>
+                            <span class="ck">{c.k}</span>
+                            <span class="cv">
+                              <span class="vide" aria-hidden="true" />
+                              <span class="val">{c.v}</span>
+                            </span>
+                          </span>
+                        ))}
+                      </span>
+                    </span>
+                    Want me to send it to Lina?
+                  </div>
+                  <div class="boutons" data-etat="d">
+                    <span data-cible="envoyer">Send it</span>
+                    <span>I'll check first</span>
+                  </div>
+                  <p class="m patron" data-etat="e">Send it</p>
+                  <p class="m robin" data-etat="f">
+                    Sent to Lina ✅ I'll have her payslip ready at the end of the month.
+                  </p>
+                </>
+              )}
+            </div>
+
+            <div class="wa-saisie" aria-hidden="true">
+              <span>Message</span>
+              <span class="micro">
+                <svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 003-3V6a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 006 6.9V21h2v-2.1a7 7 0 006-6.9z" /></svg>
+              </span>
+            </div>
+          </div>
+
+          {/* The owner's thumb, tapping the link or the button */}
+          <span class="doigt" aria-hidden="true" />
+
+          <button type="button" class="rejouer" data-rejouer>
+            <span aria-hidden="true">↻</span> Replay
+          </button>
+        </div>
+      </div>
+    ))
+  }
+</div>
+
+<script is:inline data-keep>
+  // The scenarios: a list of steps { t: ms, on: [states to turn on, 'name' or 'name:class'],
+  // off: [states to turn off], tap: the target the thumb taps }. Each scene plays once.
+  (function () {
+    var SCENARIOS = {
+      0: [
+        { t: 300, on: ['tete:ecrit'] },
+        { t: 1300, on: ['a'], off: ['tete:ecrit'] },
+        { t: 2400, tap: 'lien' },
+        { t: 2700, on: ['ok'] },
+        { t: 3400, on: ['b'] },
+        { t: 3800, on: ['tete:ecrit'] },
+        { t: 4800, on: ['c'], off: ['tete:ecrit'] },
+        { t: 6000, on: ['tete:ecrit'] },
+        { t: 7200, on: ['d'], off: ['tete:ecrit'] },
+      ],
+      1: [
+        { t: 300, on: ['a'] },
+        { t: 900, on: ['tete:ecrit'] },
+        { t: 1800, on: ['b'], off: ['tete:ecrit'] },
+        { t: 2300, on: ['l0:lu'] },
+        { t: 2900, on: ['l0:ok', 'l1:lu'] },
+        { t: 3500, on: ['l1:ok', 'l2:lu'] },
+        { t: 4200, on: ['l2:ecart'] },
+        { t: 4900, on: ['c', 'd'] },
+        { t: 6100, tap: 'oui' },
+        { t: 6900, on: ['e'] },
+        { t: 7300, on: ['tete:ecrit'] },
+        { t: 8300, on: ['f'], off: ['tete:ecrit'] },
+      ],
+      2: [
+        { t: 300, on: ['a'] },
+        { t: 900, on: ['tete:ecrit'] },
+        { t: 2600, on: ['b'], off: ['tete:ecrit'] },
+        { t: 3300, on: ['g:lu'] },
+      ],
+      3: [
+        { t: 300, on: ['a'] },
+        { t: 1100, on: ['tete:ecrit'] },
+        { t: 2100, on: ['b'], off: ['tete:ecrit'] },
+        { t: 2500, on: ['c0'] },
+        { t: 3000, on: ['c1'] },
+        { t: 3500, on: ['c2'] },
+        { t: 4000, on: ['c3'] },
+        { t: 4600, on: ['tampon'] },
+        { t: 5200, on: ['d'] },
+        { t: 6300, tap: 'envoyer' },
+        { t: 7100, on: ['e'] },
+        { t: 7500, on: ['tete:ecrit'] },
+        { t: 8400, on: ['f'], off: ['tete:ecrit'] },
+      ],
+    };
+    var reduit = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function scene(root) {
+      var id = root.getAttribute('data-situ');
+      var etapes = SCENARIOS[id] || [];
+      var doigt = root.querySelector('.doigt');
+      var minuteries = [];
+      var allumes = [];
+
+      function el(nom) {
+        return root.querySelector('[data-etat="' + nom + '"]');
+      }
+      function allumer(spec) {
+        var p = spec.split(':');
+        var e = el(p[0]);
+        if (!e) return;
+        var cls = p[1] || 'on';
+        e.classList.add(cls);
+        allumes.push([e, cls]);
+      }
+      function eteindre(spec) {
+        var p = spec.split(':');
+        var e = el(p[0]);
+        if (e) e.classList.remove(p[1] || 'on');
+      }
+      function taper(nom) {
+        var c = root.querySelector('[data-cible="' + nom + '"]');
+        if (!c || !doigt) return;
+        var r = root.getBoundingClientRect();
+        var b = c.getBoundingClientRect();
+        doigt.style.setProperty('--x', b.left - r.left + b.width / 2 + 'px');
+        doigt.style.setProperty('--y', b.top - r.top + b.height / 2 + 'px');
+        c.classList.add('presse');
+        allumes.push([c, 'presse']);
+        doigt.classList.remove('tape');
+        void doigt.offsetWidth;
+        doigt.classList.add('tape');
+      }
+      function appliquer(e, sansDoigt) {
+        (e.on || []).forEach(allumer);
+        (e.off || []).forEach(eteindre);
+        if (e.tap && !sansDoigt) taper(e.tap);
+      }
+      function remettre() {
+        minuteries.forEach(clearTimeout);
+        minuteries = [];
+        allumes.forEach(function (a) {
+          a[0].classList.remove(a[1]);
+        });
+        allumes = [];
+        if (doigt) doigt.classList.remove('tape');
+      }
+      function jouer() {
+        remettre();
+        if (reduit) {
+          etapes.forEach(function (e) {
+            appliquer(e, true);
+          });
+          return;
+        }
+        etapes.forEach(function (e) {
+          minuteries.push(
+            setTimeout(function () {
+              appliquer(e);
+            }, e.t),
+          );
+        });
+      }
+      root.querySelector('[data-rejouer]').addEventListener('click', jouer);
+      root.jouer = jouer;
+      remettre();
+      if ('IntersectionObserver' in window) {
+        var vu = false;
+        new IntersectionObserver(
+          function (entries) {
+            if (entries[0].isIntersecting && !vu) {
+              vu = true;
+              jouer();
+            }
+          },
+          { threshold: 0.45 },
+        ).observe(root);
+      } else {
+        jouer();
+      }
+    }
+    document.documentElement.classList.add('situ-js');
+    [].slice.call(document.querySelectorAll('[data-situ]')).forEach(scene);
+  })();
+</script>
+
+<style>
+  @media (min-width: 48rem) {
+    .rangee.inverse > :first-child {
+      order: 2;
+    }
+  }
+
+  /* The tinted card that holds the scene. */
+  .situ {
+    position: relative;
+    display: grid;
+    place-items: center;
+    padding: 32px 24px 64px;
+    border-radius: 28px;
+    overflow: hidden;
+    color: var(--color-ink);
+  }
+  @media (min-width: 64rem) {
+    .situ {
+      border-radius: 36px;
+      padding: 44px 48px 68px;
+    }
+  }
+
+  /* The WhatsApp conversation: header, thread, input bar. */
+  .wa {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 380px;
+    border-radius: 22px;
+    overflow: hidden;
+    background: var(--color-whatsapp-wall);
+    box-shadow: var(--shadow-3);
+    font: 400 13.5px/1.4 var(--font-sans);
+    text-align: left;
+  }
+  /* The WhatsApp-coloured header: green bar, back, contact, calls, menu. */
+  .wa-tete {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px 10px 10px;
+    background: var(--color-whatsapp-teal);
+    color: var(--color-white);
+  }
+  .wa-retour {
+    font-size: 18px;
+    line-height: 1;
+  }
+  .wa-icones {
+    display: flex;
+    gap: 14px;
+    margin-left: auto;
+  }
+  .wa-icones svg {
+    width: 19px;
+    height: 19px;
+    fill: var(--color-white);
+  }
+  .wa-tete :global(.wa-av) {
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    object-fit: cover;
+    background: var(--color-cream);
+  }
+  .wa-qui {
+    display: grid;
+    line-height: 1.2;
+  }
+  .wa-qui b {
+    font-size: 14.5px;
+  }
+  .wa-qui > span {
+    grid-area: 2 / 1;
+    font-size: 11.5px;
+    color: color-mix(in srgb, var(--color-white) 85%, transparent);
+    transition: opacity 0.2s;
+  }
+  .st-ecrit {
+    opacity: 0;
+  }
+  .wa-tete.ecrit .st-ligne {
+    opacity: 0;
+  }
+  .wa-tete.ecrit .st-ecrit {
+    opacity: 1;
+  }
+
+  /* The thread keeps its height: new messages arrive at the bottom and push older ones up. */
+  .wa-fil {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 6px;
+    height: 372px;
+    padding: 12px 10px;
+    overflow: hidden;
+  }
+  .m {
+    max-width: 86%;
+    padding: 7px 10px;
+    border-radius: 10px;
+    box-shadow: 0 1px 0.5px color-mix(in srgb, var(--color-black) 13%, transparent);
+  }
+  :global(.situ-js) .m,
+  :global(.situ-js) .boutons {
+    display: none;
+  }
+  :global(.situ-js) .m.on,
+  :global(.situ-js) .boutons.on {
+    display: block;
+    animation: arrive 0.35s var(--ease-doux, ease-out) both;
+  }
+  :global(.situ-js) .boutons.on {
+    display: flex;
+  }
+  @keyframes arrive {
+    from {
+      opacity: 0;
+      translate: 0 8px;
+    }
+  }
+  /* The time and grey ticks (delivered), like in WhatsApp. */
+  .m.robin::after,
+  .m.patron::after {
+    content: '21:42';
+    float: right;
+    margin: 7px 0 -5px 10px;
+    font-size: 10.5px;
+    line-height: 1;
+    color: var(--color-soft);
+  }
+  .m.patron::after {
+    content: '21:42 ✓✓';
+  }
+  .m.vocal::after {
+    grid-column: 1 / -1;
+    justify-self: end;
+    margin: -2px 0 -3px;
+  }
+  .m.robin {
+    align-self: flex-start;
+    background: var(--color-surface);
+    border-top-left-radius: 0;
+  }
+  .m.patron {
+    align-self: flex-end;
+    background: var(--color-whatsapp);
+    border-top-right-radius: 0;
+  }
+  .m.sys {
+    align-self: center;
+    padding: 4px 10px;
+    border-radius: 8px;
+    background: var(--color-surface);
+    font-size: 11.5px;
+    color: var(--color-soft);
+  }
+
+  /* Quick reply buttons, attached under Robin's message. */
+  .m.avec-boutons {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  .boutons {
+    display: flex;
+    gap: 2px;
+    align-self: flex-start;
+    width: 86%;
+    margin-top: -4px;
+  }
+  .boutons > span {
+    flex: 1;
+    padding: 8px 6px;
+    background: var(--color-surface);
+    text-align: center;
+    font-weight: 600;
+    font-size: 12.5px;
+    color: var(--color-whatsapp-teal);
+    box-shadow: 0 1px 0.5px color-mix(in srgb, var(--color-black) 13%, transparent);
+    transition: background-color 0.2s;
+  }
+  .boutons > span::before {
+    content: '↩ ';
+  }
+  .boutons > span:first-child {
+    border-bottom-left-radius: 10px;
+  }
+  .boutons > span:last-child {
+    border-bottom-right-radius: 10px;
+  }
+  .presse {
+    background: var(--color-cream-2) !important;
+  }
+
+  /* 1 · The link card and what Robin found. */
+  .carte-lien {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+    padding: 9px 10px;
+    border-radius: 8px;
+    background: var(--color-cream-2);
+    transition: background-color 0.2s;
+  }
+  .cl-ico {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    background: var(--color-surface);
+    font: 700 13px/1 var(--font-sans);
+  }
+  .cl-txt {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    line-height: 1.25;
+  }
+  .cl-txt span {
+    font-size: 11.5px;
+    color: var(--color-soft);
+  }
+  .cl-ok {
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    background: var(--color-night);
+    color: var(--color-cream);
+    font: 700 11px/1 var(--font-sans);
+    opacity: 0;
+    scale: 0.5;
+    transition:
+      opacity 0.25s,
+      scale 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .cl-ok.on {
+    opacity: 1;
+    scale: 1;
+  }
+  .puces {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 8px;
+  }
+  .puce {
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: var(--color-cream-2);
+    font-size: 12px;
+  }
+  .m.on .puce {
+    animation: arrive 0.3s calc(0.2s + var(--k) * 0.18s) both;
+  }
+
+  /* 2 · The delivery note photo, the invoice. */
+  .m.photo {
+    padding: 4px 4px 7px;
+  }
+  .bl-photo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 180px;
+    margin-bottom: 6px;
+    padding: 12px 12px 16px;
+    border-radius: 7px;
+    background: var(--color-surface);
+    rotate: -1.5deg;
+    box-shadow: inset 0 0 0 1px var(--color-line);
+  }
+  .bl-photo b {
+    font: 400 9px/1 var(--font-mono);
+    letter-spacing: 0.08em;
+  }
+  .bl-photo i {
+    height: 5px;
+    border-radius: 3px;
+    background: var(--color-stone);
+  }
+  .bl-photo i:nth-child(odd) {
+    width: 70%;
+  }
+  .m.photo {
+    font-size: 13px;
+  }
+  .doc-tete {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 12.5px;
+  }
+  .lignes {
+    display: flex;
+    flex-direction: column;
+    min-width: 260px;
+  }
+  .ligne {
+    display: grid;
+    grid-template-columns: 1.25fr 0.7fr 1fr;
+    gap: 6px;
+    align-items: center;
+    padding: 6px 6px;
+    border-top: 1px solid var(--color-line);
+    border-radius: 6px;
+    font-size: 12.5px;
+    transition: background-color 0.3s;
+  }
+  .ligne.lu {
+    background: var(--color-cream-2);
+  }
+  .bl {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    color: var(--color-soft);
+  }
+  .coche {
+    display: grid;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    font: 700 10px/1 var(--font-sans);
+    opacity: 0;
+    scale: 0.5;
+    transition:
+      opacity 0.25s,
+      scale 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .ligne.ok .coche {
+    opacity: 1;
+    scale: 1;
+    background: var(--color-night);
+    color: var(--color-cream);
+  }
+  .ligne.ecart {
+    background: var(--color-orange-tint);
+  }
+  .ligne.ecart .coche {
+    opacity: 1;
+    scale: 1;
+    background: var(--color-orange);
+    color: var(--color-ink);
+  }
+  .ligne.ecart > span:nth-child(2),
+  .ligne.ecart .bl {
+    font-weight: 700;
+    color: var(--color-orange-txt);
+  }
+  .fichier {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: var(--color-cream-2);
+  }
+  .f-ico {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 38px;
+    flex-shrink: 0;
+    border-radius: 5px;
+    background: var(--color-night);
+    color: var(--color-cream);
+    font: 400 9px/1 var(--font-mono);
+  }
+  .fichier.xls {
+    margin-top: 8px;
+  }
+  .xls .f-ico {
+    background: var(--color-whatsapp-teal);
+  }
+  .f-txt {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.25;
+  }
+  .f-txt span {
+    font-size: 11.5px;
+    color: var(--color-soft);
+  }
+
+  /* 3 · The chart sent as an image. */
+  .m.image {
+    padding: 4px 4px 7px;
+  }
+  .leg {
+    display: block;
+    padding: 0 6px;
+  }
+  .graphe {
+    display: block;
+    margin-bottom: 7px;
+    padding: 10px 12px 8px;
+    border-radius: 7px;
+    background: var(--color-cream);
+  }
+  .g-titre {
+    display: block;
+    margin-bottom: 4px;
+    font: 400 10px/1.3 var(--font-mono);
+    letter-spacing: 0.04em;
+    color: var(--color-soft);
+  }
+  .graph {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    align-items: end;
+    gap: 8px;
+    width: 250px;
+    max-width: 100%;
+    height: 118px;
+    padding-top: 6px;
+  }
+  .seuil {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(55 * 1px + 16px);
+    border-top: 1.5px dashed var(--color-ink);
+    opacity: 0.55;
+  }
+  .seuil span {
+    position: absolute;
+    left: 0;
+    bottom: 3px;
+    padding-right: 4px;
+    background: var(--color-cream);
+    font: 400 9px/1 var(--font-mono);
+    color: var(--color-ink);
+  }
+  .barre {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+    height: 100%;
+  }
+  .barre i {
+    display: block;
+    width: 100%;
+    height: calc(var(--h) * 1px);
+    border-radius: 4px 4px 1px 1px;
+    background: color-mix(in srgb, var(--color-ink) 18%, transparent);
+    transition: background-color 0.5s;
+  }
+  .barre span {
+    height: 10px;
+    font: 400 10px/1 var(--font-sans);
+    color: var(--color-soft);
+  }
+  .graphe.lu .barre i {
+    background: var(--color-stone);
+  }
+  .graphe.lu .barre.au-dessus i {
+    background: var(--color-orange);
+  }
+
+  /* 4 · The voice note and the contract. */
+  .m.vocal {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 8px;
+    width: 250px;
+  }
+  :global(.situ-js) .m.vocal.on {
+    display: grid;
+  }
+  .v-lecture {
+    font-size: 13px;
+    color: var(--color-soft);
+  }
+  .v-onde {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    height: 18px;
+  }
+  .v-onde i {
+    width: 3px;
+    height: calc(var(--v) * 1.2px);
+    border-radius: 2px;
+    background: color-mix(in srgb, var(--color-ink) 45%, transparent);
+  }
+  .v-duree {
+    font-size: 11px;
+    color: var(--color-soft);
+  }
+  .v-transcrit {
+    grid-column: 1 / -1;
+    font-size: 12px;
+    font-style: italic;
+    color: var(--color-soft);
+  }
+  .contrat {
+    position: relative;
+    display: block;
+    min-width: 250px;
+    margin: -3px -6px 8px;
+    padding: 10px 12px 6px;
+    border-radius: 7px;
+    background: var(--color-cream);
+  }
+  .champs {
+    display: flex;
+    flex-direction: column;
+  }
+  .champ-c {
+    display: grid;
+    grid-template-columns: 5.6rem 1fr;
+    gap: 8px;
+    align-items: center;
+    padding: 6px 0;
+    border-top: 1px solid var(--color-line);
+  }
+  .ck {
+    font: 400 9.5px/1.3 var(--font-mono);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-soft);
+  }
+  .cv {
+    display: grid;
+    font-weight: 600;
+    font-size: 12.5px;
+  }
+  .cv > span {
+    grid-area: 1 / 1;
+  }
+  .vide {
+    align-self: center;
+    height: 8px;
+    width: 70%;
+    border-radius: 4px;
+    background: var(--color-stone);
+    transition: opacity 0.2s;
+  }
+  :global(.situ-js) .val {
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path 0.45s steps(14);
+  }
+  .vide {
+    opacity: 0;
+  }
+  :global(.situ-js) .vide {
+    opacity: 1;
+  }
+  :global(.situ-js) .champ-c.on .vide {
+    opacity: 0;
+  }
+  :global(.situ-js) .champ-c.on .val {
+    clip-path: inset(0 0 0 0);
+  }
+  .c-tete {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .tampon {
+    flex-shrink: 0;
+    padding: 4px 7px;
+    border: 2px solid var(--color-orange-txt);
+    border-radius: 6px;
+    font: 400 9.5px/1 var(--font-mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-orange-txt);
+    rotate: -8deg;
+  }
+  :global(.situ-js) .tampon {
+    opacity: 0;
+    scale: 1.6;
+    transition:
+      opacity 0.2s,
+      scale 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  :global(.situ-js) .tampon.on {
+    opacity: 1;
+    scale: 1;
+  }
+
+  .wa-saisie {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 10px 10px;
+    color: var(--color-soft);
+  }
+  .wa-saisie > span:first-child {
+    flex: 1;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: var(--color-surface);
+  }
+  .micro {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    background: var(--color-whatsapp-teal);
+  }
+  .micro svg {
+    width: 18px;
+    height: 18px;
+    fill: var(--color-white);
+  }
+
+  /* The owner's thumb: a dot that lands on what it taps and fades. */
+  .doigt {
+    --x: 50%;
+    --y: 50%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 3;
+    width: 34px;
+    height: 34px;
+    margin: -17px 0 0 -17px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-night) 35%, transparent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-surface) 80%, transparent);
+    translate: var(--x) var(--y);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .doigt.tape {
+    animation: tape 0.9s ease-out both;
+  }
+  @keyframes tape {
+    0% {
+      opacity: 0;
+      scale: 1.5;
+    }
+    30% {
+      opacity: 1;
+      scale: 0.85;
+    }
+    55% {
+      opacity: 1;
+      scale: 1;
+    }
+    100% {
+      opacity: 0;
+      scale: 1.3;
+    }
+  }
+
+  /* Replay */
+  .rejouer {
+    position: absolute;
+    right: 16px;
+    bottom: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-night) 85%, transparent);
+    color: var(--color-cream);
+    font: 600 12px/1 var(--font-sans);
+    cursor: pointer;
+  }
+  .rejouer:focus-visible {
+    outline: 2px solid var(--color-night);
+    outline-offset: 2px;
+  }
+  :global(html:not(.situ-js)) .rejouer {
+    display: none;
+  }
+  :global(html:not(.situ-js)) .cl-ok {
+    opacity: 1;
+    scale: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.situ-js) .m.on,
+    :global(.situ-js) .boutons.on,
+    .m.on .puce {
+      animation: none;
+    }
+    .cl-ok,
+    .coche,
+    .barre i,
+    :global(.situ-js) .val,
+    :global(.situ-js) .tampon {
+      transition: none;
+    }
+  }
+</style>

@@ -13,7 +13,6 @@ import Equipe from '../../components/sections/Equipe.astro';
 import Cas from '../../components/sections/Cas.astro';
 import MiseEnPlace from '../../components/sections/MiseEnPlace.astro';
 import TarifsFormulaire from '../../components/maquettes/TarifsFormulaire.astro';
-import { routes } from '../../i18n/ui';
 import siege from '../../assets/footer/siege.jpg';
 
 const locale = 'fr';
@@ -37,7 +36,7 @@ const pied = {
 
 <Base
   locale={locale}
-  paths={routes.home}
+  paths={{ fr: '/maquettes/reseau', en: '/en/maquettes/reseau' }}
   title="Maquette réseau | Hatch OS"
   description="Maquette de la page réseau de Hatch OS avec la nouvelle section tarifs en formulaire."
   pied={pied}

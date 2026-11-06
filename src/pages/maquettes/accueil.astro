@@ -44,7 +44,7 @@ const mots = [
 
 <Base
   locale="fr"
-  paths={routes.home}
+  paths={{ fr: '/maquettes/accueil', en: '/en/maquettes/accueil' }}
   nav="accueil"
   navTone="night"
   title="Maquette accueil | Hatch OS"
@@ -147,7 +147,7 @@ const mots = [
 
       <!-- Réseau → le site actuel -->
       <a
-        href="/"
+        href="/maquettes/reseau"
         class="group flex flex-col overflow-hidden rounded-[28px] bg-night shadow-1 transition hover:-translate-y-1 hover:shadow-2 lg:rounded-[36px]"
       >
         <div class="relative aspect-[16/10] overflow-hidden bg-scene">

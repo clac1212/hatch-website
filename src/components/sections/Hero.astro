@@ -407,68 +407,73 @@ const tick =
    * Paused off screen.
    * `?t=<s>` freezes the loop at an instant (captures); reduced motion shows a still frame.
    */
-  const hero = document.querySelector<HTMLElement>('.hero')!;
-  const STEP = Number(hero.querySelector<HTMLElement>('.h-piles')!.dataset.pas);
-  const piles = [...hero.querySelectorAll<HTMLElement>('.h-pile')];
-  const taches = piles.map((p) => p.querySelector<HTMLElement>('.h-tache')!);
-  const slots = piles.map((p) => p.querySelector<HTMLElement>('.h-slot')!);
-  const pings = [...hero.querySelectorAll<HTMLElement>('.h-ping')];
-  const oiseaux = [...hero.querySelectorAll<HTMLElement>('.h-oiseau')];
-  const CYCLE = STEP * piles.length;
-  const ENTREE = 1.0;
-  const BASCULE = 3.2;
-  const SORTIE = 5.0;
-  /** p = wave progress (0 → 1; ≥ 1 = idle). The second ring follows 0.3 behind the first. */
-  const clamp = (x: number) => Math.min(1, Math.max(0, x));
-  function ping(el: HTMLElement, p: number) {
-    const ease = (x: number) => 1 - (1 - x) ** 3;
-    el.style.setProperty('--p1', String(ease(clamp(p))));
-    el.style.setProperty('--p2', String(ease(clamp((p - 0.3) / 0.7))));
-    el.style.setProperty('--g', String(p < 1 ? Math.sin(Math.PI * clamp(p)) * 0.8 : 0));
-  }
+  // The Europe map mockup drives its own loop (inline script): this one only runs the France map.
+  const leHero = document.querySelector<HTMLElement>('.hero:not(.hero-europe)');
+  if (leHero) demarrer(leHero);
 
-  function rendu(t: number) {
-    const tc = t % CYCLE;
-    // the bird whose card is "running" types its answer
-    const actifs = new Set<string>();
-    piles.forEach((pile, i) => {
-      const r = tc - i * STEP;
-      if (r >= ENTREE && r < BASCULE) actifs.add(pile.dataset.agent!);
-    });
-    oiseaux.forEach((o) => o.classList.toggle('parle', actifs.has(o.dataset.agent!)));
-    piles.forEach((pile, i) => {
-      const r = tc - i * STEP;
-      const actif = r >= 0 && r < STEP;
-      ping(pings[i], actif ? r / 1.4 : 1);
-      slots[i].classList.toggle('on', actif && r >= ENTREE);
-      pile.classList.toggle('sort', actif && r >= SORTIE);
-      taches[i].classList.toggle('fait', actif && r >= BASCULE);
-    });
-  }
+  function demarrer(hero: HTMLElement) {
+    const STEP = Number(hero.querySelector<HTMLElement>('.h-piles')!.dataset.pas);
+    const piles = [...hero.querySelectorAll<HTMLElement>('.h-pile')];
+    const taches = piles.map((p) => p.querySelector<HTMLElement>('.h-tache')!);
+    const slots = piles.map((p) => p.querySelector<HTMLElement>('.h-slot')!);
+    const pings = [...hero.querySelectorAll<HTMLElement>('.h-ping')];
+    const oiseaux = [...hero.querySelectorAll<HTMLElement>('.h-oiseau')];
+    const CYCLE = STEP * piles.length;
+    const ENTREE = 1.0;
+    const BASCULE = 3.2;
+    const SORTIE = 5.0;
+    /** p = wave progress (0 → 1; ≥ 1 = idle). The second ring follows 0.3 behind the first. */
+    const clamp = (x: number) => Math.min(1, Math.max(0, x));
+    function ping(el: HTMLElement, p: number) {
+      const ease = (x: number) => 1 - (1 - x) ** 3;
+      el.style.setProperty('--p1', String(ease(clamp(p))));
+      el.style.setProperty('--p2', String(ease(clamp((p - 0.3) / 0.7))));
+      el.style.setProperty('--g', String(p < 1 ? Math.sin(Math.PI * clamp(p)) * 0.8 : 0));
+    }
 
-  const fige = new URLSearchParams(location.search).get('t');
-  if (fige !== null) rendu(Number.parseFloat(fige));
-  else if (matchMedia('(prefers-reduced-motion: reduce)').matches) rendu(2);
-  else {
-    let t = 0;
-    let avant: number | null = null;
-    let raf = 0;
-    const boucle = (maintenant: number) => {
-      // Capped step: a background tab resumes where it left off instead of jumping ahead.
-      if (avant !== null) t += Math.min(maintenant - avant, 100) / 1000;
-      avant = maintenant;
-      rendu(t);
-      raf = requestAnimationFrame(boucle);
-    };
-    new IntersectionObserver(([e]) => {
-      hero.classList.toggle('h-pause', !e.isIntersecting);
-      if (e.isIntersecting) raf ||= requestAnimationFrame(boucle);
-      else {
-        cancelAnimationFrame(raf);
-        raf = 0;
-        avant = null;
-      }
-    }).observe(hero);
+    function rendu(t: number) {
+      const tc = t % CYCLE;
+      // the bird whose card is "running" types its answer
+      const actifs = new Set<string>();
+      piles.forEach((pile, i) => {
+        const r = tc - i * STEP;
+        if (r >= ENTREE && r < BASCULE) actifs.add(pile.dataset.agent!);
+      });
+      oiseaux.forEach((o) => o.classList.toggle('parle', actifs.has(o.dataset.agent!)));
+      piles.forEach((pile, i) => {
+        const r = tc - i * STEP;
+        const actif = r >= 0 && r < STEP;
+        ping(pings[i], actif ? r / 1.4 : 1);
+        slots[i].classList.toggle('on', actif && r >= ENTREE);
+        pile.classList.toggle('sort', actif && r >= SORTIE);
+        taches[i].classList.toggle('fait', actif && r >= BASCULE);
+      });
+    }
+
+    const fige = new URLSearchParams(location.search).get('t');
+    if (fige !== null) rendu(Number.parseFloat(fige));
+    else if (matchMedia('(prefers-reduced-motion: reduce)').matches) rendu(2);
+    else {
+      let t = 0;
+      let avant: number | null = null;
+      let raf = 0;
+      const boucle = (maintenant: number) => {
+        // Capped step: a background tab resumes where it left off instead of jumping ahead.
+        if (avant !== null) t += Math.min(maintenant - avant, 100) / 1000;
+        avant = maintenant;
+        rendu(t);
+        raf = requestAnimationFrame(boucle);
+      };
+      new IntersectionObserver(([e]) => {
+        hero.classList.toggle('h-pause', !e.isIntersecting);
+        if (e.isIntersecting) raf ||= requestAnimationFrame(boucle);
+        else {
+          cancelAnimationFrame(raf);
+          raf = 0;
+          avant = null;
+        }
+      }).observe(hero);
+    }
   }
 </script>
 

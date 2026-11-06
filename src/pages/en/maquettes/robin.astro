@@ -1,0 +1,1199 @@
+---
+/**
+ * MOCKUP (EN) — Robin landing page (independent owners) with sign-up for the beta waitlist.
+ * Inspiration: muse.ai (restraint, night background, one big sentence) and ChatGPT's "dots" page:
+ * the character floating above the title, the sticky nav pill, alternating rows of text / coloured
+ * card with a conversation inside, "a week with Robin" as a timeline, the WhatsApp phone, three
+ * trust cards.
+ * Content from Notion ("Robin — the co-founder of independent restaurants") and the previous
+ * mockup. Visual only: hardcoded copy, the form sends nothing.
+ */
+import { Image } from 'astro:assets';
+import rungis from '../../../assets/footer/rungis.jpg';
+import Base from '../../../layouts/Base.astro';
+import Iphone from '../../../components/ui/Iphone.astro';
+import RobinSituations from '../../../components/maquettes/en/RobinSituations.astro';
+import { routes } from '../../../i18n/ui';
+import robin from '../../../assets/portraits/robin.jpg';
+import soir from '../../../assets/robin/soir.jpg';
+import portrait from '../../../assets/portraits/robin.jpg';
+import poseLun from '../../../assets/robin/semaine/lun.jpg';
+import poseMar from '../../../assets/robin/semaine/mar.jpg';
+import poseMer from '../../../assets/robin/semaine/mer.jpg';
+import poseJeu from '../../../assets/robin/semaine/jeu.jpg';
+import poseVen from '../../../assets/robin/semaine/ven.jpg';
+import poseDim from '../../../assets/robin/semaine/dim.jpg';
+
+/** Robin, one outfit per day of the timeline (same order as `semaine`). */
+const poses = [poseLun, poseMar, poseMer, poseJeu, poseVen, poseDim];
+
+/** A week with Robin: the timeline, one moment per day (same sources as the pillars). */
+const semaine = [
+  {
+    jour: 'Mon',
+    heure: '8:30 am',
+    titre: 'The weekly recap',
+    texte: 'Sales, purchases, staff costs: your week at a glance, site by site.',
+    bulle: 'Morning Karim, your week is ready: sales, purchases and staff costs. Saturday lunch was your best service.',
+  },
+  {
+    jour: 'Tue',
+    heure: '10 am',
+    titre: 'Deliveries',
+    texte: 'He matches what you ordered, what arrived and what was invoiced. He shows you the gaps, with the proof.',
+    bulle: 'I matched orders, delivery notes and invoices. One line at Metro looks off, want me to show you?',
+  },
+  {
+    jour: 'Wed',
+    heure: '3 pm',
+    titre: 'The team',
+    texte: 'He answers your staff without promising anything on your behalf, and sums up what needs your call.',
+    bulle: 'Thomas would like Saturday off. I told him you’d get back to him, no promises.',
+  },
+  {
+    jour: 'Thu',
+    heure: '11 am',
+    titre: 'Dish costs',
+    texte: 'When a purchase price moves, he recalculates the cost of your dishes and warns you if a margin drops below your threshold.',
+    bulle: 'With beef prices up, your tartare drops below your target margin. Want two options?',
+  },
+  {
+    jour: 'Fri',
+    heure: '6 pm',
+    titre: 'Before service',
+    texte: 'He reminds you what matters for the weekend, without you having to ask.',
+    bulle: 'Saturday night is almost full. Lina is confirmed as extra staff, her contract is signed.',
+  },
+  {
+    jour: 'Sun',
+    heure: '9 pm',
+    titre: 'A question for Monday',
+    texte: 'He starts from your decisions, not from spreadsheets: should you stay open in the afternoon, add a service, rework a menu?',
+    bulle: 'You asked whether we should stay open from 2 to 6 pm: on weekdays, that slot doesn’t cover the wages. Shall we talk tomorrow?',
+  },
+];
+
+/** Trust: three plain cards, like the dots ones. */
+const confiance = [
+  {
+    titre: 'Your data stays yours',
+    texte: 'Hosted in Europe, never used to train an AI. You choose what Robin sees.',
+  },
+  {
+    titre: 'He suggests, you decide',
+    texte: 'Robin prepares, you approve. He never promises anything on your behalf, and nothing goes out to a supplier or an employee without your OK.',
+  },
+  {
+    titre: 'In an app you already know',
+    texte: 'No software to install during the beta: Robin messages you on WhatsApp, in text or voice notes.',
+  },
+];
+
+const champs = [
+  { id: 'prenom', label: 'First name', type: 'text', placeholder: 'Karim', auto: 'given-name' },
+  { id: 'nom', label: 'Last name', type: 'text', placeholder: 'Benali', auto: 'family-name' },
+  { id: 'restaurant', label: 'Restaurant name', type: 'text', placeholder: 'Le Petit Comptoir', auto: 'organization' },
+  { id: 'site', label: 'Website', type: 'url', placeholder: 'lepetitcomptoir.fr', auto: 'url' },
+  { id: 'whatsapp', label: 'WhatsApp number', type: 'tel', placeholder: '+33 6 12 34 56 78', auto: 'tel' },
+  { id: 'email', label: 'Email', type: 'email', placeholder: 'karim@lepetitcomptoir.fr', auto: 'email' },
+];
+
+/** Robin's own footer: the Rungis market and what Robin keeps track of, hall by hall. */
+const pied = {
+  image: rungis,
+  alt: 'A hall of the Rungis market in voxels, seen in cross-section at dawn: fish, fruit, meat, dairy and an office upstairs. Robin, perched on the crates of the trolley, does the shopping with the owner.',
+  titre: 'Robin at the market',
+  liste: [
+    { repere: 'FISH', texte: 'He compares prices · Orders', href: '#fait' },
+    { repere: 'FRUIT', texte: 'He adjusts quantities · Stock', href: '#fait' },
+    { repere: 'MEAT', texte: 'He checks the weights · Invoices', href: '#fait' },
+    { repere: 'DAIRY', texte: 'He tracks credit notes · Suppliers', href: '#fait' },
+    { repere: 'OFFICE', texte: 'He prepares contracts · Team', href: '#semaine' },
+  ],
+};
+
+/** The evening scene: Robin's messages arriving one after another, as bubbles over the video. */
+const soiree = [
+  {
+    txt: 'Service is over! 🎉 Here’s your recap of the evening. You’ll find the details in the dashboard we built together.',
+    lien: 'Dashboard',
+  },
+  {
+    txt: 'The beef tartare sold out fast tonight 🔥. I cross-checked sales with your stock and adjusted tomorrow’s Metro order: more beef 🥩, less salmon 🐟.',
+  },
+  {
+    txt: 'Lina replied by email about tomorrow’s extra shift: she’s confirmed 👍. I’m preparing her extra contract and her payslip in advance.',
+  },
+];
+
+/** Monday's thread, in the WhatsApp phone. */
+const lundi = [
+  {
+    qui: 'robin',
+    txt: 'Morning Karim, here’s your weekly recap. I matched deliveries and invoices: Metro is 2 kg of beef short, the credit note request is ready.',
+  },
+  { qui: 'patron', txt: 'Send it. And do Lina’s contract for Saturday' },
+  {
+    qui: 'robin',
+    txt: 'Done, from your template. Check it before I send it.',
+    doc: 'Extra contract · Lina.pdf',
+    meta: 'Your template · ready to sign',
+  },
+];
+---
+
+<Base
+  locale="en"
+  paths={{ fr: '/maquettes/robin', en: '/en/maquettes/robin' }}
+  nav="accueil"
+  navTone="night"
+  pied={pied}
+  title="Robin mockup | Hatch OS"
+  description="Mockup of the Robin page, the AI partner for independent restaurant owners on WhatsApp, with sign-up for the beta waitlist."
+>
+  <div class="nuit bg-night text-cream">
+    <!-- 1 · Hero: Robin floats above the title (dots), one big centred sentence (muse.ai) -->
+    <section id="robin" class="flex flex-col items-center px-4 pt-36 pb-14 text-center sm:px-6 lg:pt-44 lg:pb-20">
+      <!-- Robin flies into his circle, waves, takes notes, checks a receipt, gives a thumbs up,
+           then flies off (15 s loop, with a pause button: WCAG 2.2.2). -->
+      <div class="mb-8 flex flex-col items-center gap-2" data-vol>
+        <div class="size-[132px] overflow-hidden rounded-full bg-cream-2 lg:size-[156px]">
+          <video
+            class="size-full object-cover"
+            src="/maquettes/anim/robin-vol.mp4"
+            poster={portrait.src}
+            muted
+            loop
+            playsinline
+            preload="auto"
+            aria-label="Robin, a voxel robin, flies in, waves, takes notes, checks a receipt, gives a thumbs up and flies off."
+          ></video>
+        </div>
+        <button type="button" class="vol-pause" data-vol-pause aria-pressed="false">
+          <span class="sr-only" data-vol-label>Pause Robin's animation</span>
+          <svg viewBox="0 0 24 24" class="ico-pause size-3.5" fill="currentColor" aria-hidden="true">
+            <path d="M7 5h4v14H7zm6 0h4v14h-4z"></path>
+          </svg>
+          <svg viewBox="0 0 24 24" class="ico-lecture size-3.5" fill="currentColor" aria-hidden="true">
+            <path d="M8 5v14l11-7z"></path>
+          </svg>
+        </button>
+      </div>
+      <h1
+        class="font-display text-[40px] leading-[1.04] font-medium tracking-[-0.02em] sm:text-[54px] lg:text-[64px]"
+      >
+        Robin, your AI partner.
+      </h1>
+      <p class="mt-5 max-w-[520px] text-[16px] leading-7 text-cream/75 lg:text-[18px] lg:leading-8">
+        You do everything, on your own. Robin is the right hand you don't have: he knows your
+        restaurant, follows up with you and gets the work ready.
+      </p>
+      <div class="mt-8 flex flex-wrap justify-center gap-3">
+        <a href="#beta" class="btn-vif rounded-full bg-cream px-6 py-3 text-[0.9rem] font-bold text-ink">
+          Join the waitlist
+        </a>
+      </div>
+
+      <!-- The scene below the hero, like the dots video: the bistro at closing time, Robin talks to
+           the owner (looping video), and his messages pop out of his beak, as comic bubbles, one after another. -->
+      <div class="soiree mt-14 w-full max-w-[860px] lg:mt-16" data-soiree>
+        <div class="soiree-cadre">
+          <video
+            class="soiree-video"
+            src="/maquettes/anim/robin-soir.mp4"
+            poster={soir.src}
+            muted
+            loop
+            playsinline
+            preload="auto"
+            aria-label="Evening, closing time at a small voxel bistro: Robin, perched on the counter, goes over the day with the owner, who is looking at his phone."
+          ></video>
+          <ol class="bulles-soir" aria-label="Robin's messages tonight">
+            {
+              soiree.map((m, i) => (
+                <li class="bs" style={`--i:${i}`}>
+                  <span class="bs-bulle">
+                    {m.txt}
+                    {m.lien && (
+                      <span class="bs-lien">
+                        {m.lien} <span aria-hidden="true">→</span>
+                      </span>
+                    )}
+                  </span>
+                </li>
+              ))
+            }
+          </ol>
+          <button type="button" class="soiree-pause" data-pause aria-pressed="false">
+            <span class="sr-only" data-pause-label>Pause the animation</span>
+            <svg viewBox="0 0 24 24" class="ico-pause size-4" fill="currentColor" aria-hidden="true">
+              <path d="M7 5h4v14H7zm6 0h4v14h-4z"></path>
+            </svg>
+            <svg viewBox="0 0 24 24" class="ico-lecture size-4" fill="currentColor" aria-hidden="true">
+              <path d="M8 5v14l11-7z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 · The sticky nav pill (dots) -->
+    <nav class="pilule-zone" aria-label="On this page">
+      <div class="pilule">
+        <a href="#robin" class="pilule-nom">
+          <span class="pastille" aria-hidden="true"></span>
+          Robin <span class="pilule-statut">online</span>
+        </a>
+        <a href="#fait">What he does</a>
+        <a href="#semaine">A week</a>
+        <a href="#canaux">Where to find him</a>
+        <a href="#beta" class="pilule-cta">Join the waitlist</a>
+      </div>
+    </nav>
+
+    <!-- 3 · What Robin does: alternating rows, a conversation in a tinted card -->
+    <section id="fait" class="mx-auto flex max-w-[1180px] flex-col gap-12 px-4 py-20 sm:px-6 lg:gap-16 lg:py-28">
+      <div class="flex max-w-[640px] flex-col gap-4">
+        <span class="font-mono text-kicker text-cream/60 uppercase">What Robin does</span>
+        <h2 class="font-display text-[34px] leading-[1.08] font-medium tracking-[-0.02em] lg:text-[48px]">
+          Not one more piece of software. A partner who knows your restaurant.
+        </h2>
+      </div>
+      <RobinSituations />
+    </section>
+
+    <!-- 4 · A week with Robin: the day timeline (the dots "day") -->
+    <section id="semaine" class="border-t border-line-night px-4 py-20 sm:px-6 lg:py-28" data-semaine>
+      <div class="mx-auto flex max-w-[980px] flex-col items-center text-center">
+        <span class="font-mono text-kicker text-cream/60 uppercase">A week with Robin</span>
+        <h2 class="mt-4 max-w-[18ch] font-display text-[34px] leading-[1.08] font-medium tracking-[-0.02em] lg:text-[48px]">
+          From Monday morning to Sunday night.
+        </h2>
+
+        <!-- Robin and his bubble, which change with the day -->
+        <div class="scene mt-12">
+          <!-- Robin changes outfit with the day: coffee on Monday, crate on Tuesday, calendar on
+               Wednesday, chef's hat on Thursday, bell on Friday, nightcap on Sunday. -->
+          <div class="flotte jour-av">
+            {
+              poses.map((src, i) => (
+                <Image
+                  src={src}
+                  alt=""
+                  widths={[120, 240]}
+                  sizes="120px"
+                  class:list={['pose', i === 0 && 'on']}
+                  data-j={i}
+                />
+              ))
+            }
+          </div>
+          <div class="bulles">
+            {
+              semaine.map((j, i) => (
+                <p class:list={['bulle', i === 0 && 'on']} data-j={i}>
+                  {j.bulle}
+                </p>
+              ))
+            }
+          </div>
+        </div>
+
+        <!-- The timeline -->
+        <div class="frise mt-10 w-full" role="tablist" aria-label="Days of the week">
+          {
+            semaine.map((j, i) => (
+              <button
+                type="button"
+                role="tab"
+                class="jour"
+                aria-selected={i === 0 ? 'true' : 'false'}
+                aria-controls="semaine-detail"
+                data-j={i}
+              >
+                <span class="jour-point" aria-hidden="true" />
+                <span class="jour-nom">{j.jour}</span>
+                <span class="jour-heure">{j.heure}</span>
+              </button>
+            ))
+          }
+        </div>
+
+        <div id="semaine-detail" class="details mt-10" aria-live="polite">
+          {
+            semaine.map((j, i) => (
+              <div class:list={['detail', i === 0 && 'on']} data-j={i}>
+                <h3 class="font-display text-[26px] leading-tight font-medium lg:text-[32px]">{j.titre}</h3>
+                <p class="mx-auto mt-3 max-w-[520px] text-[16px] leading-7 text-cream/75">{j.texte}</p>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 · Where to find him: the WhatsApp phone (no app yet) -->
+    <section id="canaux" class="border-t border-line-night px-4 py-20 sm:px-6 lg:py-28" data-canaux>
+      <div class="mx-auto flex max-w-[980px] flex-col items-center text-center">
+        <span class="font-mono text-kicker text-cream/60 uppercase">Where to find him</span>
+        <h2 class="mt-4 font-display text-[34px] leading-[1.08] font-medium tracking-[-0.02em] lg:text-[48px]">
+          Right where you already are.
+        </h2>
+        <p class="mt-4 max-w-[520px] text-[16px] leading-7 text-cream/75">
+          During the beta, Robin lives in WhatsApp. Later, he'll have his own app, built for him,
+          always within reach.
+        </p>
+
+        <div class="telephone mt-10 w-full max-w-[320px]">
+          <Iphone>
+            <!-- WhatsApp -->
+            <div class="ecran wa on" data-c="0">
+              <div class="wa-statut" aria-hidden="true"><span>8:31</span><span>●●● ▮</span></div>
+              <header class="wa-barre">
+                <span class="wa-retour" aria-hidden="true">‹</span>
+                <Image src={robin} alt="" width={40} densities={[1, 2]} class="wa-av" />
+                <span class="wa-contact"><b>Robin</b><span>online</span></span>
+              </header>
+              <div class="wa-fil">
+                <p class="wa-jour">Monday</p>
+                {
+                  lundi.map((m) => (
+                    <div class:list={['wa-msg', m.qui, m.doc && 'wa-doc']}>
+                      {m.doc && (
+                        <span class="wa-fichier">
+                          <b>{m.doc}</b>
+                          <span>{m.meta}</span>
+                        </span>
+                      )}
+                      {m.txt}
+                    </div>
+                  ))
+                }
+              </div>
+            </div>
+          </Iphone>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 · Trust: on the dark background, three cards outlined in the blue of Robin's feathers. -->
+    <section class="border-t border-line-night px-4 py-20 sm:px-6 lg:py-28">
+      <div class="mx-auto flex max-w-[1180px] flex-col items-center">
+        <h2 class="max-w-[20ch] text-center font-display text-[34px] leading-[1.08] font-medium tracking-[-0.02em] lg:text-[48px]">
+          By your side, under your control.
+        </h2>
+        <div class="mt-12 grid w-full gap-4 md:grid-cols-3">
+          {
+            confiance.map((c, i) => (
+              <article class="flex flex-col items-start gap-3 rounded-[24px] bg-night-2 p-7 ring-1 ring-robin/60 lg:p-8">
+                <span class="font-mono text-[12px] tracking-[0.08em] text-cream/60">0{i + 1}</span>
+                <h3 class="font-display text-[22px] leading-tight font-medium">{c.titre}</h3>
+                <p class="text-[15px] leading-6 text-cream/75">{c.texte}</p>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 · The beta: the waitlist -->
+    <section id="beta" class="border-t border-line-night px-4 py-20 sm:px-6 lg:py-28">
+      <div class="mx-auto grid max-w-[1100px] items-center gap-12 lg:grid-cols-[1fr_0.95fr] lg:gap-16">
+        <div class="flex flex-col items-start gap-5">
+          <span class="font-mono text-kicker text-cream/60 uppercase">Beta</span>
+          <h2 class="font-display text-[34px] leading-[1.06] font-medium tracking-[-0.02em] lg:text-[48px]">
+            Want to use Robin? Join the waitlist.
+          </h2>
+          <p class="max-w-[440px] text-[16px] leading-7 text-cream/75">
+            Early sign-ups get priority. We're opening Robin to a few restaurant owners at a time,
+            and we'll message you on WhatsApp when it's your turn.
+          </p>
+        </div>
+        <form
+          class="flex flex-col gap-4 rounded-[28px] bg-cream p-6 text-ink sm:p-8 lg:rounded-[36px] lg:p-10"
+          onsubmit="event.preventDefault()"
+        >
+          <div class="grid gap-3 sm:grid-cols-2">
+            {
+              champs.map((c, i) => (
+                <label class="champ" for={`r-${c.id}`}>
+                  <span>{c.label}</span>
+                  <input id={`r-${c.id}`} name={c.id} type={c.type} placeholder={c.placeholder} autocomplete={c.auto} />
+                </label>
+              ))
+            }
+          </div>
+          <button
+            type="submit"
+            class="btn-vif mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full bg-orange px-6 py-4 text-base font-bold text-ink"
+          >
+            Join the waitlist <span aria-hidden="true">→</span>
+          </button>
+          <p class="text-center text-[12.5px] text-soft">Free during the beta. No commitment.</p>
+        </form>
+      </div>
+    </section>
+  </div>
+
+  <script is:inline data-keep>
+    // Robin flying in the hero: the loop starts on its own (except with reduced motion: the portrait
+    // stays still), the small button pauses it.
+    (function () {
+      var root = document.querySelector('[data-vol]');
+      if (!root) return;
+      var video = root.querySelector('video');
+      var bouton = root.querySelector('[data-vol-pause]');
+      var label = root.querySelector('[data-vol-label]');
+      function regler(pause) {
+        root.classList.toggle('pause', pause);
+        bouton.setAttribute('aria-pressed', pause ? 'true' : 'false');
+        label.textContent = pause ? "Play Robin's animation" : "Pause Robin's animation";
+        if (pause) video.pause();
+        else video.play().catch(function () {});
+      }
+      bouton.addEventListener('click', function () {
+        regler(!root.classList.contains('pause'));
+      });
+      regler(matchMedia('(prefers-reduced-motion: reduce)').matches);
+    })();
+    // The evening scene: the video starts on its own (except with reduced motion), the button pauses
+    // the video and the incoming messages (WCAG 2.2.2: anything that loops can be paused).
+    (function () {
+      var root = document.querySelector('[data-soiree]');
+      if (!root) return;
+      var video = root.querySelector('video');
+      var bouton = root.querySelector('[data-pause]');
+      var label = root.querySelector('[data-pause-label]');
+      var reduit = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function regler(pause) {
+        root.classList.toggle('pause', pause);
+        bouton.setAttribute('aria-pressed', pause ? 'true' : 'false');
+        label.textContent = pause ? 'Play the animation' : 'Pause the animation';
+        if (pause) video.pause();
+        else video.play().catch(function () {});
+      }
+      bouton.addEventListener('click', function () {
+        regler(!root.classList.contains('pause'));
+      });
+      regler(reduit);
+    })();
+    // A week with Robin: clicking a day changes the bubble and the detail. Channels: clicking a tab
+    // changes the phone screen. Without JS: Monday and WhatsApp stay visible.
+    (function () {
+      function onglets(root, attr) {
+        if (!root) return;
+        var tabs = [].slice.call(root.querySelectorAll('[role="tab"]'));
+        var panneaux = [].slice.call(root.querySelectorAll('[' + attr + ']:not([role="tab"])'));
+        tabs.forEach(function (t) {
+          t.addEventListener('click', function () {
+            var v = t.getAttribute(attr);
+            tabs.forEach(function (u) {
+              u.setAttribute('aria-selected', u === t ? 'true' : 'false');
+            });
+            panneaux.forEach(function (p) {
+              var on = p.getAttribute(attr) === v;
+              p.classList.toggle('on', on);
+              p.setAttribute('aria-hidden', on ? 'false' : 'true');
+            });
+          });
+        });
+      }
+      onglets(document.querySelector('[data-semaine]'), 'data-j');
+    })();
+  </script>
+</Base>
+
+<style>
+  /* Robin floats gently, like the dot above the title. */
+  /* The pause button for flying Robin: discreet, under the circle. */
+  .vol-pause {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    color: color-mix(in srgb, var(--color-cream) 75%, transparent);
+    box-shadow: 0 0 0 1px var(--color-line-night);
+    cursor: pointer;
+  }
+  .vol-pause:hover,
+  .vol-pause:focus-visible {
+    color: var(--color-cream);
+  }
+  .vol-pause:focus-visible {
+    outline: 2px solid var(--color-cream);
+    outline-offset: 2px;
+  }
+  .vol-pause .ico-lecture,
+  [data-vol].pause .vol-pause .ico-pause {
+    display: none;
+  }
+  [data-vol].pause .vol-pause .ico-lecture {
+    display: block;
+  }
+  .flotte {
+    filter: drop-shadow(0 18px 24px color-mix(in srgb, var(--color-black) 45%, transparent));
+    animation: flotte 5s ease-in-out infinite;
+  }
+  @keyframes flotte {
+    0%,
+    100% {
+      transform: translateY(0) rotate(-2deg);
+    }
+    50% {
+      transform: translateY(-10px) rotate(2deg);
+    }
+  }
+
+
+  /* The evening scene: the video large, Robin's messages arriving top left (over the windows, so they hide no one). */
+  .soiree-cadre {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    border-radius: 28px;
+    background: var(--color-night-2);
+    box-shadow: 0 0 0 1px var(--color-line-night);
+  }
+  @media (min-width: 64rem) {
+    .soiree-cadre {
+      border-radius: 36px;
+    }
+  }
+  .soiree-video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* The bubbles come from Robin on the counter: opening to the left, the tail pointing down just to his left.
+     One at a time, in the same cell, each in turn (9 s, time to read), then the evening restarts.
+     Robin sits at ~55% of the video's width and ~42% of its height. */
+  .bulles-soir {
+    position: absolute;
+    right: 46%;
+    bottom: 66%;
+    display: grid;
+    align-items: end;
+    width: min(330px, 40%);
+    text-align: left;
+    container-type: inline-size;
+  }
+  .bs {
+    grid-area: 1 / 1;
+    opacity: 0;
+    transform-origin: 88% 100%;
+    animation: bulle-soir 19.5s var(--ease-doux) infinite;
+    animation-delay: calc(0.6s + var(--i) * 6.5s);
+  }
+  .bs-bulle {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 15px 13px;
+    border-radius: 20px;
+    background: var(--color-surface);
+    box-shadow: var(--shadow-2);
+    font: 400 13px/1.45 var(--font-sans);
+    color: var(--color-ink);
+  }
+  /* The bubble opens to the left; its tail, bottom right, points down just left of Robin. */
+  .bs-bulle::after {
+    content: '';
+    position: absolute;
+    right: 26px;
+    bottom: -13px;
+    width: 22px;
+    height: 16px;
+    background: var(--color-surface);
+    clip-path: polygon(0 0, 100% 0, 82% 100%);
+  }
+  .bs-lien {
+    align-self: flex-start;
+    padding: 6px 10px;
+    border-radius: 10px;
+    background: var(--color-orange-tint);
+    font: 600 12px/1.2 var(--font-sans);
+    color: var(--color-orange-txt);
+  }
+  /* The bubble pops from Robin, stays long enough to read, then makes way for the next. */
+  @keyframes bulle-soir {
+    0% {
+      opacity: 0;
+      transform: scale(0.85);
+    }
+    3%,
+    29% {
+      opacity: 1;
+      transform: none;
+    }
+    33%,
+    100% {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+  }
+  .soiree.pause .bs {
+    animation-play-state: paused;
+  }
+  .soiree-pause {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-night) 70%, transparent);
+    backdrop-filter: blur(8px);
+    color: var(--color-cream);
+    cursor: pointer;
+  }
+  .soiree-pause:focus-visible {
+    outline: 2px solid var(--color-cream);
+    outline-offset: 2px;
+  }
+  .soiree-pause .ico-lecture,
+  .soiree.pause .soiree-pause .ico-pause {
+    display: none;
+  }
+  .soiree.pause .soiree-pause .ico-lecture {
+    display: block;
+  }
+  /* On small screens, the bubble keeps its place above Robin, smaller. */
+  @media (max-width: 47.99rem) {
+    .bulles-soir {
+      right: 45%;
+      width: 52%;
+    }
+    .bs-bulle {
+      padding: 8px 10px 9px;
+      border-radius: 14px;
+      font-size: 10.5px;
+      gap: 5px;
+    }
+    .bs-lien {
+      padding: 4px 7px;
+      font-size: 10px;
+    }
+  }
+
+  /* The sticky pill: under the fixed nav, it follows the scroll. */
+  .pilule-zone {
+    position: sticky;
+    top: 84px;
+    z-index: 50;
+    display: flex;
+    justify-content: center;
+    padding: 0 16px;
+    pointer-events: none;
+  }
+  .pilule {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-night-2) 88%, transparent);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 0 0 1px var(--color-line-night);
+    font-size: 13.5px;
+    pointer-events: auto;
+    overflow-x: auto;
+    max-width: 100%;
+  }
+  .pilule a {
+    padding: 8px 14px;
+    border-radius: 999px;
+    color: color-mix(in srgb, var(--color-cream) 75%, transparent);
+    white-space: nowrap;
+    transition: color 0.2s;
+  }
+  .pilule a:hover {
+    color: var(--color-cream);
+  }
+  .pilule .pilule-nom {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding-left: 6px;
+    font-weight: 700;
+    color: var(--color-cream);
+  }
+  /* Robin's "online" dot: a breathing orange circle, like ChatGPT's dot. */
+  .pastille {
+    position: relative;
+    width: 10px;
+    height: 10px;
+    margin: 0 2px 0 4px;
+    border-radius: 999px;
+    background: var(--color-orange);
+  }
+  .pastille::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    background: var(--color-orange);
+    animation: pastille 2.4s ease-out infinite;
+  }
+  @keyframes pastille {
+    0% {
+      transform: scale(1);
+      opacity: 0.6;
+    }
+    70%,
+    100% {
+      transform: scale(2.6);
+      opacity: 0;
+    }
+  }
+  .pilule-statut {
+    font: 400 11px/1 var(--font-mono);
+    letter-spacing: 0.06em;
+    color: color-mix(in srgb, var(--color-cream) 60%, transparent);
+  }
+  .pilule .pilule-cta {
+    background: var(--color-cream);
+    color: var(--color-ink);
+    font-weight: 700;
+  }
+
+  /* Alternating rows: the card on the right, then on the left. */
+  @media (min-width: 48rem) {
+    .rangee.inverse > :first-child {
+      order: 2;
+    }
+  }
+  .carte-couleur {
+    min-height: 340px;
+  }
+  .fil {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .msg {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+  }
+  .msg.patron {
+    justify-content: flex-end;
+  }
+  .msg :global(.msg-av) {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    border-radius: 999px;
+    background: var(--color-cream);
+    object-fit: cover;
+  }
+  .msg-bulle {
+    max-width: 82%;
+    padding: 12px 15px;
+    border-radius: 18px;
+    font: 400 15px/1.45 var(--font-sans);
+    color: var(--color-ink);
+    box-shadow: var(--shadow-1);
+  }
+  .msg.robin .msg-bulle {
+    background: var(--color-surface);
+    border-bottom-left-radius: 6px;
+  }
+  .msg.patron .msg-bulle {
+    background: var(--color-night);
+    color: var(--color-cream);
+    border-bottom-right-radius: 6px;
+  }
+  .msg-doc {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 8px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: var(--color-cream-2);
+  }
+  .msg-doc span {
+    font-size: 12px;
+    color: var(--color-soft);
+  }
+
+  /* A week: the scene (Robin + bubble), the timeline, the detail. */
+  .scene {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .jour-av {
+    display: grid;
+    width: 120px;
+    height: 120px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--color-cream-2);
+  }
+  .jour-av :global(.pose) {
+    grid-area: 1 / 1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    scale: 0.92;
+    transition:
+      opacity 0.3s var(--ease-doux),
+      scale 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .jour-av :global(.pose.on) {
+    opacity: 1;
+    scale: 1;
+  }
+  .bulles {
+    display: grid;
+    min-height: 74px;
+  }
+  .bulle {
+    grid-area: 1 / 1;
+    max-width: 380px;
+    padding: 14px 18px;
+    border-radius: 18px;
+    background: var(--color-cream);
+    color: var(--color-ink);
+    font: 500 15px/1.45 var(--font-sans);
+    opacity: 0;
+    translate: 0 8px;
+    transition:
+      opacity 0.3s var(--ease-doux),
+      translate 0.4s var(--ease-doux);
+  }
+  .bulle.on {
+    opacity: 1;
+    translate: 0 0;
+  }
+  .frise {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+  }
+  .frise::before {
+    content: '';
+    position: absolute;
+    top: 7px;
+    left: 8%;
+    right: 8%;
+    height: 1px;
+    background: var(--color-line-night);
+  }
+  .jour {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 6px;
+    cursor: pointer;
+  }
+  .jour-point {
+    width: 15px;
+    height: 15px;
+    border-radius: 999px;
+    background: var(--color-night);
+    box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--color-cream) 45%, transparent);
+    transition:
+      background-color 0.2s,
+      box-shadow 0.2s;
+  }
+  .jour-nom {
+    font: 600 14px/1 var(--font-sans);
+    color: color-mix(in srgb, var(--color-cream) 70%, transparent);
+  }
+  .jour-heure {
+    font: 400 11px/1 var(--font-mono);
+    letter-spacing: 0.06em;
+    color: color-mix(in srgb, var(--color-cream) 60%, transparent);
+  }
+  .jour[aria-selected='true'] .jour-point {
+    background: var(--color-orange);
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-orange) 25%, transparent);
+  }
+  .jour[aria-selected='true'] .jour-nom {
+    color: var(--color-cream);
+  }
+  .jour:focus-visible,
+  .canal:focus-visible {
+    outline: 2px solid var(--color-cream);
+    outline-offset: 4px;
+    border-radius: 8px;
+  }
+  .details {
+    display: grid;
+  }
+  .detail {
+    grid-area: 1 / 1;
+    opacity: 0;
+    transition: opacity 0.3s var(--ease-doux);
+  }
+  .detail.on {
+    opacity: 1;
+  }
+
+  /* Channels: two tabs, two screens in the same phone. */
+  .canaux {
+    display: inline-flex;
+    gap: 4px;
+    padding: 5px;
+    border-radius: 999px;
+    box-shadow: 0 0 0 1px var(--color-line-night);
+  }
+  .canal {
+    padding: 9px 16px;
+    border-radius: 999px;
+    font: 600 14px/1 var(--font-sans);
+    color: color-mix(in srgb, var(--color-cream) 75%, transparent);
+    cursor: pointer;
+    transition:
+      background-color 0.2s,
+      color 0.2s;
+  }
+  .canal span {
+    margin-left: 4px;
+    font: 400 11px/1 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+  .canal[aria-selected='true'] {
+    background: var(--color-cream);
+    color: var(--color-ink);
+  }
+  .ecran {
+    --pt: calc(100cqw / 370);
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.35s var(--ease-doux);
+    text-align: left;
+  }
+  .ecran.on {
+    opacity: 1;
+  }
+
+  /* WhatsApp in the iPhone, same proportions as the demo mockups. */
+  .wa {
+    container-type: inline-size;
+    background: var(--color-whatsapp-wall);
+    font: 400 calc(15 * var(--pt)) / 1.35 var(--font-sans);
+    color: var(--color-ink);
+  }
+  .wa-statut,
+  .app-statut {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: calc(54 * var(--pt));
+    padding: calc(4 * var(--pt)) calc(34 * var(--pt)) 0 calc(48 * var(--pt));
+    font: 600 calc(16 * var(--pt)) / 1 var(--font-sans);
+  }
+  .wa-statut {
+    background: var(--color-surface);
+  }
+  .wa-barre {
+    display: flex;
+    align-items: center;
+    gap: calc(10 * var(--pt));
+    padding: calc(6 * var(--pt)) calc(16 * var(--pt)) calc(9 * var(--pt)) calc(10 * var(--pt));
+    background: var(--color-surface);
+    box-shadow: 0 1px 0 var(--color-line);
+  }
+  .wa-retour {
+    font-size: calc(30 * var(--pt));
+    line-height: 1;
+  }
+  .wa-barre :global(.wa-av) {
+    width: calc(38 * var(--pt));
+    height: calc(38 * var(--pt));
+    object-fit: cover;
+    border-radius: 999px;
+    background: var(--color-cream);
+  }
+  .wa-contact {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+  }
+  .wa-contact b {
+    font-size: calc(17 * var(--pt));
+  }
+  .wa-contact span {
+    font-size: calc(13 * var(--pt));
+    color: var(--color-soft);
+  }
+  .wa-fil {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: calc(8 * var(--pt));
+    padding: calc(10 * var(--pt)) calc(10 * var(--pt)) calc(16 * var(--pt));
+  }
+  .wa-jour {
+    align-self: center;
+    margin-bottom: auto;
+    padding: calc(5 * var(--pt)) calc(12 * var(--pt));
+    border-radius: calc(9 * var(--pt));
+    background: var(--color-surface);
+    box-shadow: var(--shadow-1);
+    font: 500 calc(12 * var(--pt)) / 1.2 var(--font-sans);
+    color: var(--color-soft);
+  }
+  .wa-msg {
+    max-width: 84%;
+    padding: calc(8 * var(--pt)) calc(11 * var(--pt));
+    border-radius: calc(10 * var(--pt));
+    box-shadow: 0 1px 0.5px color-mix(in srgb, var(--color-black) 13%, transparent);
+  }
+  .wa-msg.robin {
+    align-self: flex-start;
+    background: var(--color-surface);
+    border-top-left-radius: 0;
+  }
+  .wa-msg.patron {
+    align-self: flex-end;
+    background: var(--color-whatsapp);
+    border-top-right-radius: 0;
+  }
+  .wa-fichier {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: calc(6 * var(--pt));
+    padding: calc(10 * var(--pt)) calc(12 * var(--pt));
+    border-radius: calc(8 * var(--pt));
+    background: var(--color-gray-50);
+    border-left: calc(4 * var(--pt)) solid var(--color-statut-rouge);
+  }
+  .wa-fichier span {
+    font-size: calc(12 * var(--pt));
+    color: var(--color-soft);
+  }
+
+  /* The Robin app, Muse style: cream background, Robin at the top, plain bubbles. */
+  .app {
+    container-type: inline-size;
+    background: var(--color-cream);
+    font: 400 calc(15 * var(--pt)) / 1.4 var(--font-sans);
+    color: var(--color-ink);
+  }
+  .app-tete {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: calc(6 * var(--pt));
+    padding: calc(8 * var(--pt)) 0 calc(14 * var(--pt));
+    font-size: calc(16 * var(--pt));
+  }
+  .app-tete :global(.app-av) {
+    width: calc(56 * var(--pt));
+    height: calc(56 * var(--pt));
+    border-radius: 999px;
+    background: var(--color-cream-2);
+    object-fit: cover;
+  }
+  .app-fil {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: calc(10 * var(--pt));
+    padding: 0 calc(16 * var(--pt)) calc(12 * var(--pt));
+  }
+  .app-msg {
+    max-width: 86%;
+  }
+  .app-msg.robin {
+    align-self: flex-start;
+  }
+  .app-msg.patron {
+    align-self: flex-end;
+    padding: calc(9 * var(--pt)) calc(13 * var(--pt));
+    border-radius: calc(18 * var(--pt));
+    background: var(--color-night);
+    color: var(--color-cream);
+  }
+  .app-fichier {
+    display: block;
+    margin-bottom: calc(6 * var(--pt));
+    padding: calc(10 * var(--pt)) calc(12 * var(--pt));
+    border-radius: calc(12 * var(--pt));
+    background: var(--color-surface);
+    box-shadow: 0 0 0 1px var(--color-line);
+  }
+  .app-saisie {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 calc(12 * var(--pt)) calc(22 * var(--pt));
+    padding: calc(12 * var(--pt)) calc(10 * var(--pt)) calc(12 * var(--pt)) calc(16 * var(--pt));
+    border-radius: 999px;
+    background: var(--color-surface);
+    box-shadow: 0 0 0 1px var(--color-line);
+    color: var(--color-soft);
+  }
+  .app-micro {
+    width: calc(26 * var(--pt));
+    height: calc(26 * var(--pt));
+    border-radius: 999px;
+    background: var(--color-orange);
+  }
+
+  /* Beta form. */
+  .champ {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+  .champ input {
+    height: 48px;
+    padding: 0 16px;
+    border-radius: 14px;
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
+    font: 400 15px var(--font-sans);
+    color: var(--color-ink);
+    outline: none;
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s;
+  }
+  .champ input::placeholder {
+    color: var(--color-muted);
+  }
+  .champ input:focus {
+    border-color: var(--color-orange-txt);
+    box-shadow: 0 0 0 4px var(--color-orange-tint);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .flotte,
+    .pastille::after {
+      animation: none;
+    }
+    .bulle,
+    .detail,
+    .ecran {
+      transition: none;
+    }
+    .bs {
+      animation: none;
+      opacity: 1;
+    }
+  }
+</style>

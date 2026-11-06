@@ -1,0 +1,51 @@
+---
+/**
+ * MOCKUP — the full network page in English (the current site, moving to /reseaux), with the
+ * pricing section turned into a form. No Security block: it now lives on the home page.
+ */
+import Base from '../../../layouts/Base.astro';
+import Hero from '../../../components/sections/Hero.astro';
+import Clients from '../../../components/sections/Clients.astro';
+import Probleme from '../../../components/sections/Probleme.astro';
+import Demo from '../../../components/sections/Demo.astro';
+import Equipe from '../../../components/sections/Equipe.astro';
+import Cas from '../../../components/sections/Cas.astro';
+import MiseEnPlace from '../../../components/sections/MiseEnPlace.astro';
+import TarifsFormulaire from '../../../components/maquettes/en/TarifsFormulaire.astro';
+import siege from '../../../assets/footer/siege.jpg';
+
+const locale = 'en';
+
+/** The network page's own footer scene: the agents' open space, each at their desk. */
+const pied = {
+  image: siege,
+  alt: 'A modern voxel open space seen in cross-section: the seven Hatch OS agents each work at their own desk, between shared desks, a dashboard screen, the coffee corner and the board with opening plans.',
+  titre: 'The open space',
+  liste: [
+    { repere: 'SCREEN', texte: 'Management · Lark', href: '#agents' },
+    { repere: 'MESSAGES', texte: 'Network life · Peep', href: '#agents' },
+    { repere: 'TABLET', texte: 'On site · Owl', href: '#agents' },
+    { repere: 'HEADSET', texte: 'Documentation · Jay', href: '#agents' },
+    { repere: 'SHEET', texte: 'Quality · Finch', href: '#agents' },
+    { repere: 'CHECKLIST', texte: 'Training · Pecker', href: '#agents' },
+    { repere: 'PLANS', texte: 'Development · Sparrow', href: '#agents' },
+  ],
+};
+---
+
+<Base
+  locale={locale}
+  paths={{ fr: '/maquettes/reseau', en: '/en/maquettes/reseau' }}
+  title="Network mockup | Hatch OS"
+  description="Mockup of the Hatch OS network page with the new pricing section as a form."
+  pied={pied}
+>
+  <Hero locale={locale} europe />
+  <Clients locale={locale} />
+  <Probleme locale={locale} />
+  <Demo locale={locale} />
+  <Equipe locale={locale} />
+  <Cas locale={locale} />
+  <MiseEnPlace locale={locale} />
+  <TarifsFormulaire />
+</Base>
