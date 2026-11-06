@@ -34,10 +34,12 @@ const num = (i: number) => String(i + 1).padStart(2, '0');
 <section
   id="securite"
   aria-labelledby="secu-livre-titre"
-  class="overflow-hidden rounded-[28px] bg-orange bg-cover bg-center px-5 pt-12 pb-5 sm:px-8 lg:rounded-[36px] lg:px-12 lg:pt-16 lg:pb-8"
+  class="bg-orange bg-cover bg-center px-5 py-14 sm:px-8 lg:px-12 lg:py-20"
   style={`background-image:url(${bg.src})`}
   data-livre
 >
+  <!-- Pleine largeur : la bande orange va d'un bord à l'autre, le contenu reste dans la grille du site. -->
+  <div class="mx-auto max-w-site">
   <div class="flex flex-col items-start gap-5">
     <p class="font-mono text-kicker text-night uppercase">{hero.kicker}</p>
     <h2
@@ -199,6 +201,7 @@ const num = (i: number) => String(i + 1).padStart(2, '0');
         </svg>
       </button>
     </div>
+  </div>
   </div>
 </section>
 
