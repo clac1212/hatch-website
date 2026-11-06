@@ -19,6 +19,14 @@ tasks:
       done:
         title: 'Peep a répondu à BunBun Dijon'
         detail: 'Fiche allergènes envoyée · 2 min'
+      # Carte Europe (maquette) : Peep est posé devant BunBun Lyon.
+      europe:
+        running:
+          title: 'Peep répond à BunBun Lyon'
+          detail: '« Où est la fiche allergènes ? »'
+        done:
+          title: 'Peep a répondu à BunBun Lyon'
+          detail: 'Fiche allergènes envoyée · 2 min'
     - agent: lark
       running:
         title: 'Lark analyse BunBun Strasbourg'
@@ -40,3 +48,11 @@ tasks:
       done:
         title: 'Owl a répondu à BunBun Huesca'
         detail: 'À voix haute, en espagnol'
+      # Carte Europe (maquette) : Owl est avec le chef de BunBun Bordeaux.
+      europe:
+        running:
+          title: "Owl forme l'équipe de BunBun Bordeaux"
+          detail: '« Comment on nettoie la friteuse ? »'
+        done:
+          title: "Owl a formé l'équipe de BunBun Bordeaux"
+          detail: 'Tuto friteuse en 3 étapes'

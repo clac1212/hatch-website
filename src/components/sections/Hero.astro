@@ -85,7 +85,31 @@ if (SHOPS.length !== events.length) {
 }
 /** Shop height in the frame: the card sits just above the roof. */
 const ROOF = 30;
+/**
+ * Mockup carte Europe : chaque carte de tâche se pose au-dessus de l'agent dessiné sur la carte (tête),
+ * et l'onde part de ses pieds. Pixels de l'image 3840 × 2143, même ratio que le cadre 1440 × 804.
+ */
+const AGENTS_EUROPE: Record<string, { x: number; tete: number; pieds: number }> = {
+  peep: { x: 2430, tete: 1000, pieds: 1070 }, // devant BunBun Lyon
+  lark: { x: 2215, tete: 750, pieds: 830 }, // au siège, avec le directeur
+  sparrow: { x: 2490, tete: 1232, pieds: 1320 }, // chantier du sud
+  owl: { x: 1990, tete: 1208, pieds: 1305 }, // avec le chef de BunBun Bordeaux
+};
+const enCadre = (v: number, de: number, vers: number) => (v / de) * vers;
 const steps = events.map((e, i) => {
+  if (europe) {
+    const a = AGENTS_EUROPE[e.agent];
+    const texte = e.europe ?? e;
+    return {
+      ...e,
+      ...texte,
+      x: enCadre(a.x, 3840, W),
+      y: enCadre(a.pieds, 2143, H),
+      roof: enCadre(a.pieds - a.tete + 14, 2143, H),
+      anchor: 'center' as Ancre,
+      avatar: avatars[e.agent],
+    };
+  }
   const at = SHOPS[i];
   const [x, y] = cadre(...('shop' in at ? (boutiques.shops[at.shop] as [number, number]) : [at.x, at.y]));
   const roof = ('shop' in at ? ROOF : at.roof) * K;
@@ -157,7 +181,7 @@ const tick =
       )
     }
     {
-      !europe && steps.map((e) => (
+      steps.map((e) => (
         <div class="h-ping" style={`left:${pct(e.x, W)};top:${pct(e.y, H)}`}>
           <span />
           <span />
@@ -205,7 +229,7 @@ const tick =
   >
     <div class="h-piles" aria-hidden="true" data-pas={STEP}>
       {
-        !europe && steps.map((e) => (
+        steps.map((e) => (
           <div
             class="h-pile"
             data-agent={e.agent}
@@ -308,6 +332,39 @@ const tick =
           regler(!hero.classList.contains('h-en-pause'));
         });
         regler(matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+        // Boucle des cartes de tâche (même rythme que la carte de France : onde, carte en cours,
+        // terminé, sortie, puis l'agent suivant). Suspendue par le bouton pause.
+        var piles = [].slice.call(hero.querySelectorAll('.h-pile'));
+        var pings = [].slice.call(hero.querySelectorAll('.h-ping'));
+        var STEP = Number(hero.querySelector('.h-piles').dataset.pas);
+        var CYCLE = STEP * piles.length;
+        function clamp(x) { return Math.min(1, Math.max(0, x)); }
+        function ease(x) { return 1 - Math.pow(1 - x, 3); }
+        function rendu(t) {
+          var tc = t % CYCLE;
+          piles.forEach(function (pile, i) {
+            var r = tc - i * STEP;
+            var actif = r >= 0 && r < STEP;
+            var p = actif ? r / 1.4 : 1;
+            var g = pings[i];
+            g.style.setProperty('--p1', String(ease(clamp(p))));
+            g.style.setProperty('--p2', String(ease(clamp((p - 0.3) / 0.7))));
+            g.style.setProperty('--g', String(p < 1 ? Math.sin(Math.PI * clamp(p)) * 0.8 : 0));
+            pile.querySelector('.h-slot').classList.toggle('on', actif && r >= 1.0);
+            pile.classList.toggle('sort', actif && r >= 5.0);
+            pile.querySelector('.h-tache').classList.toggle('fait', actif && r >= 3.2);
+          });
+        }
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) { rendu(2); return; }
+        var t = 0, avant = null;
+        function boucle(maintenant) {
+          if (avant !== null && !hero.classList.contains('h-en-pause')) t += Math.min(maintenant - avant, 100) / 1000;
+          avant = maintenant;
+          rendu(t);
+          requestAnimationFrame(boucle);
+        }
+        requestAnimationFrame(boucle);
       })();
     </script>
   )
@@ -619,7 +676,8 @@ const tick =
       --sw: calc(max(100cqw, calc(100cqh * 1440 / 804)) * 1.3);
       --fx: 0.3;
     }
-    .hero-europe .h-decor {
+    .hero-europe .h-decor,
+    .hero-europe .h-piles {
       top: calc((100cqh - var(--sh)) * 0.35);
     }
     .hero-europe .carte-hero {

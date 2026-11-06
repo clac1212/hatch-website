@@ -18,6 +18,14 @@ tasks:
       done:
         title: 'Peep answered BunBun Dijon'
         detail: 'Allergen sheet sent · 2 min'
+      # Europe map (mockup): Peep stands in front of BunBun Lyon.
+      europe:
+        running:
+          title: 'Peep is answering BunBun Lyon'
+          detail: '“Where’s the allergen sheet?”'
+        done:
+          title: 'Peep answered BunBun Lyon'
+          detail: 'Allergen sheet sent · 2 min'
     - agent: lark
       running:
         title: 'Lark is reviewing BunBun Strasbourg'
@@ -39,3 +47,11 @@ tasks:
       done:
         title: 'Owl answered BunBun Huesca'
         detail: 'Out loud, in Spanish'
+      # Europe map (mockup): Owl is with the chef of BunBun Bordeaux.
+      europe:
+        running:
+          title: 'Owl is training BunBun Bordeaux'
+          detail: '“How do we clean the fryer?”'
+        done:
+          title: 'Owl trained BunBun Bordeaux'
+          detail: 'Fryer how-to in 3 steps'
