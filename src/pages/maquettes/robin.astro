@@ -565,12 +565,12 @@ const lundi = [
     height: 100%;
     object-fit: cover;
   }
-  /* Les bulles partent du Robin du comptoir : ouvertes vers la gauche au-dessus de lui, la pointe vers son bec.
+  /* Les bulles partent du Robin du comptoir : ouvertes vers la droite au-dessus de lui, la pointe juste à sa gauche.
      Une seule à la fois, dans la même case, chacune son tour (5 s), puis la soirée recommence.
      Robin est à ~55 % de la largeur et ~42 % de la hauteur de la vidéo. */
   .bulles-soir {
     position: absolute;
-    right: 39%;
+    left: 45%;
     bottom: 66%;
     display: grid;
     align-items: end;
@@ -581,7 +581,7 @@ const lundi = [
   .bs {
     grid-area: 1 / 1;
     opacity: 0;
-    transform-origin: 88% 100%;
+    transform-origin: 12% 100%;
     animation: bulle-soir 15s var(--ease-doux) infinite;
     animation-delay: calc(0.6s + var(--i) * 5s);
   }
@@ -597,16 +597,16 @@ const lundi = [
     font: 400 13px/1.45 var(--font-sans);
     color: var(--color-ink);
   }
-  /* La bulle s'ouvre vers la gauche ; sa pointe, en bas à droite, descend vers Robin. */
+  /* La bulle s'ouvre vers la droite ; sa pointe, en bas à gauche, descend juste à gauche de Robin. */
   .bs-bulle::after {
     content: '';
     position: absolute;
-    right: 26px;
+    left: 26px;
     bottom: -13px;
     width: 22px;
     height: 16px;
     background: var(--color-surface);
-    clip-path: polygon(0 0, 100% 0, 82% 100%);
+    clip-path: polygon(0 0, 100% 0, 18% 100%);
   }
   .bs-lien {
     align-self: flex-start;
@@ -664,7 +664,7 @@ const lundi = [
   /* Sur petit écran, la bulle garde sa place au-dessus de Robin, en plus petit. */
   @media (max-width: 47.99rem) {
     .bulles-soir {
-      right: 38%;
+      left: 38%;
       width: 56%;
     }
     .bs-bulle {
