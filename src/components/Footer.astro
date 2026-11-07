@@ -123,20 +123,36 @@ const lien = 'lien-pied block w-fit text-[14.5px] leading-[normal] text-paper';
 
       {
         epure && (
-          <nav data-rv aria-labelledby="pied-legal-epure" class="flex flex-col gap-3">
-            <h2 id="pied-legal-epure" class={titre}>
-              {data.legal.titre}
-            </h2>
-            <ul class="flex flex-col gap-3">
-              {legal.map((l) => (
-                <li>
-                  <a href={l.href} class={lien}>
-                    {l.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          <div data-rv class="flex flex-wrap gap-x-14 gap-y-10">
+            <nav aria-labelledby="pied-hatch-epure" class="flex flex-col gap-3">
+              <h2 id="pied-hatch-epure" class={titre}>
+                {t('footer.company')}
+              </h2>
+              <ul class="flex flex-col gap-3">
+                {socialLinks.map((l) => (
+                  <li>
+                    <a href={l.href} rel="noopener" class={lien}>
+                      {l.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+            <nav aria-labelledby="pied-legal-epure" class="flex flex-col gap-3">
+              <h2 id="pied-legal-epure" class={titre}>
+                {data.legal.titre}
+              </h2>
+              <ul class="flex flex-col gap-3">
+                {legal.map((l) => (
+                  <li>
+                    <a href={l.href} class={lien}>
+                      {l.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </div>
         )
       }
 
