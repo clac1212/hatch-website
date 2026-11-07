@@ -33,9 +33,14 @@ interface Props {
   scene?: ScenePied;
   /** The home page: no customer-cases link, and Security points at the page's own Security block. */
   accueil?: boolean;
+  /**
+   * A pared-down footer (Robin): no link columns, the brand and the scene centred; the legal links
+   * stay reachable, small, on the fine-print line.
+   */
+  epure?: boolean;
 }
 
-const { locale, paths, scene, accueil = false } = Astro.props;
+const { locale, paths, scene, accueil = false, epure = false } = Astro.props;
 const t = useTranslations(locale);
 const data = await section('piedDePage', locale);
 const home = routes.home[locale];
@@ -73,10 +78,18 @@ const lien = 'lien-pied block w-fit text-[14.5px] leading-[normal] text-paper';
 ---
 
 <footer data-rv-groupe class="bg-black text-paper">
-  <div class="mx-auto flex max-w-[1920px] flex-col lg:flex-row xl:h-[900px]">
+  <div
+    class:list={[
+      'mx-auto flex max-w-[1920px] flex-col lg:flex-row',
+      epure ? 'max-w-[1440px] lg:items-center lg:gap-10 lg:px-12' : 'xl:h-[900px]',
+    ]}
+  >
     <div
       data-rv
-      class="order-1 flex justify-center lg:order-2 lg:w-[40%] lg:shrink-0 xl:w-[min(720px,42%)]"
+      class:list={[
+        'order-1 flex justify-center lg:order-2 lg:shrink-0',
+        epure ? 'lg:w-[46%] lg:py-14' : 'lg:w-[40%] xl:w-[min(720px,42%)]',
+      ]}
     >
       <Picture
         pictureAttributes={{ class: 'block w-full max-w-[460px] lg:h-full lg:max-w-none' }}
@@ -85,12 +98,20 @@ const lien = 'lien-pied block w-fit text-[14.5px] leading-[normal] text-paper';
         widths={[480, 720, 1080, 1440]}
         sizes="(min-width: 1280px) 720px, (min-width: 1024px) 40vw, (min-width: 768px) 460px, 100vw"
         formats={['avif', 'webp']}
-        class="block h-auto w-full lg:h-full lg:object-contain lg:object-bottom xl:object-cover"
+        class:list={[
+          'block h-auto w-full',
+          !epure && 'lg:h-full lg:object-contain lg:object-bottom xl:object-cover',
+        ]}
       />
     </div>
 
     <div
-      class="order-2 flex min-w-0 flex-1 flex-col justify-between gap-14 px-6 pt-4 pb-10 md:px-12 lg:order-1 lg:gap-10 lg:pt-20 lg:pr-8 xl:pt-[88px] xl:pr-12 xl:pl-24"
+      class:list={[
+        'order-2 flex min-w-0 flex-1 flex-col gap-14 px-6 pt-4 pb-10 md:px-12 lg:order-1',
+        epure
+          ? 'lg:justify-center lg:gap-16 lg:py-14 lg:pr-0 lg:pl-0 xl:pl-12'
+          : 'justify-between lg:gap-10 lg:pt-20 lg:pr-8 xl:pt-[88px] xl:pr-12 xl:pl-24',
+      ]}
     >
       <div data-rv class="flex max-w-[420px] flex-col items-start gap-[18px]">
         <a href={home} aria-label={t('a11y.home')}>
@@ -100,91 +121,98 @@ const lien = 'lien-pied block w-fit text-[14.5px] leading-[normal] text-paper';
         <Button href={routes.demo[locale]} variant="cream">{data.cta}</Button>
       </div>
 
-      <div
-        data-rv
-        class="grid grid-cols-2 gap-x-6 gap-y-10 md:flex md:flex-wrap md:gap-x-11 lg:flex-nowrap lg:gap-x-8 xl:gap-x-11"
-      >
-        <nav aria-labelledby="pied-produit" class="flex flex-col gap-3">
-          <h2 id="pied-produit" class={titre}>{t('footer.product')}</h2>
-          <ul class="flex flex-col gap-3">
-            {
-              produit.map((l) => (
-                <li>
-                  <a href={l.href} class={lien}>
-                    {l.label}
-                  </a>
-                </li>
-              ))
-            }
-          </ul>
-        </nav>
-
-        <nav aria-labelledby="pied-agents" class="order-last col-span-2 md:order-none">
-          <h2 id="pied-agents" class={titre}>{scene?.titre ?? data.agents.titre}</h2>
-          <ul class="mt-3">
-            {
-              (scene
-                ? scene.liste.map((l) => ({
-                    etage: l.repere,
-                    metier: l.texte,
-                    nom: '',
-                    href: l.href,
-                  }))
-                : residents
-              ).map((r) => (
-                <li>
-                  <a
-                    href={r.href}
-                    class="lien-pied flex w-fit items-center gap-3 py-1.5 leading-[normal]"
-                  >
-                    <span class="w-[58px] shrink-0 font-mono text-[11px] tracking-[0.8px] text-orange">
-                      {r.etage}
-                    </span>
-                    <span class="text-[14.5px] whitespace-nowrap">
-                      {r.nom ? `${r.metier} · ${r.nom}` : r.metier}
-                    </span>
-                  </a>
-                </li>
-              ))
-            }
-          </ul>
-        </nav>
-
-        <div class="flex flex-col gap-8">
-          <nav aria-labelledby="pied-hatch" class="flex flex-col gap-3">
-            <h2 id="pied-hatch" class={titre}>{t('footer.company')}</h2>
-            <ul class="flex flex-col gap-3">
-              {
-                socialLinks.map((l) => (
-                  <li>
-                    <a href={l.href} rel="noopener" class={lien}>
-                      {l.label}
-                    </a>
-                  </li>
-                ))
-              }
-            </ul>
-          </nav>
-          <nav aria-labelledby="pied-legal" class="flex flex-col gap-3">
-            <h2 id="pied-legal" class={titre}>{data.legal.titre}</h2>
-            <ul class="flex flex-col gap-3">
-              {
-                legal.map((l) => (
+      {
+        !epure && (
+          <div
+            data-rv
+            class="grid grid-cols-2 gap-x-6 gap-y-10 md:flex md:flex-wrap md:gap-x-11 lg:flex-nowrap lg:gap-x-8 xl:gap-x-11"
+          >
+            <nav aria-labelledby="pied-produit" class="flex flex-col gap-3">
+              <h2 id="pied-produit" class={titre}>
+                {t('footer.product')}
+              </h2>
+              <ul class="flex flex-col gap-3">
+                {produit.map((l) => (
                   <li>
                     <a href={l.href} class={lien}>
                       {l.label}
                     </a>
                   </li>
-                ))
-              }
-            </ul>
-          </nav>
-        </div>
-      </div>
+                ))}
+              </ul>
+            </nav>
+
+            <nav aria-labelledby="pied-agents" class="order-last col-span-2 md:order-none">
+              <h2 id="pied-agents" class={titre}>
+                {scene?.titre ?? data.agents.titre}
+              </h2>
+              <ul class="mt-3">
+                {(scene
+                  ? scene.liste.map((l) => ({
+                      etage: l.repere,
+                      metier: l.texte,
+                      nom: '',
+                      href: l.href,
+                    }))
+                  : residents
+                ).map((r) => (
+                  <li>
+                    <a
+                      href={r.href}
+                      class="lien-pied flex w-fit items-center gap-3 py-1.5 leading-[normal]"
+                    >
+                      <span class="w-[58px] shrink-0 font-mono text-[11px] tracking-[0.8px] text-orange">
+                        {r.etage}
+                      </span>
+                      <span class="text-[14.5px] whitespace-nowrap">
+                        {r.nom ? `${r.metier} · ${r.nom}` : r.metier}
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+
+            <div class="flex flex-col gap-8">
+              <nav aria-labelledby="pied-hatch" class="flex flex-col gap-3">
+                <h2 id="pied-hatch" class={titre}>
+                  {t('footer.company')}
+                </h2>
+                <ul class="flex flex-col gap-3">
+                  {socialLinks.map((l) => (
+                    <li>
+                      <a href={l.href} rel="noopener" class={lien}>
+                        {l.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+              <nav aria-labelledby="pied-legal" class="flex flex-col gap-3">
+                <h2 id="pied-legal" class={titre}>
+                  {data.legal.titre}
+                </h2>
+                <ul class="flex flex-col gap-3">
+                  {legal.map((l) => (
+                    <li>
+                      <a href={l.href} class={lien}>
+                        {l.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            </div>
+          </div>
+        )
+      }
 
       <div class="flex flex-col gap-[18px] border-t border-white/12 pt-[18px]">
         <div
-          class="flex flex-col gap-2 font-mono text-[11px] leading-[14px] tracking-[0.14em] text-stone uppercase sm:flex-row sm:justify-between"
+          class:list={[
+            'flex flex-col gap-2 font-mono text-[11px] leading-[14px] tracking-[0.14em] text-stone uppercase',
+            !epure && 'sm:flex-row sm:justify-between',
+          ]}
         >
           {/* The language switch sits with the page's fine print, not among the social links. */}
           <p class="flex flex-wrap gap-x-6 gap-y-2">
@@ -203,6 +231,20 @@ const lien = 'lien-pied block w-fit text-[14.5px] leading-[normal] text-paper';
           </p>
           <p>{data.mention}</p>
         </div>
+        {
+          epure && (
+            <nav
+              aria-label={data.legal.titre}
+              class="flex flex-wrap gap-x-5 gap-y-2 font-mono text-[11px] leading-[14px] tracking-[0.14em] text-stone uppercase"
+            >
+              {legal.map((l) => (
+                <a href={l.href} class="transition-colors duration-300 hover:text-orange">
+                  {l.label}
+                </a>
+              ))}
+            </nav>
+          )
+        }
       </div>
     </div>
   </div>

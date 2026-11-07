@@ -49,6 +49,8 @@ interface Props {
   navTone?: 'day' | 'night';
   /** A footer scene of the page's own (image + its list); the voxel building by default. */
   pied?: ScenePied;
+  /** Pared-down footer (no link columns), for Robin. */
+  piedEpure?: boolean;
 }
 
 const {
@@ -64,6 +66,7 @@ const {
   navTone = 'day',
   espace = false,
   pied,
+  piedEpure = false,
 } = Astro.props;
 const t = useTranslations(locale);
 // `site` is set in astro.config.mjs, so Astro.site is always defined.
@@ -145,7 +148,13 @@ const structuredData = serializeJsonLd([
     <main id="contenu">
       <slot />
     </main>
-    <Footer locale={locale} paths={paths} scene={pied} accueil={nav === 'accueil' && !espace} />
+    <Footer
+      locale={locale}
+      paths={paths}
+      scene={pied}
+      accueil={nav === 'accueil' && !espace}
+      epure={piedEpure}
+    />
     <SpeedInsights />
     <script>
       // After every section script, so their `etape` / `apparition` listeners are in place.
