@@ -12,9 +12,11 @@ interface Props {
   paths: Paths;
   /** `night` over a black hero (accueil), `day` on cream (Robin). */
   tone?: 'day' | 'night';
+  /** A space of the site (Robin): the logo brings back to the top of this page, « Accueil » to the home. */
+  espace?: boolean;
 }
 
-const { locale, paths, tone = 'day' } = Astro.props;
+const { locale, paths, tone = 'day', espace = false } = Astro.props;
 const nuit = tone === 'night';
 const t = useTranslations(locale);
 const other = otherLocale(locale);
@@ -26,10 +28,21 @@ const other = otherLocale(locale);
     aria-label={t('a11y.mainNav')}
     class="mx-auto flex max-w-[1360px] items-center justify-between px-4 py-4 sm:px-6 lg:py-5"
   >
-    <a href={routes.home[locale]} aria-label={t('a11y.home')} class="shrink-0">
+    <a href={espace ? '#' : routes.home[locale]} aria-label={t('a11y.home')} class="shrink-0">
       <Logo tone={nuit ? 'night' : 'day'} class="w-[84px] md:w-[96px]" />
     </a>
     <div class="flex items-center gap-1">
+      {
+        espace && (
+          <a
+            href={routes.home[locale]}
+            class:list={['inline-flex items-center gap-1 rounded-full px-3 py-2.5 text-[0.875rem] font-semibold transition-colors', nuit ? 'text-cream/70 hover:text-orange' : 'text-soft hover:text-orange-hover']}
+          >
+            <svg viewBox="0 0 24 24" class="size-3.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>
+            {t('nav.back')}
+          </a>
+        )
+      }
       <a
         href={paths[other]}
         hreflang={other}

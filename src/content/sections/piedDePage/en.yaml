@@ -9,7 +9,7 @@ agents:
     - etage: 3rd L
       metier: Independent
       nom: Robin
-      lien: /maquettes/robin
+      lien: /en/maquettes/robin
     - etage: 3rd R
       metier: Management
       agent: lark

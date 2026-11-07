@@ -43,6 +43,8 @@ interface Props {
   noindex?: boolean;
   /** Which nav to show: the network space's (default) or the home / independents' minimal one. */
   nav?: 'reseau' | 'accueil';
+  /** A space of the site (Robin, network): logo back to the top, plus a link back to the home. */
+  espace?: boolean;
   /** Tone of the home nav: `night` over a black hero. */
   navTone?: 'day' | 'night';
   /** A footer scene of the page's own (image + its list); the voxel building by default. */
@@ -60,6 +62,7 @@ const {
   noindex = false,
   nav = 'reseau',
   navTone = 'day',
+  espace = false,
   pied,
 } = Astro.props;
 const t = useTranslations(locale);
@@ -132,9 +135,9 @@ const structuredData = serializeJsonLd([
     </a>
     {
       nav === 'accueil' ? (
-        <NavAccueil locale={locale} paths={paths} tone={navTone} />
+        <NavAccueil locale={locale} paths={paths} tone={navTone} espace={espace} />
       ) : (
-        <Nav locale={locale} paths={paths} />
+        <Nav locale={locale} paths={paths} espace={espace} />
       )
     }
     <main id="contenu">
