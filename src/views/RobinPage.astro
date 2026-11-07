@@ -1,0 +1,1135 @@
+---
+/**
+ * The Robin page (/robin, /en/robin): the AI partner of independent restaurant owners, on WhatsApp,
+ * with the sign-up form for the beta waitlist. Shared by src/pages/robin.astro (FR) and
+ * src/pages/en/robin.astro (EN); copy in src/content/sections/robin/{fr,en}.yaml.
+ * Inspiration: muse.ai (restraint, night background, one big sentence) and ChatGPT's "dots" page:
+ * the character floating above the title, the sticky nav pill, the WhatsApp situations, "a week with
+ * Robin" as a timeline, the WhatsApp phone, three trust cards.
+ * The form posts JSON to /api/liste-attente (200 {ok:true}, 400 {ok:false,error:'invalid'}, 500 {ok:false}).
+ */
+import { Image } from 'astro:assets';
+import rungis from '../assets/footer/rungis.jpg';
+import Base from '../layouts/Base.astro';
+import Iphone from '../components/ui/Iphone.astro';
+import Situations from '../components/robin/Situations.astro';
+import { section } from '../content/section';
+import { routes, type Locale } from '../i18n/ui';
+import portrait from '../assets/portraits/robin.jpg';
+import soir from '../assets/robin/soir.jpg';
+import poseLun from '../assets/robin/semaine/lun.jpg';
+import poseMar from '../assets/robin/semaine/mar.jpg';
+import poseMer from '../assets/robin/semaine/mer.jpg';
+import poseJeu from '../assets/robin/semaine/jeu.jpg';
+import poseVen from '../assets/robin/semaine/ven.jpg';
+import poseDim from '../assets/robin/semaine/dim.jpg';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const { seo, hero, soiree, pilule, fait, semaine, canaux, confiance, beta } = await section(
+  'robin',
+  locale,
+);
+
+/** Robin's own footer: the Rungis market and what Robin keeps track of, hall by hall. */
+const pied = { image: rungis, ...(await section('piedDePage', locale)).scenes.robin };
+
+/** Robin, one outfit per day of the timeline (same order as `semaine.jours`). */
+const poses = [poseLun, poseMar, poseMer, poseJeu, poseVen, poseDim];
+
+/** The waitlist fields, in display order; the website is the only optional one. */
+const champs = [
+  { id: 'prenom', type: 'text', auto: 'given-name', requis: true },
+  { id: 'nom', type: 'text', auto: 'family-name', requis: true },
+  { id: 'restaurant', type: 'text', auto: 'organization', requis: true },
+  { id: 'site', type: 'url', auto: 'url', requis: false },
+  { id: 'whatsapp', type: 'tel', auto: 'tel', requis: true },
+  { id: 'email', type: 'email', auto: 'email', requis: true },
+] as const;
+---
+
+<Base
+  espace
+  locale={locale}
+  paths={routes.robin}
+  nav="accueil"
+  navTone="night"
+  pied={pied}
+  title={seo.title}
+  description={seo.description}
+>
+  <div class="nuit bg-night text-cream">
+    <!-- 1 · Hero: Robin floats above the title (dots), one big centred sentence (muse.ai) -->
+    <section
+      id="robin"
+      class="flex flex-col items-center px-4 pt-36 pb-14 text-center sm:px-6 lg:pt-44 lg:pb-20"
+    >
+      <!-- Robin flies into his circle, waves, takes notes, checks a receipt, gives a thumbs up,
+           then flies off (15 s loop, with a pause button: WCAG 2.2.2). -->
+      <div class="mb-8 flex flex-col items-center gap-2" data-vol>
+        <div class="size-[132px] overflow-hidden rounded-full bg-cream-2 lg:size-[156px]">
+          <video
+            class="size-full object-cover"
+            src="/anim/robin-vol.mp4"
+            poster={portrait.src}
+            muted
+            loop
+            playsinline
+            preload="auto"
+            aria-label={hero.video}></video>
+        </div>
+        <button
+          type="button"
+          class="vol-pause"
+          data-vol-pause
+          aria-pressed="false"
+          data-label-pause={hero.pause.pause}
+          data-label-lecture={hero.pause.lecture}
+        >
+          <span class="sr-only" data-vol-label>{hero.pause.pause}</span>
+          <svg
+            viewBox="0 0 24 24"
+            class="ico-pause size-3.5"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path d="M7 5h4v14H7zm6 0h4v14h-4z"></path>
+          </svg>
+          <svg
+            viewBox="0 0 24 24"
+            class="ico-lecture size-3.5"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path d="M8 5v14l11-7z"></path>
+          </svg>
+        </button>
+      </div>
+      <h1
+        class="font-display text-[40px] leading-[1.04] font-medium tracking-[-0.02em] sm:text-[54px] lg:text-[64px]"
+      >
+        {hero.titre}
+      </h1>
+      <p class="mt-5 max-w-[520px] text-[16px] leading-7 text-cream/75 lg:text-[18px] lg:leading-8">
+        {hero.intro}
+      </p>
+      <div class="mt-8 flex flex-wrap justify-center gap-3">
+        <a
+          href="#beta"
+          class="btn-vif rounded-full bg-cream px-6 py-3 text-[0.9rem] font-bold text-ink"
+        >
+          {hero.cta}
+        </a>
+      </div>
+
+      <!-- The scene below the hero, like the dots video: the bistro at closing time, Robin talks to
+           the owner (looping video), and his messages pop out of his beak, as comic bubbles, one after another. -->
+      <div class="soiree mt-14 w-full max-w-[860px] lg:mt-16" data-soiree>
+        <div class="soiree-cadre">
+          <video
+            class="soiree-video"
+            src="/anim/robin-soir.mp4"
+            poster={soir.src}
+            muted
+            loop
+            playsinline
+            preload="auto"
+            aria-label={soiree.video}></video>
+          <ol class="bulles-soir" aria-label={soiree.label}>
+            {
+              soiree.messages.map((m, i) => (
+                <li class="bs" style={`--i:${i}`}>
+                  <span class="bs-bulle">
+                    {m.txt}
+                    {m.lien && (
+                      <span class="bs-lien">
+                        {m.lien} <span aria-hidden="true">→</span>
+                      </span>
+                    )}
+                  </span>
+                </li>
+              ))
+            }
+          </ol>
+          <button
+            type="button"
+            class="soiree-pause"
+            data-pause
+            aria-pressed="false"
+            data-label-pause={soiree.pause.pause}
+            data-label-lecture={soiree.pause.lecture}
+          >
+            <span class="sr-only" data-pause-label>{soiree.pause.pause}</span>
+            <svg
+              viewBox="0 0 24 24"
+              class="ico-pause size-4"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path d="M7 5h4v14H7zm6 0h4v14h-4z"></path>
+            </svg>
+            <svg
+              viewBox="0 0 24 24"
+              class="ico-lecture size-4"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path d="M8 5v14l11-7z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 · The sticky nav pill (dots) -->
+    <nav class="pilule-zone" aria-label={pilule.label}>
+      <div class="pilule">
+        <a href="#robin" class="pilule-nom">
+          <span class="pastille" aria-hidden="true"></span>
+          Robin <span class="pilule-statut">{pilule.statut}</span>
+        </a>
+        <a href="#fait">{pilule.fait}</a>
+        <a href="#semaine">{pilule.semaine}</a>
+        <a href="#canaux">{pilule.canaux}</a>
+        <a href="#beta" class="pilule-cta">{pilule.cta}</a>
+      </div>
+    </nav>
+
+    <!-- 3 · What Robin does: alternating rows, a WhatsApp situation in a tinted card -->
+    <section
+      id="fait"
+      class="mx-auto flex max-w-[1180px] flex-col gap-12 px-4 py-20 sm:px-6 lg:gap-16 lg:py-28"
+    >
+      <div class="flex max-w-[640px] flex-col gap-4">
+        <span class="font-mono text-kicker text-cream/60 uppercase">{fait.kicker}</span>
+        <h2
+          class="font-display text-[34px] leading-[1.08] font-medium tracking-[-0.02em] lg:text-[48px]"
+        >
+          {fait.titre}
+        </h2>
+      </div>
+      <Situations locale={locale} />
+    </section>
+
+    <!-- 4 · A week with Robin: the day timeline (the dots "day") -->
+    <section
+      id="semaine"
+      class="border-t border-line-night px-4 py-20 sm:px-6 lg:py-28"
+      data-semaine
+    >
+      <div class="mx-auto flex max-w-[980px] flex-col items-center text-center">
+        <span class="font-mono text-kicker text-cream/60 uppercase">{semaine.kicker}</span>
+        <h2
+          class="mt-4 max-w-[18ch] font-display text-[34px] leading-[1.08] font-medium tracking-[-0.02em] lg:text-[48px]"
+        >
+          {semaine.titre}
+        </h2>
+
+        <!-- Robin and his bubble, which change with the day -->
+        <div class="scene mt-12">
+          <!-- Robin changes outfit with the day: coffee on Monday, crate on Tuesday, calendar on
+               Wednesday, chef's hat on Thursday, bell on Friday, nightcap on Sunday. -->
+          <div class="flotte jour-av">
+            {
+              poses.map((src, i) => (
+                <Image
+                  src={src}
+                  alt=""
+                  widths={[120, 240]}
+                  sizes="120px"
+                  class:list={['pose', i === 0 && 'on']}
+                  data-j={i}
+                />
+              ))
+            }
+          </div>
+          <div class="bulles">
+            {
+              semaine.jours.map((j, i) => (
+                <p class:list={['bulle', i === 0 && 'on']} data-j={i}>
+                  {j.bulle}
+                </p>
+              ))
+            }
+          </div>
+        </div>
+
+        <!-- The timeline -->
+        <div class="frise mt-10 w-full" role="tablist" aria-label={semaine.frise}>
+          {
+            semaine.jours.map((j, i) => (
+              <button
+                type="button"
+                role="tab"
+                class="jour"
+                aria-selected={i === 0 ? 'true' : 'false'}
+                aria-controls="semaine-detail"
+                data-j={i}
+              >
+                <span class="jour-point" aria-hidden="true" />
+                <span class="jour-nom">{j.jour}</span>
+                <span class="jour-heure">{j.heure}</span>
+              </button>
+            ))
+          }
+        </div>
+
+        <div id="semaine-detail" class="details mt-10" aria-live="polite">
+          {
+            semaine.jours.map((j, i) => (
+              <div class:list={['detail', i === 0 && 'on']} data-j={i}>
+                <h3 class="font-display text-[26px] leading-tight font-medium lg:text-[32px]">
+                  {j.titre}
+                </h3>
+                <p class="mx-auto mt-3 max-w-[520px] text-[16px] leading-7 text-cream/75">
+                  {j.texte}
+                </p>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 · Where to find him: the WhatsApp phone (no app yet) -->
+    <section id="canaux" class="border-t border-line-night px-4 py-20 sm:px-6 lg:py-28" data-canaux>
+      <div class="mx-auto flex max-w-[980px] flex-col items-center text-center">
+        <span class="font-mono text-kicker text-cream/60 uppercase">{canaux.kicker}</span>
+        <h2
+          class="mt-4 font-display text-[34px] leading-[1.08] font-medium tracking-[-0.02em] lg:text-[48px]"
+        >
+          {canaux.titre}
+        </h2>
+        <p class="mt-4 max-w-[520px] text-[16px] leading-7 text-cream/75">
+          {canaux.texte}
+        </p>
+
+        <div class="telephone mt-10 w-full max-w-[320px]">
+          <Iphone>
+            <!-- WhatsApp -->
+            <div class="ecran wa on" data-c="0">
+              <div class="wa-statut" aria-hidden="true"><span>8:31</span><span>●●● ▮</span></div>
+              <header class="wa-barre">
+                <span class="wa-retour" aria-hidden="true">‹</span>
+                <Image src={portrait} alt="" width={40} densities={[1, 2]} class="wa-av" />
+                <span class="wa-contact"><b>Robin</b><span>{canaux.telephone.statut}</span></span>
+              </header>
+              <div class="wa-fil">
+                <p class="wa-jour">{canaux.telephone.jour}</p>
+                {
+                  canaux.telephone.messages.map((m) => (
+                    <div class:list={['wa-msg', m.qui, m.doc && 'wa-doc']}>
+                      {m.doc && (
+                        <span class="wa-fichier">
+                          <b>{m.doc}</b>
+                          <span>{m.meta}</span>
+                        </span>
+                      )}
+                      {m.txt}
+                    </div>
+                  ))
+                }
+              </div>
+            </div>
+          </Iphone>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 · Trust: on the dark background, three cards outlined in the blue of Robin's feathers. -->
+    <section class="border-t border-line-night px-4 py-20 sm:px-6 lg:py-28">
+      <div class="mx-auto flex max-w-[1180px] flex-col items-center">
+        <h2
+          class="max-w-[20ch] text-center font-display text-[34px] leading-[1.08] font-medium tracking-[-0.02em] lg:text-[48px]"
+        >
+          {confiance.titre}
+        </h2>
+        <div class="mt-12 grid w-full gap-4 md:grid-cols-3">
+          {
+            confiance.cartes.map((c, i) => (
+              <article class="flex flex-col items-start gap-3 rounded-[24px] bg-night-2 p-7 ring-1 ring-robin/60 lg:p-8">
+                <span class="font-mono text-[12px] tracking-[0.08em] text-cream/60">0{i + 1}</span>
+                <h3 class="font-display text-[22px] leading-tight font-medium">{c.titre}</h3>
+                <p class="text-[15px] leading-6 text-cream/75">{c.texte}</p>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 · The beta: the waitlist -->
+    <section id="beta" class="border-t border-line-night px-4 py-20 sm:px-6 lg:py-28">
+      <div
+        class="mx-auto grid max-w-[1100px] items-center gap-12 lg:grid-cols-[1fr_0.95fr] lg:gap-16"
+      >
+        <div class="flex flex-col items-start gap-5">
+          <span class="font-mono text-kicker text-cream/60 uppercase">{beta.kicker}</span>
+          <h2
+            class="font-display text-[34px] leading-[1.06] font-medium tracking-[-0.02em] lg:text-[48px]"
+          >
+            {beta.titre}
+          </h2>
+          <p class="max-w-[440px] text-[16px] leading-7 text-cream/75">
+            {beta.texte}
+          </p>
+        </div>
+        <!-- Without JS the form still posts (POST, so nothing lands in the URL); with JS the inline
+             script validates, then sends JSON and swaps the form for the confirmation. -->
+        <form
+          class="flex flex-col gap-4 rounded-[28px] bg-cream p-6 text-ink sm:p-8 lg:rounded-[36px] lg:p-10"
+          action="/api/liste-attente"
+          method="post"
+          novalidate
+          data-liste
+          data-locale={locale}
+          data-envoi={beta.messages.envoi}
+          data-succes={beta.messages.succes}
+          data-erreur={beta.messages.erreur}
+          data-invalide={beta.messages.invalide}
+        >
+          <div class="grid gap-3 sm:grid-cols-2" data-masquer>
+            {
+              champs.map((c) => (
+                <label class="champ" for={`r-${c.id}`}>
+                  <span>{beta.champs[c.id].label}</span>
+                  <input
+                    id={`r-${c.id}`}
+                    name={c.id}
+                    type={c.type}
+                    placeholder={beta.champs[c.id].placeholder}
+                    autocomplete={c.auto}
+                    required={c.requis}
+                  />
+                </label>
+              ))
+            }
+          </div>
+          <!-- Honeypot: invisible to people and assistive tech, bots fill it and get dropped server-side. -->
+          <div class="sr-only" aria-hidden="true">
+            <input type="text" name="website" tabindex="-1" autocomplete="off" />
+          </div>
+          <input type="hidden" name="locale" value={locale} />
+
+          <button
+            type="submit"
+            class="btn-vif mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full bg-orange px-6 py-4 text-base font-bold text-ink disabled:cursor-wait disabled:opacity-60"
+            data-masquer
+          >
+            {beta.bouton}
+            <span aria-hidden="true">→</span>
+          </button>
+          <p class="statut" role="status" aria-live="polite" tabindex="-1" data-statut></p>
+          <p class="text-center text-[12.5px] text-soft" data-masquer>{beta.mention}</p>
+        </form>
+      </div>
+    </section>
+  </div>
+
+  <script is:inline data-keep>
+    // Robin flying in the hero: the loop starts on its own (except with reduced motion: the portrait
+    // stays still), the small button pauses it.
+    (function () {
+      var root = document.querySelector('[data-vol]');
+      if (!root) return;
+      var video = root.querySelector('video');
+      var bouton = root.querySelector('[data-vol-pause]');
+      var label = root.querySelector('[data-vol-label]');
+      function regler(pause) {
+        root.classList.toggle('pause', pause);
+        bouton.setAttribute('aria-pressed', pause ? 'true' : 'false');
+        label.textContent = bouton.getAttribute(pause ? 'data-label-lecture' : 'data-label-pause');
+        if (pause) video.pause();
+        else video.play().catch(function () {});
+      }
+      bouton.addEventListener('click', function () {
+        regler(!root.classList.contains('pause'));
+      });
+      regler(matchMedia('(prefers-reduced-motion: reduce)').matches);
+    })();
+    // The evening scene: the video starts on its own (except with reduced motion), the button pauses
+    // the video and the incoming messages (WCAG 2.2.2: anything that loops can be paused).
+    (function () {
+      var root = document.querySelector('[data-soiree]');
+      if (!root) return;
+      var video = root.querySelector('video');
+      var bouton = root.querySelector('[data-pause]');
+      var label = root.querySelector('[data-pause-label]');
+      var reduit = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function regler(pause) {
+        root.classList.toggle('pause', pause);
+        bouton.setAttribute('aria-pressed', pause ? 'true' : 'false');
+        label.textContent = bouton.getAttribute(pause ? 'data-label-lecture' : 'data-label-pause');
+        if (pause) video.pause();
+        else video.play().catch(function () {});
+      }
+      bouton.addEventListener('click', function () {
+        regler(!root.classList.contains('pause'));
+      });
+      regler(reduit);
+    })();
+    // A week with Robin: clicking a day changes the bubble and the detail. Without JS, Monday stays
+    // visible.
+    (function () {
+      function onglets(root, attr) {
+        if (!root) return;
+        var tabs = [].slice.call(root.querySelectorAll('[role="tab"]'));
+        var panneaux = [].slice.call(root.querySelectorAll('[' + attr + ']:not([role="tab"])'));
+        tabs.forEach(function (t) {
+          t.addEventListener('click', function () {
+            var v = t.getAttribute(attr);
+            tabs.forEach(function (u) {
+              u.setAttribute('aria-selected', u === t ? 'true' : 'false');
+            });
+            panneaux.forEach(function (p) {
+              var on = p.getAttribute(attr) === v;
+              p.classList.toggle('on', on);
+              p.setAttribute('aria-hidden', on ? 'false' : 'true');
+            });
+          });
+        });
+      }
+      onglets(document.querySelector('[data-semaine]'), 'data-j');
+    })();
+    // The beta waitlist: checks the required fields and the email, posts JSON to /api/liste-attente,
+    // and on success swaps the fields for the confirmation. Every message comes from the form's
+    // data attributes and lands in the aria-live status line.
+    (function () {
+      var form = document.querySelector('[data-liste]');
+      if (!form) return;
+      var statut = form.querySelector('[data-statut]');
+      var bouton = form.querySelector('button[type="submit"]');
+      var requis = [].slice.call(form.querySelectorAll('input[required]'));
+      var courriel = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      var enCours = false;
+      function valeur(nom) {
+        return form.elements.namedItem(nom).value.trim();
+      }
+      function dire(cle) {
+        statut.textContent = form.getAttribute('data-' + cle);
+      }
+      // Back from a plain form post (the script had not loaded): the endpoint adds ?inscription=.
+      var retour = new URLSearchParams(location.search).get('inscription');
+      if (retour === 'ok') {
+        [].forEach.call(form.querySelectorAll('[data-masquer]'), function (el) {
+          el.hidden = true;
+        });
+        statut.classList.add('ok');
+        dire('succes');
+      } else if (retour === 'erreur') {
+        dire('erreur');
+      }
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        if (enCours) return;
+        var fautifs = requis.filter(function (c) {
+          return !c.value.trim() || (c.name === 'email' && !courriel.test(c.value.trim()));
+        });
+        requis.forEach(function (c) {
+          c.setAttribute('aria-invalid', fautifs.indexOf(c) >= 0 ? 'true' : 'false');
+        });
+        if (fautifs.length) {
+          dire('invalide');
+          fautifs[0].focus();
+          return;
+        }
+        enCours = true;
+        bouton.disabled = true;
+        dire('envoi');
+        fetch('/api/liste-attente', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            prenom: valeur('prenom'),
+            nom: valeur('nom'),
+            restaurant: valeur('restaurant'),
+            site: valeur('site'),
+            whatsapp: valeur('whatsapp'),
+            email: valeur('email'),
+            locale: form.getAttribute('data-locale'),
+            website: form.elements.namedItem('website').value,
+          }),
+        })
+          .then(function (r) {
+            return r
+              .json()
+              .catch(function () {
+                return {};
+              })
+              .then(function (d) {
+                if (r.ok) {
+                  [].forEach.call(form.querySelectorAll('[data-masquer]'), function (el) {
+                    el.hidden = true;
+                  });
+                  statut.classList.add('ok');
+                  dire('succes');
+                  statut.focus();
+                  return;
+                }
+                dire(d && d.error === 'invalid' ? 'invalide' : 'erreur');
+                enCours = false;
+                bouton.disabled = false;
+              });
+          })
+          .catch(function () {
+            dire('erreur');
+            enCours = false;
+            bouton.disabled = false;
+          });
+      });
+    })();
+  </script>
+</Base>
+
+<style>
+  /* The pause button for flying Robin: discreet, under the circle. */
+  .vol-pause {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    color: color-mix(in srgb, var(--color-cream) 75%, transparent);
+    box-shadow: 0 0 0 1px var(--color-line-night);
+    cursor: pointer;
+  }
+  .vol-pause:hover,
+  .vol-pause:focus-visible {
+    color: var(--color-cream);
+  }
+  .vol-pause:focus-visible {
+    outline: 2px solid var(--color-cream);
+    outline-offset: 2px;
+  }
+  .vol-pause .ico-lecture,
+  [data-vol].pause .vol-pause .ico-pause {
+    display: none;
+  }
+  [data-vol].pause .vol-pause .ico-lecture {
+    display: block;
+  }
+  /* Robin floats gently, like the dot above the title. */
+  .flotte {
+    filter: drop-shadow(0 18px 24px color-mix(in srgb, var(--color-black) 45%, transparent));
+    animation: flotte 5s ease-in-out infinite;
+  }
+  @keyframes flotte {
+    0%,
+    100% {
+      transform: translateY(0) rotate(-2deg);
+    }
+    50% {
+      transform: translateY(-10px) rotate(2deg);
+    }
+  }
+
+  /* The evening scene: the video large, Robin's messages arriving top left (over the windows, so they hide no one). */
+  .soiree-cadre {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    border-radius: 28px;
+    background: var(--color-night-2);
+    box-shadow: 0 0 0 1px var(--color-line-night);
+  }
+  @media (min-width: 64rem) {
+    .soiree-cadre {
+      border-radius: 36px;
+    }
+  }
+  .soiree-video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* The bubbles come from Robin on the counter: opening to the left, the tail pointing down just to his left.
+     One at a time, in the same cell, each in turn (9 s, time to read), then the evening restarts.
+     Robin sits at ~55% of the video's width and ~42% of its height. */
+  .bulles-soir {
+    position: absolute;
+    right: 46%;
+    bottom: 66%;
+    display: grid;
+    align-items: end;
+    width: min(330px, 40%);
+    text-align: left;
+    container-type: inline-size;
+  }
+  .bs {
+    grid-area: 1 / 1;
+    opacity: 0;
+    transform-origin: 88% 100%;
+    animation: bulle-soir 19.5s var(--ease-doux) infinite;
+    animation-delay: calc(0.6s + var(--i) * 6.5s);
+  }
+  .bs-bulle {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 15px 13px;
+    border-radius: 20px;
+    background: var(--color-surface);
+    box-shadow: var(--shadow-2);
+    font: 400 13px/1.45 var(--font-sans);
+    color: var(--color-ink);
+  }
+  /* The bubble opens to the left; its tail, bottom right, points down just left of Robin. */
+  .bs-bulle::after {
+    content: '';
+    position: absolute;
+    right: 26px;
+    bottom: -13px;
+    width: 22px;
+    height: 16px;
+    background: var(--color-surface);
+    clip-path: polygon(0 0, 100% 0, 82% 100%);
+  }
+  .bs-lien {
+    align-self: flex-start;
+    padding: 6px 10px;
+    border-radius: 10px;
+    background: var(--color-orange-tint);
+    font: 600 12px/1.2 var(--font-sans);
+    color: var(--color-orange-txt);
+  }
+  /* The bubble pops from Robin, stays long enough to read, then makes way for the next. */
+  @keyframes bulle-soir {
+    0% {
+      opacity: 0;
+      transform: scale(0.85);
+    }
+    3%,
+    29% {
+      opacity: 1;
+      transform: none;
+    }
+    33%,
+    100% {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+  }
+  .soiree.pause .bs {
+    animation-play-state: paused;
+  }
+  .soiree-pause {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-night) 70%, transparent);
+    backdrop-filter: blur(8px);
+    color: var(--color-cream);
+    cursor: pointer;
+  }
+  .soiree-pause:focus-visible {
+    outline: 2px solid var(--color-cream);
+    outline-offset: 2px;
+  }
+  .soiree-pause .ico-lecture,
+  .soiree.pause .soiree-pause .ico-pause {
+    display: none;
+  }
+  .soiree.pause .soiree-pause .ico-lecture {
+    display: block;
+  }
+  /* On small screens, the bubble keeps its place above Robin, smaller. */
+  @media (max-width: 47.99rem) {
+    .bulles-soir {
+      right: 45%;
+      width: 52%;
+    }
+    .bs-bulle {
+      padding: 8px 10px 9px;
+      border-radius: 14px;
+      font-size: 10.5px;
+      gap: 5px;
+    }
+    .bs-lien {
+      padding: 4px 7px;
+      font-size: 10px;
+    }
+  }
+
+  /* The sticky pill: under the fixed nav, it follows the scroll. */
+  .pilule-zone {
+    position: sticky;
+    top: 84px;
+    z-index: 50;
+    display: flex;
+    justify-content: center;
+    padding: 0 16px;
+    pointer-events: none;
+  }
+  .pilule {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-night-2) 88%, transparent);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 0 0 1px var(--color-line-night);
+    font-size: 13.5px;
+    pointer-events: auto;
+    overflow-x: auto;
+    max-width: 100%;
+  }
+  .pilule a {
+    padding: 8px 14px;
+    border-radius: 999px;
+    color: color-mix(in srgb, var(--color-cream) 75%, transparent);
+    white-space: nowrap;
+    transition: color 0.2s;
+  }
+  .pilule a:hover {
+    color: var(--color-cream);
+  }
+  .pilule .pilule-nom {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding-left: 6px;
+    font-weight: 700;
+    color: var(--color-cream);
+  }
+  /* Robin's "online" dot: a breathing orange circle, like ChatGPT's dot. */
+  .pastille {
+    position: relative;
+    width: 10px;
+    height: 10px;
+    margin: 0 2px 0 4px;
+    border-radius: 999px;
+    background: var(--color-orange);
+  }
+  .pastille::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    background: var(--color-orange);
+    animation: pastille 2.4s ease-out infinite;
+  }
+  @keyframes pastille {
+    0% {
+      transform: scale(1);
+      opacity: 0.6;
+    }
+    70%,
+    100% {
+      transform: scale(2.6);
+      opacity: 0;
+    }
+  }
+  .pilule-statut {
+    font: 400 11px/1 var(--font-mono);
+    letter-spacing: 0.06em;
+    color: color-mix(in srgb, var(--color-cream) 60%, transparent);
+  }
+  .pilule .pilule-cta {
+    background: var(--color-cream);
+    color: var(--color-ink);
+    font-weight: 700;
+  }
+
+  /* A week: the scene (Robin + bubble), the timeline, the detail. */
+  .scene {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .jour-av {
+    display: grid;
+    width: 120px;
+    height: 120px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--color-cream-2);
+  }
+  .jour-av :global(.pose) {
+    grid-area: 1 / 1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    scale: 0.92;
+    transition:
+      opacity 0.3s var(--ease-doux),
+      scale 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .jour-av :global(.pose.on) {
+    opacity: 1;
+    scale: 1;
+  }
+  .bulles {
+    display: grid;
+    min-height: 74px;
+  }
+  .bulle {
+    grid-area: 1 / 1;
+    max-width: 380px;
+    padding: 14px 18px;
+    border-radius: 18px;
+    background: var(--color-cream);
+    color: var(--color-ink);
+    font: 500 15px/1.45 var(--font-sans);
+    opacity: 0;
+    translate: 0 8px;
+    transition:
+      opacity 0.3s var(--ease-doux),
+      translate 0.4s var(--ease-doux);
+  }
+  .bulle.on {
+    opacity: 1;
+    translate: 0 0;
+  }
+  .frise {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+  }
+  .frise::before {
+    content: '';
+    position: absolute;
+    top: 7px;
+    left: 8%;
+    right: 8%;
+    height: 1px;
+    background: var(--color-line-night);
+  }
+  .jour {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 6px;
+    cursor: pointer;
+  }
+  .jour-point {
+    width: 15px;
+    height: 15px;
+    border-radius: 999px;
+    background: var(--color-night);
+    box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--color-cream) 45%, transparent);
+    transition:
+      background-color 0.2s,
+      box-shadow 0.2s;
+  }
+  .jour-nom {
+    font: 600 14px/1 var(--font-sans);
+    color: color-mix(in srgb, var(--color-cream) 70%, transparent);
+  }
+  .jour-heure {
+    font: 400 11px/1 var(--font-mono);
+    letter-spacing: 0.06em;
+    color: color-mix(in srgb, var(--color-cream) 60%, transparent);
+  }
+  .jour[aria-selected='true'] .jour-point {
+    background: var(--color-orange);
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-orange) 25%, transparent);
+  }
+  .jour[aria-selected='true'] .jour-nom {
+    color: var(--color-cream);
+  }
+  .jour:focus-visible {
+    outline: 2px solid var(--color-cream);
+    outline-offset: 4px;
+    border-radius: 8px;
+  }
+  .details {
+    display: grid;
+  }
+  .detail {
+    grid-area: 1 / 1;
+    opacity: 0;
+    transition: opacity 0.3s var(--ease-doux);
+  }
+  .detail.on {
+    opacity: 1;
+  }
+
+  /* The phone screen. */
+  .ecran {
+    --pt: calc(100cqw / 370);
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.35s var(--ease-doux);
+    text-align: left;
+  }
+  .ecran.on {
+    opacity: 1;
+  }
+
+  /* WhatsApp in the iPhone, same proportions as the demo mock-ups. */
+  .wa {
+    container-type: inline-size;
+    background: var(--color-whatsapp-wall);
+    font: 400 calc(15 * var(--pt)) / 1.35 var(--font-sans);
+    color: var(--color-ink);
+  }
+  .wa-statut {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: calc(54 * var(--pt));
+    padding: calc(4 * var(--pt)) calc(34 * var(--pt)) 0 calc(48 * var(--pt));
+    font: 600 calc(16 * var(--pt)) / 1 var(--font-sans);
+    background: var(--color-surface);
+  }
+  .wa-barre {
+    display: flex;
+    align-items: center;
+    gap: calc(10 * var(--pt));
+    padding: calc(6 * var(--pt)) calc(16 * var(--pt)) calc(9 * var(--pt)) calc(10 * var(--pt));
+    background: var(--color-surface);
+    box-shadow: 0 1px 0 var(--color-line);
+  }
+  .wa-retour {
+    font-size: calc(30 * var(--pt));
+    line-height: 1;
+  }
+  .wa-barre :global(.wa-av) {
+    width: calc(38 * var(--pt));
+    height: calc(38 * var(--pt));
+    object-fit: cover;
+    border-radius: 999px;
+    background: var(--color-cream);
+  }
+  .wa-contact {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+  }
+  .wa-contact b {
+    font-size: calc(17 * var(--pt));
+  }
+  .wa-contact span {
+    font-size: calc(13 * var(--pt));
+    color: var(--color-soft);
+  }
+  .wa-fil {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: calc(8 * var(--pt));
+    padding: calc(10 * var(--pt)) calc(10 * var(--pt)) calc(16 * var(--pt));
+  }
+  .wa-jour {
+    align-self: center;
+    margin-bottom: auto;
+    padding: calc(5 * var(--pt)) calc(12 * var(--pt));
+    border-radius: calc(9 * var(--pt));
+    background: var(--color-surface);
+    box-shadow: var(--shadow-1);
+    font: 500 calc(12 * var(--pt)) / 1.2 var(--font-sans);
+    color: var(--color-soft);
+  }
+  .wa-msg {
+    max-width: 84%;
+    padding: calc(8 * var(--pt)) calc(11 * var(--pt));
+    border-radius: calc(10 * var(--pt));
+    box-shadow: 0 1px 0.5px color-mix(in srgb, var(--color-black) 13%, transparent);
+  }
+  .wa-msg.robin {
+    align-self: flex-start;
+    background: var(--color-surface);
+    border-top-left-radius: 0;
+  }
+  .wa-msg.patron {
+    align-self: flex-end;
+    background: var(--color-whatsapp);
+    border-top-right-radius: 0;
+  }
+  .wa-fichier {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: calc(6 * var(--pt));
+    padding: calc(10 * var(--pt)) calc(12 * var(--pt));
+    border-radius: calc(8 * var(--pt));
+    background: var(--color-gray-50);
+    border-left: calc(4 * var(--pt)) solid var(--color-statut-rouge);
+  }
+  .wa-fichier span {
+    font-size: calc(12 * var(--pt));
+    color: var(--color-soft);
+  }
+
+  /* Beta form. */
+  .champ {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+  .champ input {
+    height: 48px;
+    padding: 0 16px;
+    border-radius: 14px;
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
+    font: 400 15px var(--font-sans);
+    color: var(--color-ink);
+    outline: none;
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s;
+  }
+  .champ input::placeholder {
+    color: var(--color-muted);
+  }
+  .champ input:focus {
+    border-color: var(--color-orange-txt);
+    box-shadow: 0 0 0 4px var(--color-orange-tint);
+  }
+  .champ input[aria-invalid='true'] {
+    border-color: var(--color-statut-rouge);
+  }
+  /* The form's status line: empty until a submit, then the error, or the confirmation in place of the fields. */
+  .statut {
+    text-align: center;
+    font: 600 14px/1.45 var(--font-sans);
+    color: var(--color-ink);
+    outline: none;
+  }
+  .statut:empty {
+    display: none;
+  }
+  .statut.ok {
+    padding: 24px 0;
+    font: 500 24px/1.25 var(--font-display);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .flotte,
+    .pastille::after {
+      animation: none;
+    }
+    .bulle,
+    .detail,
+    .ecran {
+      transition: none;
+    }
+    .bs {
+      animation: none;
+      opacity: 1;
+    }
+  }
+</style>

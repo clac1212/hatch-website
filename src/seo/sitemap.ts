@@ -26,10 +26,22 @@ const ENTRY_SOURCES: Record<string, (id: string, l: Locale) => string[]> = {
 /** Sources of each route's page, per locale. A route without an entry gets no lastmod. */
 const SOURCES: Partial<Record<RouteKey, (l: Locale) => string[]>> = {
   home: (l) => [
-    'src/views/HomePage.astro',
+    'src/views/AccueilPage.astro',
+    `src/content/home/${l}.yaml`,
+    `src/content/sections/accueil/${l}.yaml`,
+    'src/components/sections/SecuriteLivre.astro',
+  ],
+  reseaux: (l) => [
+    'src/views/ReseauxPage.astro',
     `src/content/home/${l}.yaml`,
     'src/content/sections',
     'src/components/sections',
+  ],
+  robin: (l) => [
+    'src/views/RobinPage.astro',
+    `src/content/sections/robin/${l}.yaml`,
+    `src/content/sections/robinSituations/${l}.yaml`,
+    'src/components/robin',
   ],
   demo: (l) => ['src/views/DemoPage.astro', `src/content/pages/demo/${l}.yaml`],
   security: (l) => ['src/views/SecurityPage.astro', `src/content/pages/security/${l}.yaml`],

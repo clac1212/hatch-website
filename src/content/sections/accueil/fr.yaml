@@ -1,0 +1,40 @@
+# The home page (/): the crossroads between independent restaurants (Robin) and franchise networks.
+# Each ending completes « Des collaborateurs IA qui… ».
+titre:
+  debut: 'Des collaborateurs IA'
+  liaison: 'qui'
+mots:
+  - agent: peep
+    texte: 'répondent à vos équipes sur WhatsApp'
+  - agent: owl
+    texte: 'répondent à voix haute en cuisine'
+  - agent: jay
+    texte: 'retrouvent et rédigent vos documents'
+  - agent: lark
+    texte: 'font le point chaque matin'
+  - agent: finch
+    texte: 'auditent vos établissements'
+  - agent: pecker
+    texte: 'forment vos équipes'
+  - agent: sparrow
+    texte: 'qualifient vos candidats franchisés'
+  - agent: robin
+    texte: 'surveillent vos factures fournisseurs'
+lead: "Pour le patron d'un restaurant indépendant comme pour la tête d'un réseau de franchise. Choisissez votre espace."
+espaces:
+  independant:
+    kicker: 'Restaurant indépendant'
+    titre: 'Robin, votre associé IA'
+    texte: 'Vous tenez un ou deux restaurants et vous faites tout vous-même. Robin connaît votre maison, revient vers vous chaque semaine et vous prépare ce dont vous avez besoin.'
+    cta: 'Découvrir Robin'
+    alt: 'Un petit bistrot indépendant en voxels : derrière le comptoir, le patron consulte son téléphone, Robin perché à côté de lui.'
+  reseau:
+    kicker: 'Réseau, franchise, succursales'
+    titre: 'Vos collaborateurs IA pour piloter votre réseau'
+    texte: "Animation, documentation, audits, formation, ouvertures : une équipe d'agents qui travaille pour le siège et répond à chaque établissement."
+    cta: 'Découvrir les agents'
+    alt: 'Un réseau en voxels : le siège au centre, huit restaurants de la même enseigne autour, et les sept agents Hatch OS dans les rues du réseau.'
+securite:
+  lien: 'Lire notre politique de sécurité'
+  precedent: 'Page précédente'
+  suivant: 'Page suivante'

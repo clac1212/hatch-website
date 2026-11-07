@@ -1,0 +1,99 @@
+conversation:
+  ariaLabel: Conversation WhatsApp avec Robin (exemple)
+  contact: Robin
+  enLigne: en ligne
+  ecrit: écrit…
+  saisie: Message
+  rejouer: Rejouer
+
+situations:
+  - titre: Il se branche à vos outils
+    texte: Tout se passe dans WhatsApp. Robin vous envoie un lien, vous lui ouvrez votre boîte mail ou votre Drive, et il retrouve tout seul vos factures et vos documents.
+  - titre: Il vérifie chaque facture
+    texte: Prenez le bon de livraison en photo. Robin le rapproche de la commande et de la facture, et vous montre l'écart. Il prépare l'avoir, vous dites oui.
+  - titre: Il éclaire vos décisions
+    texte: Posez-lui une vraie question de patron. Il croise vos ventes, vos achats et le coût du personnel, et vous répond chiffres en main.
+  - titre: Il prépare le travail
+    texte: Un vocal suffit. Il part de vos modèles et de vos données, vous envoie le document prêt à relire, et rien ne part sans votre accord.
+
+connexion:
+  demande: "Pour retrouver tes factures, il me faut ta boîte mail. Tu peux me l'ouvrir ici :"
+  lien:
+    icone: G
+    titre: Connecter ta boîte mail
+    sousTitre: Lien sécurisé Hatch OS
+  systeme: Boîte mail connectée
+  trouve: "C'est bon ✅ J'ai déjà trouvé :"
+  trouvailles:
+    - 3 factures Metro
+    - 1 avoir Promocash
+    - Plan de maîtrise sanitaire
+    - Modèle de contrat d'extra
+  compta: "Je prépare la compta du mois avec 📊 Tout sera dans un fichier Excel : tu le relis, puis tu l'envoies à Sylvain, ton expert-comptable."
+  fichier:
+    type: XLS
+    nom: Compta octobre · Le Petit Comptoir.xlsx
+    statut: Brouillon, à relire
+
+facture:
+  photo:
+    titre: BON DE LIVRAISON
+    legende: Le BL Metro de ce matin
+  document:
+    titre: Facture Metro · reçue par mail
+    prefixeBl: BL
+    lignes:
+      - nom: Beurre doux
+        facture: 5 kg
+        livre: 5 kg
+        ecart: false
+      - nom: Salade batavia
+        facture: 3 caisses
+        livre: 3 caisses
+        ecart: false
+      - nom: Bœuf haché
+        facture: 12 kg
+        livre: 10 kg
+        ecart: true
+  ecart: 12 kg de bœuf facturés, 10 livrés ⚠️ Je prépare la demande d'avoir ?
+  boutons:
+    oui: Oui, prépare-la
+    non: Pas maintenant
+  reponse: Oui, prépare-la 👍
+  avoir:
+    type: PDF
+    nom: Demande d'avoir · Metro.pdf
+    statut: Brouillon, à valider
+
+decision:
+  question: On reste ouvert de 14 h à 18 h ?
+  graphe:
+    titre: Créneau 14 h – 18 h · ventes par jour
+    seuil: coût du personnel
+    jours:
+      - { jour: L, ventes: 30, auDessus: false }
+      - { jour: M, ventes: 26, auDessus: false }
+      - { jour: M, ventes: 36, auDessus: false }
+      - { jour: J, ventes: 32, auDessus: false }
+      - { jour: V, ventes: 44, auDessus: false }
+      - { jour: S, ventes: 82, auDessus: true }
+  reponse: En semaine, le créneau ne couvre pas les salaires. Le samedi, si 💪 On ferme l'après-midi du lundi au vendredi ?
+
+preparation:
+  vocal:
+    duree: '0:04'
+    transcription: « Fais le contrat de Lina pour samedi soir. »
+  contrat:
+    titre: Contrat d'extra · ton modèle
+    tampon: Prêt à signer
+    champs:
+      - { cle: Salariée, valeur: Lina Moreau }
+      - { cle: Poste, valeur: Serveuse en salle }
+      - { cle: Date, valeur: 'Samedi, service du soir' }
+      - { cle: Horaires, valeur: 18 h – minuit }
+  question: Je l'envoie à Lina ?
+  boutons:
+    oui: Envoie-le
+    non: Je relis d'abord
+  reponse: Envoie-le
+  confirmation: Envoyé à Lina ✅ Je prépare sa fiche de paie pour la fin du mois.

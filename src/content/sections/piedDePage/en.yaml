@@ -1,4 +1,4 @@
-signature: The OS for franchise networks. Seven agents backing up your teams, from head office to the shop floor.
+signature: Your AI teammates, available 24/7.
 cta: Book a demo
 agents:
   titre: The agents
@@ -6,6 +6,10 @@ agents:
     - etage: ATTIC
       metier: On site
       agent: owl
+    - etage: 3rd L
+      metier: Independent
+      nom: Robin
+      lien: /en/robin
     - etage: 3rd R
       metier: Management
       agent: lark
@@ -33,3 +37,26 @@ legal:
 copyright: Hatch OS · Paris
 mention: Data hosted in Europe · GDPR compliant
 immeubleAlt: A cutaway voxel Parisian building where each Hatch OS agent lives on its own floor
+
+# Footer scenes of the network and Robin pages: their image (in the page), its alt, a title and the list beside it.
+scenes:
+  reseaux:
+    alt: 'A modern voxel open space seen in cross-section: the seven Hatch OS agents each work at their own desk, between shared desks, a dashboard screen, the coffee corner and the board with opening plans.'
+    titre: 'The open space'
+    liste:
+      - { repere: 'SCREEN', texte: 'Management · Lark', href: '#agents' }
+      - { repere: 'MESSAGES', texte: 'Network life · Peep', href: '#agents' }
+      - { repere: 'TABLET', texte: 'On site · Owl', href: '#agents' }
+      - { repere: 'HEADSET', texte: 'Documentation · Jay', href: '#agents' }
+      - { repere: 'SHEET', texte: 'Quality · Finch', href: '#agents' }
+      - { repere: 'CHECKLIST', texte: 'Training · Pecker', href: '#agents' }
+      - { repere: 'PLANS', texte: 'Development · Sparrow', href: '#agents' }
+  robin:
+    alt: 'A hall of the Rungis market in voxels, seen in cross-section at dawn: fish, fruit, meat, dairy and an office upstairs. Robin, perched on the crates of the trolley, does the shopping with the owner.'
+    titre: 'Robin at the market'
+    liste:
+      - { repere: 'FISH', texte: 'He compares prices · Orders', href: '#fait' }
+      - { repere: 'FRUIT', texte: 'He adjusts quantities · Stock', href: '#fait' }
+      - { repere: 'MEAT', texte: 'He checks the weights · Invoices', href: '#fait' }
+      - { repere: 'DAIRY', texte: 'He tracks credits · Suppliers', href: '#fait' }
+      - { repere: 'OFFICE', texte: 'He prepares contracts · Team', href: '#semaine' }

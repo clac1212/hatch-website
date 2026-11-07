@@ -8,13 +8,17 @@ import Demo from '../components/sections/Demo.astro';
 import Equipe from '../components/sections/Equipe.astro';
 import Cas from '../components/sections/Cas.astro';
 import MiseEnPlace from '../components/sections/MiseEnPlace.astro';
-import Securite from '../components/sections/Securite.astro';
 import Tarifs from '../components/sections/Tarifs.astro';
 import { section } from '../content/section';
+import siege from '../assets/footer/siege.jpg';
 import { routes, type Locale } from '../i18n/ui';
-import { BRAND, languageTag, organizationId, webSite } from '../seo/jsonld';
+import { BRAND, languageTag, organizationId } from '../seo/jsonld';
 
-/** The home page, shared by src/pages/index.astro (FR) and src/pages/en/index.astro (EN). Order = v4 prototype. */
+/**
+ * The franchise-network space (/reseaux, /en/networks): the former one-page home, with the Europe map
+ * hero and the agents' open space in the footer. The Security block now lives on the home page.
+ * Shared by src/pages/reseaux.astro (FR) and src/pages/en/networks.astro (EN).
+ */
 interface Props {
   locale: Locale;
 }
@@ -22,13 +26,14 @@ interface Props {
 const { locale } = Astro.props;
 const home = await getEntry('home', locale);
 if (!home) throw new Error(`Missing src/content/home/${locale}.yaml`);
-const { seo } = home.data;
+const { seo } = home.data.reseaux;
+const pied = { image: siege, ...(await section('piedDePage', locale)).scenes.reseaux };
 
 // Structured data: the site, and the product with the real prices of the Tarifs section
 // (euros excl. VAT, per location and per month, monthly and annual billing).
 const site = Astro.site!;
 const tarifs = await section('tarifs', locale);
-const homeUrl = new URL(routes.home[locale], site).href;
+const homeUrl = new URL(routes.reseaux[locale], site).href;
 const price = (name: string, amount: number) => ({
   '@type': 'UnitPriceSpecification',
   name,
@@ -38,7 +43,6 @@ const price = (name: string, amount: number) => ({
   unitText: tarifs.unite.replace(/^\/\s*/, ''),
 });
 const jsonLd = [
-  webSite(site, locale, routes.home[locale], seo.description),
   {
     '@type': 'SoftwareApplication',
     '@id': `${homeUrl}#software`,
@@ -66,18 +70,19 @@ const jsonLd = [
 
 <Base
   locale={locale}
-  paths={routes.home}
+  paths={routes.reseaux}
   title={seo.title}
   description={seo.description}
   jsonLd={jsonLd}
+  pied={pied}
+  espace
 >
-  <Hero locale={locale} />
+  <Hero locale={locale} europe />
   <Clients locale={locale} />
   <Probleme locale={locale} />
   <Demo locale={locale} />
   <Equipe locale={locale} />
   <Cas locale={locale} />
   <MiseEnPlace locale={locale} />
-  <Securite locale={locale} />
   <Tarifs locale={locale} />
 </Base>

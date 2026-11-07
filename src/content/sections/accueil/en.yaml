@@ -1,0 +1,40 @@
+# The home page (/en): the crossroads between independent restaurants (Robin) and franchise networks.
+# Each ending completes "AI teammates that…".
+titre:
+  debut: 'AI teammates'
+  liaison: 'that'
+mots:
+  - agent: peep
+    texte: 'answer your teams on WhatsApp'
+  - agent: owl
+    texte: 'answer out loud in the kitchen'
+  - agent: jay
+    texte: 'find and write your documents'
+  - agent: lark
+    texte: 'brief you every morning'
+  - agent: finch
+    texte: 'audit your locations'
+  - agent: pecker
+    texte: 'train your teams'
+  - agent: sparrow
+    texte: 'qualify your franchise candidates'
+  - agent: robin
+    texte: 'keep an eye on your supplier invoices'
+lead: 'For the owner of an independent restaurant and for the head of a franchise network alike. Choose your space.'
+espaces:
+  independant:
+    kicker: 'Independent restaurant'
+    titre: 'Robin, your AI business partner'
+    texte: 'You run one or two restaurants and you do everything yourself. Robin knows your restaurant, checks in with you every week and prepares what you need.'
+    cta: 'Meet Robin'
+    alt: 'A small independent bistro in voxels: behind the counter, the owner checks his phone, with Robin perched beside him.'
+  reseau:
+    kicker: 'Network, franchise, company-owned'
+    titre: 'Your AI teammates to run your network'
+    texte: 'Network life, documents, audits, training, openings: a team of agents that works for head office and answers every location.'
+    cta: 'Meet the agents'
+    alt: "A network in voxels: head office in the centre, eight restaurants of the same brand around it, and the seven Hatch OS agents in the network's streets."
+securite:
+  lien: 'Read our security policy'
+  precedent: 'Previous page'
+  suivant: 'Next page'

@@ -1,0 +1,99 @@
+conversation:
+  ariaLabel: WhatsApp conversation with Robin (example)
+  contact: Robin
+  enLigne: online
+  ecrit: typing…
+  saisie: Message
+  rejouer: Replay
+
+situations:
+  - titre: He plugs into your tools
+    texte: It all happens in WhatsApp. Robin sends you a link, you give him access to your inbox or your Drive, and he finds your invoices and documents on his own.
+  - titre: He checks every invoice
+    texte: Snap a photo of the delivery note. Robin matches it against the order and the invoice, and shows you the gap. He drafts the credit request, you say yes.
+  - titre: He helps you decide
+    texte: Ask him a real owner’s question. He cross-checks your sales, your purchases and your staff costs, and answers with the numbers to back it up.
+  - titre: He does the prep work
+    texte: A voice note is enough. He starts from your templates and your data, sends you the document ready to review, and nothing goes out without your OK.
+
+connexion:
+  demande: 'To find your invoices, I need access to your inbox. You can connect it here:'
+  lien:
+    icone: G
+    titre: Connect your inbox
+    sousTitre: Secure Hatch OS link
+  systeme: Inbox connected
+  trouve: "All set ✅ Here's what I found so far:"
+  trouvailles:
+    - 3 Metro invoices
+    - 1 Promocash credit note
+    - Food safety plan
+    - Temp contract template
+  compta: "I'm doing this month's books with these 📊 It'll all be in one Excel file: you give it a look, then send it to Sylvain, your accountant."
+  fichier:
+    type: XLS
+    nom: October books · Le Petit Comptoir.xlsx
+    statut: Draft, for you to review
+
+facture:
+  photo:
+    titre: DELIVERY NOTE
+    legende: This morning's Metro delivery note
+  document:
+    titre: Metro invoice · from your inbox
+    prefixeBl: DN
+    lignes:
+      - nom: Unsalted butter
+        facture: 5 kg
+        livre: 5 kg
+        ecart: false
+      - nom: Batavia lettuce
+        facture: 3 crates
+        livre: 3 crates
+        ecart: false
+      - nom: Ground beef
+        facture: 12 kg
+        livre: 10 kg
+        ecart: true
+  ecart: Billed for 12 kg of beef, only 10 delivered ⚠️ Want me to draft a credit request?
+  boutons:
+    oui: Yes, draft it
+    non: Not now
+  reponse: Yes, draft it 👍
+  avoir:
+    type: PDF
+    nom: Credit request · Metro.pdf
+    statut: Draft, needs your OK
+
+decision:
+  question: Is it worth staying open from 2 to 6?
+  graphe:
+    titre: 14:00–18:00 slot · sales by day
+    seuil: staff cost
+    jours:
+      - { jour: M, ventes: 30, auDessus: false }
+      - { jour: T, ventes: 26, auDessus: false }
+      - { jour: W, ventes: 36, auDessus: false }
+      - { jour: T, ventes: 32, auDessus: false }
+      - { jour: F, ventes: 44, auDessus: false }
+      - { jour: S, ventes: 82, auDessus: true }
+  reponse: On weekdays, that slot doesn't cover wages. Saturdays it does 💪 Close afternoons Monday to Friday?
+
+preparation:
+  vocal:
+    duree: '0:04'
+    transcription: “Do Lina's contract for Saturday night.”
+  contrat:
+    titre: Temp contract · your template
+    tampon: Ready to sign
+    champs:
+      - { cle: Employee, valeur: Lina Moreau }
+      - { cle: Role, valeur: Floor server }
+      - { cle: Date, valeur: 'Saturday, dinner service' }
+      - { cle: Hours, valeur: '18:00 – 00:00' }
+  question: Want me to send it to Lina?
+  boutons:
+    oui: Send it
+    non: I'll check first
+  reponse: Send it
+  confirmation: Sent to Lina ✅ I'll have her payslip ready at the end of the month.
