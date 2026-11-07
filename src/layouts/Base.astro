@@ -42,7 +42,7 @@ interface Props {
   jsonLd?: JsonLdNode[];
   noindex?: boolean;
   /** Which nav to show: the network space's (default) or the home / independents' minimal one. */
-  nav?: 'reseau' | 'accueil';
+  nav?: 'reseau' | 'accueil' | 'legal';
   /** A space of the site (Robin, network): logo back to the top, plus a link back to the home. */
   espace?: boolean;
   /** Tone of the home nav: `night` over a black hero. */
@@ -134,7 +134,9 @@ const structuredData = serializeJsonLd([
       {t('a11y.skip')}
     </a>
     {
-      nav === 'accueil' ? (
+      nav === 'legal' ? (
+        <NavAccueil locale={locale} paths={paths} seul />
+      ) : nav === 'accueil' ? (
         <NavAccueil locale={locale} paths={paths} tone={navTone} espace={espace} />
       ) : (
         <Nav locale={locale} paths={paths} espace={espace} />
@@ -143,7 +145,7 @@ const structuredData = serializeJsonLd([
     <main id="contenu">
       <slot />
     </main>
-    <Footer locale={locale} paths={paths} scene={pied} />
+    <Footer locale={locale} paths={paths} scene={pied} accueil={nav === 'accueil' && !espace} />
     <SpeedInsights />
     <script>
       // After every section script, so their `etape` / `apparition` listeners are in place.
