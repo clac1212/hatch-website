@@ -16,7 +16,13 @@ const { Content } = await render(entry);
 const { seo, title, meta } = entry.data;
 ---
 
-<Base locale={locale} paths={routes[page]} title={seo.title} description={seo.description}>
+<Base
+  locale={locale}
+  paths={routes[page]}
+  title={seo.title}
+  description={seo.description}
+  nav="legal"
+>
   <article class="mx-auto max-w-prose px-6 pt-32 pb-24 md:pt-40">
     <h1
       class="font-display text-[clamp(2.25rem,1.6rem+2.4vw,3.25rem)] leading-[1.08] font-bold tracking-[-0.02em] text-ink"

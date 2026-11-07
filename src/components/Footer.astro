@@ -31,9 +31,11 @@ interface Props {
   locale: Locale;
   paths: Paths;
   scene?: ScenePied;
+  /** The home page: no customer-cases link, and Security points at the page's own Security block. */
+  accueil?: boolean;
 }
 
-const { locale, paths, scene } = Astro.props;
+const { locale, paths, scene, accueil = false } = Astro.props;
 const t = useTranslations(locale);
 const data = await section('piedDePage', locale);
 const home = routes.home[locale];
@@ -53,10 +55,12 @@ const residents = await Promise.all(
   }),
 );
 const other = otherLocale(locale);
-const produit = [
-  { href: `${reseaux}#cas-clients`, label: t('nav.cases') },
-  { href: routes.security[locale], label: t('nav.security') },
-];
+const produit = accueil
+  ? [{ href: '#securite', label: t('nav.security') }]
+  : [
+      { href: `${reseaux}#cas-clients`, label: t('nav.cases') },
+      { href: routes.security[locale], label: t('nav.security') },
+    ];
 const legal = [
   { href: routes.terms[locale], label: data.legal.conditions },
   { href: routes.sales[locale], label: data.legal.vente },

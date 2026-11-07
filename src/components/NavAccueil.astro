@@ -14,9 +14,11 @@ interface Props {
   tone?: 'day' | 'night';
   /** A space of the site (Robin): the logo brings back to the top of this page, « Accueil » to the home. */
   espace?: boolean;
+  /** Legal pages: only the logo and « Accueil », no language switch nor sign-in. */
+  seul?: boolean;
 }
 
-const { locale, paths, tone = 'day', espace = false } = Astro.props;
+const { locale, paths, tone = 'day', espace = false, seul = false } = Astro.props;
 const nuit = tone === 'night';
 const t = useTranslations(locale);
 const other = otherLocale(locale);
@@ -35,7 +37,7 @@ const other = otherLocale(locale);
     </a>
     <div class="flex items-center gap-1">
       {
-        espace && (
+        (espace || seul) && (
           <a
             href={routes.home[locale]}
             class:list={[
@@ -59,26 +61,33 @@ const other = otherLocale(locale);
           </a>
         )
       }
-      <a
-        href={paths[other]}
-        hreflang={other}
-        lang={other}
-        class:list={[
-          'rounded-full px-2 py-2.5 text-[0.875rem] font-semibold uppercase sm:px-3 transition-colors',
-          nuit ? 'text-cream/70 hover:text-orange' : 'text-soft hover:text-orange-hover',
-        ]}
-      >
-        {other}<span class="sr-only"> · {t('lang.switch')}</span>
-      </a>
-      <a
-        href={appUrls.login}
-        class:list={[
-          'rounded-full px-4 py-2.5 text-[0.875rem] font-semibold whitespace-nowrap sm:px-5 transition-colors hover:bg-orange hover:text-ink',
-          nuit ? 'bg-cream text-ink' : 'bg-ink text-cream',
-        ]}
-      >
-        {t('nav.login')}
-      </a>
+      {
+        !seul && (
+          <>
+            <a
+              href={paths[other]}
+              hreflang={other}
+              lang={other}
+              class:list={[
+                'rounded-full px-2 py-2.5 text-[0.875rem] font-semibold uppercase sm:px-3 transition-colors',
+                nuit ? 'text-cream/70 hover:text-orange' : 'text-soft hover:text-orange-hover',
+              ]}
+            >
+              {other}
+              <span class="sr-only"> · {t('lang.switch')}</span>
+            </a>
+            <a
+              href={appUrls.login}
+              class:list={[
+                'rounded-full px-4 py-2.5 text-[0.875rem] font-semibold whitespace-nowrap sm:px-5 transition-colors hover:bg-orange hover:text-ink',
+                nuit ? 'bg-cream text-ink' : 'bg-ink text-cream',
+              ]}
+            >
+              {t('nav.login')}
+            </a>
+          </>
+        )
+      }
     </div>
   </nav>
 </header>
