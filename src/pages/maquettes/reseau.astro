@@ -1,0 +1,53 @@
+---
+/**
+ * MAQUETTE — la page réseau complète (le site actuel, qui passera à /reseaux), avec la nouvelle
+ * section Tarifs en formulaire à la place des trois offres chiffrées. Sans le bloc Sécurité, qui vit
+ * désormais sur l'accueil.
+ */
+import Base from '../../layouts/Base.astro';
+import Hero from '../../components/sections/Hero.astro';
+import Clients from '../../components/sections/Clients.astro';
+import Probleme from '../../components/sections/Probleme.astro';
+import Demo from '../../components/sections/Demo.astro';
+import Equipe from '../../components/sections/Equipe.astro';
+import Cas from '../../components/sections/Cas.astro';
+import MiseEnPlace from '../../components/sections/MiseEnPlace.astro';
+import TarifsFormulaire from '../../components/maquettes/TarifsFormulaire.astro';
+import siege from '../../assets/footer/siege.jpg';
+
+const locale = 'fr';
+
+/** Le pied de page propre au réseau : l'open space des agents, chacun à son poste. */
+const pied = {
+  image: siege,
+  alt: "Un open space moderne en voxels, vu en coupe : les sept agents Hatch OS travaillent chacun à son poste, entre les bureaux partagés, l'écran de tableaux de bord, le coin café et le tableau des plans d'ouverture.",
+  titre: "L'open space",
+  liste: [
+    { repere: 'ÉCRAN', texte: 'Pilotage · Lark', href: '#agents' },
+    { repere: 'MESSAGES', texte: 'Vie de réseau · Peep', href: '#agents' },
+    { repere: 'TABLETTE', texte: 'Établissement · Owl', href: '#agents' },
+    { repere: 'CASQUE', texte: 'Documentation · Jay', href: '#agents' },
+    { repere: 'TABLEUR', texte: 'Qualité · Finch', href: '#agents' },
+    { repere: 'GRILLE', texte: 'Formation · Pecker', href: '#agents' },
+    { repere: 'PLANS', texte: 'Développement · Sparrow', href: '#agents' },
+  ],
+};
+---
+
+<Base
+  espace
+  locale={locale}
+  paths={{ fr: '/maquettes/reseau', en: '/en/maquettes/reseau' }}
+  title="Maquette réseau | Hatch OS"
+  description="Maquette de la page réseau de Hatch OS avec la nouvelle section tarifs en formulaire."
+  pied={pied}
+>
+  <Hero locale={locale} europe />
+  <Clients locale={locale} />
+  <Probleme locale={locale} />
+  <Demo locale={locale} />
+  <Equipe locale={locale} />
+  <Cas locale={locale} />
+  <MiseEnPlace locale={locale} />
+  <TarifsFormulaire />
+</Base>

@@ -1,4 +1,4 @@
-signature: The OS for franchise networks. Seven agents backing up your teams, from head office to the shop floor.
+signature: Your AI teammates, available 24/7.
 cta: Book a demo
 agents:
   titre: The agents
@@ -6,6 +6,10 @@ agents:
     - etage: ATTIC
       metier: On site
       agent: owl
+    - etage: 3rd L
+      metier: Independent
+      nom: Robin
+      lien: /en/maquettes/robin
     - etage: 3rd R
       metier: Management
       agent: lark

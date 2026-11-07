@@ -1,4 +1,4 @@
-signature: L'OS des réseaux de franchise. Sept agents qui renforcent vos équipes, du siège au terrain.
+signature: Vos collaborateurs IA, disponibles 7j/7, 24h/24.
 cta: Réserver une démo
 agents:
   titre: Les agents
@@ -6,6 +6,10 @@ agents:
     - etage: COMBLES
       metier: Établissement
       agent: owl
+    - etage: 3e G
+      metier: Indépendant
+      nom: Robin
+      lien: /maquettes/robin
     - etage: 3e D
       metier: Direction
       agent: lark

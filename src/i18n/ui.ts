@@ -44,6 +44,8 @@ const fr = {
   'cta.try': 'Essayer Hatch OS',
   /** Nav: sign-in to the app (its /auth page also lets a newcomer sign up). */
   'nav.login': 'Se connecter',
+  /** Robin and network pages: back to the home page (the crossroads). */
+  'nav.back': 'Accueil',
   'lang.switch': 'English',
   'footer.product': 'Produit',
   'footer.company': 'Hatch OS',
@@ -73,6 +75,7 @@ const en: Record<keyof typeof fr, string> = {
   'cta.demo': 'Book a demo',
   'cta.try': 'Try Hatch OS',
   'nav.login': 'Log in',
+  'nav.back': 'Home',
   'lang.switch': 'Français',
   'footer.product': 'Product',
   'footer.company': 'Hatch OS',

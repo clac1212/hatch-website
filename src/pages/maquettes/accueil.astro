@@ -1,0 +1,370 @@
+---
+/**
+ * MAQUETTE — nouvelle page d'accueil : un bandeau qui dit ce que fait Hatch OS (phrase à mot
+ * changeant), puis deux portes côte à côte : restaurant indépendant (Robin) et réseau (le site actuel).
+ * Visuel uniquement : textes en dur, rien n'est branché.
+ */
+import { Image, Picture } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import SecuriteLivre from '../../components/maquettes/SecuriteLivre.astro';
+import { routes } from '../../i18n/ui';
+import oeuf from '../../assets/robin/independant.jpg';
+import reseau from '../../assets/tarifs/reseau-flotte.jpg';
+import peep from '../../assets/portraits/peep.jpg';
+import pecker from '../../assets/portraits/pecker.jpg';
+import finch from '../../assets/portraits/finch.jpg';
+import jay from '../../assets/portraits/jay.jpg';
+import sparrow from '../../assets/portraits/sparrow.jpg';
+import owl from '../../assets/portraits/owl.jpg';
+import lark from '../../assets/portraits/lark.jpg';
+import robin from '../../assets/portraits/robin.jpg';
+// Icône 3D en fin de phrase, comme muse.ai : Fluent Emoji 3D de Microsoft (licence MIT).
+import emPeep from '../../assets/emojis/peep.png';
+import emOwl from '../../assets/emojis/owl.png';
+import emJay from '../../assets/emojis/jay.png';
+import emLark from '../../assets/emojis/lark.png';
+import emFinch from '../../assets/emojis/finch.png';
+import emPecker from '../../assets/emojis/pecker.png';
+import emSparrow from '../../assets/emojis/sparrow.png';
+import emRobin from '../../assets/emojis/robin.png';
+
+// Une tâche par agent, tirée de son pitch (src/content/agents/fr/*.md ; Robin : Notion).
+// Son avatar change avec le texte ; quand une boucle vidéo existe (le coucou), elle remplace l'image.
+const mots = [
+  { texte: 'répondent à vos équipes sur WhatsApp', agent: 'Peep', img: peep, emoji: emPeep, video: '/maquettes/anim/peep.mp4' },
+  { texte: 'répondent à voix haute en cuisine', agent: 'Owl', img: owl, emoji: emOwl, video: '/maquettes/anim/owl.mp4' },
+  { texte: 'retrouvent et rédigent vos documents', agent: 'Jay', img: jay, emoji: emJay, video: '/maquettes/anim/jay.mp4' },
+  { texte: 'font le point chaque matin', agent: 'Lark', img: lark, emoji: emLark, video: '/maquettes/anim/lark.mp4' },
+  { texte: 'auditent vos établissements', agent: 'Finch', img: finch, emoji: emFinch, video: '/maquettes/anim/finch.mp4' },
+  { texte: 'forment vos équipes', agent: 'Pecker', img: pecker, emoji: emPecker, video: '/maquettes/anim/pecker.mp4' },
+  { texte: 'qualifient vos candidats franchisés', agent: 'Sparrow', img: sparrow, emoji: emSparrow, video: '/maquettes/anim/sparrow.mp4' },
+  { texte: 'surveillent vos factures fournisseurs', agent: 'Robin', img: robin, emoji: emRobin, video: '/maquettes/anim/robin.mp4' },
+];
+---
+
+<Base
+  locale="fr"
+  paths={{ fr: '/maquettes/accueil', en: '/en/maquettes/accueil' }}
+  nav="accueil"
+  navTone="night"
+  title="Maquette accueil | Hatch OS"
+  description="Maquette de la nouvelle page d'accueil de Hatch OS : un bandeau qui explique ce que font les agents, puis deux espaces, indépendants et réseaux."
+>
+  <!-- 1 · Le bandeau : ce que fait Hatch OS -->
+  <!-- Juste le texte, façon muse.ai : pas de cadre, pas d'image, une grande phrase centrée. -->
+  <section
+    class="hero-noir flex flex-col items-center gap-4 bg-night px-4 pt-36 pb-20 text-center sm:px-6 lg:pt-44 lg:pb-28"
+    aria-labelledby="accueil-titre"
+  >
+    <!-- Le titre « rébus » de muse.ai : ligne 1 avec l'avatar dans un cercle, ligne 2 la fin de
+         phrase qui change mot par mot. L'avatar change avec elle : c'est l'agent qui fait ce travail. -->
+    <h1
+      id="accueil-titre"
+      class="rebus w-full font-display text-[30px] leading-[1.08] font-medium tracking-[-0.015em] sm:text-[38px] lg:text-[clamp(38px,3.2vw,46px)] text-cream"
+      data-rebus
+    >
+      <span class="sr-only">Des collaborateurs IA qui {mots[0].texte}</span>
+      <span class="ligne" aria-hidden="true">
+        Des collaborateurs IA<span class="avatars" data-avatars>
+          {
+            mots.map((m, i) => (
+              <span class:list={['av', i === 0 && 'on']} title={m.agent}>
+                {m.video ? (
+                  <video class="av-img portrait" src={m.video} poster={m.img.src} autoplay muted loop playsinline />
+                ) : (
+                  <Image src={m.img} alt="" width={128} densities={[1, 2]} class:list={['av-img', 'portrait']} />
+                )}
+              </span>
+            ))
+          }
+        </span>qui
+      </span>
+      <span class="ligne phrases" aria-hidden="true">
+        {
+          mots.map((m, i) => (
+            <span class:list={['ph', i === 0 && 'on']}>
+              {m.texte.split(' ').map((w, j) => (
+                <>
+                  <span class="w" style={`--i:${j}`}>
+                    {w}
+                  </span>{' '}
+                </>
+              ))}
+              <span class="w icone" style={`--i:${m.texte.split(' ').length}`}>
+                <Image src={m.emoji} alt="" width={128} densities={[1, 2]} class="icone-img" />
+              </span>
+            </span>
+          ))
+        }
+      </span>
+    </h1>
+    <p class="max-w-[440px] text-[12px] leading-5 text-white lg:text-[13px] lg:leading-5">
+      Pour le patron d'un restaurant indépendant comme pour la tête d'un réseau de franchise.
+      Choisissez votre espace.
+    </p>
+  </section>
+
+  <main class="mx-auto flex max-w-[1360px] flex-col gap-4 px-4 pt-6 pb-16 sm:px-6 lg:gap-5 lg:pt-8">
+
+
+    <!-- 2 · Les deux portes -->
+    <div class="grid gap-4 md:grid-cols-2 lg:gap-5">
+      <!-- Indépendant → Robin -->
+      <a
+        href="/maquettes/robin"
+        class="group flex flex-col overflow-hidden rounded-[28px] bg-surface shadow-1 ring-1 ring-line transition hover:-translate-y-1 hover:shadow-2 lg:rounded-[36px]"
+      >
+        <div class="relative aspect-[16/10] overflow-hidden">
+          <Picture
+            src={oeuf}
+            alt="Un petit bistrot indépendant en voxels : derrière le comptoir, le patron consulte son téléphone, Robin perché à côté de lui."
+            widths={[600, 1000]}
+            sizes="(min-width: 768px) 50vw, 100vw"
+            formats={['avif', 'webp']}
+            class="size-full object-cover transition duration-700 group-hover:scale-[1.03]"
+          />
+        </div>
+        <div class="flex flex-1 flex-col gap-3 px-6 pt-6 pb-7 lg:px-9 lg:pt-8 lg:pb-9">
+          <span class="font-mono text-[12px] tracking-[0.16em] text-orange-txt uppercase">
+            Restaurant indépendant
+          </span>
+          <h2 class="font-display text-[28px] leading-[1.1] font-semibold text-ink lg:text-[36px]">
+            Robin, votre associé IA
+          </h2>
+          <p class="text-[15px] leading-6 text-soft">
+            Vous tenez un ou deux restaurants et vous faites tout vous-même. Robin connaît votre
+            maison, revient vers vous chaque semaine et vous prépare ce dont vous avez besoin.
+          </p>
+          <span class="mt-auto pt-3">
+            <span
+              class="btn-vif inline-flex items-center gap-2 rounded-full bg-orange px-5 py-3 text-[0.875rem] font-bold text-ink shadow-[0_6px_16px_rgb(248_122_1/0.35)]"
+            >
+              Découvrir Robin <span aria-hidden="true">→</span>
+            </span>
+          </span>
+        </div>
+      </a>
+
+      <!-- Réseau → le site actuel -->
+      <a
+        href="/maquettes/reseau"
+        class="group flex flex-col overflow-hidden rounded-[28px] bg-night shadow-1 transition hover:-translate-y-1 hover:shadow-2 lg:rounded-[36px]"
+      >
+        <div class="relative aspect-[16/10] overflow-hidden bg-scene">
+          <Picture
+            src={reseau}
+            alt="Un réseau en voxels : le siège au centre, huit restaurants de la même enseigne autour, et les sept agents Hatch OS dans les rues du réseau."
+            widths={[600, 1000]}
+            sizes="(min-width: 768px) 50vw, 100vw"
+            formats={['avif', 'webp']}
+            class="size-full object-cover transition duration-700 group-hover:scale-[1.03]"
+          />
+        </div>
+        <div class="flex flex-1 flex-col gap-3 px-6 pt-6 pb-7 lg:px-9 lg:pt-8 lg:pb-9">
+          <span class="font-mono text-[12px] tracking-[0.16em] text-peach uppercase">
+            Réseau, franchise, succursales
+          </span>
+          <h2 class="font-display text-[28px] leading-[1.1] font-semibold text-cream lg:text-[36px]">
+            Vos collaborateurs IA pour piloter votre réseau
+          </h2>
+          <p class="text-[15px] leading-6 text-cream/75">
+            Animation, documentation, audits, formation, ouvertures : une équipe d'agents qui
+            travaille pour le siège et répond à chaque établissement.
+          </p>
+          <span class="mt-auto pt-3">
+            <span
+              class="btn-vif inline-flex items-center gap-2 rounded-full bg-cream px-5 py-3 text-[0.875rem] font-bold text-ink"
+            >
+              Découvrir les agents <span aria-hidden="true">→</span>
+            </span>
+          </span>
+        </div>
+      </a>
+    </div>
+
+    <script is:inline data-keep>
+      // Titre « rébus » façon muse.ai. Toutes les 2,8 s : les mots de la fin de phrase sortent vers le
+      // haut l'un après l'autre, ceux de la suivante entrent par le bas ; l'agent du cercle change avec
+      // elle (il arrive en sautillant). Mouvement réduit : la première phrase reste, sans animation.
+      (function () {
+        var root = document.querySelector('[data-rebus]');
+        if (!root || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        var ph = [].slice.call(root.querySelectorAll('.ph'));
+        var av = [].slice.call(root.querySelectorAll('.av'));
+        var sr = root.querySelector('.sr-only');
+        var i = 0;
+        setInterval(function () {
+          var a = ph[i], b = av[i];
+          a.classList.remove('on'); a.classList.add('out');
+          b.classList.remove('on'); b.classList.add('out');
+          i = (i + 1) % ph.length;
+          ph[i].classList.remove('out'); ph[i].classList.add('on');
+          av[i].classList.remove('out'); av[i].classList.add('on');
+          if (sr) sr.textContent = 'Des collaborateurs IA qui ' + ph[i].textContent.replace(/\s+/g, ' ').trim();
+          setTimeout(function () { a.classList.remove('out'); b.classList.remove('out'); }, 900);
+        }, 2800);
+      })();
+    </script>
+  </main>
+
+  <!-- 3 · La sécurité, pleine largeur : le bandeau orange de la page Sécurité, ses quatre thèmes -->
+  <SecuriteLivre locale="fr" />
+</Base>
+
+
+
+<style>
+  .rebus .ligne {
+    display: block;
+  }
+
+  /* L'avatar, comme celui de Muse : un cercle un peu plus haut que les capitales, liseré fin,
+     posé dans la ligne. Tous les agents empilés dans la même case, un seul visible. */
+  .avatars {
+    position: relative;
+    display: inline-grid;
+    width: 1.3em;
+    height: 1.3em;
+    margin: -0.12em 0.19em;
+    vertical-align: middle;
+    translate: 0 -0.05em;
+    border-radius: 999px;
+    background: var(--color-cream-2);
+    box-shadow: 0 0 0 0.5px color-mix(in srgb, var(--color-white) 20%, transparent);
+    overflow: hidden;
+    cursor: default;
+  }
+  .av {
+    grid-area: 1 / 1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    opacity: 0;
+    translate: 0 60%;
+    scale: 0.7;
+    transition:
+      opacity 0.3s ease,
+      translate 0.55s cubic-bezier(0.34, 1.56, 0.64, 1),
+      scale 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .av.on {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+  }
+  .av.out {
+    opacity: 0;
+    translate: 0 -40%;
+    scale: 0.85;
+    transition-timing-function: ease-in;
+    transition-duration: 0.3s;
+  }
+  .av :global(.av-img) {
+    width: 80%;
+    height: auto;
+    margin-bottom: 6%;
+    transform-origin: 50% 100%;
+  }
+  /* il respire tant qu'il est affiché, il se dandine au survol (le « working » de Muse) */
+  /* Portrait façon Muse (fond crème, agent de face qui remplit le cercle) : pleine case. */
+  .av :global(.av-img.portrait) {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    object-fit: cover;
+    /* l'agent un peu plus petit dans son cercle, ancré en bas */
+    scale: 0.9;
+    transform-origin: 50% 100%;
+  }
+  .av.on :global(.av-img) {
+    animation: respire 2.2s 0.6s ease-in-out infinite;
+  }
+  .avatars:hover .av.on :global(.av-img) {
+    animation: dandine 0.7s ease-in-out infinite;
+  }
+  @keyframes respire {
+    0%,
+    100% {
+      transform: scale(1, 1);
+    }
+    50% {
+      transform: scale(1.04, 0.96);
+    }
+  }
+  @keyframes dandine {
+    0%,
+    100% {
+      transform: rotate(0);
+    }
+    25% {
+      transform: rotate(-8deg) translateY(-3%);
+    }
+    75% {
+      transform: rotate(8deg) translateY(-3%);
+    }
+  }
+
+  /* La fin de phrase : toutes empilées dans la même case (sa hauteur est celle de la plus longue),
+     mot par mot. Sortie vers le haut, entrée par le bas, décalée de 45 ms par mot. */
+  /* La fin de phrase qui change : gras, italique (le vrai italique de Fraunces) et orange de la
+     marque, en version texte (#a34f00) pour rester lisible sur le crème. */
+  .rebus .phrases {
+    display: grid;
+    justify-items: center;
+    font-weight: 700;
+    font-style: italic;
+    /* sur le noir, l'orange vif de la marque est lisible (6,6:1) */
+    color: var(--color-orange);
+  }
+  .ph {
+    grid-area: 1 / 1;
+    place-self: start center;
+    max-width: 100%;
+  }
+  .w {
+    display: inline-block;
+    opacity: 0;
+    translate: 0 0.3em;
+    transition:
+      opacity 0.35s ease,
+      translate 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: calc(var(--i) * 45ms);
+  }
+  .ph.on .w {
+    opacity: 1;
+    translate: 0 0;
+    transition-delay: calc(180ms + var(--i) * 45ms);
+  }
+  /* L'icône 3D en fin de phrase (muse.ai : 1em, posée un peu sous la ligne de base). */
+  .icone {
+    /* calé comme muse.ai : boîte de 1em centrée sur la hauteur des minuscules */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 1em;
+    vertical-align: -0.14em;
+    padding-inline: 0.08em;
+  }
+  .icone :global(.icone-img) {
+    display: block;
+    width: 1.05em;
+    height: 1.05em;
+    object-fit: contain;
+  }
+  .ph.out .w {
+    opacity: 0;
+    translate: 0 -0.3em;
+    transition-timing-function: ease-in;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .av,
+    .w {
+      transition: none;
+    }
+    .av.on :global(.av-img),
+    .avatars:hover .av.on :global(.av-img) {
+      animation: none;
+    }
+  }
+</style>

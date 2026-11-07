@@ -4,7 +4,8 @@ import Button from '../ui/Button.astro';
 import LisierePixel from '../ui/LisierePixel.astro';
 import { section } from '../../content/section';
 import { appUrls, routes, useTranslations, type Locale } from '../../i18n/ui';
-import carte from '../../assets/hero/carte-v5-1.jpg';
+import carteFrance from '../../assets/hero/carte-v5-1.jpg';
+import carteEurope from '../../assets/hero/carte-europe.jpg';
 import grain from '../../assets/hero/grain.png';
 import boutiques from './hero-boutiques.json';
 import peep from '../../assets/hero/agents/peep.webp';
@@ -34,9 +35,19 @@ import oiseauxPos from './hero-oiseaux.json';
  */
 interface Props {
   locale: Locale;
+  /**
+   * Mockup: a new map of Western Europe (relief, an established network, the agents at work). Its
+   * places differ from the France map, so the map-anchored pings, bubbles and task cards are left out
+   * until they are re-anchored. The scene is pinned left so the Atlantic sits under the glass card.
+   */
+  europe?: boolean;
 }
 
-const { locale } = Astro.props;
+const { locale, europe = false } = Astro.props;
+const carte = europe ? carteEurope : carteFrance;
+const K = europe ? 0.5176 : 1;
+const cadre = (x: number, y: number): [number, number] =>
+  europe ? [358.2 + x * K, 157.5 + y * K] : [x, y];
 const data = await section('hero', locale);
 const t = useTranslations(locale);
 const { status, events } = data.tasks;
@@ -74,21 +85,64 @@ if (SHOPS.length !== events.length) {
 }
 /** Shop height in the frame: the card sits just above the roof. */
 const ROOF = 30;
+/**
+ * Mockup carte Europe : chaque carte de tâche se pose au-dessus de l'agent dessiné sur la carte (tête),
+ * et l'onde part de ses pieds. Pixels de l'image 3840 × 2143, même ratio que le cadre 1440 × 804.
+ */
+const AGENTS_EUROPE: Record<string, { x: number; tete: number; pieds: number }> = {
+  peep: { x: 2430, tete: 1000, pieds: 1070 }, // devant BunBun Lyon
+  lark: { x: 2215, tete: 750, pieds: 830 }, // au siège, avec le directeur
+  sparrow: { x: 2490, tete: 1232, pieds: 1320 }, // chantier du sud
+  owl: { x: 1990, tete: 1208, pieds: 1305 }, // avec le chef de BunBun Bordeaux
+};
+const enCadre = (v: number, de: number, vers: number) => (v / de) * vers;
 const steps = events.map((e, i) => {
+  if (europe) {
+    const a = AGENTS_EUROPE[e.agent];
+    const texte = e.europe ?? e;
+    return {
+      ...e,
+      ...texte,
+      x: enCadre(a.x, 3840, W),
+      y: enCadre(a.pieds, 2143, H),
+      roof: enCadre(a.pieds - a.tete + 14, 2143, H),
+      anchor: 'center' as Ancre,
+      avatar: avatars[e.agent],
+    };
+  }
   const at = SHOPS[i];
-  const [x, y] = 'shop' in at ? (boutiques.shops[at.shop] as [number, number]) : [at.x, at.y];
-  const roof = 'shop' in at ? ROOF : at.roof;
+  const [x, y] = cadre(...('shop' in at ? (boutiques.shops[at.shop] as [number, number]) : [at.x, at.y]));
+  const roof = ('shop' in at ? ROOF : at.roof) * K;
   return { ...e, x, y, roof, anchor: at.anchor, avatar: avatars[e.agent] };
 });
 /** Seconds per event (wave, card running, card done, exit). */
 const STEP = 5.6;
+
+/** Mockup carte Europe : les trois chantiers (cadre 3840 × 2143 de l'image) et les nuages. */
+const GRUES = [
+  { id: 'de', x: `${(2640 / 3840) * 100}%`, y: `${(180 / 2143) * 100}%` },
+  { id: 'fr', x: `${(2400 / 3840) * 100}%`, y: `${(960 / 2143) * 100}%` },
+  { id: 'es', x: `${(1280 / 3840) * 100}%`, y: `${(1320 / 2143) * 100}%` },
+];
+const NUAGES = [
+  { id: 1, y: '60%', w: '11%', d: 70, t: 10 },
+  { id: 2, y: '90%', w: '9%', d: 80, t: 45 },
+  { id: 3, y: '120%', w: '12%', d: 75, t: 30 },
+  { id: 2, y: '45%', w: '7%', d: 85, t: 62 },
+  { id: 1, y: '75%', w: '8%', d: 78, t: 52 },
+  { id: 3, y: '105%', w: '9%', d: 72, t: 2 },
+  { id: 1, y: '135%', w: '10%', d: 82, t: 66 },
+];
 
 const tick =
   'M10 18H8v-2h2v2Zm-2-2H6v-2h2v2Zm4-2v2h-2v-2h2Zm-6 0H4v-2h2v2Zm8 0h-2v-2h2v2Zm2-2h-2v-2h2v2Zm2-2h-2V8h2v2Zm2-2h-2V6h2v2Z';
 ---
 
 <section
-  class="hero relative h-dvh min-h-[640px] overflow-hidden bg-night [container-type:size]"
+  class:list={[
+    'hero relative h-dvh min-h-[640px] overflow-hidden bg-night [container-type:size]',
+    europe && 'hero-europe',
+  ]}
   aria-labelledby="hero-titre"
   data-rv-groupe
 >
@@ -105,6 +159,32 @@ const tick =
       class="absolute inset-0 size-full object-cover"
     />
     {
+      /* Mockup « carte Europe » : les grues des trois chantiers pivotent (vidéos en boucle posées sur
+         l'image) et des nuages traversent la carte. Un bouton met tout en pause. */
+      europe && (
+        <>
+          <div class="h-grues">
+            {GRUES.map((g) => (
+              <video
+                class="h-grue"
+                src={`/maquettes/anim/grue-${g.id}.mp4`}
+                style={`left:${g.x};top:${g.y}`}
+                autoplay
+                muted
+                loop
+                playsinline
+              />
+            ))}
+          </div>
+          <div class="h-nuages">
+            {NUAGES.map((n) => (
+              <img class="h-nuage" src={`/maquettes/anim/nuage-${n.id}.webp`} alt="" style={`--y0:${n.y};width:${n.w};animation-duration:${n.d}s;animation-delay:-${n.t}s`} />
+            ))}
+          </div>
+        </>
+      )
+    }
+    {
       steps.map((e) => (
         <div class="h-ping" style={`left:${pct(e.x, W)};top:${pct(e.y, H)}`}>
           <span />
@@ -113,8 +193,10 @@ const tick =
       ))
     }
     {
-      (Object.keys(OISEAUX) as Oiseau[]).map((agent) => {
-        const b = OISEAUX[agent];
+      !europe && (Object.keys(OISEAUX) as Oiseau[]).map((agent) => {
+        const o = OISEAUX[agent];
+        const [bl, bt] = cadre(o.left, o.top);
+        const b = { left: bl, top: bt, width: o.width * K, height: o.height * K };
         return (
           <div
             class="h-oiseau"
@@ -138,9 +220,13 @@ const tick =
 
   <!-- Pixel edge into the clients band below (white): over the map and the grain, under the piles
        and the glass card. -->
-  <div class="absolute inset-x-0 bottom-0 z-0">
-    <LisierePixel color="var(--color-white)" />
-  </div>
+  {
+    !europe && (
+      <div class="absolute inset-x-0 bottom-0 z-0">
+        <LisierePixel color="var(--color-white)" />
+      </div>
+    )
+  }
 
   <div
     class="relative z-1 mx-auto flex h-full max-w-[1440px] flex-col justify-end gap-2 px-4 pt-24 pb-4 sm:px-6 sm:pb-6 lg:static lg:justify-center lg:gap-0 lg:px-14 lg:pt-36 lg:pb-12"
@@ -219,7 +305,99 @@ const tick =
       </div>
     </div>
   </div>
+  {
+    europe && (
+      <button type="button" class="h-pause" data-hero-pause aria-pressed="false">
+        <span class="sr-only" data-hero-pause-label>Mettre l'animation de la carte en pause</span>
+        <span class="h-pause-ico" aria-hidden="true"></span>
+      </button>
+    )
+  }
 </section>
+{
+  europe && (
+    <script is:inline data-keep>
+      (function () {
+        var hero = document.querySelector('.hero-europe');
+        if (!hero) return;
+        var bouton = hero.querySelector('[data-hero-pause]');
+        var label = hero.querySelector('[data-hero-pause-label]');
+        var videos = [].slice.call(hero.querySelectorAll('.h-grue'));
+        function regler(pause) {
+          hero.classList.toggle('h-en-pause', pause);
+          bouton.setAttribute('aria-pressed', pause ? 'true' : 'false');
+          label.textContent = pause ? "Relancer l'animation de la carte" : "Mettre l'animation de la carte en pause";
+          videos.forEach(function (v) {
+            if (pause) v.pause();
+            else v.play().catch(function () {});
+          });
+        }
+        bouton.addEventListener('click', function () {
+          regler(!hero.classList.contains('h-en-pause'));
+        });
+        regler(matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+        // Boucle des cartes de tâche (même rythme que la carte de France : onde, carte en cours,
+        // terminé, sortie, puis l'agent suivant). Suspendue par le bouton pause.
+        var piles = [].slice.call(hero.querySelectorAll('.h-pile'));
+        var pings = [].slice.call(hero.querySelectorAll('.h-ping'));
+        var STEP = Number(hero.querySelector('.h-piles').dataset.pas);
+        var CYCLE = STEP * piles.length;
+        function clamp(x) { return Math.min(1, Math.max(0, x)); }
+        function ease(x) { return 1 - Math.pow(1 - x, 3); }
+        function rendu(t) {
+          var tc = t % CYCLE;
+          piles.forEach(function (pile, i) {
+            var r = tc - i * STEP;
+            var actif = r >= 0 && r < STEP;
+            var p = actif ? r / 1.4 : 1;
+            var g = pings[i];
+            g.style.setProperty('--p1', String(ease(clamp(p))));
+            g.style.setProperty('--p2', String(ease(clamp((p - 0.3) / 0.7))));
+            g.style.setProperty('--g', String(p < 1 ? Math.sin(Math.PI * clamp(p)) * 0.8 : 0));
+            pile.querySelector('.h-slot').classList.toggle('on', actif && r >= 1.0);
+            pile.classList.toggle('sort', actif && r >= 5.0);
+            pile.querySelector('.h-tache').classList.toggle('fait', actif && r >= 3.2);
+          });
+        }
+        // Garde chaque carte dans l'écran, à droite de la carte de titre : on la décale, sa pointe
+        // reste sur l'agent. Recalculé au redimensionnement.
+        var titre = hero.querySelector('.carte-hero');
+        function caler() {
+          var large = matchMedia('(min-width: 64rem)').matches;
+          var zone = hero.getBoundingClientRect();
+          if (!zone.width) return; // page de la maquette pas encore affichée
+          var gauche = zone.left + 16 + (large ? titre.getBoundingClientRect().right - zone.left : 0);
+          var droite = zone.right - 16;
+          piles.forEach(function (pile) {
+            pile.style.setProperty('--decal', '0px');
+            if (!large) return;
+            var c = pile.querySelector('.h-tache').getBoundingClientRect();
+            var d = 0;
+            if (c.right > droite) d = droite - c.right;
+            if (c.left + d < gauche) d = gauche - c.left;
+            var max = c.width / 2 - 24;
+            d = Math.max(-max, Math.min(max, d));
+            pile.style.setProperty('--decal', d + 'px');
+          });
+        }
+        caler();
+        addEventListener('resize', caler);
+        addEventListener('hashchange', function () { setTimeout(caler, 50); });
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) { rendu(2); return; }
+        var t = 0, avant = null, images = 0;
+        function boucle(maintenant) {
+          if (avant !== null && !hero.classList.contains('h-en-pause')) t += Math.min(maintenant - avant, 100) / 1000;
+          avant = maintenant;
+          rendu(t);
+          if (++images % 30 === 0) caler();
+          requestAnimationFrame(boucle);
+        }
+        requestAnimationFrame(boucle);
+      })();
+    </script>
+  )
+}
 
 <script>
   /**
@@ -229,72 +407,163 @@ const tick =
    * Paused off screen.
    * `?t=<s>` freezes the loop at an instant (captures); reduced motion shows a still frame.
    */
-  const hero = document.querySelector<HTMLElement>('.hero')!;
-  const STEP = Number(hero.querySelector<HTMLElement>('.h-piles')!.dataset.pas);
-  const piles = [...hero.querySelectorAll<HTMLElement>('.h-pile')];
-  const taches = piles.map((p) => p.querySelector<HTMLElement>('.h-tache')!);
-  const slots = piles.map((p) => p.querySelector<HTMLElement>('.h-slot')!);
-  const pings = [...hero.querySelectorAll<HTMLElement>('.h-ping')];
-  const oiseaux = [...hero.querySelectorAll<HTMLElement>('.h-oiseau')];
-  const CYCLE = STEP * piles.length;
-  const ENTREE = 1.0;
-  const BASCULE = 3.2;
-  const SORTIE = 5.0;
-  /** p = wave progress (0 → 1; ≥ 1 = idle). The second ring follows 0.3 behind the first. */
-  const clamp = (x: number) => Math.min(1, Math.max(0, x));
-  function ping(el: HTMLElement, p: number) {
-    const ease = (x: number) => 1 - (1 - x) ** 3;
-    el.style.setProperty('--p1', String(ease(clamp(p))));
-    el.style.setProperty('--p2', String(ease(clamp((p - 0.3) / 0.7))));
-    el.style.setProperty('--g', String(p < 1 ? Math.sin(Math.PI * clamp(p)) * 0.8 : 0));
-  }
+  // The Europe map mockup drives its own loop (inline script): this one only runs the France map.
+  const leHero = document.querySelector<HTMLElement>('.hero:not(.hero-europe)');
+  if (leHero) demarrer(leHero);
 
-  function rendu(t: number) {
-    const tc = t % CYCLE;
-    // the bird whose card is "running" types its answer
-    const actifs = new Set<string>();
-    piles.forEach((pile, i) => {
-      const r = tc - i * STEP;
-      if (r >= ENTREE && r < BASCULE) actifs.add(pile.dataset.agent!);
-    });
-    oiseaux.forEach((o) => o.classList.toggle('parle', actifs.has(o.dataset.agent!)));
-    piles.forEach((pile, i) => {
-      const r = tc - i * STEP;
-      const actif = r >= 0 && r < STEP;
-      ping(pings[i], actif ? r / 1.4 : 1);
-      slots[i].classList.toggle('on', actif && r >= ENTREE);
-      pile.classList.toggle('sort', actif && r >= SORTIE);
-      taches[i].classList.toggle('fait', actif && r >= BASCULE);
-    });
-  }
+  function demarrer(hero: HTMLElement) {
+    const STEP = Number(hero.querySelector<HTMLElement>('.h-piles')!.dataset.pas);
+    const piles = [...hero.querySelectorAll<HTMLElement>('.h-pile')];
+    const taches = piles.map((p) => p.querySelector<HTMLElement>('.h-tache')!);
+    const slots = piles.map((p) => p.querySelector<HTMLElement>('.h-slot')!);
+    const pings = [...hero.querySelectorAll<HTMLElement>('.h-ping')];
+    const oiseaux = [...hero.querySelectorAll<HTMLElement>('.h-oiseau')];
+    const CYCLE = STEP * piles.length;
+    const ENTREE = 1.0;
+    const BASCULE = 3.2;
+    const SORTIE = 5.0;
+    /** p = wave progress (0 → 1; ≥ 1 = idle). The second ring follows 0.3 behind the first. */
+    const clamp = (x: number) => Math.min(1, Math.max(0, x));
+    function ping(el: HTMLElement, p: number) {
+      const ease = (x: number) => 1 - (1 - x) ** 3;
+      el.style.setProperty('--p1', String(ease(clamp(p))));
+      el.style.setProperty('--p2', String(ease(clamp((p - 0.3) / 0.7))));
+      el.style.setProperty('--g', String(p < 1 ? Math.sin(Math.PI * clamp(p)) * 0.8 : 0));
+    }
 
-  const fige = new URLSearchParams(location.search).get('t');
-  if (fige !== null) rendu(Number.parseFloat(fige));
-  else if (matchMedia('(prefers-reduced-motion: reduce)').matches) rendu(2);
-  else {
-    let t = 0;
-    let avant: number | null = null;
-    let raf = 0;
-    const boucle = (maintenant: number) => {
-      // Capped step: a background tab resumes where it left off instead of jumping ahead.
-      if (avant !== null) t += Math.min(maintenant - avant, 100) / 1000;
-      avant = maintenant;
-      rendu(t);
-      raf = requestAnimationFrame(boucle);
-    };
-    new IntersectionObserver(([e]) => {
-      hero.classList.toggle('h-pause', !e.isIntersecting);
-      if (e.isIntersecting) raf ||= requestAnimationFrame(boucle);
-      else {
-        cancelAnimationFrame(raf);
-        raf = 0;
-        avant = null;
-      }
-    }).observe(hero);
+    function rendu(t: number) {
+      const tc = t % CYCLE;
+      // the bird whose card is "running" types its answer
+      const actifs = new Set<string>();
+      piles.forEach((pile, i) => {
+        const r = tc - i * STEP;
+        if (r >= ENTREE && r < BASCULE) actifs.add(pile.dataset.agent!);
+      });
+      oiseaux.forEach((o) => o.classList.toggle('parle', actifs.has(o.dataset.agent!)));
+      piles.forEach((pile, i) => {
+        const r = tc - i * STEP;
+        const actif = r >= 0 && r < STEP;
+        ping(pings[i], actif ? r / 1.4 : 1);
+        slots[i].classList.toggle('on', actif && r >= ENTREE);
+        pile.classList.toggle('sort', actif && r >= SORTIE);
+        taches[i].classList.toggle('fait', actif && r >= BASCULE);
+      });
+    }
+
+    const fige = new URLSearchParams(location.search).get('t');
+    if (fige !== null) rendu(Number.parseFloat(fige));
+    else if (matchMedia('(prefers-reduced-motion: reduce)').matches) rendu(2);
+    else {
+      let t = 0;
+      let avant: number | null = null;
+      let raf = 0;
+      const boucle = (maintenant: number) => {
+        // Capped step: a background tab resumes where it left off instead of jumping ahead.
+        if (avant !== null) t += Math.min(maintenant - avant, 100) / 1000;
+        avant = maintenant;
+        rendu(t);
+        raf = requestAnimationFrame(boucle);
+      };
+      new IntersectionObserver(([e]) => {
+        hero.classList.toggle('h-pause', !e.isIntersecting);
+        if (e.isIntersecting) raf ||= requestAnimationFrame(boucle);
+        else {
+          cancelAnimationFrame(raf);
+          raf = 0;
+          avant = null;
+        }
+      }).observe(hero);
+    }
   }
 </script>
 
 <style>
+  /* Mockup carte Europe : grues, nuages, pause. */
+  .h-grue {
+    position: absolute;
+    width: 12.5%;
+    height: 22.4%;
+    object-fit: cover;
+    -webkit-mask-image: radial-gradient(circle at 55% 45%, #000 38%, transparent 62%);
+    mask-image: radial-gradient(circle at 55% 45%, #000 38%, transparent 62%);
+  }
+  .h-nuages {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 0.92;
+  }
+  .h-nuage {
+    position: absolute;
+    height: auto;
+    animation-name: h-nuage;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    filter: drop-shadow(0 30px 24px color-mix(in srgb, var(--color-navy) 35%, transparent));
+  }
+  @keyframes h-nuage {
+    /* En diagonale, du bas gauche vers le haut droit, tous dans le même sens. */
+    from {
+      left: -15%;
+      top: var(--y0);
+    }
+    to {
+      left: 105%;
+      top: calc(var(--y0) - 120%);
+    }
+  }
+  .h-pause {
+    position: absolute;
+    right: max(16px, 2vw);
+    bottom: 28px;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-night) 70%, transparent);
+    color: var(--color-cream);
+    cursor: pointer;
+  }
+  /* Phone and tablet: the title card fills the bottom, so the pause sits top right, under the nav. */
+  @media (max-width: 63.999rem) {
+    .h-pause {
+      top: 96px;
+      bottom: auto;
+    }
+  }
+  .h-pause:focus-visible {
+    outline: 2px solid var(--color-cream);
+    outline-offset: 2px;
+  }
+  .h-pause-ico {
+    width: 10px;
+    height: 12px;
+    border-left: 3px solid currentColor;
+    border-right: 3px solid currentColor;
+  }
+  .h-en-pause .h-pause-ico {
+    width: 0;
+    height: 0;
+    border-left: 11px solid currentColor;
+    border-right: 0;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+  }
+  .h-en-pause .h-nuage {
+    animation-play-state: paused;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .h-nuage {
+      animation: none;
+    }
+    .h-nuage {
+      display: none;
+    }
+  }
+
   /* The scene: the image's 1440 × 804 frame, covering the section (container units), pinned right. */
   .hero {
     --sw: max(100cqw, calc(100cqh * 1440 / 804));
@@ -443,6 +712,19 @@ const tick =
     .hero {
       --fx: 1;
     }
+    /* Mockup « carte Europe » : the scene pinned left (the Atlantic under the card), the card narrower. */
+    .hero.hero-europe {
+      --sw: calc(max(100cqw, calc(100cqh * 1440 / 804)) * 1.3);
+      --fx: 0.3;
+    }
+    .hero-europe .h-decor,
+    .hero-europe .h-piles {
+      top: calc((100cqh - var(--sh)) * 0.35);
+    }
+    .hero-europe .carte-hero {
+      width: clamp(500px, 38vw, 580px);
+      margin-bottom: auto;
+    }
     .h-piles {
       position: absolute;
       z-index: 1;
@@ -457,7 +739,8 @@ const tick =
       bottom: auto;
       width: max-content;
       max-width: none;
-      transform: translate(var(--dx), -100%);
+      /* --decal: mockup Europe only, slides a card back inside the screen (its tail stays on the agent) */
+      transform: translate(calc(var(--dx) + var(--decal, 0px)), -100%);
     }
   }
   .h-slot {
@@ -642,7 +925,7 @@ const tick =
     .h-tache::after {
       content: '';
       position: absolute;
-      left: var(--ax);
+      left: calc(var(--ax) - var(--decal, 0px));
       bottom: -6px;
       width: 12px;
       height: 12px;

@@ -1,0 +1,19 @@
+---
+/**
+ * MAQUETTE — la section Tarifs de l'espace réseau devient un formulaire : agents qui intéressent,
+ * enseigne, nombre d'établissements, contact. L'envoi ouvre le Cal.com de la démo avec les réponses.
+ * Visuel uniquement : textes en dur, le formulaire n'envoie rien.
+ */
+import Base from '../../layouts/Base.astro';
+import TarifsFormulaire from '../../components/maquettes/TarifsFormulaire.astro';
+import { routes } from '../../i18n/ui';
+---
+
+<Base
+  locale="fr"
+  paths={routes.home}
+  title="Maquette tarifs | Hatch OS"
+  description="Maquette de la section tarifs de l'espace réseau de Hatch OS : un formulaire pour composer son équipe d'agents avant de réserver une démo."
+>
+  <TarifsFormulaire />
+</Base>
