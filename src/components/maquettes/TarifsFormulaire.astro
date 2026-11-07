@@ -79,15 +79,15 @@ const etapes = [
       </p>
     </div>
 
-    <div class="grid items-start gap-5 lg:grid-cols-[1fr_340px]">
+    <div class="grid grid-cols-[minmax(0,1fr)] items-start gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
       <form
       data-tarifs
       novalidate
-        class="flex flex-col gap-9 rounded-[28px] bg-surface p-6 shadow-1 ring-1 ring-line sm:p-8 lg:rounded-[36px] lg:p-10"
+        class="flex min-w-0 flex-col gap-9 rounded-[28px] bg-surface p-6 shadow-1 ring-1 ring-line sm:p-8 lg:rounded-[36px] lg:p-10"
         onsubmit="event.preventDefault()"
       >
         <!-- 1 · Agents -->
-        <fieldset class="flex flex-col gap-4">
+        <fieldset class="flex min-w-0 flex-col gap-4">
           <legend class="etape" data-etape="1"><span>1</span>Quels agents vous intéressent ?</legend>
           <button type="button" class="anim-pause" data-anim-pause aria-pressed="false" hidden>
             <span class="ap-ico" aria-hidden="true"></span>
@@ -151,7 +151,7 @@ const etapes = [
         </fieldset>
 
         <!-- 2 · Réseau -->
-        <fieldset class="flex flex-col gap-4">
+        <fieldset class="flex min-w-0 flex-col gap-4">
           <legend class="etape" data-etape="2"><span>2</span>Votre réseau</legend>
           <div class="grid gap-3 sm:grid-cols-[1fr_220px]">
             <label class="champ"><span>Nom de l'enseigne</span><input id="t-enseigne" name="enseigne" required data-e="2" placeholder="BunBun" autocomplete="organization" /></label>
@@ -160,7 +160,7 @@ const etapes = [
         </fieldset>
 
         <!-- 3 · Contact -->
-        <fieldset class="flex flex-col gap-4">
+        <fieldset class="flex min-w-0 flex-col gap-4">
           <legend class="etape" data-etape="3"><span>3</span>Vos coordonnées</legend>
           <div class="grid gap-3 sm:grid-cols-2">
             <label class="champ"><span>Prénom et nom</span><input id="t-nom" name="nom" required data-e="3" placeholder="Camille Martin" autocomplete="name" /></label>
@@ -425,6 +425,7 @@ const etapes = [
      sont face à nous, chacun dans son cercle ; cochés, ils se lèvent un peu et font coucou. */
   .agent {
     position: relative;
+    min-width: 0;
     display: flex;
     flex-direction: column;
     gap: 14px;
@@ -507,12 +508,28 @@ const etapes = [
     }
   }
   @media (max-width: 30rem) {
+    /* Phone: the four of the core share the card width, names wrap under their circle. */
     .socle .troupe {
-      gap: 10px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-right: 30px; /* room for the check mark, top right */
+    }
+    .socle .membre {
+      min-width: 0;
     }
     .socle .rond {
-      width: 64px;
-      height: 64px;
+      width: 100%;
+      max-width: 64px;
+      height: auto;
+      aspect-ratio: 1;
+    }
+    .socle .membre-nom {
+      font-size: 11px;
+      overflow-wrap: anywhere;
+    }
+    .socle .membre-nom b {
+      font-size: 12.5px;
     }
   }
   @media (prefers-reduced-motion: reduce) {

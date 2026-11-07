@@ -527,6 +527,13 @@ const tick =
     color: var(--color-cream);
     cursor: pointer;
   }
+  /* Phone and tablet: the title card fills the bottom, so the pause sits top right, under the nav. */
+  @media (max-width: 63.999rem) {
+    .h-pause {
+      top: 96px;
+      bottom: auto;
+    }
+  }
   .h-pause:focus-visible {
     outline: 2px solid var(--color-cream);
     outline-offset: 2px;
