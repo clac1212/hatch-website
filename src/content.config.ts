@@ -14,6 +14,7 @@ import { schema as piedDePage } from './content/schemas/piedDePage';
 import { schema as accueil } from './content/schemas/accueil';
 import { schema as robin } from './content/schemas/robin';
 import { schema as robinSituations } from './content/schemas/robinSituations';
+import { schema as tarifsFormulaire } from './content/schemas/tarifsFormulaire';
 import { schema as agent } from './content/schemas/agents';
 import { schema as bento } from './content/schemas/bento';
 import { schema as scene } from './content/schemas/scenes';
@@ -129,4 +130,5 @@ export const collections = {
   accueil: sectionCollection('accueil', accueil),
   robin: sectionCollection('robin', robin),
   robinSituations: sectionCollection('robinSituations', robinSituations),
+  tarifsFormulaire: sectionCollection('tarifsFormulaire', tarifsFormulaire),
 };

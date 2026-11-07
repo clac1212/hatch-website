@@ -120,10 +120,24 @@ const calLink = 'patrick-rakotondrajao-bjremk/presentation-hatch';
     getComputedStyle(document.documentElement).getPropertyValue(`--color-${name}`).trim();
 
   Cal('init', { origin: 'https://cal.com' });
+  // Answers of the network page's pricing form (TarifsFormulaire), handed over in sessionStorage
+  // (never in the URL): they prefill the booking's name, email and notes, then are cleared.
+  let prefill: { name?: string; email?: string; notes?: string } = {};
+  try {
+    prefill = JSON.parse(sessionStorage.getItem('hatch-demo') ?? '{}') ?? {};
+    sessionStorage.removeItem('hatch-demo');
+  } catch {
+    prefill = {};
+  }
+  const config: Record<string, string> = { layout: 'month_view', theme: 'light' };
+  for (const key of ['name', 'email', 'notes'] as const) {
+    const value = prefill[key];
+    if (typeof value === 'string' && value.trim()) config[key] = value.trim();
+  }
   Cal('inline', {
     elementOrSelector: '#cal-inline',
     calLink: el.dataset.calLink,
-    config: { layout: 'month_view', theme: 'light' },
+    config,
   });
   Cal('ui', {
     theme: 'light',

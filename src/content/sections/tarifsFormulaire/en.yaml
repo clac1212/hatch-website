@@ -1,0 +1,92 @@
+titre: 'Build your team of agents.'
+intro: 'Every network is different. Tell us what you are interested in: we present pricing tailored to your agents and the size of your network, during the demo.'
+
+etapes:
+  agents: 'Which agents are you interested in?'
+  reseau: 'Your network'
+  contact: 'Your contact details'
+
+pause:
+  pause: 'Pause animations'
+  reprendre: 'Resume animations'
+
+offres:
+  - id: socle
+    nom: 'The Core'
+    tag: 'Every team starts here'
+    texte: 'Peep answers your teams on WhatsApp, Owl works in the kitchen on a tablet, Jay keeps your documents up to date, Lark runs the network.'
+    agents:
+      - { id: peep, nom: 'Peep', role: 'Your teams' }
+      - { id: owl, nom: 'Owl', role: 'The kitchen' }
+      - { id: jay, nom: 'Jay', role: 'Your documents' }
+      - { id: lark, nom: 'Lark', role: 'Management' }
+  - id: finch
+    nom: 'Finch'
+    tag: 'Quality and audits'
+    texte: 'Prepares audit checklists and follows every action plan through to proof.'
+    agents:
+      - { id: finch, nom: 'Finch', role: 'Quality' }
+  - id: pecker
+    nom: 'Pecker'
+    tag: 'Training'
+    texte: "Turns your procedures into short courses and follows up with those who haven't taken them."
+    agents:
+      - { id: pecker, nom: 'Pecker', role: 'Training' }
+  - id: sparrow
+    nom: 'Sparrow'
+    tag: 'Development and openings'
+    texte: 'Pre-qualifies your franchise candidates and tracks every opening through to launch day.'
+    agents:
+      - { id: sparrow, nom: 'Sparrow', role: 'Development' }
+
+avecSocle: 'Adds to the Core'
+requis: 'Always included with Finch or Pecker'
+
+ouvertures:
+  question: 'How many openings do you plan per year?'
+  choix: ['1 to 3', '4 to 10', '11 to 25', 'More than 25']
+
+champs:
+  enseigne: { label: 'Brand name', placeholder: 'BunBun' }
+  etablissements: { label: 'Number of locations', placeholder: '24' }
+  nom: { label: 'Full name', placeholder: 'Camille Martin' }
+  role: { label: 'Your role', placeholder: 'Head of Operations' }
+  email: { label: 'Work email', placeholder: 'camille@bunbun.com' }
+  telephone: { label: 'Phone', placeholder: '+33 6 12 34 56 78' }
+
+decisionnaire: 'I am a decision maker for this project'
+
+reste:
+  initial: 'Next step: you pick a slot, and your answers are attached to the booking.'
+  pret: 'All set: you pick a slot, and your answers are attached to the booking.'
+  manque: 'Still to complete:'
+  etape: 'step'
+  noms:
+    agents: 'pick at least one agent'
+    reseau: 'your network'
+    contact: 'your contact details'
+
+envoi: 'Pick a demo slot'
+
+deroule:
+  kicker: 'How it works'
+  etapes:
+    - titre: 'You pick your agents'
+      texte: 'And tell us how many locations your network has.'
+    - titre: 'You book a slot'
+      texte: 'Your answers are attached to the booking, no need to repeat anything.'
+    - titre: 'We present your pricing'
+      texte: 'Based on your agents and the size of your network, during the demo.'
+  mention: 'No commitment. Your data is only used to prepare the demo.'
+
+notes:
+  agents: 'Agents:'
+  socle: 'Core'
+  ouvertures: 'Openings per year:'
+  enseigne: 'Brand:'
+  etablissements: 'Locations:'
+  role: 'Role:'
+  telephone: 'Phone:'
+  decisionnaire: 'Decision maker:'
+  oui: 'yes'
+  non: 'no'

@@ -8,7 +8,7 @@ import Demo from '../components/sections/Demo.astro';
 import Equipe from '../components/sections/Equipe.astro';
 import Cas from '../components/sections/Cas.astro';
 import MiseEnPlace from '../components/sections/MiseEnPlace.astro';
-import Tarifs from '../components/sections/Tarifs.astro';
+import TarifsFormulaire from '../components/sections/TarifsFormulaire.astro';
 import { section } from '../content/section';
 import siege from '../assets/footer/siege.jpg';
 import { routes, type Locale } from '../i18n/ui';
@@ -29,19 +29,10 @@ if (!home) throw new Error(`Missing src/content/home/${locale}.yaml`);
 const { seo } = home.data.reseaux;
 const pied = { image: siege, ...(await section('piedDePage', locale)).scenes.reseaux };
 
-// Structured data: the site, and the product with the real prices of the Tarifs section
-// (euros excl. VAT, per location and per month, monthly and annual billing).
+// Structured data: the product. Pricing is quoted per network during the demo (the Tarifs form),
+// so no public price is published.
 const site = Astro.site!;
-const tarifs = await section('tarifs', locale);
 const homeUrl = new URL(routes.reseaux[locale], site).href;
-const price = (name: string, amount: number) => ({
-  '@type': 'UnitPriceSpecification',
-  name,
-  price: amount,
-  priceCurrency: 'EUR',
-  valueAddedTaxIncluded: false,
-  unitText: tarifs.unite.replace(/^\/\s*/, ''),
-});
 const jsonLd = [
   {
     '@type': 'SoftwareApplication',
@@ -53,17 +44,6 @@ const jsonLd = [
     applicationCategory: 'BusinessApplication',
     operatingSystem: 'Web',
     publisher: { '@id': organizationId(site) },
-    offers: tarifs.offres.map((o) => ({
-      '@type': 'Offer',
-      name: o.nom.replace(/\s*\n\s*/g, ' '),
-      description: o.type,
-      price: o.prix.mensuel,
-      priceCurrency: 'EUR',
-      priceSpecification: [
-        price(tarifs.formule.mensuel, o.prix.mensuel),
-        price(tarifs.formule.annuel, o.prix.annuel),
-      ],
-    })),
   },
 ];
 ---
@@ -84,5 +64,5 @@ const jsonLd = [
   <Equipe locale={locale} />
   <Cas locale={locale} />
   <MiseEnPlace locale={locale} />
-  <Tarifs locale={locale} />
+  <TarifsFormulaire locale={locale} />
 </Base>
