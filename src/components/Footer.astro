@@ -19,33 +19,42 @@ import immeuble from '../assets/footer/immeuble.jpg';
  * Site-wide footer — v4 node DbMpt ("Footer D · L'immeuble voxel"): brand + links on the left,
  * the voxel building (one agent per floor) on the right. Stacked, building first, below 1280 px.
  */
+/** A page's own footer scene: its image, and the list that goes with it in place of the building's floors. */
+export interface ScenePied {
+  image: ImageMetadata;
+  alt: string;
+  titre: string;
+  liste: { repere: string; texte: string; href: string }[];
+}
+
 interface Props {
   locale: Locale;
   paths: Paths;
+  scene?: ScenePied;
 }
 
-const { locale, paths } = Astro.props;
+const { locale, paths, scene } = Astro.props;
 const t = useTranslations(locale);
 const data = await section('piedDePage', locale);
 const home = routes.home[locale];
+const reseaux = routes.reseaux[locale];
 /** The building's residents: each floor links to its agent's page once published (César 12/10). */
 const residents = await Promise.all(
   data.agents.residents.map(async (r) => {
+    if (!('agent' in r)) return { etage: r.etage, metier: r.metier, nom: r.nom, href: r.lien };
     const e = await getEntry('agents', `${locale}/${r.agent}`);
     if (!e) throw new Error(`Missing src/content/agents/${locale}/${r.agent}.md`);
     const publiee = !!e.data.page && !e.data.page.brouillon;
     return {
       ...r,
       nom: e.data.name,
-      href: publiee ? entryRoutes.agents(r.agent)[locale] : `${home}#agents`,
+      href: publiee ? entryRoutes.agents(r.agent)[locale] : `${reseaux}#agents`,
     };
   }),
 );
 const other = otherLocale(locale);
 const produit = [
-  { href: `${home}#agents`, label: t('nav.agents') },
-  { href: `${home}#cas-clients`, label: t('nav.cases') },
-  { href: `${home}#tarifs`, label: t('nav.pricing') },
+  { href: `${reseaux}#cas-clients`, label: t('nav.cases') },
   { href: routes.security[locale], label: t('nav.security') },
 ];
 const legal = [
@@ -67,8 +76,8 @@ const lien = 'lien-pied block w-fit text-[14.5px] leading-[normal] text-paper';
     >
       <Picture
         pictureAttributes={{ class: 'block w-full max-w-[460px] lg:h-full lg:max-w-none' }}
-        src={immeuble}
-        alt={data.immeubleAlt}
+        src={scene?.image ?? immeuble}
+        alt={scene?.alt ?? data.immeubleAlt}
         widths={[480, 720, 1080, 1440]}
         sizes="(min-width: 1280px) 720px, (min-width: 1024px) 40vw, (min-width: 768px) 460px, 100vw"
         formats={['avif', 'webp']}
@@ -107,10 +116,18 @@ const lien = 'lien-pied block w-fit text-[14.5px] leading-[normal] text-paper';
         </nav>
 
         <nav aria-labelledby="pied-agents" class="order-last col-span-2 md:order-none">
-          <h2 id="pied-agents" class={titre}>{data.agents.titre}</h2>
+          <h2 id="pied-agents" class={titre}>{scene?.titre ?? data.agents.titre}</h2>
           <ul class="mt-3">
             {
-              residents.map((r) => (
+              (scene
+                ? scene.liste.map((l) => ({
+                    etage: l.repere,
+                    metier: l.texte,
+                    nom: '',
+                    href: l.href,
+                  }))
+                : residents
+              ).map((r) => (
                 <li>
                   <a
                     href={r.href}
@@ -120,7 +137,7 @@ const lien = 'lien-pied block w-fit text-[14.5px] leading-[normal] text-paper';
                       {r.etage}
                     </span>
                     <span class="text-[14.5px] whitespace-nowrap">
-                      {r.metier} · {r.nom}
+                      {r.nom ? `${r.metier} · ${r.nom}` : r.metier}
                     </span>
                   </a>
                 </li>

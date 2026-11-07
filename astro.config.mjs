@@ -19,6 +19,19 @@ export default defineConfig({
   env: {
     schema: {
       PUBLIC_POSTHOG_KEY: envField.string({ context: 'client', access: 'public', optional: true }),
+      // Robin's beta waitlist (/api/liste-attente): a Notion database row + a Slack alert. Secrets,
+      // set in Vercel Environment Variables only (never in the repo).
+      NOTION_TOKEN: envField.string({ context: 'server', access: 'secret', optional: true }),
+      NOTION_LISTE_ATTENTE_DB: envField.string({
+        context: 'server',
+        access: 'secret',
+        optional: true,
+      }),
+      SLACK_WEBHOOK_LISTE_ATTENTE: envField.string({
+        context: 'server',
+        access: 'secret',
+        optional: true,
+      }),
     },
   },
 

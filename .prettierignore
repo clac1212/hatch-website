@@ -6,3 +6,5 @@ pnpm-lock.yaml
 _reference
 public/ref.html
 package-lock.json
+# Chat bubbles: inline whitespace is rendered, Prettier would change the output.
+src/components/robin/Situations.astro

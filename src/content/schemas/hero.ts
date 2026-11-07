@@ -21,6 +21,8 @@ export const schema = z.strictObject({
           agent: z.enum(['peep', 'lark', 'jay', 'finch', 'owl', 'pecker', 'sparrow']),
           running: line,
           done: line,
+          /** Europe map (network page): the same task, when the agent's site on that map is another one. */
+          europe: z.strictObject({ running: line, done: line }).optional(),
         }),
       )
       .min(1),

@@ -1,6 +1,6 @@
 # Le titre, en fragments joints par des espaces : le navigateur répartit les lignes (Fraunces, équilibré).
 title:
-  - Recrutez des agents IA
+  - Recrutez vos collaborateurs IA
   - pour piloter et
   - développer votre
   - réseau
@@ -19,6 +19,14 @@ tasks:
       done:
         title: 'Peep a répondu à BunBun Dijon'
         detail: 'Fiche allergènes envoyée · 2 min'
+      # Carte Europe (page réseaux) : Peep est posé devant BunBun Lyon.
+      europe:
+        running:
+          title: 'Peep répond à BunBun Lyon'
+          detail: '« Où est la fiche allergènes ? »'
+        done:
+          title: 'Peep a répondu à BunBun Lyon'
+          detail: 'Fiche allergènes envoyée · 2 min'
     - agent: lark
       running:
         title: 'Lark analyse BunBun Strasbourg'
@@ -40,3 +48,11 @@ tasks:
       done:
         title: 'Owl a répondu à BunBun Huesca'
         detail: 'À voix haute, en espagnol'
+      # Carte Europe (page réseaux) : Owl, sur la tablette de BunBun Bordeaux, répond au chef à voix haute.
+      europe:
+        running:
+          title: 'Owl répond à BunBun Bordeaux'
+          detail: '« Comment on nettoie la friteuse ? »'
+        done:
+          title: 'Owl a répondu à BunBun Bordeaux'
+          detail: 'À voix haute, depuis la fiche friteuse'

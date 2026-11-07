@@ -11,6 +11,9 @@ import { schema as miseEnPlace } from './content/schemas/miseEnPlace';
 import { schema as securite } from './content/schemas/securite';
 import { schema as tarifs } from './content/schemas/tarifs';
 import { schema as piedDePage } from './content/schemas/piedDePage';
+import { schema as accueil } from './content/schemas/accueil';
+import { schema as robin } from './content/schemas/robin';
+import { schema as robinSituations } from './content/schemas/robinSituations';
 import { schema as agent } from './content/schemas/agents';
 import { schema as bento } from './content/schemas/bento';
 import { schema as scene } from './content/schemas/scenes';
@@ -34,11 +37,16 @@ const sectionCollection = <S extends z.ZodType>(name: string, schema: S) =>
     schema,
   });
 
-/** Page-level metadata of the home (`src/content/home/{fr,en}.yaml`). */
+/** Page-level metadata of the home and the network page (`src/content/home/{fr,en}.yaml`). */
 const home = defineCollection({
   loader: glob({ pattern: '*.yaml', base: './src/content/home' }),
   schema: z.strictObject({
+    /** The home page (/): the crossroads between independents (Robin) and networks. */
     seo: z.strictObject({ title: z.string(), description: z.string() }),
+    /** The network space (/reseaux), the former one-page home. */
+    reseaux: z.strictObject({
+      seo: z.strictObject({ title: z.string(), description: z.string() }),
+    }),
   }),
 });
 
@@ -118,4 +126,7 @@ export const collections = {
   securite: sectionCollection('securite', securite),
   tarifs: sectionCollection('tarifs', tarifs),
   piedDePage: sectionCollection('piedDePage', piedDePage),
+  accueil: sectionCollection('accueil', accueil),
+  robin: sectionCollection('robin', robin),
+  robinSituations: sectionCollection('robinSituations', robinSituations),
 };

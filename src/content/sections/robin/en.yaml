@@ -1,0 +1,119 @@
+# Robin page (/en/robin): the AI partner of independent restaurant owners, with the beta waitlist.
+seo:
+  title: 'Robin · Your AI partner on WhatsApp | Hatch OS'
+  description: 'Robin, the AI partner of independent restaurant owners on WhatsApp, gets the work ready and leaves the decisions to you: the beta waitlist is open.'
+
+hero:
+  titre: 'Robin, your AI partner.'
+  intro: "You do everything, on your own. Robin is the right hand you don't have: he knows your restaurant, follows up with you and gets the work ready."
+  cta: 'Join the waitlist'
+  video: 'Robin, a voxel robin, flies in, waves, takes notes, checks a receipt, gives a thumbs up and flies off.'
+  pause:
+    pause: "Pause Robin's animation"
+    lecture: "Play Robin's animation"
+
+soiree:
+  video: 'Evening, closing time at a small voxel bistro: Robin, perched on the counter, goes over the day with the owner, who is looking at his phone.'
+  label: "Robin's messages tonight"
+  pause:
+    pause: 'Pause the animation'
+    lecture: 'Play the animation'
+  messages:
+    - txt: 'Service is over! 🎉 Here’s your recap of the evening. You’ll find the details in the dashboard we built together.'
+      lien: 'Dashboard'
+    - txt: 'The beef tartare sold out fast tonight 🔥. I cross-checked sales with your stock and adjusted tomorrow’s Metro order: more beef 🥩, less salmon 🐟.'
+    - txt: 'Lina replied by email about tomorrow’s extra shift: she’s confirmed 👍. I’m preparing her extra contract and her payslip in advance.'
+
+pilule:
+  label: 'On this page'
+  statut: 'online'
+  fait: 'What he does'
+  semaine: 'A week'
+  canaux: 'Where to find him'
+  cta: 'Join the waitlist'
+
+fait:
+  kicker: 'What Robin does'
+  titre: 'Not one more piece of software. A partner who knows your restaurant.'
+
+semaine:
+  kicker: 'A week with Robin'
+  titre: 'From Monday morning to Sunday night.'
+  frise: 'Days of the week'
+  jours:
+    - jour: 'Mon'
+      heure: '8:30 am'
+      titre: 'The weekly recap'
+      texte: 'Sales, purchases, staff costs: your week at a glance, site by site.'
+      bulle: 'Morning Karim, your week is ready: sales, purchases and staff costs. Saturday lunch was your best service.'
+    - jour: 'Tue'
+      heure: '10 am'
+      titre: 'Deliveries'
+      texte: 'He matches what you ordered, what arrived and what was invoiced. He shows you the gaps, with the proof.'
+      bulle: 'I matched orders, delivery notes and invoices. One line at Metro looks off, want me to show you?'
+    - jour: 'Wed'
+      heure: '3 pm'
+      titre: 'The team'
+      texte: 'He answers your staff without promising anything on your behalf, and sums up what needs your call.'
+      bulle: 'Thomas would like Saturday off. I told him you’d get back to him, no promises.'
+    - jour: 'Thu'
+      heure: '11 am'
+      titre: 'Dish costs'
+      texte: 'When a purchase price moves, he recalculates the cost of your dishes and warns you if a margin drops below your threshold.'
+      bulle: 'With beef prices up, your tartare drops below your target margin. Want two options?'
+    - jour: 'Fri'
+      heure: '6 pm'
+      titre: 'Before service'
+      texte: 'He reminds you what matters for the weekend, without you having to ask.'
+      bulle: 'Saturday night is almost full. Lina is confirmed as extra staff, her contract is signed.'
+    - jour: 'Sun'
+      heure: '9 pm'
+      titre: 'A question for Monday'
+      texte: 'He starts from your decisions, not from spreadsheets: should you stay open in the afternoon, add a service, rework a menu?'
+      bulle: 'You asked whether we should stay open from 2 to 6 pm: on weekdays, that slot doesn’t cover the wages. Shall we talk tomorrow?'
+
+canaux:
+  kicker: 'Where to find him'
+  titre: 'Right where you already are.'
+  texte: "During the beta, Robin lives in WhatsApp. Later, he'll have his own app, built for him, always within reach."
+  telephone:
+    statut: 'online'
+    jour: 'Monday'
+    messages:
+      - qui: robin
+        txt: 'Morning Karim, here’s your weekly recap. I matched deliveries and invoices: Metro is 2 kg of beef short, the credit note request is ready.'
+      - qui: patron
+        txt: 'Send it. And do Lina’s contract for Saturday'
+      - qui: robin
+        txt: 'Done, from your template. Check it before I send it.'
+        doc: 'Extra contract · Lina.pdf'
+        meta: 'Your template · ready to sign'
+
+confiance:
+  titre: 'By your side, under your control.'
+  cartes:
+    - titre: 'Your data stays yours'
+      texte: 'Hosted in Europe, never used to train an AI. You choose what Robin sees.'
+    - titre: 'He suggests, you decide'
+      texte: 'Robin prepares, you approve. He never promises anything on your behalf, and nothing goes out to a supplier or an employee without your OK.'
+    - titre: 'In an app you already know'
+      texte: 'No software to install during the beta: Robin messages you on WhatsApp, in text or voice notes.'
+
+beta:
+  kicker: 'Beta'
+  titre: 'Want to use Robin? Join the waitlist.'
+  texte: "Early sign-ups get priority. We're opening Robin to a few restaurant owners at a time, and we'll message you on WhatsApp when it's your turn."
+  champs:
+    prenom: { label: 'First name', placeholder: 'Karim' }
+    nom: { label: 'Last name', placeholder: 'Benali' }
+    restaurant: { label: 'Restaurant name', placeholder: 'Le Petit Comptoir' }
+    site: { label: 'Website', placeholder: 'lepetitcomptoir.fr' }
+    whatsapp: { label: 'WhatsApp number', placeholder: '+33 6 12 34 56 78' }
+    email: { label: 'Email', placeholder: 'karim@lepetitcomptoir.fr' }
+  bouton: 'Join the waitlist'
+  mention: 'Free during the beta. No commitment.'
+  messages:
+    envoi: 'Sending…'
+    succes: "Got it, we'll message you on WhatsApp very soon."
+    erreur: 'Something went wrong. Please try again in a moment.'
+    invalide: "Something's missing: fill in every field (the website is optional) with a valid email address."

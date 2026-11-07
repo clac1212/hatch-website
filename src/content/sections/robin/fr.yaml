@@ -1,0 +1,119 @@
+# Page Robin (/robin) : l'associé IA des restaurateurs indépendants, avec la liste d'attente de la bêta.
+seo:
+  title: 'Robin · Votre associé IA sur WhatsApp | Hatch OS'
+  description: "Robin, l'associé IA des restaurateurs indépendants sur WhatsApp, prépare le travail et vous laisse décider : la liste d'attente de la bêta est ouverte."
+
+hero:
+  titre: 'Robin, votre associé IA.'
+  intro: "Vous faites tout, tout seul. Robin est le bras droit que vous n'avez pas : il connaît la maison, revient vers vous et prépare le travail."
+  cta: "Rejoindre la liste d'attente"
+  video: 'Robin, un rouge-gorge en voxel, arrive en volant, fait coucou, prend des notes, vérifie un ticket, lève le pouce et repart.'
+  pause:
+    pause: "Mettre l'animation de Robin en pause"
+    lecture: "Relancer l'animation de Robin"
+
+soiree:
+  video: "Le soir, à la fermeture d'un petit bistrot en voxels : Robin, perché sur le comptoir, fait le point avec le patron, qui regarde son téléphone."
+  label: 'Les messages de Robin ce soir'
+  pause:
+    pause: "Mettre l'animation en pause"
+    lecture: "Relancer l'animation"
+  messages:
+    - txt: "Le service est fini ! 🎉 Je te fais le point de la soirée. Tu trouveras le détail dans le tableau de bord qu'on a construit ensemble."
+      lien: 'Tableau de bord'
+    - txt: "Le tartare de bœuf est parti très vite ce soir 🔥. J'ai croisé les ventes avec ton stock et ajusté la commande Metro de demain : plus de bœuf 🥩, moins de saumon 🐟."
+    - txt: "Lina t'a répondu par mail pour l'extra de demain : elle confirme sa présence 👍. Je prépare son contrat d'extra et sa fiche de paie en avance."
+
+pilule:
+  label: 'Sur cette page'
+  statut: 'en ligne'
+  fait: "Ce qu'il fait"
+  semaine: 'Une semaine'
+  canaux: 'Où le trouver'
+  cta: "Rejoindre la liste d'attente"
+
+fait:
+  kicker: 'Ce que fait Robin'
+  titre: 'Pas un logiciel de plus. Un associé qui connaît la maison.'
+
+semaine:
+  kicker: 'Une semaine avec Robin'
+  titre: 'Du lundi matin au dimanche soir.'
+  frise: 'Jours de la semaine'
+  jours:
+    - jour: 'Lun'
+      heure: '8 h 30'
+      titre: 'Le point de la semaine'
+      texte: 'Ventes, achats, coût du personnel : votre semaine en un coup d’œil, établissement par établissement.'
+      bulle: 'Bonjour Karim, ta semaine est prête : ventes, achats et coût du personnel. Le samedi midi a été ton meilleur service.'
+    - jour: 'Mar'
+      heure: '10 h'
+      titre: 'Les livraisons'
+      texte: 'Il rapproche ce que vous avez commandé, ce qui est arrivé et ce qui est facturé. Il vous montre les écarts, preuves à l’appui.'
+      bulle: 'J’ai rapproché commandes, bons de livraison et factures. Une ligne cloche chez Metro, je te montre ?'
+    - jour: 'Mer'
+      heure: '15 h'
+      titre: "L'équipe"
+      texte: 'Il répond à vos salariés sans rien promettre à votre place, et vous fait un récap de ce qui demande votre avis.'
+      bulle: 'Thomas voudrait poser samedi. Je lui ai dit que tu revenais vers lui, sans rien promettre.'
+    - jour: 'Jeu'
+      heure: '11 h'
+      titre: 'Le coût des plats'
+      texte: "Quand un prix d'achat bouge, il recalcule le coût de vos plats et vous prévient si une marge passe sous votre seuil."
+      bulle: 'Avec la hausse du bœuf, ton tartare passe sous ta marge cible. Je te propose deux pistes ?'
+    - jour: 'Ven'
+      heure: '18 h'
+      titre: 'Avant le service'
+      texte: 'Il vous rappelle ce qui compte pour le week-end, sans que vous ayez à le lui demander.'
+      bulle: 'Samedi soir est presque complet. Lina est confirmée en extra, son contrat est signé.'
+    - jour: 'Dim'
+      heure: '21 h'
+      titre: 'Une question pour lundi'
+      texte: 'Il part de vos décisions, pas de tableaux : faut-il rester ouvert l’après-midi, ajouter un service, revoir une carte ?'
+      bulle: 'Tu me demandais si on reste ouvert de 14 h à 18 h : en semaine, le créneau ne couvre pas les salaires. On en parle demain ?'
+
+canaux:
+  kicker: 'Où le trouver'
+  titre: 'Là où vous êtes déjà.'
+  texte: 'Pendant la bêta, Robin vit dans WhatsApp. Ensuite, il aura sa propre application, pensée pour lui, toujours à portée de main.'
+  telephone:
+    statut: 'en ligne'
+    jour: 'Lundi'
+    messages:
+      - qui: robin
+        txt: 'Bonjour Karim, voici le point de la semaine. J’ai rapproché les livraisons et les factures : il manque 2 kg de bœuf chez Metro, la demande d’avoir est prête.'
+      - qui: patron
+        txt: 'Envoie-la. Et fais le contrat de Lina pour samedi'
+      - qui: robin
+        txt: "C'est fait, à partir de ton modèle. Relis-le avant que je l'envoie."
+        doc: "Contrat d'extra · Lina.pdf"
+        meta: 'Ton modèle · prêt à signer'
+
+confiance:
+  titre: 'À vos côtés, sous votre contrôle.'
+  cartes:
+    - titre: 'Vos données restent les vôtres'
+      texte: 'Hébergées en Europe, jamais utilisées pour entraîner une IA. Vous choisissez ce que Robin voit.'
+    - titre: 'Il propose, vous décidez'
+      texte: 'Robin prépare, vous validez. Il ne promet rien à votre place, et rien ne part chez un fournisseur ou un salarié sans votre accord.'
+    - titre: 'Dans une appli que vous connaissez'
+      texte: "Pas de logiciel à installer pendant la bêta : Robin vous écrit sur WhatsApp, à l'écrit ou en vocal."
+
+beta:
+  kicker: 'Bêta'
+  titre: "Vous souhaitez utiliser Robin ? Inscrivez-vous sur la liste d'attente."
+  texte: "Les premiers inscrits seront avantagés. On ouvre Robin à quelques restaurateurs à la fois, on vous écrit sur WhatsApp quand c'est votre tour."
+  champs:
+    prenom: { label: 'Prénom', placeholder: 'Karim' }
+    nom: { label: 'Nom', placeholder: 'Benali' }
+    restaurant: { label: 'Nom du restaurant', placeholder: 'Le Petit Comptoir' }
+    site: { label: 'Site web', placeholder: 'lepetitcomptoir.fr' }
+    whatsapp: { label: 'Numéro WhatsApp', placeholder: '06 12 34 56 78' }
+    email: { label: 'Email', placeholder: 'karim@lepetitcomptoir.fr' }
+  bouton: "Rejoindre la liste d'attente"
+  mention: 'Gratuit pendant la bêta. Aucun engagement.'
+  messages:
+    envoi: 'Envoi en cours…'
+    succes: "C'est noté, on vous écrit très vite sur WhatsApp."
+    erreur: "L'envoi n'a pas abouti. Réessayez dans un instant."
+    invalide: 'Il manque une information : remplissez tous les champs (le site web est facultatif) avec une adresse email valide.'

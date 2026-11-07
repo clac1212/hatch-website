@@ -1,3 +1,9 @@
+# The home page (/en): the crossroads between independent restaurants (Robin) and franchise networks.
 seo:
-  title: 'Hatch OS · The OS for franchise networks'
-  description: 'Seven AI agents that back up your teams, from head office to the field: they answer your locations, train, audit and prepare your next openings.'
+  title: 'Hatch OS · AI teammates for restaurants'
+  description: 'AI teammates for restaurants: Robin, the AI partner of independent restaurants on WhatsApp, and seven agents that back up franchise networks, from head office to the field.'
+# The networks space (/en/networks), the former home page.
+reseaux:
+  seo:
+    title: 'Hatch OS · The OS for franchise networks'
+    description: 'Seven AI agents that back up your teams, from head office to the field: they answer your locations, train, audit and prepare your next openings.'

@@ -14,6 +14,10 @@ export const appUrls = {
 
 export const routes = {
   home: { fr: '/', en: '/en' },
+  /** The franchise-network space (the former one-page home, its sections and pricing). */
+  reseaux: { fr: '/reseaux', en: '/en/networks' },
+  /** Robin, the AI partner of independent restaurants (beta waitlist). */
+  robin: { fr: '/robin', en: '/en/robin' },
   demo: { fr: '/demo', en: '/en/demo' },
   security: { fr: '/securite', en: '/en/security' },
   terms: { fr: '/conditions', en: '/en/terms' },
@@ -44,6 +48,11 @@ const fr = {
   'cta.try': 'Essayer Hatch OS',
   /** Nav: sign-in to the app (its /auth page also lets a newcomer sign up). */
   'nav.login': 'Se connecter',
+  /** Robin and network pages: back to the home page (the crossroads). */
+  'nav.back': 'Accueil',
+  /** Pause control of the animated Europe map (network page hero). */
+  'hero.mapPause': "Mettre l'animation de la carte en pause",
+  'hero.mapPlay': "Relancer l'animation de la carte",
   'lang.switch': 'English',
   'footer.product': 'Produit',
   'footer.company': 'Hatch OS',
@@ -73,6 +82,9 @@ const en: Record<keyof typeof fr, string> = {
   'cta.demo': 'Book a demo',
   'cta.try': 'Try Hatch OS',
   'nav.login': 'Log in',
+  'nav.back': 'Home',
+  'hero.mapPause': 'Pause the map animation',
+  'hero.mapPlay': 'Play the map animation',
   'lang.switch': 'Français',
   'footer.product': 'Product',
   'footer.company': 'Hatch OS',

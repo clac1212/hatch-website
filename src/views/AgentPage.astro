@@ -85,14 +85,14 @@ const liens: Lien[] =
 // Structured data: the breadcrumb, the agent as part of Hatch OS with the prices of the Tarifs
 // section (euros excl. VAT, per location and per month), and the visible FAQ word for word.
 const site = Astro.site!;
-const homeUrl = new URL(routes.home[locale], site).href;
+const homeUrl = new URL(routes.reseaux[locale], site).href;
 const pageUrl = new URL(paths[locale], site).href;
 const tarifs = await section('tarifs', locale);
 const prix = tarifs.offres.flatMap((o) => [o.prix.annuel, o.prix.mensuel]);
 const jsonLd = [
   breadcrumbList(site, [
     { name: ui.breadcrumb.home, path: routes.home[locale] },
-    { name: ui.breadcrumb.agents, path: `${routes.home[locale]}#agents` },
+    { name: ui.breadcrumb.agents, path: `${routes.reseaux[locale]}#agents` },
     { name, path: paths[locale] },
   ]),
   {
@@ -262,7 +262,7 @@ const jsonLd = [
         <h2 id="agent-suite" class="font-display text-section font-bold text-ink" data-rv>
           {ui.related.title}
         </h2>
-        <div class="grid gap-5 lg:grid-cols-[520px_1fr]" data-rv>
+        <div class="grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[520px_1fr]" data-rv>
           <ul class="flex flex-col gap-3">
             {
               p.related.map((r) => {

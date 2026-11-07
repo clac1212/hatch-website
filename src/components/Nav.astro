@@ -1,7 +1,7 @@
 ---
 import Logo from './ui/Logo.astro';
 import Button from './ui/Button.astro';
-import { appUrls, routes, otherLocale, useTranslations, type Locale, type Paths } from '../i18n/ui';
+import { routes, otherLocale, useTranslations, type Locale, type Paths } from '../i18n/ui';
 
 /**
  * v4 nav: liquid-glass pill, centred and fixed at the top; a drop shadow appears once the page scrolls.
@@ -13,16 +13,21 @@ import { appUrls, routes, otherLocale, useTranslations, type Locale, type Paths 
 interface Props {
   locale: Locale;
   paths: Paths;
+  /**
+   * A space of the site (the network page): the logo brings back to the top of this page, the
+   * links point at its own sections, and a « Accueil » link leads back to the home page.
+   */
+  espace?: boolean;
 }
 
-const { locale, paths } = Astro.props;
+const { locale, paths, espace = false } = Astro.props;
 const t = useTranslations(locale);
 const home = routes.home[locale];
+const base = espace ? '' : routes.reseaux[locale];
 const links = [
-  { href: `${home}#agents`, label: t('nav.agents') },
-  { href: `${home}#cas-clients`, label: t('nav.cases') },
-  { href: `${home}#tarifs`, label: t('nav.pricing') },
-  { href: routes.security[locale], label: t('nav.security') },
+  { href: `${base}#agents`, label: t('nav.agents') },
+  { href: `${base}#cas-clients`, label: t('nav.cases') },
+  { href: `${base}#tarifs`, label: t('nav.pricing') },
 ];
 const other = otherLocale(locale);
 ---
@@ -33,9 +38,31 @@ const other = otherLocale(locale);
     aria-label={t('a11y.mainNav')}
     class="vitre pointer-events-auto flex w-full max-w-max items-center gap-1.5 rounded-full py-2 pr-2 pl-5 transition-[filter] duration-500 max-sm:justify-between md:pl-6 [&.defile]:drop-shadow-[0_10px_24px_rgb(20_10_0/0.18)]"
   >
-    <a href={home} aria-label={t('a11y.home')} class="shrink-0">
+    <a href={espace ? '#' : home} aria-label={t('a11y.home')} class="shrink-0">
       <Logo class="w-[80px] md:w-[92px]" />
     </a>
+    {
+      espace && (
+        <a
+          href={home}
+          class="ml-2 hidden items-center gap-1 rounded-full px-3 py-2.5 text-[0.875rem] font-semibold whitespace-nowrap transition-colors duration-300 hover:bg-orange/14 hover:text-orange-hover lg:inline-flex"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            class="size-3.5"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.4"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M15 6l-6 6 6 6" />
+          </svg>
+          {t('nav.back')}
+        </a>
+      )
+    }
     <div class="n-pli n-liens hidden items-center lg:flex" data-pli>
       <span class="mx-2 h-[22px] w-px shrink-0 bg-ink/15" aria-hidden="true"></span>
 
@@ -65,15 +92,7 @@ const other = otherLocale(locale);
       </ul>
     </div>
 
-    <!-- Two calls to action, the classic SaaS pair (César 06/10): sign-in, a text link (the app's
-         /auth page also lets a newcomer create an account), and the demo, the one filled button.
-         Below lg the menu carries sign-in; the pill keeps the demo. -->
-    <a
-      href={appUrls.login}
-      class="hidden rounded-full px-3.5 py-2.5 text-[0.875rem] font-semibold whitespace-nowrap transition-colors duration-300 hover:bg-orange/14 hover:text-orange-hover lg:block"
-    >
-      {t('nav.login')}
-    </a>
+    <!-- The demo alone: sign-in now lives on the home page's nav (NavAccueil). -->
     <Button href={routes.demo[locale]} class="max-sm:px-4 max-sm:text-[0.8125rem]">
       {t('cta.demo')}
     </Button>
@@ -101,6 +120,18 @@ const other = otherLocale(locale);
       >
         <ul class="flex flex-col">
           {
+            espace && (
+              <li>
+                <a
+                  href={home}
+                  class="block rounded-btn px-3 py-2.5 font-semibold hover:bg-orange-tint"
+                >
+                  ← {t('nav.back')}
+                </a>
+              </li>
+            )
+          }
+          {
             links.map((link) => (
               <li>
                 <a
@@ -120,14 +151,6 @@ const other = otherLocale(locale);
               class="block rounded-btn px-3 py-2.5 font-semibold hover:bg-orange-tint"
             >
               {t('lang.switch')}
-            </a>
-          </li>
-          <li class="mt-1 border-t border-line pt-1">
-            <a
-              href={appUrls.login}
-              class="block rounded-btn px-3 py-2.5 font-semibold hover:bg-orange-tint"
-            >
-              {t('nav.login')}
             </a>
           </li>
         </ul>
