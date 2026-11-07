@@ -1,0 +1,92 @@
+titre: "Composez votre équipe d'agents."
+intro: 'Chaque réseau est différent. Dites-nous ce qui vous intéresse : on vous présente un tarif adapté à vos agents et à la taille de votre réseau, pendant la démo.'
+
+etapes:
+  agents: 'Quels agents vous intéressent ?'
+  reseau: 'Votre réseau'
+  contact: 'Vos coordonnées'
+
+pause:
+  pause: 'Mettre les animations en pause'
+  reprendre: 'Relancer les animations'
+
+offres:
+  - id: socle
+    nom: 'Le socle'
+    tag: 'Base de chaque équipe'
+    texte: 'Peep répond à vos équipes sur WhatsApp, Owl en cuisine sur tablette, Jay tient vos documents à jour, Lark pilote le réseau.'
+    agents:
+      - { id: peep, nom: 'Peep', role: 'Vos équipes' }
+      - { id: owl, nom: 'Owl', role: 'La cuisine' }
+      - { id: jay, nom: 'Jay', role: 'Vos documents' }
+      - { id: lark, nom: 'Lark', role: 'Le pilotage' }
+  - id: finch
+    nom: 'Finch'
+    tag: 'Qualité et audits'
+    texte: "Prépare les grilles d'audit, suit chaque plan d'action jusqu'à la preuve."
+    agents:
+      - { id: finch, nom: 'Finch', role: 'Qualité' }
+  - id: pecker
+    nom: 'Pecker'
+    tag: 'Formation'
+    texte: 'Transforme vos procédures en parcours courts et relance ceux qui ne les ont pas faits.'
+    agents:
+      - { id: pecker, nom: 'Pecker', role: 'Formation' }
+  - id: sparrow
+    nom: 'Sparrow'
+    tag: 'Développement et ouvertures'
+    texte: "Pré-qualifie vos candidats à la franchise et suit chaque ouverture jusqu'au jour J."
+    agents:
+      - { id: sparrow, nom: 'Sparrow', role: 'Développement' }
+
+avecSocle: "S'ajoute au socle"
+requis: "Inclus d'office avec Finch ou Pecker"
+
+ouvertures:
+  question: "Combien d'ouvertures prévoyez-vous par an ?"
+  choix: ['1 à 3', '4 à 10', '11 à 25', 'Plus de 25']
+
+champs:
+  enseigne: { label: "Nom de l'enseigne", placeholder: 'BunBun' }
+  etablissements: { label: "Nombre d'établissements", placeholder: '24' }
+  nom: { label: 'Prénom et nom', placeholder: 'Camille Martin' }
+  role: { label: 'Votre rôle', placeholder: 'Directrice des opérations' }
+  email: { label: 'Email professionnel', placeholder: 'camille@bunbun.fr' }
+  telephone: { label: 'Téléphone', placeholder: '06 12 34 56 78' }
+
+decisionnaire: 'Je suis décisionnaire pour ce projet'
+
+reste:
+  initial: 'Étape suivante : vous choisissez un créneau, vos réponses sont jointes à la réservation.'
+  pret: 'Tout est prêt : vous choisissez un créneau, vos réponses sont jointes à la réservation.'
+  manque: 'Encore à compléter :'
+  etape: 'étape'
+  noms:
+    agents: 'choisir au moins un agent'
+    reseau: 'votre réseau'
+    contact: 'vos coordonnées'
+
+envoi: 'Choisir un créneau de démo'
+
+deroule:
+  kicker: 'Comment ça se passe'
+  etapes:
+    - titre: 'Vous choisissez vos agents'
+      texte: "Et vous nous dites combien d'établissements compte votre réseau."
+    - titre: 'Vous réservez un créneau'
+      texte: 'Vos réponses sont jointes à la réservation, pas besoin de tout répéter.'
+    - titre: 'On vous présente votre tarif'
+      texte: 'Calé sur vos agents et la taille de votre réseau, pendant la démo.'
+  mention: 'Sans engagement. Vos données servent uniquement à préparer la démo.'
+
+notes:
+  agents: 'Agents :'
+  socle: 'Socle'
+  ouvertures: 'Ouvertures par an :'
+  enseigne: 'Enseigne :'
+  etablissements: 'Établissements :'
+  role: 'Rôle :'
+  telephone: 'Téléphone :'
+  decisionnaire: 'Décisionnaire :'
+  oui: 'oui'
+  non: 'non'

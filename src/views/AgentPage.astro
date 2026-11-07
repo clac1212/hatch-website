@@ -11,7 +11,6 @@ import Icone from '../components/agents/Icone.astro';
 import { centres } from '../components/agents/visuels';
 import { agentPhoto, avatars } from '../components/pages/agent-visuels';
 import { fill } from '../components/pages/format';
-import { section } from '../content/section';
 import { agentSlugs, type AgentSlug } from '../content/schemas/agents';
 import { BRAND, breadcrumbList, languageTag, organizationId } from '../seo/jsonld';
 import { entryRoutes, routes, useTranslations, type Locale } from '../i18n/ui';
@@ -82,13 +81,11 @@ const liens: Lien[] =
         href: agents[a].href,
       }));
 
-// Structured data: the breadcrumb, the agent as part of Hatch OS with the prices of the Tarifs
-// section (euros excl. VAT, per location and per month), and the visible FAQ word for word.
+// Structured data: the breadcrumb, the agent as part of Hatch OS (pricing is quoted during the demo,
+// so no public price), and the visible FAQ word for word.
 const site = Astro.site!;
 const homeUrl = new URL(routes.reseaux[locale], site).href;
 const pageUrl = new URL(paths[locale], site).href;
-const tarifs = await section('tarifs', locale);
-const prix = tarifs.offres.flatMap((o) => [o.prix.annuel, o.prix.mensuel]);
 const jsonLd = [
   breadcrumbList(site, [
     { name: ui.breadcrumb.home, path: routes.home[locale] },
@@ -107,14 +104,6 @@ const jsonLd = [
     dateModified: p.updated,
     isPartOf: { '@id': `${homeUrl}#software` },
     publisher: { '@id': organizationId(site) },
-    offers: {
-      '@type': 'AggregateOffer',
-      lowPrice: Math.min(...prix),
-      highPrice: Math.max(...prix),
-      priceCurrency: 'EUR',
-      offerCount: tarifs.offres.length,
-      url: `${homeUrl}#tarifs`,
-    },
   },
   {
     '@type': 'FAQPage',
