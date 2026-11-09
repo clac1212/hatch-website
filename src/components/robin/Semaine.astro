@@ -1,18 +1,17 @@
 ---
 /**
- * "From Monday morning to Sunday night" (signature section, César 09/11): a row of day tabs, then
- * one panel. On the left, Robin whole in the day's outfit, on his own cream backdrop; on the right,
- * the message he sends that day (a WhatsApp bubble on the chat's wall), then what it is about.
- * The days advance on their own like the features above (src/scripts/avance.ts), a click stops it.
- * Changing day is a crossfade, nothing floats. Without JS: Monday.
+ * "From Monday morning to Sunday night" (signature section, César 09/11): Robin in the day's outfit,
+ * the message he sends that day in a bubble above him, the week's timeline under him and what the
+ * day is about. The timeline runs on its own: the line fills from one day to the next
+ * (src/scripts/avance.ts), a click on a day stops it. Changing day is a crossfade in place, nothing
+ * moves or floats. Without JS: Monday.
  */
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
-import Carte from '../ui/Carte.astro';
 import Heure from '../ui/WhatsAppHeure.astro';
 
 interface Props {
-  /** aria-label of the tab row. */
+  /** aria-label of the timeline. */
   frise: string;
   jours: { jour: string; heure: string; titre: string; texte: string; bulle: string }[];
   /** Robin's outfit per day, in the order of `jours`. */
@@ -28,7 +27,36 @@ const horloge = (h: string) => {
 ---
 
 <div class="semaine" data-semaine>
-  <div class="jours" role="tablist" aria-label={frise}>
+  <!-- Robin and his message of the day: every bubble and outfit share one cell, so the stage never
+       changes size from one day to the next. -->
+  <div class="scene">
+    <div class="bulles">
+      {
+        jours.map((j, i) => (
+          <p class:list={['bulle', i === 0 && 'on']} aria-hidden={i === 0 ? undefined : 'true'}>
+            {j.bulle}
+            <Heure heure={horloge(j.heure)} />
+          </p>
+        ))
+      }
+    </div>
+    <div class="robin" aria-hidden="true">
+      {
+        poses.map((src, i) => (
+          <Image
+            src={src}
+            alt=""
+            widths={[200, 400]}
+            sizes="200px"
+            class:list={['pose', i === 0 && 'on']}
+          />
+        ))
+      }
+    </div>
+  </div>
+
+  <!-- The timeline: each day carries the segment to the next one, the active one fills. -->
+  <div class="frise" role="tablist" aria-label={frise}>
     {
       jours.map((j, i) => (
         <button
@@ -40,53 +68,32 @@ const horloge = (h: string) => {
           aria-controls={`semaine-jour-${i}`}
           tabindex={i === 0 ? 0 : -1}
         >
-          <span class="jour-nom">{j.jour}</span>
-          <span class="jour-heure font-mono">{j.heure}</span>
-          <span class="jour-barre avance-barre" aria-hidden="true">
+          <span class="segment avance-barre" aria-hidden="true">
             <i />
           </span>
+          <span class="point" aria-hidden="true" />
+          <span class="jour-nom">{j.jour}</span>
+          <span class="jour-heure font-mono">{j.heure}</span>
         </button>
       ))
     }
   </div>
 
-  <Carte variante="surface" taille="panneau" class="panneau">
-    <div class="poses" aria-hidden="true">
-      {
-        poses.map((src, i) => (
-          <Image
-            src={src}
-            alt=""
-            widths={[400]}
-            sizes="(min-width: 64rem) 400px, 100vw"
-            class:list={['pose', i === 0 && 'on']}
-          />
-        ))
-      }
-    </div>
-
-    <div class="textes">
-      {
-        jours.map((j, i) => (
-          <div
-            class:list={['texte', i === 0 && 'on']}
-            id={`semaine-jour-${i}`}
-            role="tabpanel"
-            aria-labelledby={`semaine-onglet-${i}`}
-          >
-            <div class="fil">
-              <p class="bulle">
-                {j.bulle}
-                <Heure heure={horloge(j.heure)} />
-              </p>
-            </div>
-            <h3 class="mt-7 font-display text-card font-semibold">{j.titre}</h3>
-            <p class="mt-2 text-body text-(--doux)">{j.texte}</p>
-          </div>
-        ))
-      }
-    </div>
-  </Carte>
+  <div class="details">
+    {
+      jours.map((j, i) => (
+        <div
+          class:list={['detail', i === 0 && 'on']}
+          id={`semaine-jour-${i}`}
+          role="tabpanel"
+          aria-labelledby={`semaine-onglet-${i}`}
+        >
+          <h3 class="font-display text-card font-semibold">{j.titre}</h3>
+          <p class="mx-auto mt-2 max-w-lead text-body text-(--doux)">{j.texte}</p>
+        </div>
+      ))
+    }
+  </div>
 </div>
 
 <script>
@@ -95,10 +102,9 @@ const horloge = (h: string) => {
   const racine = document.querySelector<HTMLElement>('[data-semaine]');
   if (racine) {
     const onglets = [...racine.querySelectorAll<HTMLElement>('[role="tab"]')];
+    const bulles = [...racine.querySelectorAll<HTMLElement>('.bulle')];
     const poses = [...racine.querySelectorAll<HTMLElement>('.pose')];
-    const textes = [...racine.querySelectorAll<HTMLElement>('[role="tabpanel"]')];
-    const rangee = racine.querySelector<HTMLElement>('.jours')!;
-    racine.classList.add('js');
+    const details = [...racine.querySelectorAll<HTMLElement>('[role="tabpanel"]')];
     avance(
       racine,
       onglets,
@@ -106,25 +112,24 @@ const horloge = (h: string) => {
         onglets.forEach((o, k) => {
           o.setAttribute('aria-selected', String(k === i));
           o.tabIndex = k === i ? 0 : -1;
+          o.classList.toggle('passe', k < i);
+        });
+        bulles.forEach((b, k) => {
+          b.classList.toggle('on', k === i);
+          b.toggleAttribute('aria-hidden', k !== i);
         });
         poses.forEach((p, k) => p.classList.toggle('on', k === i));
-        textes.forEach((t, k) => t.classList.toggle('on', k === i));
-        // Phones: the tab row follows the active day (scrolls the row only).
-        if (rangee.scrollWidth > rangee.clientWidth) {
-          rangee.scrollTo({
-            left: onglets[i].offsetLeft - onglets[0].offsetLeft,
-            behavior: 'smooth',
-          });
-        }
+        details.forEach((d, k) => d.classList.toggle('on', k === i));
       },
-      { pause: racine.querySelector('.panneau') ?? undefined },
+      { pause: racine.querySelector('.scene') ?? undefined },
     );
     // Arrow keys move between days, as in any tab list.
-    rangee.addEventListener('keydown', (e) => {
+    racine.querySelector('.frise')!.addEventListener('keydown', (e) => {
+      const { key } = e as KeyboardEvent;
       const k = onglets.indexOf(document.activeElement as HTMLElement);
-      if (k < 0 || (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft')) return;
-      const suivant =
-        onglets[(k + (e.key === 'ArrowRight' ? 1 : -1) + onglets.length) % onglets.length];
+      if (k < 0 || (key !== 'ArrowRight' && key !== 'ArrowLeft')) return;
+      const n = onglets.length;
+      const suivant = onglets[(k + (key === 'ArrowRight' ? 1 : -1) + n) % n];
       suivant.focus();
       suivant.click();
     });
@@ -134,95 +139,169 @@ const horloge = (h: string) => {
 <style>
   .semaine {
     --avance-duree: 7s;
-    display: grid;
-    gap: 20px;
-    max-width: 64rem;
-    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
 
-  /* The days: a row of tabs, the active one on the card's color, its bar filling. */
-  /* exception: on phones the row scrolls under the page gutters (the conteneur's own clamp) */
-  .jours {
+  /* --- Robin and his bubble --- */
+  .scene {
     display: flex;
-    gap: 6px;
-    margin-inline: calc(-1 * clamp(1.25rem, 4.4vw, 4rem));
-    padding-inline: clamp(1.25rem, 4.4vw, 4rem);
-    overflow-x: auto;
-    scrollbar-width: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    width: 100%;
   }
-  .jour {
-    position: relative;
+  .bulles {
     display: grid;
-    flex: 1 0 auto;
+    align-items: end;
     justify-items: center;
-    gap: 4px;
-    padding: 12px 18px 16px;
-    border-radius: var(--radius-card-sm);
-    color: var(--doux);
-    cursor: pointer;
-    transition:
-      background-color 0.25s var(--ease-hatch),
-      color 0.25s var(--ease-hatch);
+    width: min(100%, 27rem);
   }
-  .jour:hover {
-    color: var(--color-cream);
-  }
-  .jour[aria-selected='true'] {
-    background: var(--color-night-2);
-    color: var(--color-cream);
-  }
-  .jour:focus-visible {
-    outline: 2px solid var(--color-orange);
-    outline-offset: 2px;
-  }
-  .jour-nom {
-    font-weight: 600;
-    font-size: var(--text-body);
-    line-height: 1;
-  }
-  .jour-heure {
-    font-size: var(--text-source);
-    letter-spacing: 0.06em;
-  }
-  .jour-barre {
-    --avance-origine: left;
-    left: 18px;
-    right: 18px;
-    bottom: 7px;
-    height: 2px;
+  /* A WhatsApp bubble (white, iOS font, its time), its point aimed down at Robin. */
+  .bulle {
+    position: relative;
+    grid-area: 1 / 1;
+    padding: 10px 14px 11px;
+    border-radius: 18px;
+    background: var(--color-white);
+    box-shadow: var(--shadow-2);
+    color: var(--color-whatsapp-ink);
+    font: 400 var(--text-body) / 1.4 var(--font-ios);
+    text-align: left;
     opacity: 0;
+    transition: opacity 0.4s var(--ease-hatch);
   }
-  .jour[aria-selected='true'] .jour-barre {
+  .bulle.on {
     opacity: 1;
   }
-
-  /* The panel: Robin on the left, the day's message and text on the right. */
-  .semaine :global(.panneau) {
+  .bulle::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: calc(100% - 1px);
+    width: 18px;
+    height: 10px;
+    background: inherit;
+    translate: -50% 0;
+    /* exception: the point of a speech bubble, a curved notch */
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 10'%3E%3Cpath d='M0 0h18c-4.2.8-7 3.8-9 10C7 3.8 4.2.8 0 0z'/%3E%3C/svg%3E")
+      no-repeat center / 100% 100%;
+  }
+  .bulle :global(.wa-h) {
+    float: right;
+    margin: 9px -2px -4px 12px;
+    font-size: 11px;
+    line-height: 1;
+    color: var(--color-whatsapp-meta);
+  }
+  /* Robin whole, on his own cream backdrop, in a card-shaped tile. */
+  .robin {
     display: grid;
+    width: 168px;
+    aspect-ratio: 1;
     overflow: clip;
-  }
-  .poses {
-    display: grid;
-    aspect-ratio: 4 / 3;
+    border-radius: var(--radius-card);
+    corner-shape: squircle;
     background: var(--color-cream-2);
+    box-shadow: var(--shadow-3);
   }
-  .poses :global(.pose) {
+  .robin :global(.pose) {
     grid-area: 1 / 1;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: 50% 35%;
     opacity: 0;
-    transition: opacity 0.45s var(--ease-hatch);
+    transition: opacity 0.4s var(--ease-hatch);
   }
-  .poses :global(.pose.on) {
+  .robin :global(.pose.on) {
     opacity: 1;
   }
-  .textes {
+
+  /* --- The timeline --- */
+  .frise {
     display: grid;
-    padding: 28px 24px 32px;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    width: min(100%, 52rem);
+    margin-top: 48px;
   }
-  .texte {
+  .jour {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding-bottom: 4px;
+    color: var(--doux);
+    cursor: pointer;
+    transition: color 0.25s var(--ease-hatch);
+  }
+  .jour:hover,
+  .jour[aria-selected='true'] {
+    color: var(--color-cream);
+  }
+  .jour:focus-visible {
+    outline: 2px solid var(--color-orange);
+    outline-offset: 4px;
+    border-radius: var(--radius-sm);
+  }
+  /* From this day's dot to the next one's: full for the days gone, filling for the active one
+     while the week runs on its own, empty once a click stopped it. */
+  .segment {
+    --avance-origine: left;
+    top: 6px;
+    left: 50%;
+    width: 100%;
+    height: 2px;
+  }
+  .jour:last-child .segment {
+    width: 0;
+  }
+  .semaine:not(.auto) .en-cours .segment > i {
+    transform: scale(0);
+  }
+  .passe .segment > i {
+    transform: none;
+  }
+  .point {
+    position: relative;
+    width: 14px;
+    height: 14px;
+    border-radius: 999px;
+    background: var(--fond);
+    box-shadow: inset 0 0 0 2px var(--filet);
+    transition:
+      background-color 0.25s,
+      box-shadow 0.25s;
+  }
+  .passe .point {
+    background: var(--color-orange);
+    box-shadow: none;
+  }
+  .jour[aria-selected='true'] .point {
+    background: var(--color-orange);
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-orange) 25%, transparent);
+  }
+  .jour-nom {
+    margin-top: 4px;
+    font-weight: 600;
+    font-size: var(--text-caption);
+    line-height: 1;
+  }
+  .jour-heure {
+    font-size: var(--text-source);
+    letter-spacing: 0.04em;
+    color: var(--doux);
+  }
+
+  /* --- What the day is about --- */
+  .details {
+    display: grid;
+    width: 100%;
+    margin-top: 36px;
+  }
+  .detail {
     grid-area: 1 / 1;
     opacity: 0;
     visibility: hidden;
@@ -230,69 +309,25 @@ const horloge = (h: string) => {
       opacity 0.35s var(--ease-hatch),
       visibility 0s 0.35s;
   }
-  .texte.on {
+  .detail.on {
     opacity: 1;
     visibility: visible;
-    transition-delay: 0.1s, 0s;
-  }
-  @media (width >= 48rem) {
-    .jours {
-      margin: 0;
-      padding: 0;
-      overflow: visible;
-    }
-    .semaine :global(.panneau) {
-      grid-template-columns: minmax(0, 26rem) minmax(0, 1fr);
-    }
-    .poses {
-      aspect-ratio: auto;
-      min-height: 26rem;
-    }
-    .textes {
-      align-content: center;
-      padding: 40px 48px;
-    }
+    transition-delay: 0s;
   }
 
-  /* The day's message: a WhatsApp bubble on the chat's wall (scene palette). */
-  .fil {
-    padding: 14px;
-    border-radius: var(--radius-card-sm);
-    background: var(--color-whatsapp-wall);
-  }
-  .bulle {
-    position: relative;
-    max-width: 30rem;
-    padding: 8px 12px 9px;
-    border-radius: 14px 14px 14px 4px;
-    background: var(--color-white);
-    box-shadow: 0 1px 1px color-mix(in srgb, var(--color-black) 12%, transparent);
-    color: var(--color-whatsapp-ink);
-    font: 400 var(--text-body) / 1.4 var(--font-ios);
-  }
-  /* The iOS tail (--wa-queue, shared with ui/WhatsApp). */
-  .bulle::after {
-    content: '';
-    position: absolute;
-    left: -7px;
-    bottom: 0;
-    width: 9px;
-    height: 14px;
-    background: inherit;
-    scale: -1 1;
-    mask: var(--wa-queue) no-repeat center / 100% 100%;
-  }
-  .bulle :global(.wa-h) {
-    float: right;
-    margin: 8px -2px -4px 12px;
-    font-size: 11px;
-    line-height: 1;
-    color: var(--color-whatsapp-meta);
+  @media (width >= 48rem) {
+    .robin {
+      width: 200px;
+    }
+    .jour-nom {
+      font-size: var(--text-body);
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .poses :global(.pose),
-    .texte {
+    .bulle,
+    .robin :global(.pose),
+    .detail {
       transition: none;
     }
   }
