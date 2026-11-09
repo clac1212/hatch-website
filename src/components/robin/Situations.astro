@@ -36,44 +36,54 @@ const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7,
 ---
 
 <div class="fonctions" data-fonctions>
-  <!-- The four features: the active one is lit, the phone plays its conversation -->
-  <ol class="liste">
+  <!-- The four features: each lights in turn (a bar fills, then the next one), a click picks one -->
+  <ol class="liste" role="list">
     {
       situations.map((s, i) => (
         <li class:list={['fn', i === 0 && 'on']} data-fn={i}>
           <button type="button" class="fn-btn" aria-pressed={i === 0 ? 'true' : 'false'}>
-            <span class="font-mono text-kicker text-(--doux)">0{i + 1}</span>
-            <h3 class="font-display text-card font-semibold">{s.titre}</h3>
-            <p class="fn-texte max-w-lead text-body text-(--doux)">{s.texte}</p>
+            <span class="fn-barre" aria-hidden="true">
+              <i />
+            </span>
+            <span class="fn-num font-mono text-kicker">0{i + 1}</span>
+            <span class="fn-titre font-display font-semibold">{s.titre}</span>
+            <span class="fn-plie">
+              <span class="fn-texte text-body text-(--doux)">{s.texte}</span>
+            </span>
           </button>
         </li>
       ))
     }
   </ol>
+  <!-- On phones the list is a row of tabs: the active feature's text sits under it -->
+  <div class="fn-detail text-body text-(--doux)">
+    {situations.map((s, i) => <p class:list={[i === 0 && 'on']}>{s.texte}</p>)}
+  </div>
 
-  <!-- One realistic phone, sticky beside the list: the active feature's WhatsApp conversation, which
-       plays once then can be scrolled by hand -->
+  <!-- One realistic phone: one chat with Robin, each feature a day of it, slid in like WhatsApp -->
   <div class="tel-zone">
     <Iphone class="tel">
-    {
-      situations.map((s, i) => (
-          <div class:list={['wa', i === 0 && 'on']} data-situ={i} aria-label={conversation.ariaLabel}>
-            <header class="wa-tete" data-etat="tete">
-              <span class="wa-retour" aria-hidden="true">←</span>
-              <Image src={portrait} alt="" width={36} densities={[1, 2]} class="wa-av" />
-              <span class="wa-qui">
-                <b>{conversation.contact}</b>
-                <span class="st-ligne">{conversation.enLigne}</span>
-                <span class="st-ecrit">{conversation.ecrit}</span>
-              </span>
-              <span class="wa-icones" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M3 7h12v10H3zM16 10l5-3v10l-5-3z" /></svg>
-                <svg viewBox="0 0 24 24"><path d="M6.6 10.8a15 15 0 006.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 013 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1z" /></svg>
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="12" cy="19" r="2" /></svg>
-              </span>
-            </header>
+      <div class="wa" aria-label={conversation.ariaLabel}>
+        <header class="wa-tete" data-tete>
+          <span class="wa-retour" aria-hidden="true">←</span>
+          <Image src={portrait} alt="" width={36} densities={[1, 2]} class="wa-av" />
+          <span class="wa-qui">
+            <b>{conversation.contact}</b>
+            <span class="st-ligne">{conversation.enLigne}</span>
+            <span class="st-ecrit">{conversation.ecrit}</span>
+          </span>
+          <span class="wa-icones" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M3 7h12v10H3zM16 10l5-3v10l-5-3z" /></svg>
+            <svg viewBox="0 0 24 24"><path d="M6.6 10.8a15 15 0 006.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 013 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1z" /></svg>
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="12" cy="19" r="2" /></svg>
+          </span>
+        </header>
 
-            <div class="wa-fil">
+        <div class="wa-fils">
+        {
+          situations.map((s, i) => (
+            <div class:list={['wa-fil', i === 0 && 'on']} data-situ={i} style={`--heure:"${s.moment.heure}"`}>
+              <span class="jour">{s.moment.jour}</span>
               {/* 1 · The link to connect the inbox */}
               {i === 0 && (
                 <>
@@ -230,105 +240,105 @@ const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7,
               )}
             </div>
 
-            <div class="wa-saisie" aria-hidden="true">
-              <span>{conversation.saisie}</span>
-              <span class="micro">
-                <svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 003-3V6a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 006 6.9V21h2v-2.1a7 7 0 006-6.9z" /></svg>
-              </span>
-            </div>
-            {/* The owner's thumb, tapping the link or the button */}
-            <span class="doigt" aria-hidden="true" />
-          </div>
-      ))
-    }
+          ))
+        }
+        </div>
+
+        <div class="wa-saisie" aria-hidden="true">
+          <span>{conversation.saisie}</span>
+          <span class="micro">
+            <svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 003-3V6a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 006 6.9V21h2v-2.1a7 7 0 006-6.9z" /></svg>
+          </span>
+        </div>
+        <span class="doigt" aria-hidden="true" />
+      </div>
     </Iphone>
   </div>
 </div>
 
 <script is:inline data-keep>
-  // The scenarios: a list of steps { t: ms, on: [states to turn on, 'name' or 'name:class'],
-  // off: [states to turn off], tap: the target the thumb taps }. Each scene plays once.
+  // Each scene is a list of steps { t: ms, on: [states to turn on, 'name' or 'name:class'],
+  // off: [states to turn off], tap: the target the thumb taps }. 'tete' is the shared chat header.
+  // Fast on purpose (César 09/11): the whole chat is on screen within ~4 s, then it is read.
   (function () {
     var SCENARIOS = {
       0: [
-        { t: 300, on: ['tete:ecrit'] },
-        { t: 1300, on: ['a'], off: ['tete:ecrit'] },
-        { t: 2400, tap: 'lien' },
-        { t: 2700, on: ['ok'] },
-        { t: 3400, on: ['b'] },
-        { t: 3800, on: ['tete:ecrit'] },
-        { t: 4800, on: ['c'], off: ['tete:ecrit'] },
-        { t: 6000, on: ['tete:ecrit'] },
-        { t: 7200, on: ['d'], off: ['tete:ecrit'] },
+        { t: 150, on: ['tete:ecrit'] },
+        { t: 500, on: ['a'], off: ['tete:ecrit'] },
+        { t: 1000, tap: 'lien' },
+        { t: 1200, on: ['ok'] },
+        { t: 1500, on: ['b'] },
+        { t: 1700, on: ['tete:ecrit'] },
+        { t: 2100, on: ['c'], off: ['tete:ecrit'] },
+        { t: 2700, on: ['tete:ecrit'] },
+        { t: 3100, on: ['d'], off: ['tete:ecrit'] },
       ],
       1: [
-        { t: 300, on: ['a'] },
-        { t: 900, on: ['tete:ecrit'] },
-        { t: 1800, on: ['b'], off: ['tete:ecrit'] },
-        { t: 2300, on: ['l0:lu'] },
-        { t: 2900, on: ['l0:ok', 'l1:lu'] },
-        { t: 3500, on: ['l1:ok', 'l2:lu'] },
-        { t: 4200, on: ['l2:ecart'] },
-        { t: 4900, on: ['c', 'd'] },
-        { t: 6100, tap: 'oui' },
-        { t: 6900, on: ['e'] },
-        { t: 7300, on: ['tete:ecrit'] },
-        { t: 8300, on: ['f'], off: ['tete:ecrit'] },
+        { t: 150, on: ['a'] },
+        { t: 450, on: ['tete:ecrit'] },
+        { t: 850, on: ['b'], off: ['tete:ecrit'] },
+        { t: 1100, on: ['l0:lu'] },
+        { t: 1350, on: ['l0:ok', 'l1:lu'] },
+        { t: 1600, on: ['l1:ok', 'l2:lu'] },
+        { t: 1900, on: ['l2:ecart'] },
+        { t: 2300, on: ['c', 'd'] },
+        { t: 2900, tap: 'oui' },
+        { t: 3200, on: ['e'] },
+        { t: 3400, on: ['tete:ecrit'] },
+        { t: 3800, on: ['f'], off: ['tete:ecrit'] },
       ],
       2: [
-        { t: 300, on: ['a'] },
-        { t: 900, on: ['tete:ecrit'] },
-        { t: 2600, on: ['b'], off: ['tete:ecrit'] },
-        { t: 3300, on: ['g:lu'] },
+        { t: 150, on: ['a'] },
+        { t: 450, on: ['tete:ecrit'] },
+        { t: 1100, on: ['b'], off: ['tete:ecrit'] },
+        { t: 1400, on: ['g:lu'] },
       ],
       3: [
-        { t: 300, on: ['a'] },
-        { t: 1100, on: ['tete:ecrit'] },
-        { t: 2100, on: ['b'], off: ['tete:ecrit'] },
-        { t: 2500, on: ['c0'] },
-        { t: 3000, on: ['c1'] },
-        { t: 3500, on: ['c2'] },
-        { t: 4000, on: ['c3'] },
-        { t: 4600, on: ['tampon'] },
-        { t: 5200, on: ['d'] },
-        { t: 6300, tap: 'envoyer' },
-        { t: 7100, on: ['e'] },
-        { t: 7500, on: ['tete:ecrit'] },
-        { t: 8400, on: ['f'], off: ['tete:ecrit'] },
+        { t: 150, on: ['a'] },
+        { t: 500, on: ['tete:ecrit'] },
+        { t: 900, on: ['b'], off: ['tete:ecrit'] },
+        { t: 1100, on: ['c0'] },
+        { t: 1300, on: ['c1'] },
+        { t: 1500, on: ['c2'] },
+        { t: 1700, on: ['c3'] },
+        { t: 2000, on: ['tampon'] },
+        { t: 2300, on: ['d'] },
+        { t: 2900, tap: 'envoyer' },
+        { t: 3200, on: ['e'] },
+        { t: 3400, on: ['tete:ecrit'] },
+        { t: 3800, on: ['f'], off: ['tete:ecrit'] },
       ],
     };
+    var SORTIE = 450; // ms, the outgoing chat's slide (matches the CSS)
     var reduit = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var racine = document.querySelector('[data-fonctions]');
+    if (!racine) return;
+    var ecran = racine.querySelector('.wa');
+    var tete = racine.querySelector('[data-tete]');
+    var doigt = racine.querySelector('.doigt');
 
-    function scene(root) {
-      var id = root.getAttribute('data-situ');
-      var etapes = SCENARIOS[id] || [];
-      var doigt = root.querySelector('.doigt');
+    function scene(fil) {
+      var etapes = SCENARIOS[fil.getAttribute('data-situ')] || [];
       var minuteries = [];
       var allumes = [];
-
       function el(nom) {
-        return root.querySelector('[data-etat="' + nom + '"]');
+        return nom === 'tete' ? tete : fil.querySelector('[data-etat="' + nom + '"]');
       }
-      function allumer(spec) {
+      function basculer(spec, oui) {
         var p = spec.split(':');
         var e = el(p[0]);
         if (!e) return;
         var cls = p[1] || 'on';
-        e.classList.add(cls);
-        allumes.push([e, cls]);
-        // Like WhatsApp, the thread follows the newest message.
-        var fil = root.querySelector('.wa-fil');
-        if (fil) fil.scrollTo({ top: fil.scrollHeight, behavior: reduit ? 'auto' : 'smooth' });
-      }
-      function eteindre(spec) {
-        var p = spec.split(':');
-        var e = el(p[0]);
-        if (e) e.classList.remove(p[1] || 'on');
+        e.classList.toggle(cls, oui);
+        if (oui && e !== tete) {
+          allumes.push([e, cls]);
+          fil.scrollTo({ top: fil.scrollHeight, behavior: reduit ? 'auto' : 'smooth' });
+        }
       }
       function taper(nom) {
-        var c = root.querySelector('[data-cible="' + nom + '"]');
+        var c = fil.querySelector('[data-cible="' + nom + '"]');
         if (!c || !doigt) return;
-        var r = root.getBoundingClientRect();
+        var r = ecran.getBoundingClientRect();
         var b = c.getBoundingClientRect();
         doigt.style.setProperty('--x', b.left - r.left + b.width / 2 + 'px');
         doigt.style.setProperty('--y', b.top - r.top + b.height / 2 + 'px');
@@ -339,123 +349,213 @@ const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7,
         doigt.classList.add('tape');
       }
       function appliquer(e, sansDoigt) {
-        (e.on || []).forEach(allumer);
-        (e.off || []).forEach(eteindre);
+        (e.on || []).forEach(function (n) {
+          basculer(n, true);
+        });
+        (e.off || []).forEach(function (n) {
+          basculer(n, false);
+        });
         if (e.tap && !sansDoigt) taper(e.tap);
       }
-      function remettre() {
+      function vider() {
         minuteries.forEach(clearTimeout);
         minuteries = [];
         allumes.forEach(function (a) {
           a[0].classList.remove(a[1]);
         });
         allumes = [];
-        if (doigt) doigt.classList.remove('tape');
       }
-      function jouer() {
-        remettre();
-        if (reduit) {
+      return {
+        fil: fil,
+        jouer: function () {
+          vider();
+          fil.scrollTop = 0;
+          if (reduit) {
+            etapes.forEach(function (e) {
+              appliquer(e, true);
+            });
+            tete.classList.remove('ecrit');
+            return;
+          }
           etapes.forEach(function (e) {
-            appliquer(e, true);
+            minuteries.push(setTimeout(appliquer, e.t, e));
           });
-          return;
-        }
-        etapes.forEach(function (e) {
-          minuteries.push(
-            setTimeout(function () {
-              appliquer(e);
-            }, e.t),
-          );
-        });
-      }
-      root.jouer = jouer;
-      root.remettre = remettre;
-      remettre();
+        },
+        // Once its slide-out is over, so the outgoing chat does not empty while it leaves.
+        ranger: function () {
+          minuteries.forEach(clearTimeout);
+          minuteries = [setTimeout(vider, SORTIE)];
+        },
+      };
     }
-    document.documentElement.classList.add('situ-js');
-    var scenes = [].slice.call(document.querySelectorAll('[data-situ]'));
-    scenes.forEach(scene);
 
-    // The list drives the phone: scrolling past a feature (wide screens) or tapping it lights it and
-    // plays its conversation from the start; the phone starts with the first one when it comes in view.
-    var items = [].slice.call(document.querySelectorAll('[data-fn]'));
+    racine.classList.add('js');
+    var scenes = [].slice.call(racine.querySelectorAll('[data-situ]')).map(scene);
+    var items = [].slice.call(racine.querySelectorAll('[data-fn]'));
+    var liste = racine.querySelector('.liste');
+    var details = [].slice.call(racine.querySelectorAll('.fn-detail p'));
     var actif = -1;
+
     function activer(i) {
       if (i === actif) return;
-      if (actif > -1) scenes[actif].remettre();
+      var avant = actif;
       actif = i;
+      tete.classList.remove('ecrit');
+      if (doigt) doigt.classList.remove('tape');
       items.forEach(function (it, k) {
         it.classList.toggle('on', k === i);
         it.querySelector('button').setAttribute('aria-pressed', k === i ? 'true' : 'false');
       });
-      scenes.forEach(function (sc, k) {
-        sc.classList.toggle('on', k === i);
+      // Phones: the tab row follows the active tab (scrolls the row only, never the page).
+      if (liste.scrollWidth > liste.clientWidth) {
+        liste.scrollTo({
+          left: items[i].offsetLeft - items[0].offsetLeft,
+          behavior: reduit ? 'auto' : 'smooth',
+        });
+      }
+      details.forEach(function (d, k) {
+        d.classList.toggle('on', k === i);
       });
+      scenes.forEach(function (sc, k) {
+        sc.fil.classList.toggle('on', k === i);
+        sc.fil.classList.toggle('sort', k === avant);
+      });
+      if (avant > -1) scenes[avant].ranger();
       scenes[i].jouer();
     }
+
+    // Autoplay: the active feature's bar fills (CSS), at its end the next one takes over. A click
+    // picks a feature and stops it; the bar pauses while the section is off screen or the pointer
+    // is on the phone (someone scrolling the chat by hand).
+    if (!reduit) racine.classList.add('auto');
     items.forEach(function (it, k) {
       it.querySelector('button').addEventListener('click', function () {
+        racine.classList.remove('auto');
         activer(k);
       });
+      it.querySelector('.fn-barre i').addEventListener('animationend', function () {
+        if (racine.classList.contains('auto') && k === actif) activer((k + 1) % items.length);
+      });
     });
-    var large = matchMedia('(min-width: 64rem)');
-    var obs = new IntersectionObserver(
-      function (entries) {
-        entries.forEach(function (e) {
-          if (e.isIntersecting && large.matches) activer(items.indexOf(e.target));
-        });
-      },
-      { rootMargin: '-45% 0px -45% 0px' },
-    );
-    items.forEach(function (it) {
-      obs.observe(it);
+    var tel = racine.querySelector('.tel-zone');
+    tel.addEventListener('pointerenter', function () {
+      racine.classList.add('pause');
+    });
+    tel.addEventListener('pointerleave', function () {
+      racine.classList.remove('pause');
     });
     new IntersectionObserver(
-      function (entries, o) {
-        if (entries[0].isIntersecting) {
-          if (actif === -1) activer(0);
-          o.disconnect();
-        }
+      function (entries) {
+        var vu = entries[0].isIntersecting;
+        racine.classList.toggle('hors', !vu);
+        if (vu && actif === -1) activer(0);
       },
       { threshold: 0.4 },
-    ).observe(document.querySelector('[data-fonctions] .tel-zone'));
+    ).observe(tel);
   })();
 </script>
 
 <style>
-  /* The list beside the phone. Wide screens: each feature takes half a screen of scroll, the phone
-     stays put beside them; the feature crossing the middle of the screen is the active one. */
+  /* --- The list beside the phone --- */
   .fonctions {
     display: grid;
-    gap: 40px;
+    gap: 24px;
   }
+  /* exception: the tab row scrolls under the page gutters (the conteneur's own clamp) */
   .liste {
-    display: grid;
+    display: flex;
     gap: 8px;
+    margin-inline: calc(-1 * clamp(1.25rem, 4.4vw, 4rem));
+    padding-inline: clamp(1.25rem, 4.4vw, 4rem);
+    overflow-x: auto;
+    scrollbar-width: none;
   }
   .fn-btn {
+    position: relative;
     display: grid;
     justify-items: start;
-    gap: 10px;
     width: 100%;
-    padding: 18px 0;
     text-align: left;
     cursor: pointer;
-    opacity: 0.4;
-    transition: opacity 0.4s var(--ease-hatch);
-  }
-  .fn.on .fn-btn,
-  .fn-btn:hover {
-    opacity: 1;
   }
   .fn-btn:focus-visible {
     outline: 2px solid var(--color-orange);
-    outline-offset: 6px;
+    outline-offset: 4px;
     border-radius: var(--radius-sm);
   }
-  /* Small screens: only the active feature shows its line. */
-  .fn:not(.on) .fn-texte {
+  .fn-num {
+    color: var(--doux);
+  }
+  .fn.on .fn-num {
+    color: var(--color-orange-txt);
+  }
+  /* The bar: a track along the item, the active one fills over its turn. */
+  .fn-barre {
+    position: absolute;
+    overflow: clip;
+    background: var(--filet);
+    border-radius: 2px;
+  }
+  .fn-barre i {
+    position: absolute;
+    inset: 0;
+    background: var(--color-orange);
+    transform: scale(0);
+  }
+  .fn.on .fn-barre i {
+    transform: none;
+  }
+  .fonctions.auto .fn.on .fn-barre i {
+    /* exception: one feature's turn, the chat plays in ~4 s then stays to be read */
+    animation: tour 9s linear both;
+  }
+  .fonctions.auto:is(.pause, .hors) .fn.on .fn-barre i {
+    animation-play-state: paused;
+  }
+
+  /* Phones: a row of tabs (number + title), the active text under it, the phone below. */
+  .fn {
+    flex: none;
+  }
+  .fn-btn {
+    gap: 2px;
+    padding: 12px 16px 14px;
+    border-radius: var(--radius-card-sm);
+    background: color-mix(in srgb, var(--color-ink) 5%, transparent);
+  }
+  .fn.on .fn-btn {
+    background: var(--color-surface);
+    box-shadow: var(--shadow-1);
+  }
+  .fn-titre {
+    font-size: var(--text-body); /* a tab label: four card titles would not fit in a row */
+    white-space: nowrap;
+  }
+  .fn-barre {
+    left: 16px;
+    right: 16px;
+    bottom: 6px;
+    height: 2px;
+  }
+  .fn-barre i {
+    transform-origin: left;
+  }
+  .fn-plie {
     display: none;
+  }
+  .fn-detail {
+    display: grid;
+    min-height: 3lh;
+  }
+  .fn-detail p {
+    grid-area: 1 / 1;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.35s var(--ease-hatch);
+  }
+  .fn-detail p.on {
+    opacity: 1;
+    visibility: visible;
   }
   .tel-zone {
     display: flex;
@@ -464,49 +564,101 @@ const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7,
   .tel-zone :global(.tel) {
     width: min(320px, 82vw);
   }
+
+  /* Wide screens: the list on the left, every title visible, the active one opens its text. */
   @media (width >= 64rem) {
-    /* A centred pair: the list and the phone side by side, no empty middle. */
     .fonctions {
-      grid-template-columns: minmax(0, 30rem) auto;
+      grid-template-columns: minmax(0, 28rem) auto;
       justify-content: center;
-      gap: 112px;
-      align-items: start;
-    }
-    .fn {
-      display: flex;
       align-items: center;
-      min-height: 34vh;
+      column-gap: 96px;
     }
-    .fn .fn-texte {
-      display: block;
+    .liste {
+      flex-direction: column;
+      gap: 4px;
+      margin: 0;
+      padding: 0;
+      overflow: visible;
     }
-    /* exception: the phone sits in the middle of the screen while the list scrolls past it */
+    .fn-detail {
+      display: none;
+    }
     .tel-zone {
-      position: sticky;
-      top: max(96px, calc(50vh - 330px));
+      grid-row: 1 / span 2;
+      grid-column: 2;
     }
     .tel-zone :global(.tel) {
       width: 330px;
     }
+    .fn-btn {
+      gap: 6px;
+      padding: 18px 0 18px 28px;
+      border-radius: 0;
+      background: none;
+      opacity: 0.55;
+      transition: opacity 0.3s var(--ease-hatch);
+    }
+    .fn.on .fn-btn {
+      background: none;
+      box-shadow: none;
+      opacity: 1;
+    }
+    .fn-btn:hover {
+      opacity: 1;
+    }
+    .fn-titre {
+      font-size: var(--text-card);
+      white-space: normal;
+    }
+    .fn-barre {
+      left: 0;
+      right: auto;
+      top: 18px;
+      bottom: 18px;
+      width: 2px;
+      height: auto;
+    }
+    .fn-barre i {
+      transform-origin: top;
+    }
+    .fn-plie {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.45s var(--ease-hatch);
+    }
+    .fn-plie > span {
+      overflow: hidden;
+      padding-top: 4px;
+    }
+    .fn.on .fn-plie {
+      grid-template-rows: 1fr;
+    }
+  }
+  @keyframes tour {
+    from {
+      transform: scale(0);
+    }
+    to {
+      transform: scale(1);
+    }
   }
 
-  /* The WhatsApp conversation: header, thread, input bar. */
-  /* The conversation fills the phone's screen; only the active one shows. */
+  /* --- The phone: one chat, a shared header and input bar, the four days slide in between --- */
   .wa {
     position: absolute;
     inset: 0;
-    display: none;
+    display: flex;
     flex-direction: column;
     overflow: hidden;
     background: var(--color-whatsapp-wall);
     font: 400 13.5px/1.4 var(--font-sans);
     text-align: left;
   }
-  /* The WhatsApp-coloured header: green bar, back, contact, calls, menu. */
-  .wa.on {
-    display: flex;
+  .wa-fils {
+    position: relative;
+    flex: 1;
+    min-height: 0;
   }
-  /* exception: the header clears the phone's status bar and Dynamic Island */
   .wa-tete {
     display: flex;
     align-items: center;
@@ -562,18 +714,49 @@ const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7,
   /* The thread keeps its height: new messages arrive at the bottom and push older ones up. */
   /* The thread scrolls by hand, like WhatsApp: newest at the bottom, older ones above. */
   .wa-fil {
+    position: absolute;
+    inset: 0;
     display: flex;
-    flex: 1;
     flex-direction: column;
     gap: 6px;
-    min-height: 0;
-    padding: 12px 10px;
+    padding: 10px 10px 12px;
     overflow-y: auto;
     overscroll-behavior: contain;
     scrollbar-width: none;
   }
-  .wa-fil > :first-child {
-    margin-top: auto;
+  .jour {
+    align-self: center;
+    margin-bottom: 4px;
+    padding: 4px 10px;
+    border-radius: 8px;
+    background: var(--color-surface);
+    font-size: 11.5px;
+    color: var(--color-soft);
+    box-shadow: 0 1px 0.5px color-mix(in srgb, var(--color-black) 13%, transparent);
+  }
+  /* Without JS only the first day shows; with JS the active one slides in from the right and the
+     outgoing one leaves to the left, like switching chats. */
+  .wa-fil:not(.on) {
+    display: none;
+  }
+  .js .wa-fil {
+    display: flex;
+    opacity: 0;
+    visibility: hidden;
+    translate: 48px 0;
+    transition:
+      opacity 0.3s var(--ease-hatch),
+      translate 0.45s var(--ease-hatch),
+      visibility 0s 0.45s;
+  }
+  .js .wa-fil.sort {
+    translate: -48px 0;
+  }
+  .js .wa-fil.on {
+    opacity: 1;
+    visibility: visible;
+    translate: 0 0;
+    transition-delay: 0.08s, 0.08s, 0s;
   }
   .m {
     max-width: 86%;
@@ -581,16 +764,16 @@ const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7,
     border-radius: 10px;
     box-shadow: 0 1px 0.5px color-mix(in srgb, var(--color-black) 13%, transparent);
   }
-  :global(.situ-js) .m,
-  :global(.situ-js) .boutons {
+  .js .m,
+  .js .boutons {
     display: none;
   }
-  :global(.situ-js) .m.on,
-  :global(.situ-js) .boutons.on {
+  .js .m.on,
+  .js .boutons.on {
     display: block;
     animation: arrive 0.35s var(--ease-doux, ease-out) both;
   }
-  :global(.situ-js) .boutons.on {
+  .js .boutons.on {
     display: flex;
   }
   @keyframes arrive {
@@ -602,7 +785,7 @@ const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7,
   /* The time and grey ticks (delivered), like in WhatsApp. */
   .m.robin::after,
   .m.patron::after {
-    content: '21:42';
+    content: var(--heure);
     float: right;
     margin: 7px 0 -5px 10px;
     font-size: 10.5px;
@@ -610,7 +793,7 @@ const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7,
     color: var(--color-soft);
   }
   .m.patron::after {
-    content: '21:42 ✓✓';
+    content: var(--heure) ' ✓✓';
   }
   .m.vocal::after {
     grid-column: 1 / -1;
@@ -955,7 +1138,7 @@ const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7,
     gap: 8px;
     width: 250px;
   }
-  :global(.situ-js) .m.vocal.on {
+  .js .m.vocal.on {
     display: grid;
   }
   .v-lecture {
@@ -1027,20 +1210,20 @@ const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7,
     background: var(--color-stone);
     transition: opacity 0.2s;
   }
-  :global(.situ-js) .val {
+  .js .val {
     clip-path: inset(0 100% 0 0);
     transition: clip-path 0.45s steps(14);
   }
   .vide {
     opacity: 0;
   }
-  :global(.situ-js) .vide {
+  .js .vide {
     opacity: 1;
   }
-  :global(.situ-js) .champ-c.on .vide {
+  .js .champ-c.on .vide {
     opacity: 0;
   }
-  :global(.situ-js) .champ-c.on .val {
+  .js .champ-c.on .val {
     clip-path: inset(0 0 0 0);
   }
   .c-tete {
@@ -1060,14 +1243,14 @@ const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7,
     color: var(--color-orange-txt);
     rotate: -8deg;
   }
-  :global(.situ-js) .tampon {
+  .js .tampon {
     opacity: 0;
     scale: 1.6;
     transition:
       opacity 0.2s,
       scale 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
-  :global(.situ-js) .tampon.on {
+  .js .tampon.on {
     opacity: 1;
     scale: 1;
   }
@@ -1141,25 +1324,22 @@ const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7,
   }
 
   /* Replay */
-  :global(html:not(.situ-js)) .rejouer {
-    display: none;
-  }
-  :global(html:not(.situ-js)) .cl-ok {
+  .fonctions:not(.js) .cl-ok {
     opacity: 1;
     scale: 1;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    :global(.situ-js) .m.on,
-    :global(.situ-js) .boutons.on,
+    .js .m.on,
+    .js .boutons.on,
     .m.on .puce {
       animation: none;
     }
     .cl-ok,
     .coche,
     .barre i,
-    :global(.situ-js) .val,
-    :global(.situ-js) .tampon {
+    .js .val,
+    .js .tampon {
       transition: none;
     }
   }

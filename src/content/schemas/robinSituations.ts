@@ -6,6 +6,12 @@ const fichier = z.strictObject({ type: z.string(), nom: z.string(), statut: z.st
 /** Two quick reply buttons under Robin's message: the one the owner's thumb taps, then the other. */
 const boutons = z.strictObject({ oui: z.string(), non: z.string() });
 
+const situation = z.strictObject({
+  titre: z.string(),
+  texte: z.string(),
+  moment: z.strictObject({ jour: z.string(), heure: z.string() }),
+});
+
 /**
  * Copy of the Robin page's "What Robin does" block (src/content/sections/robinSituations/{fr,en}.yaml):
  * four situations, each played out in a WhatsApp-styled chat. The scene markup, the animation
@@ -24,13 +30,11 @@ export const schema = z.strictObject({
     /** Placeholder of the input bar. */
     saisie: z.string(),
   }),
-  /** Title and text next to each chat, in display order. */
-  situations: z.tuple([
-    z.strictObject({ titre: z.string(), texte: z.string() }),
-    z.strictObject({ titre: z.string(), texte: z.string() }),
-    z.strictObject({ titre: z.string(), texte: z.string() }),
-    z.strictObject({ titre: z.string(), texte: z.string() }),
-  ]),
+  /**
+   * Title and text next to each chat, in display order, and when the chat happens: `jour` is the
+   * WhatsApp date chip at the top of the chat, `heure` the time on its bubbles.
+   */
+  situations: z.tuple([situation, situation, situation, situation]),
   /** 1 · Plugs into your tools: the link card, the system notice, what he found, the month's books. */
   connexion: z.strictObject({
     demande: z.string(),
