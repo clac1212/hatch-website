@@ -5,17 +5,7 @@
  * variants with `:global(html[data-<nom>='<option>'])`. Add a switch below, remove it once decided.
  * Labels are dev tooling, not site copy: they stay here.
  */
-const SWITCHES: { nom: string; label: string; options: { valeur: string; label: string }[] }[] = [
-  {
-    nom: 'robin-fonds',
-    label: 'Fonds Robin',
-    options: [
-      { valeur: 'alterne', label: '1 · Alterné noir / crème' },
-      { valeur: 'clair', label: '2 · Clair (hero et bêta en noir)' },
-      { valeur: 'nuit', label: '3 · Tout noir (actuel)' },
-    ],
-  },
-];
+const SWITCHES: { nom: string; label: string; options: { valeur: string; label: string }[] }[] = [];
 ---
 
 {

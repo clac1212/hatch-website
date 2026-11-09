@@ -16,6 +16,7 @@ import Button from '../components/ui/Button.astro';
 import EnTete from '../components/ui/EnTete.astro';
 import Section from '../components/layout/Section.astro';
 import Iphone from '../components/ui/Iphone.astro';
+import Ipad from '../components/ui/Ipad.astro';
 import Situations from '../components/robin/Situations.astro';
 import { section } from '../content/section';
 import { routes, type Locale } from '../i18n/ui';
@@ -74,10 +75,11 @@ const champs = [
   title={seo.title}
   description={seo.description}
 >
-  <div class="nuit bg-night text-cream">
+  <!-- --debord: how far the evening iPad hangs over the next section (half of it, roughly). -->
+  <div class="nuit bg-night text-cream [--debord:clamp(120px,19vw,300px)]">
     <!-- 1 · Hero: Robin floats above the title (dots), one big centred sentence (muse.ai).
          exception: the top padding clears the floating nav. -->
-    <Section id="robin" ton="night" rythme="bas" class="pt-36 lg:pt-44" data-nav-fond="sombre">
+    <Section id="robin" ton="night" rythme="aucun" class="pt-36 lg:pt-44" data-nav-fond="sombre">
       <div class="flex flex-col items-center text-center">
         <!-- Robin flies into his circle, waves, takes notes, checks a receipt, gives a thumbs up,
            then flies off (15 s loop; reduced motion: the portrait stays still). -->
@@ -104,10 +106,11 @@ const champs = [
           <Button href="#beta" variant="orange" size="lg">{hero.cta}</Button>
         </div>
 
-        <!-- The scene below the hero, like the dots video: the bistro at closing time, Robin talks to
-           the owner (looping video), and his messages pop out of his beak, as comic bubbles, one after another. -->
-        <div class="soiree mt-14 w-full max-w-[860px] lg:mt-16" data-soiree>
-          <div class="soiree-cadre">
+        <!-- The scene below the hero, in an iPad hanging half over the next section: the bistro at
+           closing time, Robin talks to the owner (looping video), his messages pop out one after
+           another. exception: its width and overhang are the scene's own. -->
+        <div class="soiree relative z-10 mt-14 w-full max-w-[900px] lg:mt-16" data-soiree>
+          <Ipad class="soiree-ipad">
             <video
               class="soiree-video"
               src="/anim/robin-soir.mp4"
@@ -133,13 +136,13 @@ const champs = [
                 ))
               }
             </ol>
-          </div>
+          </Ipad>
         </div>
       </div>
     </Section>
 
     <!-- 3 · What Robin does: alternating rows, a WhatsApp situation in a tinted card -->
-    <Section id="fait" ton="night">
+    <Section id="fait" ton="cream" class="pt-[calc(var(--debord)+clamp(4rem,2.6rem+4.4vw,7rem))]">
       <div class="flex flex-col gap-12 lg:gap-16">
         <EnTete titre={fait.titre} />
         <Situations locale={locale} />
@@ -147,7 +150,7 @@ const champs = [
     </Section>
 
     <!-- 4 · A week with Robin: the day timeline (the dots "day") -->
-    <Section id="semaine" ton="night" class="border-t border-(--filet)" data-semaine>
+    <Section id="semaine" ton="night" data-semaine>
       <div class="flex flex-col items-center text-center">
         <EnTete titre={semaine.titre} align="centre" />
 
@@ -214,7 +217,7 @@ const champs = [
     </Section>
 
     <!-- 5 · Where to find him: the WhatsApp phone (no app yet) -->
-    <Section id="canaux" ton="night" class="border-t border-(--filet)" data-canaux>
+    <Section id="canaux" ton="cream-2" data-canaux>
       <div class="flex flex-col items-center text-center">
         <EnTete titre={canaux.titre} intro={canaux.texte} align="centre" />
 
@@ -251,7 +254,7 @@ const champs = [
     </Section>
 
     <!-- 6 · Trust: on the dark background, three cards outlined in the blue of Robin's feathers. -->
-    <Section id="confiance" ton="night" class="border-t border-(--filet)">
+    <Section id="confiance" ton="cream">
       <div class="flex flex-col items-center">
         <EnTete titre={confiance.titre} align="centre" />
         <div class="mt-12 grid w-full gap-4 md:grid-cols-3">
@@ -273,7 +276,7 @@ const champs = [
     </Section>
 
     <!-- 7 · The beta: the waitlist -->
-    <Section id="beta" ton="night" class="border-t border-(--filet)">
+    <Section id="beta" ton="night">
       <div class="grid items-center gap-12 lg:grid-cols-[1fr_0.95fr] lg:gap-16">
         <EnTete kicker={beta.kicker} titre={beta.titre} intro={beta.texte} />
         <!-- Without JS the form still posts (POST, so nothing lands in the URL); with JS the inline
@@ -452,21 +455,6 @@ const champs = [
 </Base>
 
 <style>
-  /* Background rhythm, being decided (dev switcher « Fonds Robin »). A light section takes the cream
-     tone's colors; Section's --doux / --filet / --fond keep the text, rules and dots in step. */
-  :global(html[data-robin-fonds='alterne'] :is(#fait, #canaux, #confiance)),
-  :global(html[data-robin-fonds='clair'] :is(#fait, #semaine, #canaux, #confiance)) {
-    --doux: var(--color-soft);
-    --filet: var(--color-line);
-    --fond: var(--color-cream);
-    background-color: var(--color-cream);
-    color: var(--color-ink);
-  }
-  :global(html[data-robin-fonds='alterne'] #canaux) {
-    --fond: var(--color-cream-2);
-    background-color: var(--color-cream-2);
-  }
-
   /* Robin floats gently, like the dot above the title. */
   .flotte {
     filter: drop-shadow(0 18px 24px color-mix(in srgb, var(--color-black) 45%, transparent));
@@ -482,20 +470,9 @@ const champs = [
     }
   }
 
-  /* The evening scene: the video large, Robin's messages arriving top left (over the windows, so they hide no one). */
-  .soiree-cadre {
-    position: relative;
-    overflow: hidden;
-    aspect-ratio: 16 / 9;
-    border-radius: var(--radius-panneau);
-    corner-shape: squircle;
-    background: var(--color-night-2);
-    box-shadow: 0 0 0 1px var(--color-line-night);
-  }
-  @media (min-width: 64rem) {
-    .soiree-cadre {
-      border-radius: 36px;
-    }
+  /* The evening scene: the video fills the iPad's screen, which hangs over the next section. */
+  .soiree {
+    margin-bottom: calc(-1 * var(--debord));
   }
   .soiree-video {
     display: block;
