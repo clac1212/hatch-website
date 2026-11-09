@@ -29,33 +29,34 @@ const { href, image, alt, kicker, titre, texte, cta, message, ton, bulle } = Ast
 const sombre = ton === 'sombre';
 ---
 
-<!-- exception: the door's minimum height, the illustration needs room above the plate -->
 <Carte
   href={href}
   variante="image"
   taille="panneau"
-  class="porte flex min-h-[34rem] flex-col justify-end lg:min-h-[40rem]"
+  class:list={['porte flex flex-col', sombre ? 'porte-sombre' : 'porte-claire']}
   data-rv-groupe
 >
-  <Picture
-    src={image}
-    alt={alt}
-    widths={[640, 960, 1280]}
-    sizes="(min-width: 768px) 50vw, 100vw"
-    formats={['avif', 'webp']}
-    class="carte-zoom absolute inset-0 -z-1 size-full object-cover object-[50%_18%]"
-  />
+  <!-- The illustration, with the agent's WhatsApp message next to the character who sends it -->
+  <div class="porte-image relative overflow-clip">
+    <Picture
+      src={image}
+      alt={alt}
+      widths={[640, 960, 1280]}
+      sizes="(min-width: 768px) 50vw, 100vw"
+      formats={['avif', 'webp']}
+      class="carte-zoom size-full object-cover object-[50%_40%]"
+    />
 
-  <!-- The agent's WhatsApp message, next to the character who sends it (exception: its place in the
-       illustration is set per card) -->
-  <p class="bulle" style={`--x:${bulle.x}%;--y:${bulle.y}%`} data-rv>
-    <b>{message.de}</b>
-    {message.texte}
-  </p>
+    <!-- exception: the bubble's place in the illustration is set per card -->
+    <p class="bulle" style={`--x:${bulle.x}%;--y:${bulle.y}%`} data-rv>
+      <b>{message.de}</b>
+      {message.texte}
+    </p>
+  </div>
 
   <div
     class:list={[
-      'plaque vitre rounded-interieur m-3 flex flex-col items-start gap-2 p-5 lg:m-4 lg:p-7',
+      'plaque vitre rounded-interieur flex flex-col items-start gap-2',
       sombre ? 'plaque-sombre text-cream' : 'plaque-claire text-ink',
     ]}
   >
@@ -76,49 +77,87 @@ const sombre = ton === 'sombre';
 </Carte>
 
 <style>
-  /* The plate: the card's glass, concentric with it (rounded-interieur, --inset = its margin). */
+  /* Default layout (César 09/11): the whole illustration on top, the text below on the card's tone,
+     nothing laid over the picture. */
+  .porte-claire {
+    background-color: var(--color-surface);
+    box-shadow: var(--shadow-carte);
+  }
+  .porte-sombre {
+    background-color: var(--color-night);
+  }
+  .porte-image {
+    aspect-ratio: 2 / 1;
+  }
+  /* The picture fills the frame without sizing it (else its own 16:10 would win over the 2:1). */
+  .porte-image > :global(picture),
+  .porte-image > :global(img) {
+    position: absolute;
+    inset: 0;
+  }
   .plaque {
-    --inset: 12px;
-    transition: translate 0.5s var(--ease-hatch);
+    margin: 0;
+    padding: 24px 28px 28px;
+    background: none;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
   @media (width >= 64rem) {
     .plaque {
-      --inset: 16px;
+      padding: 28px 36px 32px;
     }
   }
-  :global(.carte-lien:hover) .plaque {
-    translate: 0 -4px;
+  .plaque::before {
+    display: none;
   }
-  /* Light plate: a soft text color on the light glass. */
   .plaque-claire .texte {
     color: var(--color-soft);
   }
-  /* Dark glass, Apple's way: nearly clear, the colors behind show through, heavily blurred and
-     saturated; a bright hairline rim and a lit top edge give it its edge; text stays cream. */
-  .plaque-sombre,
-  :global(html[data-plaque-robin='sombre']) .plaque-claire {
+  .plaque-sombre .texte {
+    color: color-mix(in srgb, var(--color-cream) 75%, transparent);
+  }
+
+  /* The other layout, being compared (dev switcher « Mise en page portes »): the illustration fills
+     the card and the text sits on a glass plate over it. */
+  :global(html[data-porte='plaque']) .porte {
+    min-height: 40rem;
+    justify-content: flex-end;
+  }
+  :global(html[data-porte='plaque']) .porte-image {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    aspect-ratio: auto;
+  }
+  :global(html[data-porte='plaque']) .plaque {
+    --inset: 16px;
+    margin: 16px;
+    padding: 28px;
+    transition: translate 0.5s var(--ease-hatch);
+  }
+  :global(html[data-porte='plaque']) .plaque::before {
+    display: block;
+  }
+  :global(html[data-porte='plaque']) .plaque-claire {
+    background-color: color-mix(in srgb, var(--color-cream) 88%, transparent);
+    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px) var(--vitre-filtre,);
+  }
+  /* Dark glass, Apple's way: nearly clear, heavily blurred and saturated, a bright hairline rim. */
+  :global(html[data-porte='plaque']) .plaque-sombre {
     background-color: color-mix(in srgb, var(--color-black) 30%, transparent);
     -webkit-backdrop-filter: blur(22px) saturate(1.8) brightness(0.85);
-    /* keeps the edge refraction of vitre.ts (--vitre-filtre) when there is one */
     backdrop-filter: blur(18px) var(--vitre-filtre,) saturate(1.8) brightness(0.85);
     box-shadow:
       inset 0 1px 0 color-mix(in srgb, var(--color-white) 35%, transparent),
-      inset 0 0 0 1px color-mix(in srgb, var(--color-white) 14%, transparent),
-      0 18px 40px color-mix(in srgb, var(--color-black) 22%, transparent);
-    color: var(--color-cream);
+      inset 0 0 0 1px color-mix(in srgb, var(--color-white) 14%, transparent);
     text-shadow: 0 1px 12px color-mix(in srgb, var(--color-black) 25%, transparent);
   }
-  .plaque-sombre .texte,
-  :global(html[data-plaque-robin='sombre']) .plaque-claire .texte {
-    color: color-mix(in srgb, var(--color-cream) 82%, transparent);
+  :global(html[data-porte='plaque']) :global(.carte-lien:hover) .plaque {
+    translate: 0 -4px;
   }
-  :global(html[data-plaque-robin='sombre']) .plaque-claire .kicker {
-    color: var(--color-peach);
-  }
-  /* The light plate, more opaque (dev switcher, components/dev/Variantes.astro). */
-  :global(html[data-plaque-robin='creme']) .plaque-claire {
-    background-color: color-mix(in srgb, var(--color-cream) 88%, transparent);
-  }
+
   /* An incoming WhatsApp bubble (scene sizes): white, its tail at the bottom left, toward the agent. */
   .bulle {
     position: absolute;
