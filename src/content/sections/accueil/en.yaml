@@ -20,22 +20,6 @@ mots:
     texte: 'qualify your franchise candidates'
   - agent: robin
     texte: 'keep an eye on your supplier invoices'
-activite:
-  label: 'What the agents are doing right now at BunBun'
-  lignes:
-    - agent: peep
-      texte: 'answered the BunBun Lyon team · 2 min ago'
-    - agent: sparrow
-      texte: 'screened a franchisee application · Bordeaux'
-    - agent: finch
-      texte: 'closed the BunBun Nantes audit'
-    - agent: jay
-      texte: 'updated the autumn burger recipe card'
-    - agent: owl
-      texte: 'walked the kitchen through prep · BunBun Lille'
-    - agent: lark
-      texte: 'sent the morning brief to head office'
-equipe: 'The Hatch OS agents team'
 lead: 'For the owner of an independent restaurant and for the head of a franchise network alike. Choose your space.'
 espaces:
   independant:

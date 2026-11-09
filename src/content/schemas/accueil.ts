@@ -37,21 +37,6 @@ export const schema = z.strictObject({
       }),
     )
     .min(1),
-  /** Hero: the live-activity line under the lead, one event at a time (BunBun, the fictive network). */
-  activite: z.strictObject({
-    /** aria-label of the list. */
-    label: texte,
-    lignes: z
-      .array(
-        z.strictObject({
-          agent: z.enum(['peep', 'owl', 'jay', 'lark', 'finch', 'pecker', 'sparrow', 'robin']),
-          texte,
-        }),
-      )
-      .min(1),
-  }),
-  /** Hero: aria-label of the row of agents. */
-  equipe: texte,
   /** Line under the title: who the site is for. */
   lead: texte,
   /** The two doors: independent restaurant (Robin), network (the agents). */

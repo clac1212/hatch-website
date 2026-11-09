@@ -20,22 +20,6 @@ mots:
     texte: 'qualifient vos candidats franchisés'
   - agent: robin
     texte: 'surveillent vos factures fournisseurs'
-activite:
-  label: 'Ce que font les agents en ce moment, chez BunBun'
-  lignes:
-    - agent: peep
-      texte: "a répondu à l'équipe de BunBun Lyon · il y a 2 min"
-    - agent: sparrow
-      texte: 'a qualifié une candidature franchisé · Bordeaux'
-    - agent: finch
-      texte: "a clôturé l'audit de BunBun Nantes"
-    - agent: jay
-      texte: "a mis à jour la fiche recette du burger d'automne"
-    - agent: owl
-      texte: 'a guidé la mise en place en cuisine · BunBun Lille'
-    - agent: lark
-      texte: 'a envoyé le point du matin au siège'
-equipe: "L'équipe des agents Hatch OS"
 lead: "Pour le patron d'un restaurant indépendant comme pour la tête d'un réseau de franchise. Choisissez votre espace."
 espaces:
   independant:
