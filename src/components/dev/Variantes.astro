@@ -1,0 +1,85 @@
+---
+/**
+ * Dev-only variant switcher (never in a build): a small panel bottom left to try design variants live.
+ * Each switch sets `data-<nom>="<option>"` on <html> (kept in localStorage), components style their
+ * variants with `:global(html[data-<nom>='<option>'])`. Add a switch below, remove it once decided.
+ * Labels are dev tooling, not site copy: they stay here.
+ */
+const SWITCHES: { nom: string; label: string; options: { valeur: string; label: string }[] }[] = [
+  {
+    nom: 'plaque-robin',
+    label: 'Plaque porte Robin',
+    options: [
+      { valeur: 'verre', label: '1 · Verre clair' },
+      { valeur: 'creme', label: '2 · Crème opaque' },
+      { valeur: 'sombre', label: '3 · Sombre' },
+    ],
+  },
+];
+---
+
+{
+  import.meta.env.DEV && SWITCHES.length > 0 && (
+    <aside class="dev-variantes" aria-label="Variantes (dev)">
+      <b>Variantes · dev</b>
+      {SWITCHES.map((s) => (
+        <label>
+          <span>{s.label}</span>
+          <select data-switch={s.nom}>
+            {s.options.map((o) => (
+              <option value={o.valeur}>{o.label}</option>
+            ))}
+          </select>
+        </label>
+      ))}
+    </aside>
+  )
+}
+
+<script>
+  document.querySelectorAll<HTMLSelectElement>('select[data-switch]').forEach((sel) => {
+    const nom = sel.dataset.switch!;
+    const cle = `variante-${nom}`;
+    const appliquer = (v: string) => document.documentElement.setAttribute(`data-${nom}`, v);
+    sel.value = localStorage.getItem(cle) ?? sel.options[0].value;
+    appliquer(sel.value);
+    sel.addEventListener('change', () => {
+      localStorage.setItem(cle, sel.value);
+      appliquer(sel.value);
+    });
+  });
+</script>
+
+<style>
+  .dev-variantes {
+    position: fixed;
+    left: 12px;
+    bottom: 12px;
+    z-index: 90;
+    display: grid;
+    gap: 6px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: var(--color-night);
+    color: var(--color-cream);
+    font: 500 12px/1.3 var(--font-sans);
+    box-shadow: var(--shadow-3);
+  }
+  .dev-variantes b {
+    font: 400 11px/1 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-peach);
+  }
+  .dev-variantes label {
+    display: grid;
+    gap: 4px;
+  }
+  .dev-variantes select {
+    padding: 4px 6px;
+    border-radius: 6px;
+    background: var(--color-night-2);
+    color: var(--color-cream);
+    border: 1px solid var(--color-line-night);
+  }
+</style>

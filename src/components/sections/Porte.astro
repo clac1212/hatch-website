@@ -55,11 +55,14 @@ const sombre = ton === 'sombre';
   <div
     class:list={[
       'plaque vitre rounded-interieur m-3 flex flex-col items-start gap-2 p-5 lg:m-4 lg:p-7',
-      sombre ? 'plaque-sombre text-cream' : 'text-ink',
+      sombre ? 'plaque-sombre text-cream' : 'plaque-claire text-ink',
     ]}
   >
     <span
-      class:list={['font-mono text-kicker uppercase', sombre ? 'text-peach' : 'text-orange-txt']}
+      class:list={[
+        'kicker font-mono text-kicker uppercase',
+        sombre ? 'text-peach' : 'text-orange-txt',
+      ]}
     >
       {kicker}
     </span>
@@ -83,6 +86,17 @@ const sombre = ton === 'sombre';
   }
   :global(.carte-lien:hover) .plaque {
     translate: 0 -4px;
+  }
+  /* Variants of the light plate, being decided (dev switcher, components/dev/Variantes.astro). */
+  :global(html[data-plaque-robin='creme']) .plaque-claire {
+    background-color: color-mix(in srgb, var(--color-cream) 88%, transparent);
+  }
+  :global(html[data-plaque-robin='sombre']) .plaque-claire {
+    background-color: color-mix(in srgb, var(--color-night) 72%, transparent);
+    color: var(--color-cream);
+  }
+  :global(html[data-plaque-robin='sombre']) .plaque-claire .kicker {
+    color: var(--color-peach);
   }
   .plaque-sombre {
     background-color: color-mix(in srgb, var(--color-night) 72%, transparent);

@@ -23,6 +23,7 @@ import { Font } from 'astro:assets';
 import SpeedInsights from '@vercel/speed-insights/astro';
 import Analytics from '../components/Analytics.astro';
 import Nav from '../components/Nav.astro';
+import Variantes from '../components/dev/Variantes.astro';
 import Footer, { type ScenePied } from '../components/Footer.astro';
 import { locales, otherLocale, useTranslations, type Locale, type Paths } from '../i18n/ui';
 import { BRAND, organization, serializeJsonLd, type JsonLdNode } from '../seo/jsonld';
@@ -146,6 +147,7 @@ const structuredData = serializeJsonLd([
       accueil={nav === 'accueil' && !espace}
       epure={piedEpure}
     />
+    {import.meta.env.DEV && <Variantes />}
     <SpeedInsights />
     <script>
       // After every section script, so their `etape` / `apparition` listeners are in place.
