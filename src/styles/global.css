@@ -316,11 +316,13 @@
     overflow: clip;
   }
   .carte-surface {
+    --doux: var(--color-soft);
     background-color: var(--color-surface);
     color: var(--color-ink);
     box-shadow: var(--shadow-carte);
   }
   .carte-nuit {
+    --doux: color-mix(in srgb, var(--color-cream) 75%, transparent);
     background-color: var(--color-night-2);
     color: var(--color-cream);
     box-shadow: inset 0 0 0 1px var(--color-line-night);

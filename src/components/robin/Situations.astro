@@ -41,9 +41,9 @@ const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7,
     situations.map((s, i) => (
       <div class:list={['rangee grid items-center gap-8 md:grid-cols-[0.85fr_1.15fr] lg:gap-16', i % 2 === 1 && 'inverse']}>
         <div class="flex flex-col items-start gap-4">
-          <span class="font-mono text-[12px] tracking-[0.08em] text-cream/60">0{i + 1}</span>
-          <h3 class="font-display text-[28px] leading-tight font-medium lg:text-[36px]">{s.titre}</h3>
-          <p class="max-w-[420px] text-[16px] leading-7 text-cream/75">{s.texte}</p>
+          <span class="font-mono text-kicker text-(--doux)">0{i + 1}</span>
+          <h3 class="font-display text-section font-semibold">{s.titre}</h3>
+          <p class="max-w-lead text-body text-(--doux)">{s.texte}</p>
         </div>
 
         <div class:list={['situ', s.teinte]} data-situ={i}>

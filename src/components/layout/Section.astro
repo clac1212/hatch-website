@@ -6,7 +6,8 @@ import Conteneur from './Conteneur.astro';
  * A page section (DS layout layer): its background tone, the site's vertical rhythm (`py-section`)
  * and, unless `pleine`, the site's container around its content.
  * - `ton`: the background, which also sets the text color (cream on dark tones, ink on light ones)
- *   and `--doux`, the softer text color for leads and secondary lines (`text-(--doux)`).
+ *   and `--doux`, the softer text color for leads and secondary lines (`text-(--doux)`), `--filet` for
+ *   rules and `--fond` for its background color (so what sits in it can follow the tone).
  * - `rythme`: `normal` (both edges), `haut` / `bas` (one edge only, when two sections share a
  *   background and must not double their gap), `aucun` (a section that sets its own spacing).
  * - `pleine`: no container, the content runs edge to edge (a full-bleed visual).
@@ -22,13 +23,19 @@ interface Props extends HTMLAttributes<'section'> {
 const { ton = 'cream', rythme = 'normal', pleine = false, class: className, ...rest } = Astro.props;
 
 const TONS: Record<Ton, string> = {
-  cream: 'bg-cream text-ink [--doux:var(--color-soft)]',
-  'cream-2': 'bg-cream-2 text-ink [--doux:var(--color-soft)]',
-  surface: 'bg-surface text-ink [--doux:var(--color-soft)]',
-  night: 'bg-night text-cream [--doux:color-mix(in_srgb,var(--color-cream)_75%,transparent)]',
-  black: 'bg-black text-cream [--doux:color-mix(in_srgb,var(--color-cream)_75%,transparent)]',
+  cream:
+    'bg-cream text-ink [--doux:var(--color-soft)] [--filet:var(--color-line)] [--fond:var(--color-cream)]',
+  'cream-2':
+    'bg-cream-2 text-ink [--doux:var(--color-soft)] [--filet:var(--color-line)] [--fond:var(--color-cream-2)]',
+  surface:
+    'bg-surface text-ink [--doux:var(--color-soft)] [--filet:var(--color-line)] [--fond:var(--color-surface)]',
+  night:
+    'bg-night text-cream [--doux:color-mix(in_srgb,var(--color-cream)_75%,transparent)] [--filet:var(--color-line-night)] [--fond:var(--color-night)]',
+  black:
+    'bg-black text-cream [--doux:color-mix(in_srgb,var(--color-cream)_75%,transparent)] [--filet:var(--color-line-night)] [--fond:var(--color-black)]',
   // Orange is a flat fill: ink text on it (6.8:1), never white.
-  orange: 'bg-orange text-ink [--doux:var(--color-ink)]',
+  orange:
+    'bg-orange text-ink [--doux:var(--color-ink)] [--filet:var(--color-ink)] [--fond:var(--color-orange)]',
 };
 const RYTHMES = { normal: 'py-section', haut: 'pt-section', bas: 'pb-section', aucun: '' };
 ---

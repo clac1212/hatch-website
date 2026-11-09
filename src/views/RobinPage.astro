@@ -147,7 +147,7 @@ const champs = [
     </Section>
 
     <!-- 4 · A week with Robin: the day timeline (the dots "day") -->
-    <Section id="semaine" ton="night" class="border-t border-line-night" data-semaine>
+    <Section id="semaine" ton="night" class="border-t border-(--filet)" data-semaine>
       <div class="flex flex-col items-center text-center">
         <EnTete titre={semaine.titre} align="centre" />
 
@@ -214,7 +214,7 @@ const champs = [
     </Section>
 
     <!-- 5 · Where to find him: the WhatsApp phone (no app yet) -->
-    <Section id="canaux" ton="night" class="border-t border-line-night" data-canaux>
+    <Section id="canaux" ton="night" class="border-t border-(--filet)" data-canaux>
       <div class="flex flex-col items-center text-center">
         <EnTete titre={canaux.titre} intro={canaux.texte} align="centre" />
 
@@ -251,7 +251,7 @@ const champs = [
     </Section>
 
     <!-- 6 · Trust: on the dark background, three cards outlined in the blue of Robin's feathers. -->
-    <Section ton="night" class="border-t border-line-night">
+    <Section id="confiance" ton="night" class="border-t border-(--filet)">
       <div class="flex flex-col items-center">
         <EnTete titre={confiance.titre} align="centre" />
         <div class="mt-12 grid w-full gap-4 md:grid-cols-3">
@@ -262,7 +262,7 @@ const champs = [
                 variante="nuit"
                 class="flex flex-col items-start gap-3 p-7 lg:p-8"
               >
-                <span class="font-mono text-kicker text-cream/60">0{i + 1}</span>
+                <span class="font-mono text-kicker text-(--doux)">0{i + 1}</span>
                 <h3 class="font-display text-card font-semibold">{c.titre}</h3>
                 <p class="text-body text-(--doux)">{c.texte}</p>
               </Carte>
@@ -273,7 +273,7 @@ const champs = [
     </Section>
 
     <!-- 7 · The beta: the waitlist -->
-    <Section id="beta" ton="night" class="border-t border-line-night">
+    <Section id="beta" ton="night" class="border-t border-(--filet)">
       <div class="grid items-center gap-12 lg:grid-cols-[1fr_0.95fr] lg:gap-16">
         <EnTete kicker={beta.kicker} titre={beta.titre} intro={beta.texte} />
         <!-- Without JS the form still posts (POST, so nothing lands in the URL); with JS the inline
@@ -452,6 +452,21 @@ const champs = [
 </Base>
 
 <style>
+  /* Background rhythm, being decided (dev switcher « Fonds Robin »). A light section takes the cream
+     tone's colors; Section's --doux / --filet / --fond keep the text, rules and dots in step. */
+  :global(html[data-robin-fonds='alterne'] :is(#fait, #canaux, #confiance)),
+  :global(html[data-robin-fonds='clair'] :is(#fait, #semaine, #canaux, #confiance)) {
+    --doux: var(--color-soft);
+    --filet: var(--color-line);
+    --fond: var(--color-cream);
+    background-color: var(--color-cream);
+    color: var(--color-ink);
+  }
+  :global(html[data-robin-fonds='alterne'] #canaux) {
+    --fond: var(--color-cream-2);
+    background-color: var(--color-cream-2);
+  }
+
   /* Robin floats gently, like the dot above the title. */
   .flotte {
     filter: drop-shadow(0 18px 24px color-mix(in srgb, var(--color-black) 45%, transparent));
@@ -613,7 +628,8 @@ const champs = [
     max-width: 380px;
     padding: 14px 18px;
     border-radius: 18px;
-    background: var(--color-cream);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-2);
     color: var(--color-ink);
     font: 500 15px/1.45 var(--font-sans);
     opacity: 0;
@@ -638,7 +654,7 @@ const champs = [
     left: 8%;
     right: 8%;
     height: 1px;
-    background: var(--color-line-night);
+    background: var(--filet);
   }
   .jour {
     position: relative;
@@ -653,30 +669,30 @@ const champs = [
     width: 15px;
     height: 15px;
     border-radius: 999px;
-    background: var(--color-night);
-    box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--color-cream) 45%, transparent);
+    background: var(--fond);
+    box-shadow: inset 0 0 0 1.5px color-mix(in srgb, currentColor 45%, transparent);
     transition:
       background-color 0.2s,
       box-shadow 0.2s;
   }
   .jour-nom {
     font: 600 14px/1 var(--font-sans);
-    color: color-mix(in srgb, var(--color-cream) 70%, transparent);
+    color: color-mix(in srgb, currentColor 70%, transparent);
   }
   .jour-heure {
     font: 400 11px/1 var(--font-mono);
     letter-spacing: 0.06em;
-    color: color-mix(in srgb, var(--color-cream) 60%, transparent);
+    color: color-mix(in srgb, currentColor 60%, transparent);
   }
   .jour[aria-selected='true'] .jour-point {
     background: var(--color-orange);
     box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-orange) 25%, transparent);
   }
   .jour[aria-selected='true'] .jour-nom {
-    color: var(--color-cream);
+    color: currentColor;
   }
   .jour:focus-visible {
-    outline: 2px solid var(--color-cream);
+    outline: 2px solid currentColor;
     outline-offset: 4px;
     border-radius: 8px;
   }
