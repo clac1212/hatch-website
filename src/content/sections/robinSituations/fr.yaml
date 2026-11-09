@@ -4,7 +4,6 @@ conversation:
   enLigne: en ligne
   ecrit: écrit…
   saisie: Message
-  rejouer: Rejouer
 
 situations:
   - titre: Il se branche à vos outils

@@ -17,6 +17,7 @@
  */
 import { Image } from 'astro:assets';
 import portrait from '../../assets/portraits/robin.jpg';
+import Iphone from '../ui/Iphone.astro';
 import { section } from '../../content/section';
 import type { Locale } from '../../i18n/ui';
 
@@ -28,26 +29,35 @@ const { locale } = Astro.props;
 const t = await section('robinSituations', locale);
 const { conversation, connexion, facture, decision, preparation } = t;
 
-/** Tint of the card behind each chat, in display order. */
-const teintes = ['bg-peach', 'bg-sand', 'bg-orange-tint', 'bg-cream-2'];
-const situations = t.situations.map((s, i) => ({ ...s, teinte: teintes[i] }));
+const situations = t.situations;
 
 /** Heights of the voice note's waveform bars. */
 const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7, 9, 5];
 ---
 
-<div class="flex flex-col gap-16 lg:gap-24">
-  {
-    situations.map((s, i) => (
-      <div class:list={['rangee grid items-center gap-8 md:grid-cols-[0.85fr_1.15fr] lg:gap-16', i % 2 === 1 && 'inverse']}>
-        <div class="flex flex-col items-start gap-4">
-          <span class="font-mono text-kicker text-(--doux)">0{i + 1}</span>
-          <h3 class="font-display text-section font-semibold">{s.titre}</h3>
-          <p class="max-w-lead text-body text-(--doux)">{s.texte}</p>
-        </div>
+<div class="fonctions" data-fonctions>
+  <!-- The four features: the active one is lit, the phone plays its conversation -->
+  <ol class="liste">
+    {
+      situations.map((s, i) => (
+        <li class:list={['fn', i === 0 && 'on']} data-fn={i}>
+          <button type="button" class="fn-btn" aria-pressed={i === 0 ? 'true' : 'false'}>
+            <span class="font-mono text-kicker text-(--doux)">0{i + 1}</span>
+            <h3 class="font-display text-card font-semibold">{s.titre}</h3>
+            <p class="fn-texte max-w-lead text-body text-(--doux)">{s.texte}</p>
+          </button>
+        </li>
+      ))
+    }
+  </ol>
 
-        <div class:list={['situ', s.teinte]} data-situ={i}>
-          <div class="wa" aria-label={conversation.ariaLabel}>
+  <!-- One realistic phone, sticky beside the list: the active feature's WhatsApp conversation, which
+       plays once then can be scrolled by hand -->
+  <div class="tel-zone">
+    <Iphone class="tel">
+    {
+      situations.map((s, i) => (
+          <div class:list={['wa', i === 0 && 'on']} data-situ={i} aria-label={conversation.ariaLabel}>
             <header class="wa-tete" data-etat="tete">
               <span class="wa-retour" aria-hidden="true">←</span>
               <Image src={portrait} alt="" width={36} densities={[1, 2]} class="wa-av" />
@@ -226,18 +236,13 @@ const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7,
                 <svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 003-3V6a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 006 6.9V21h2v-2.1a7 7 0 006-6.9z" /></svg>
               </span>
             </div>
+            {/* The owner's thumb, tapping the link or the button */}
+            <span class="doigt" aria-hidden="true" />
           </div>
-
-          {/* The owner's thumb, tapping the link or the button */}
-          <span class="doigt" aria-hidden="true" />
-
-          <button type="button" class="rejouer" data-rejouer>
-            <span aria-hidden="true">↻</span> {conversation.rejouer}
-          </button>
-        </div>
-      </div>
-    ))
-  }
+      ))
+    }
+    </Iphone>
+  </div>
 </div>
 
 <script is:inline data-keep>
@@ -311,6 +316,9 @@ const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7,
         var cls = p[1] || 'on';
         e.classList.add(cls);
         allumes.push([e, cls]);
+        // Like WhatsApp, the thread follows the newest message.
+        var fil = root.querySelector('.wa-fil');
+        if (fil) fil.scrollTo({ top: fil.scrollHeight, behavior: reduit ? 'auto' : 'smooth' });
       }
       function eteindre(spec) {
         var p = spec.split(':');
@@ -360,74 +368,150 @@ const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7,
           );
         });
       }
-      root.querySelector('[data-rejouer]').addEventListener('click', jouer);
       root.jouer = jouer;
+      root.remettre = remettre;
       remettre();
-      if ('IntersectionObserver' in window) {
-        var vu = false;
-        new IntersectionObserver(
-          function (entries) {
-            if (entries[0].isIntersecting && !vu) {
-              vu = true;
-              jouer();
-            }
-          },
-          { threshold: 0.45 },
-        ).observe(root);
-      } else {
-        jouer();
-      }
     }
     document.documentElement.classList.add('situ-js');
-    [].slice.call(document.querySelectorAll('[data-situ]')).forEach(scene);
+    var scenes = [].slice.call(document.querySelectorAll('[data-situ]'));
+    scenes.forEach(scene);
+
+    // The list drives the phone: scrolling past a feature (wide screens) or tapping it lights it and
+    // plays its conversation from the start; the phone starts with the first one when it comes in view.
+    var items = [].slice.call(document.querySelectorAll('[data-fn]'));
+    var actif = -1;
+    function activer(i) {
+      if (i === actif) return;
+      if (actif > -1) scenes[actif].remettre();
+      actif = i;
+      items.forEach(function (it, k) {
+        it.classList.toggle('on', k === i);
+        it.querySelector('button').setAttribute('aria-pressed', k === i ? 'true' : 'false');
+      });
+      scenes.forEach(function (sc, k) {
+        sc.classList.toggle('on', k === i);
+      });
+      scenes[i].jouer();
+    }
+    items.forEach(function (it, k) {
+      it.querySelector('button').addEventListener('click', function () {
+        activer(k);
+      });
+    });
+    var large = matchMedia('(min-width: 64rem)');
+    var obs = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting && large.matches) activer(items.indexOf(e.target));
+        });
+      },
+      { rootMargin: '-45% 0px -45% 0px' },
+    );
+    items.forEach(function (it) {
+      obs.observe(it);
+    });
+    new IntersectionObserver(
+      function (entries, o) {
+        if (entries[0].isIntersecting) {
+          if (actif === -1) activer(0);
+          o.disconnect();
+        }
+      },
+      { threshold: 0.4 },
+    ).observe(document.querySelector('[data-fonctions] .tel-zone'));
   })();
 </script>
 
 <style>
-  @media (min-width: 48rem) {
-    .rangee.inverse > :first-child {
-      order: 2;
-    }
-  }
-
-  /* The tinted card that holds the scene. */
-  .situ {
-    position: relative;
+  /* The list beside the phone. Wide screens: each feature takes half a screen of scroll, the phone
+     stays put beside them; the feature crossing the middle of the screen is the active one. */
+  .fonctions {
     display: grid;
-    place-items: center;
-    padding: 32px 24px 64px;
-    border-radius: var(--radius-card);
-    corner-shape: squircle;
-    overflow: hidden;
-    color: var(--color-ink);
+    gap: 40px;
   }
-  @media (min-width: 64rem) {
-    .situ {
-      border-radius: 36px;
-      padding: 44px 48px 68px;
+  .liste {
+    display: grid;
+    gap: 8px;
+  }
+  .fn-btn {
+    display: grid;
+    justify-items: start;
+    gap: 10px;
+    width: 100%;
+    padding: 18px 0;
+    text-align: left;
+    cursor: pointer;
+    opacity: 0.4;
+    transition: opacity 0.4s var(--ease-hatch);
+  }
+  .fn.on .fn-btn,
+  .fn-btn:hover {
+    opacity: 1;
+  }
+  .fn-btn:focus-visible {
+    outline: 2px solid var(--color-orange);
+    outline-offset: 6px;
+    border-radius: var(--radius-sm);
+  }
+  /* Small screens: only the active feature shows its line. */
+  .fn:not(.on) .fn-texte {
+    display: none;
+  }
+  .tel-zone {
+    display: flex;
+    justify-content: center;
+  }
+  .tel-zone :global(.tel) {
+    width: min(320px, 82vw);
+  }
+  @media (width >= 64rem) {
+    /* A centred pair: the list and the phone side by side, no empty middle. */
+    .fonctions {
+      grid-template-columns: minmax(0, 30rem) auto;
+      justify-content: center;
+      gap: 112px;
+      align-items: start;
+    }
+    .fn {
+      display: flex;
+      align-items: center;
+      min-height: 34vh;
+    }
+    .fn .fn-texte {
+      display: block;
+    }
+    /* exception: the phone sits in the middle of the screen while the list scrolls past it */
+    .tel-zone {
+      position: sticky;
+      top: max(96px, calc(50vh - 330px));
+    }
+    .tel-zone :global(.tel) {
+      width: 330px;
     }
   }
 
   /* The WhatsApp conversation: header, thread, input bar. */
+  /* The conversation fills the phone's screen; only the active one shows. */
   .wa {
-    position: relative;
-    display: flex;
+    position: absolute;
+    inset: 0;
+    display: none;
     flex-direction: column;
-    width: 100%;
-    max-width: 380px;
-    border-radius: 22px;
     overflow: hidden;
     background: var(--color-whatsapp-wall);
-    box-shadow: var(--shadow-3);
     font: 400 13.5px/1.4 var(--font-sans);
     text-align: left;
   }
   /* The WhatsApp-coloured header: green bar, back, contact, calls, menu. */
+  .wa.on {
+    display: flex;
+  }
+  /* exception: the header clears the phone's status bar and Dynamic Island */
   .wa-tete {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 10px 12px 10px 10px;
+    padding: 46px 12px 10px 10px;
     background: var(--color-whatsapp-teal);
     color: var(--color-white);
   }
@@ -476,14 +560,20 @@ const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7,
   }
 
   /* The thread keeps its height: new messages arrive at the bottom and push older ones up. */
+  /* The thread scrolls by hand, like WhatsApp: newest at the bottom, older ones above. */
   .wa-fil {
     display: flex;
+    flex: 1;
     flex-direction: column;
-    justify-content: flex-end;
     gap: 6px;
-    height: 372px;
+    min-height: 0;
     padding: 12px 10px;
-    overflow: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+  }
+  .wa-fil > :first-child {
+    margin-top: auto;
   }
   .m {
     max-width: 86%;
@@ -1051,24 +1141,6 @@ const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7,
   }
 
   /* Replay */
-  .rejouer {
-    position: absolute;
-    right: 16px;
-    bottom: 14px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 7px 12px;
-    border-radius: 999px;
-    background: color-mix(in srgb, var(--color-night) 85%, transparent);
-    color: var(--color-cream);
-    font: 600 12px/1 var(--font-sans);
-    cursor: pointer;
-  }
-  .rejouer:focus-visible {
-    outline: 2px solid var(--color-night);
-    outline-offset: 2px;
-  }
   :global(html:not(.situ-js)) .rejouer {
     display: none;
   }

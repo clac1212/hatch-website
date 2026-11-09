@@ -23,7 +23,6 @@ export const schema = z.strictObject({
     ecrit: z.string(),
     /** Placeholder of the input bar. */
     saisie: z.string(),
-    rejouer: z.string(),
   }),
   /** Title and text next to each chat, in display order. */
   situations: z.tuple([

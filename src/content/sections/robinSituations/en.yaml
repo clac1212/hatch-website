@@ -4,7 +4,6 @@ conversation:
   enLigne: online
   ecrit: typing…
   saisie: Message
-  rejouer: Replay
 
 situations:
   - titre: He plugs into your tools
