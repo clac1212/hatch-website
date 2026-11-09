@@ -30,10 +30,10 @@ situations:
 connexion:
   demande: 'To find your invoices, I need access to your inbox. You can connect it here:'
   lien:
-    icone: G
-    titre: Connect your inbox
-    sousTitre: Secure Hatch OS link
-  systeme: Inbox connected
+    titre: Connect your inbox · Hatch OS
+    sousTitre: Secure link, valid for 24 h
+    domaine: gethatch.io
+    url: https://gethatch.io/c/7Kq2
   trouve: "All set ✅ Here's what I found so far:"
   trouvailles:
     - 3 Metro invoices
@@ -44,6 +44,7 @@ connexion:
   fichier:
     type: XLS
     nom: October books · Le Petit Comptoir.xlsx
+    meta: XLSX · 18 kB
     statut: Draft, for you to review
 
 facture:
@@ -74,6 +75,7 @@ facture:
   avoir:
     type: PDF
     nom: Credit request · Metro.pdf
+    meta: 1 page · PDF · 84 kB
     statut: Draft, needs your OK
 
 decision:
@@ -96,6 +98,8 @@ preparation:
     transcription: “Do Lina's contract for Saturday night.”
   contrat:
     titre: Temp contract · your template
+    nom: Temp contract · Lina Moreau.pdf
+    meta: 2 pages · PDF · 112 kB
     tampon: Ready to sign
     champs:
       - { cle: Employee, valeur: Lina Moreau }

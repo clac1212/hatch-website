@@ -30,10 +30,10 @@ situations:
 connexion:
   demande: "Pour retrouver tes factures, il me faut ta boîte mail. Tu peux me l'ouvrir ici :"
   lien:
-    icone: G
-    titre: Connecter ta boîte mail
-    sousTitre: Lien sécurisé Hatch OS
-  systeme: Boîte mail connectée
+    titre: Connecter ta boîte mail · Hatch OS
+    sousTitre: Lien sécurisé, valable 24 h
+    domaine: gethatch.io
+    url: https://gethatch.io/c/7Kq2
   trouve: "C'est bon ✅ J'ai déjà trouvé :"
   trouvailles:
     - 3 factures Metro
@@ -44,6 +44,7 @@ connexion:
   fichier:
     type: XLS
     nom: Compta octobre · Le Petit Comptoir.xlsx
+    meta: XLSX · 18 Ko
     statut: Brouillon, à relire
 
 facture:
@@ -74,6 +75,7 @@ facture:
   avoir:
     type: PDF
     nom: Demande d'avoir · Metro.pdf
+    meta: 1 page · PDF · 84 Ko
     statut: Brouillon, à valider
 
 decision:
@@ -96,6 +98,8 @@ preparation:
     transcription: « Fais le contrat de Lina pour samedi soir. »
   contrat:
     titre: Contrat d'extra · ton modèle
+    nom: Contrat d'extra · Lina Moreau.pdf
+    meta: 2 pages · PDF · 112 Ko
     tampon: Prêt à signer
     champs:
       - { cle: Salariée, valeur: Lina Moreau }

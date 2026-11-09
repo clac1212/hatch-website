@@ -69,6 +69,15 @@
   --color-whatsapp-wall: #efeae2; /* chat background */
   --color-whatsapp-tick: #53bdeb; /* read receipts */
   --color-whatsapp-teal: #008069; /* app bar and reply buttons */
+  /* WhatsApp iOS, light mode (ui/WhatsApp.astro): text, timestamps, bars, links, file icons. */
+  --color-whatsapp-ink: #111b21;
+  --color-whatsapp-meta: #667781;
+  --color-whatsapp-bar: #f6f6f6;
+  --color-whatsapp-link: #027eb5;
+  --color-whatsapp-boite: #f0f2f5; /* link preview and document box in an incoming bubble */
+  --color-whatsapp-boite-out: #c9f2c1; /* the same in an outgoing bubble */
+  --color-whatsapp-pdf: #e5252a;
+  --color-whatsapp-xls: #1d6f42;
   --color-robin: #506785; /* Robin's blue-grey plumage: accents on the Robin page (5.4:1 on cream) */
   --color-robin-tint: #e4ebf3; /* its pale wash, behind Robin's portraits */
 
