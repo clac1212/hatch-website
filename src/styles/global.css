@@ -118,8 +118,8 @@
   /* Radius scale (DS decision 2, César 09/11): sm for small controls, card for every card and panel,
      full (Tailwind) for buttons, avatars, pills. Something set inside a card takes a smaller radius or none. */
   --radius-sm: 8px;
-  --radius-card: 28px; /* drawn as a squircle: reads like a 24 px circle arc, smoother */
-  --radius-panneau: 40px; /* the large objects: home doors, forms, big scenes */
+  --radius-card: 40px; /* drawn as a squircle: soft, generous corners (César 09/11) */
+  --radius-panneau: 64px; /* the large objects: home doors, forms, big scenes */
   --shadow-1: 0 4px 14px #22190c0a;
   --shadow-2: 0 6px 26px #140f231f;
   --shadow-3: 0 22px 60px #08061457;
