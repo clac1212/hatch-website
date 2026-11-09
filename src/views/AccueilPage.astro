@@ -6,12 +6,12 @@
  * Shared by src/pages/index.astro (FR) and src/pages/en/index.astro (EN).
  */
 import { getEntry } from 'astro:content';
-import { Image, Picture } from 'astro:assets';
+import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import Base from '../layouts/Base.astro';
 import SecuriteBandeau from '../components/sections/SecuriteBandeau.astro';
 import Section from '../components/layout/Section.astro';
-import Button from '../components/ui/Button.astro';
+import Porte from '../components/sections/Porte.astro';
 import { section } from '../content/section';
 import { routes, type Locale } from '../i18n/ui';
 import { webSite } from '../seo/jsonld';
@@ -155,70 +155,31 @@ const reseauxUrl = routes.reseaux[locale];
     </div>
   </Section>
 
-  <!-- 2 · The two doors -->
+  <!-- 2 · The two doors: each a voxel world, its agent's message, a glass plate -->
   <Section ton="cream">
     <div class="grid gap-5 md:grid-cols-2">
-      <!-- Independent → Robin -->
-      <a
+      <Porte
         href={routes.robin[locale]}
-        class="group flex flex-col overflow-hidden rounded-panneau bg-surface shadow-carte transition hover:-translate-y-1 hover:shadow-2"
-      >
-        <div class="relative aspect-[16/10] overflow-hidden">
-          <Picture
-            src={oeuf}
-            alt={espaces.independant.alt}
-            widths={[600, 1000]}
-            sizes="(min-width: 768px) 50vw, 100vw"
-            formats={['avif', 'webp']}
-            class="size-full object-cover transition duration-700 group-hover:scale-[1.03]"
-          />
-        </div>
-        <div class="flex flex-1 flex-col gap-4 p-6 lg:p-9">
-          <span class="font-mono text-kicker text-orange-txt uppercase">
-            {espaces.independant.kicker}
-          </span>
-          <h2 class="font-display text-section font-semibold text-ink">
-            {espaces.independant.titre}
-          </h2>
-          <p class="text-body text-soft">
-            {espaces.independant.texte}
-          </p>
-          <span class="mt-auto pt-3">
-            <Button variant="orange">{espaces.independant.cta}</Button>
-          </span>
-        </div>
-      </a>
-
-      <!-- Network → the networks space -->
-      <a
+        image={oeuf}
+        alt={espaces.independant.alt}
+        kicker={espaces.independant.kicker}
+        titre={espaces.independant.titre}
+        cta={espaces.independant.cta}
+        message={espaces.independant.bulle}
+        ton="clair"
+        bulle={{ x: 46, y: 9 }}
+      />
+      <Porte
         href={routes.reseaux[locale]}
-        class="group flex flex-col overflow-hidden rounded-panneau bg-night shadow-1 transition hover:-translate-y-1 hover:shadow-2"
-      >
-        <div class="relative aspect-[16/10] overflow-hidden bg-scene">
-          <Picture
-            src={reseau}
-            alt={espaces.reseau.alt}
-            widths={[600, 1000]}
-            sizes="(min-width: 768px) 50vw, 100vw"
-            formats={['avif', 'webp']}
-            class="size-full object-cover transition duration-700 group-hover:scale-[1.03]"
-          />
-        </div>
-        <div class="flex flex-1 flex-col gap-4 p-6 lg:p-9">
-          <span class="font-mono text-kicker text-peach uppercase">
-            {espaces.reseau.kicker}
-          </span>
-          <h2 class="font-display text-section font-semibold text-cream">
-            {espaces.reseau.titre}
-          </h2>
-          <p class="text-body text-cream/75">
-            {espaces.reseau.texte}
-          </p>
-          <span class="mt-auto pt-3">
-            <Button variant="cream">{espaces.reseau.cta}</Button>
-          </span>
-        </div>
-      </a>
+        image={reseau}
+        alt={espaces.reseau.alt}
+        kicker={espaces.reseau.kicker}
+        titre={espaces.reseau.titre}
+        cta={espaces.reseau.cta}
+        message={espaces.reseau.bulle}
+        ton="sombre"
+        bulle={{ x: 22, y: 6 }}
+      />
     </div>
   </Section>
 

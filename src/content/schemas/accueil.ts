@@ -7,7 +7,8 @@ const espace = z.strictObject({
   /** Audience of the space (pixel-font kicker). */
   kicker: texte,
   titre: texte,
-  texte,
+  /** The WhatsApp bubble the space's agent sends, over the illustration: who writes, and what. */
+  bulle: z.strictObject({ de: texte, texte }),
   /** Label of the card's call to action (the whole card is the link). */
   cta: texte,
   /** Alt text of the card's voxel illustration. */

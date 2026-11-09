@@ -1,0 +1,115 @@
+---
+/**
+ * One of the home page's two doors (signature section, César 09/11): the voxel illustration fills the
+ * whole card, a WhatsApp bubble from the space's agent floats over it (what the product does, shown
+ * rather than told), and a glass plate at the bottom carries the audience, the title and the button.
+ * The whole card is the link; the button is drawn as a <span>.
+ * - `ton`: the plate's glass, `clair` (ink text) or `sombre` (night glass, cream text).
+ * - `bulle`: where the bubble sits, in % of the card (`x`, `y` of its top left corner), next to the
+ *   character who sends it.
+ */
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Button from '../ui/Button.astro';
+
+interface Props {
+  href: string;
+  image: ImageMetadata;
+  alt: string;
+  kicker: string;
+  titre: string;
+  cta: string;
+  message: { de: string; texte: string };
+  ton: 'clair' | 'sombre';
+  bulle: { x: number; y: number };
+}
+const { href, image, alt, kicker, titre, cta, message, ton, bulle } = Astro.props;
+const sombre = ton === 'sombre';
+---
+
+<a
+  href={href}
+  class="porte group relative isolate flex min-h-[30rem] flex-col justify-end overflow-hidden rounded-panneau bg-scene shadow-2 lg:min-h-[34rem]"
+  data-rv-groupe
+>
+  <Picture
+    src={image}
+    alt={alt}
+    widths={[640, 960, 1280]}
+    sizes="(min-width: 768px) 50vw, 100vw"
+    formats={['avif', 'webp']}
+    class="absolute inset-0 -z-1 size-full object-cover object-[50%_18%] transition duration-700 ease-hatch group-hover:scale-[1.04]"
+  />
+
+  <!-- The agent's WhatsApp message, next to the character who sends it (exception: its place in the
+       illustration is set per card) -->
+  <p class="bulle" style={`--x:${bulle.x}%;--y:${bulle.y}%`} data-rv>
+    <b>{message.de}</b>
+    {message.texte}
+  </p>
+
+  <div
+    class:list={[
+      'plaque vitre m-3 flex flex-col items-start gap-2 p-5 lg:m-4 lg:p-7',
+      sombre ? 'plaque-sombre text-cream' : 'text-ink',
+    ]}
+  >
+    <span
+      class:list={['font-mono text-kicker uppercase', sombre ? 'text-peach' : 'text-orange-txt']}
+    >
+      {kicker}
+    </span>
+    <h2 class="font-display text-section font-semibold text-balance">{titre}</h2>
+    <span class="mt-3">
+      <Button variant={sombre ? 'cream' : 'orange'}>{cta}</Button>
+    </span>
+  </div>
+</a>
+
+<style>
+  .porte {
+    transition:
+      translate 0.5s var(--ease-hatch),
+      box-shadow 0.5s var(--ease-hatch);
+  }
+  .porte:hover {
+    translate: 0 -4px;
+    box-shadow: var(--shadow-3);
+  }
+  /* The plate: the card's glass, concentric with it (panel radius minus its margin). */
+  .plaque {
+    border-radius: calc(var(--radius-panneau) - 12px);
+    corner-shape: squircle;
+    transition: translate 0.5s var(--ease-hatch);
+  }
+  @media (width >= 64rem) {
+    .plaque {
+      border-radius: calc(var(--radius-panneau) - 16px);
+    }
+  }
+  .porte:hover .plaque {
+    translate: 0 -4px;
+  }
+  .plaque-sombre {
+    background-color: color-mix(in srgb, var(--color-night) 72%, transparent);
+  }
+  /* An incoming WhatsApp bubble (scene sizes): white, its tail at the bottom left, toward the agent. */
+  .bulle {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    max-width: min(17rem, 60%);
+    padding: 10px 14px 11px;
+    border-radius: 18px 18px 18px 4px;
+    background: var(--color-surface);
+    box-shadow: var(--shadow-2);
+    font: 400 var(--text-caption) / 1.4 var(--font-sans);
+    color: var(--color-ink);
+  }
+  .bulle b {
+    display: block;
+    margin-bottom: 2px;
+    font-weight: 600;
+    color: var(--color-orange-txt);
+  }
+</style>
