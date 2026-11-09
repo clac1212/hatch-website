@@ -15,6 +15,9 @@ import Button from '../components/ui/Button.astro';
 import { section } from '../content/section';
 import { routes, type Locale } from '../i18n/ui';
 import { webSite } from '../seo/jsonld';
+import Conteneur from '../components/layout/Conteneur.astro';
+import LisierePixel from '../components/ui/LisierePixel.astro';
+import grain from '../assets/hero/grain.png';
 import oeuf from '../assets/robin/independant.jpg';
 import reseau from '../assets/tarifs/reseau-flotte.jpg';
 import peep from '../assets/portraits/peep.jpg';
@@ -43,7 +46,7 @@ const { locale } = Astro.props;
 const home = await getEntry('home', locale);
 if (!home) throw new Error(`Missing src/content/home/${locale}.yaml`);
 const { seo } = home.data;
-const { titre, mots: taches, lead, espaces } = await section('accueil', locale);
+const { titre, mots: taches, lead, espaces, activite, equipe } = await section('accueil', locale);
 
 type Agent = (typeof taches)[number]['agent'];
 const AGENTS: Record<Agent, { portrait: ImageMetadata; emoji: ImageMetadata }> = {
@@ -93,20 +96,26 @@ const reseauxUrl = routes.reseaux[locale];
 >
   <!-- 1 · The banner: what Hatch OS does -->
   <!-- Just the text, muse.ai style: no frame, no image, one big centred sentence. -->
-  <!-- exception: a taller top padding, the hero clears the floating nav -->
+  <!-- Signature section: grain on the night, a pixel edge into the doors, the agents' row and a live
+       activity line. exception: 82svh tall, top padding clears the floating nav. -->
   <Section
     ton="night"
-    rythme="bas"
-    class="hero-noir pt-36 lg:pt-44"
+    rythme="aucun"
+    pleine
+    class="hero-noir relative flex min-h-[82svh] flex-col overflow-hidden"
     aria-labelledby="accueil-titre"
     data-nav-fond="sombre"
   >
-    <div class="flex flex-col items-center gap-5 text-center">
+    <div class="hero-grain" aria-hidden="true" style={`background-image:url(${grain.src})`}></div>
+    <Conteneur
+      class="relative z-1 flex flex-1 flex-col items-center justify-center gap-6 pt-32 pb-24 text-center lg:pt-40 lg:pb-28"
+    >
       <!-- muse.ai's "rebus" title: line 1 with the avatar in a circle, line 2 the sentence ending
          that changes word by word. The avatar changes with it: it is the agent doing that job. -->
       <h1
         id="accueil-titre"
-        class="rebus w-full font-display text-h1 font-semibold text-cream"
+        class="entree rebus w-full font-display text-h1 font-semibold text-cream"
+        style="--d:1"
         data-rebus
         data-prefixe={prefixe}
       >
@@ -149,9 +158,40 @@ const reseauxUrl = routes.reseaux[locale];
           }
         </span>
       </h1>
-      <p class="max-w-lead text-punch text-(--doux)">
+      <p class="entree max-w-lead text-punch text-(--doux)" style="--d:2">
         {lead}
       </p>
+
+      <!-- The team: the agent named in the title lights up -->
+      <ul class="entree equipe mt-4" style="--d:3" aria-label={equipe} data-equipe>
+        {
+          mots.map((m, i) => (
+            <li class:list={['eq', i === 0 && 'on']} data-j={i}>
+              <Image src={m.img} alt="" width={48} densities={[1, 2]} class="eq-img" />
+              <span class="eq-nom">{m.agent}</span>
+            </li>
+          ))
+        }
+      </ul>
+
+      <!-- Live activity, one event at a time (BunBun, the fictive network) -->
+      <ol class="entree activite" style="--d:4" aria-label={activite.label} data-activite>
+        {
+          activite.lignes.map((l, i) => (
+            <li class:list={['act', i === 0 && 'on']}>
+              <span class="act-point" aria-hidden="true" />
+              <span>
+                <span class="act-nom">{l.agent.charAt(0).toUpperCase() + l.agent.slice(1)}</span>{' '}
+                {l.texte}
+              </span>
+            </li>
+          ))
+        }
+      </ol>
+    </Conteneur>
+
+    <div class="absolute inset-x-0 bottom-0 z-1">
+      <LisierePixel color="var(--color-cream)" />
     </div>
   </Section>
 
@@ -233,6 +273,7 @@ const reseauxUrl = routes.reseaux[locale];
       var av = [].slice.call(root.querySelectorAll('.av'));
       var sr = root.querySelector('.sr-only');
       var prefixe = root.dataset.prefixe;
+      var eq = [].slice.call(document.querySelectorAll('[data-equipe] .eq'));
       var i = 0;
       setInterval(function () {
         var a = ph[i],
@@ -247,11 +288,29 @@ const reseauxUrl = routes.reseaux[locale];
         av[i].classList.remove('out');
         av[i].classList.add('on');
         if (sr) sr.textContent = prefixe + ph[i].textContent.replace(/\s+/g, ' ').trim();
+        eq.forEach(function (e, k) {
+          e.classList.toggle('on', k === i);
+        });
         setTimeout(function () {
           a.classList.remove('out');
           b.classList.remove('out');
         }, 900);
       }, 2800);
+    })();
+  </script>
+
+  <script is:inline data-keep>
+    // The activity line: one event every 3.6 s, the previous one slides up and out.
+    // Reduced motion: the first event stays.
+    (function () {
+      var li = [].slice.call(document.querySelectorAll('[data-activite] .act'));
+      if (li.length < 2 || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      var k = 0;
+      setInterval(function () {
+        li[k].classList.remove('on');
+        k = (k + 1) % li.length;
+        li[k].classList.add('on');
+      }, 3600);
     })();
   </script>
 
@@ -272,6 +331,134 @@ const reseauxUrl = routes.reseaux[locale];
 </Base>
 
 <style>
+  /* Film grain over the night: a material, not a gradient. */
+  .hero-grain {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-size: 128px 128px;
+    mix-blend-mode: screen;
+    opacity: 0.06;
+  }
+
+  /* Entrance, once: title, lead, team, activity fade up in turn. */
+  .entree {
+    animation: entree 0.7s var(--ease-hatch) both;
+    animation-delay: calc(var(--d, 0) * 110ms);
+  }
+  @keyframes entree {
+    from {
+      opacity: 0;
+      translate: 0 14px;
+    }
+  }
+
+  /* The team row: 8 small portraits, the one named in the title lit, the others dimmed. */
+  .equipe {
+    display: flex;
+    gap: 10px;
+  }
+  .eq {
+    position: relative;
+    display: grid;
+    justify-items: center;
+  }
+  .eq :global(.eq-img) {
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    background: var(--color-cream-2);
+    opacity: 0.55;
+    filter: saturate(0.85);
+    transition:
+      opacity 0.4s var(--ease-hatch),
+      filter 0.4s var(--ease-hatch),
+      translate 0.4s var(--ease-hatch);
+  }
+  .eq.on :global(.eq-img),
+  .eq:hover :global(.eq-img) {
+    opacity: 1;
+    filter: none;
+    translate: 0 -3px;
+  }
+  .eq-nom {
+    position: absolute;
+    top: calc(100% + 8px);
+    font: 400 var(--text-source) / 1 var(--font-mono);
+    letter-spacing: 0.08em;
+    color: color-mix(in srgb, var(--color-cream) 60%, transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .eq.on .eq-nom,
+  .eq:hover .eq-nom {
+    opacity: 1;
+  }
+
+  /* The activity line: Departure Mono, one event shown, a breathing orange dot. */
+  .activite {
+    display: grid;
+    margin-top: 28px;
+    font: 400 var(--text-kicker) / 1.4 var(--font-mono);
+    letter-spacing: 0.04em;
+    color: color-mix(in srgb, var(--color-cream) 70%, transparent);
+  }
+  .act {
+    grid-area: 1 / 1;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 8px;
+    text-wrap: balance;
+    opacity: 0;
+    translate: 0 8px;
+    transition:
+      opacity 0.5s var(--ease-hatch),
+      translate 0.5s var(--ease-hatch);
+  }
+  .act.on {
+    opacity: 1;
+    translate: 0 0;
+  }
+  .act-nom {
+    color: var(--color-cream);
+  }
+  .act-point {
+    position: relative;
+    flex: none;
+    translate: 0 -1px;
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: var(--color-orange);
+  }
+  .act-point::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--color-orange);
+    animation: point 2.4s ease-out infinite;
+  }
+  @keyframes point {
+    70%,
+    100% {
+      scale: 2.6;
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .entree,
+    .act-point::after {
+      animation: none;
+    }
+    .act,
+    .eq :global(.eq-img) {
+      transition: none;
+    }
+  }
+
   .rebus .ligne {
     display: block;
   }
