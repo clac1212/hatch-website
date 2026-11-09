@@ -11,6 +11,7 @@
 import { Picture } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import Button from '../ui/Button.astro';
+import Carte from '../ui/Carte.astro';
 
 interface Props {
   href: string;
@@ -27,9 +28,12 @@ const { href, image, alt, kicker, titre, cta, message, ton, bulle } = Astro.prop
 const sombre = ton === 'sombre';
 ---
 
-<a
+<!-- exception: the door's minimum height, the illustration needs room above the plate -->
+<Carte
   href={href}
-  class="porte group relative isolate flex min-h-[30rem] flex-col justify-end overflow-hidden rounded-panneau bg-scene shadow-2 lg:min-h-[34rem]"
+  variante="image"
+  taille="panneau"
+  class="porte flex min-h-[30rem] flex-col justify-end lg:min-h-[34rem]"
   data-rv-groupe
 >
   <Picture
@@ -38,7 +42,7 @@ const sombre = ton === 'sombre';
     widths={[640, 960, 1280]}
     sizes="(min-width: 768px) 50vw, 100vw"
     formats={['avif', 'webp']}
-    class="absolute inset-0 -z-1 size-full object-cover object-[50%_18%] transition duration-700 ease-hatch group-hover:scale-[1.04]"
+    class="carte-zoom absolute inset-0 -z-1 size-full object-cover object-[50%_18%]"
   />
 
   <!-- The agent's WhatsApp message, next to the character who sends it (exception: its place in the
@@ -64,18 +68,9 @@ const sombre = ton === 'sombre';
       <Button variant={sombre ? 'cream' : 'orange'}>{cta}</Button>
     </span>
   </div>
-</a>
+</Carte>
 
 <style>
-  .porte {
-    transition:
-      translate 0.5s var(--ease-hatch),
-      box-shadow 0.5s var(--ease-hatch);
-  }
-  .porte:hover {
-    translate: 0 -4px;
-    box-shadow: var(--shadow-3);
-  }
   /* The plate: the card's glass, concentric with it (rounded-interieur, --inset = its margin). */
   .plaque {
     --inset: 12px;
@@ -86,7 +81,7 @@ const sombre = ton === 'sombre';
       --inset: 16px;
     }
   }
-  .porte:hover .plaque {
+  :global(.carte-lien:hover) .plaque {
     translate: 0 -4px;
   }
   .plaque-sombre {

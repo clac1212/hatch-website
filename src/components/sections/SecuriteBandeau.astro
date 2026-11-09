@@ -13,6 +13,7 @@ import { Picture, getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import Section from '../layout/Section.astro';
 import EnTete from '../ui/EnTete.astro';
+import Carte from '../ui/Carte.astro';
 import fond from '../../assets/securite/fond-orange-grain.jpg';
 import jay from '../../assets/securite/jay.png';
 import owl from '../../assets/securite/owl.png';
@@ -56,7 +57,7 @@ const TEINTES = { jay: 'bg-sand', owl: 'bg-stone', finch: 'bg-peach', ecran: 'bg
     <ul class="grid gap-4 sm:grid-cols-2">
       {
         sections.map((s) => (
-          <li class="flex items-center gap-4 rounded-card bg-surface p-3 pr-5 text-ink shadow-carte">
+          <Carte as="li" class="flex items-center gap-4 p-3 pr-5">
             <div
               class:list={[
                 'vignette rounded-interieur grid shrink-0 place-items-center',
@@ -85,7 +86,7 @@ const TEINTES = { jay: 'bg-sand', owl: 'bg-stone', finch: 'bg-peach', ecran: 'bg
               <h3 class="font-display text-card font-semibold text-balance">{s.title}</h3>
               <p class="text-caption text-soft">{s.subtitle}</p>
             </div>
-          </li>
+          </Carte>
         ))
       }
     </ul>
