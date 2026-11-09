@@ -45,7 +45,7 @@ const sombre = ton === 'sombre';
 
   <div
     class:list={[
-      'plaque vitre rounded-interieur flex flex-col items-start gap-2',
+      'plaque flex flex-col items-start gap-2',
       sombre ? 'plaque-sombre text-cream' : 'plaque-claire text-ink',
     ]}
   >
@@ -66,8 +66,8 @@ const sombre = ton === 'sombre';
 </Carte>
 
 <style>
-  /* Default layout (César 09/11): the whole illustration on top, the text below on the card's tone,
-     nothing laid over the picture. */
+  /* The whole illustration on top, the text below on the card's tone, nothing laid over the picture
+     (César 09/11: a glass plate over it hid the scene and took too much height). */
   .porte-claire {
     background-color: var(--color-surface);
     box-shadow: var(--shadow-carte);
@@ -85,65 +85,17 @@ const sombre = ton === 'sombre';
     inset: 0;
   }
   .plaque {
-    margin: 0;
     padding: 24px 28px 28px;
-    background: none;
-    box-shadow: none;
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
   }
   @media (width >= 64rem) {
     .plaque {
       padding: 28px 36px 32px;
     }
   }
-  .plaque::before {
-    display: none;
-  }
   .plaque-claire .texte {
     color: var(--color-soft);
   }
   .plaque-sombre .texte {
     color: color-mix(in srgb, var(--color-cream) 75%, transparent);
-  }
-
-  /* The other layout, being compared (dev switcher « Mise en page portes »): the illustration fills
-     the card and the text sits on a glass plate over it. */
-  :global(html[data-porte='plaque']) .porte {
-    min-height: 40rem;
-    justify-content: flex-end;
-  }
-  :global(html[data-porte='plaque']) .porte-image {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    aspect-ratio: auto;
-  }
-  :global(html[data-porte='plaque']) .plaque {
-    --inset: 16px;
-    margin: 16px;
-    padding: 28px;
-    transition: translate 0.5s var(--ease-hatch);
-  }
-  :global(html[data-porte='plaque']) .plaque::before {
-    display: block;
-  }
-  :global(html[data-porte='plaque']) .plaque-claire {
-    background-color: color-mix(in srgb, var(--color-cream) 88%, transparent);
-    -webkit-backdrop-filter: blur(18px);
-    backdrop-filter: blur(18px) var(--vitre-filtre,);
-  }
-  /* Dark glass, Apple's way: nearly clear, heavily blurred and saturated, a bright hairline rim. */
-  :global(html[data-porte='plaque']) .plaque-sombre {
-    background-color: color-mix(in srgb, var(--color-black) 30%, transparent);
-    -webkit-backdrop-filter: blur(22px) saturate(1.8) brightness(0.85);
-    backdrop-filter: blur(18px) var(--vitre-filtre,) saturate(1.8) brightness(0.85);
-    box-shadow:
-      inset 0 1px 0 color-mix(in srgb, var(--color-white) 35%, transparent),
-      inset 0 0 0 1px color-mix(in srgb, var(--color-white) 14%, transparent);
-    text-shadow: 0 1px 12px color-mix(in srgb, var(--color-black) 25%, transparent);
-  }
-  :global(html[data-porte='plaque']) :global(.carte-lien:hover) .plaque {
-    translate: 0 -4px;
   }
 </style>
