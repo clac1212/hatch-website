@@ -12,6 +12,9 @@ import { Image } from 'astro:assets';
 import rungis from '../assets/footer/rungis.jpg';
 import Base from '../layouts/Base.astro';
 import Carte from '../components/ui/Carte.astro';
+import Button from '../components/ui/Button.astro';
+import EnTete from '../components/ui/EnTete.astro';
+import Section from '../components/layout/Section.astro';
 import Iphone from '../components/ui/Iphone.astro';
 import Situations from '../components/robin/Situations.astro';
 import { section } from '../content/section';
@@ -30,10 +33,17 @@ interface Props {
 }
 
 const { locale } = Astro.props;
-const { seo, hero, soiree, fait, semaine, canaux, confiance, beta } = await section(
-  'robin',
-  locale,
-);
+const {
+  seo,
+  hero,
+  pied: piedRobin,
+  soiree,
+  fait,
+  semaine,
+  canaux,
+  confiance,
+  beta,
+} = await section('robin', locale);
 
 /** Robin's own footer: the Rungis market and what Robin keeps track of, hall by hall. */
 const pied = { image: rungis, ...(await section('piedDePage', locale)).scenes.robin };
@@ -60,157 +70,86 @@ const champs = [
   navTone="night"
   pied={pied}
   piedEpure
+  piedAppel={{ href: '#beta', label: hero.cta, signature: piedRobin.signature }}
   title={seo.title}
   description={seo.description}
 >
   <div class="nuit bg-night text-cream">
-    <!-- 1 · Hero: Robin floats above the title (dots), one big centred sentence (muse.ai) -->
-    <section
-      id="robin"
-      class="flex flex-col items-center px-4 pt-36 pb-14 text-center sm:px-6 lg:pt-44 lg:pb-20"
-    >
-      <!-- Robin flies into his circle, waves, takes notes, checks a receipt, gives a thumbs up,
-           then flies off (15 s loop, with a pause button: WCAG 2.2.2). -->
-      <div class="mb-8 flex flex-col items-center gap-2" data-vol>
-        <div class="size-[132px] overflow-hidden rounded-full bg-cream-2 lg:size-[156px]">
-          <video
-            class="size-full object-cover"
-            src="/anim/robin-vol.mp4"
-            poster={portrait.src}
-            muted
-            loop
-            playsinline
-            preload="auto"
-            aria-label={hero.video}></video>
+    <!-- 1 · Hero: Robin floats above the title (dots), one big centred sentence (muse.ai).
+         exception: the top padding clears the floating nav. -->
+    <Section id="robin" ton="night" rythme="bas" class="pt-36 lg:pt-44" data-nav-fond="sombre">
+      <div class="flex flex-col items-center text-center">
+        <!-- Robin flies into his circle, waves, takes notes, checks a receipt, gives a thumbs up,
+           then flies off (15 s loop; reduced motion: the portrait stays still). -->
+        <div class="mb-8 flex flex-col items-center gap-2" data-vol>
+          <div class="size-[132px] overflow-hidden rounded-full bg-cream-2 lg:size-[156px]">
+            <video
+              class="size-full object-cover"
+              src="/anim/robin-vol.mp4"
+              poster={portrait.src}
+              muted
+              loop
+              playsinline
+              preload="auto"
+              aria-label={hero.video}></video>
+          </div>
         </div>
-        <button
-          type="button"
-          class="vol-pause"
-          data-vol-pause
-          aria-pressed="false"
-          data-label-pause={hero.pause.pause}
-          data-label-lecture={hero.pause.lecture}
-        >
-          <span class="sr-only" data-vol-label>{hero.pause.pause}</span>
-          <svg
-            viewBox="0 0 24 24"
-            class="ico-pause size-3.5"
-            fill="currentColor"
-            aria-hidden="true"
-          >
-            <path d="M7 5h4v14H7zm6 0h4v14h-4z"></path>
-          </svg>
-          <svg
-            viewBox="0 0 24 24"
-            class="ico-lecture size-3.5"
-            fill="currentColor"
-            aria-hidden="true"
-          >
-            <path d="M8 5v14l11-7z"></path>
-          </svg>
-        </button>
-      </div>
-      <h1 class="font-display text-h1 font-semibold">
-        {hero.titre}
-      </h1>
-      <p class="mt-5 max-w-[520px] text-[16px] leading-7 text-cream/75 lg:text-[18px] lg:leading-8">
-        {hero.intro}
-      </p>
-      <div class="mt-8 flex flex-wrap justify-center gap-3">
-        <a
-          href="#beta"
-          class="btn-vif rounded-full bg-cream px-6 py-3 text-[0.9rem] font-bold text-ink"
-        >
-          {hero.cta}
-        </a>
-      </div>
+        <h1 class="font-display text-h1 font-semibold">
+          {hero.titre}
+        </h1>
+        <p class="mt-5 max-w-lead text-punch text-(--doux)">
+          {hero.intro}
+        </p>
+        <div class="mt-8 flex flex-wrap justify-center gap-3">
+          <Button href="#beta" variant="orange" size="lg">{hero.cta}</Button>
+        </div>
 
-      <!-- The scene below the hero, like the dots video: the bistro at closing time, Robin talks to
+        <!-- The scene below the hero, like the dots video: the bistro at closing time, Robin talks to
            the owner (looping video), and his messages pop out of his beak, as comic bubbles, one after another. -->
-      <div class="soiree mt-14 w-full max-w-[860px] lg:mt-16" data-soiree>
-        <div class="soiree-cadre">
-          <video
-            class="soiree-video"
-            src="/anim/robin-soir.mp4"
-            poster={soir.src}
-            muted
-            loop
-            playsinline
-            preload="auto"
-            aria-label={soiree.video}></video>
-          <ol class="bulles-soir" aria-label={soiree.label}>
-            {
-              soiree.messages.map((m, i) => (
-                <li class="bs" style={`--i:${i}`}>
-                  <span class="bs-bulle">
-                    {m.txt}
-                    {m.lien && (
-                      <span class="bs-lien">
-                        {m.lien} <span aria-hidden="true">→</span>
-                      </span>
-                    )}
-                  </span>
-                </li>
-              ))
-            }
-          </ol>
-          <button
-            type="button"
-            class="soiree-pause"
-            data-pause
-            aria-pressed="false"
-            data-label-pause={soiree.pause.pause}
-            data-label-lecture={soiree.pause.lecture}
-          >
-            <span class="sr-only" data-pause-label>{soiree.pause.pause}</span>
-            <svg
-              viewBox="0 0 24 24"
-              class="ico-pause size-4"
-              fill="currentColor"
-              aria-hidden="true"
-            >
-              <path d="M7 5h4v14H7zm6 0h4v14h-4z"></path>
-            </svg>
-            <svg
-              viewBox="0 0 24 24"
-              class="ico-lecture size-4"
-              fill="currentColor"
-              aria-hidden="true"
-            >
-              <path d="M8 5v14l11-7z"></path>
-            </svg>
-          </button>
+        <div class="soiree mt-14 w-full max-w-[860px] lg:mt-16" data-soiree>
+          <div class="soiree-cadre">
+            <video
+              class="soiree-video"
+              src="/anim/robin-soir.mp4"
+              poster={soir.src}
+              muted
+              loop
+              playsinline
+              preload="auto"
+              aria-label={soiree.video}></video>
+            <ol class="bulles-soir" aria-label={soiree.label}>
+              {
+                soiree.messages.map((m, i) => (
+                  <li class="bs" style={`--i:${i}`}>
+                    <span class="bs-bulle">
+                      {m.txt}
+                      {m.lien && (
+                        <span class="bs-lien">
+                          {m.lien} <span aria-hidden="true">→</span>
+                        </span>
+                      )}
+                    </span>
+                  </li>
+                ))
+              }
+            </ol>
+          </div>
         </div>
       </div>
-    </section>
+    </Section>
 
     <!-- 3 · What Robin does: alternating rows, a WhatsApp situation in a tinted card -->
-    <section
-      id="fait"
-      class="mx-auto flex max-w-[1180px] flex-col gap-12 px-4 py-20 sm:px-6 lg:gap-16 lg:py-28"
-    >
-      <div class="flex max-w-[640px] flex-col gap-4">
-        <h2
-          class="font-display text-[34px] leading-[1.08] font-medium tracking-[-0.02em] lg:text-[48px]"
-        >
-          {fait.titre}
-        </h2>
+    <Section id="fait" ton="night">
+      <div class="flex flex-col gap-12 lg:gap-16">
+        <EnTete titre={fait.titre} />
+        <Situations locale={locale} />
       </div>
-      <Situations locale={locale} />
-    </section>
+    </Section>
 
     <!-- 4 · A week with Robin: the day timeline (the dots "day") -->
-    <section
-      id="semaine"
-      class="border-t border-line-night px-4 py-20 sm:px-6 lg:py-28"
-      data-semaine
-    >
-      <div class="mx-auto flex max-w-[980px] flex-col items-center text-center">
-        <h2
-          class="max-w-[18ch] font-display text-[34px] leading-[1.08] font-medium tracking-[-0.02em] lg:text-[48px]"
-        >
-          {semaine.titre}
-        </h2>
+    <Section id="semaine" ton="night" class="border-t border-line-night" data-semaine>
+      <div class="flex flex-col items-center text-center">
+        <EnTete titre={semaine.titre} align="centre" />
 
         <!-- Robin and his bubble, which change with the day -->
         <div class="scene mt-12">
@@ -265,30 +204,19 @@ const champs = [
           {
             semaine.jours.map((j, i) => (
               <div class:list={['detail', i === 0 && 'on']} data-j={i}>
-                <h3 class="font-display text-[26px] leading-tight font-medium lg:text-[32px]">
-                  {j.titre}
-                </h3>
-                <p class="mx-auto mt-3 max-w-[520px] text-[16px] leading-7 text-cream/75">
-                  {j.texte}
-                </p>
+                <h3 class="font-display text-card font-semibold">{j.titre}</h3>
+                <p class="mx-auto mt-3 max-w-lead text-body text-(--doux)">{j.texte}</p>
               </div>
             ))
           }
         </div>
       </div>
-    </section>
+    </Section>
 
     <!-- 5 · Where to find him: the WhatsApp phone (no app yet) -->
-    <section id="canaux" class="border-t border-line-night px-4 py-20 sm:px-6 lg:py-28" data-canaux>
-      <div class="mx-auto flex max-w-[980px] flex-col items-center text-center">
-        <h2
-          class="font-display text-[34px] leading-[1.08] font-medium tracking-[-0.02em] lg:text-[48px]"
-        >
-          {canaux.titre}
-        </h2>
-        <p class="mt-4 max-w-[520px] text-[16px] leading-7 text-cream/75">
-          {canaux.texte}
-        </p>
+    <Section id="canaux" ton="night" class="border-t border-line-night" data-canaux>
+      <div class="flex flex-col items-center text-center">
+        <EnTete titre={canaux.titre} intro={canaux.texte} align="centre" />
 
         <div class="telephone mt-10 w-full max-w-[320px]">
           <Iphone>
@@ -320,16 +248,12 @@ const champs = [
           </Iphone>
         </div>
       </div>
-    </section>
+    </Section>
 
     <!-- 6 · Trust: on the dark background, three cards outlined in the blue of Robin's feathers. -->
-    <section class="border-t border-line-night px-4 py-20 sm:px-6 lg:py-28">
-      <div class="mx-auto flex max-w-[1180px] flex-col items-center">
-        <h2
-          class="max-w-[20ch] text-center font-display text-[34px] leading-[1.08] font-medium tracking-[-0.02em] lg:text-[48px]"
-        >
-          {confiance.titre}
-        </h2>
+    <Section ton="night" class="border-t border-line-night">
+      <div class="flex flex-col items-center">
+        <EnTete titre={confiance.titre} align="centre" />
         <div class="mt-12 grid w-full gap-4 md:grid-cols-3">
           {
             confiance.cartes.map((c, i) => (
@@ -338,32 +262,20 @@ const champs = [
                 variante="nuit"
                 class="flex flex-col items-start gap-3 p-7 lg:p-8"
               >
-                <span class="font-mono text-[12px] tracking-[0.08em] text-cream/60">0{i + 1}</span>
-                <h3 class="font-display text-[22px] leading-tight font-medium">{c.titre}</h3>
-                <p class="text-[15px] leading-6 text-cream/75">{c.texte}</p>
+                <span class="font-mono text-kicker text-cream/60">0{i + 1}</span>
+                <h3 class="font-display text-card font-semibold">{c.titre}</h3>
+                <p class="text-body text-(--doux)">{c.texte}</p>
               </Carte>
             ))
           }
         </div>
       </div>
-    </section>
+    </Section>
 
     <!-- 7 · The beta: the waitlist -->
-    <section id="beta" class="border-t border-line-night px-4 py-20 sm:px-6 lg:py-28">
-      <div
-        class="mx-auto grid max-w-[1100px] items-center gap-12 lg:grid-cols-[1fr_0.95fr] lg:gap-16"
-      >
-        <div class="flex flex-col items-start gap-5">
-          <span class="font-mono text-kicker text-cream/60 uppercase">{beta.kicker}</span>
-          <h2
-            class="font-display text-[34px] leading-[1.06] font-medium tracking-[-0.02em] lg:text-[48px]"
-          >
-            {beta.titre}
-          </h2>
-          <p class="max-w-[440px] text-[16px] leading-7 text-cream/75">
-            {beta.texte}
-          </p>
-        </div>
+    <Section id="beta" ton="night" class="border-t border-line-night">
+      <div class="grid items-center gap-12 lg:grid-cols-[1fr_0.95fr] lg:gap-16">
+        <EnTete kicker={beta.kicker} titre={beta.titre} intro={beta.texte} />
         <!-- Without JS the form still posts (POST, so nothing lands in the URL); with JS the inline
              script validates, then sends JSON and swaps the form for the confirmation. -->
         <form
@@ -397,66 +309,34 @@ const champs = [
           </div>
           <!-- Honeypot: invisible to people and assistive tech, bots fill it and get dropped server-side. -->
           <div class="sr-only" aria-hidden="true">
-            <input type="text" name="website" tabindex="-1" autocomplete="off" />
+            <input type="text" name="hatch_hp" tabindex="-1" autocomplete="off" />
           </div>
           <input type="hidden" name="locale" value={locale} />
 
-          <button
+          <Button
             type="submit"
-            class="btn-vif mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full bg-orange px-6 py-4 text-base font-bold text-ink disabled:cursor-wait disabled:opacity-60"
+            size="lg"
+            block
+            class="mt-2 disabled:cursor-wait disabled:opacity-60"
             data-masquer
           >
             {beta.bouton}
-            <span aria-hidden="true">→</span>
-          </button>
+          </Button>
           <p class="statut" role="status" aria-live="polite" tabindex="-1" data-statut></p>
-          <p class="text-center text-[12.5px] text-soft" data-masquer>{beta.mention}</p>
+          <p class="text-center text-caption text-soft" data-masquer>{beta.mention}</p>
         </form>
       </div>
-    </section>
+    </Section>
   </div>
 
   <script is:inline data-keep>
-    // Robin flying in the hero: the loop starts on its own (except with reduced motion: the portrait
-    // stays still), the small button pauses it.
+    // Robin flying in the hero and the evening scene: both loops start on their own, except with
+    // reduced motion (the posters stay still).
     (function () {
-      var root = document.querySelector('[data-vol]');
-      if (!root) return;
-      var video = root.querySelector('video');
-      var bouton = root.querySelector('[data-vol-pause]');
-      var label = root.querySelector('[data-vol-label]');
-      function regler(pause) {
-        root.classList.toggle('pause', pause);
-        bouton.setAttribute('aria-pressed', pause ? 'true' : 'false');
-        label.textContent = bouton.getAttribute(pause ? 'data-label-lecture' : 'data-label-pause');
-        if (pause) video.pause();
-        else video.play().catch(function () {});
-      }
-      bouton.addEventListener('click', function () {
-        regler(!root.classList.contains('pause'));
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      document.querySelectorAll('[data-vol] video, [data-soiree] video').forEach(function (v) {
+        v.play().catch(function () {});
       });
-      regler(matchMedia('(prefers-reduced-motion: reduce)').matches);
-    })();
-    // The evening scene: the video starts on its own (except with reduced motion), the button pauses
-    // the video and the incoming messages (WCAG 2.2.2: anything that loops can be paused).
-    (function () {
-      var root = document.querySelector('[data-soiree]');
-      if (!root) return;
-      var video = root.querySelector('video');
-      var bouton = root.querySelector('[data-pause]');
-      var label = root.querySelector('[data-pause-label]');
-      var reduit = matchMedia('(prefers-reduced-motion: reduce)').matches;
-      function regler(pause) {
-        root.classList.toggle('pause', pause);
-        bouton.setAttribute('aria-pressed', pause ? 'true' : 'false');
-        label.textContent = bouton.getAttribute(pause ? 'data-label-lecture' : 'data-label-pause');
-        if (pause) video.pause();
-        else video.play().catch(function () {});
-      }
-      bouton.addEventListener('click', function () {
-        regler(!root.classList.contains('pause'));
-      });
-      regler(reduit);
     })();
     // A week with Robin: clicking a day changes the bubble and the detail. Without JS, Monday stays
     // visible.
@@ -537,7 +417,7 @@ const champs = [
             whatsapp: valeur('whatsapp'),
             email: valeur('email'),
             locale: form.getAttribute('data-locale'),
-            website: form.elements.namedItem('website').value,
+            hatch_hp: form.elements.namedItem('hatch_hp').value,
           }),
         })
           .then(function (r) {
@@ -572,32 +452,6 @@ const champs = [
 </Base>
 
 <style>
-  /* The pause button for flying Robin: discreet, under the circle. */
-  .vol-pause {
-    display: grid;
-    place-items: center;
-    width: 28px;
-    height: 28px;
-    border-radius: 999px;
-    color: color-mix(in srgb, var(--color-cream) 75%, transparent);
-    box-shadow: 0 0 0 1px var(--color-line-night);
-    cursor: pointer;
-  }
-  .vol-pause:hover,
-  .vol-pause:focus-visible {
-    color: var(--color-cream);
-  }
-  .vol-pause:focus-visible {
-    outline: 2px solid var(--color-cream);
-    outline-offset: 2px;
-  }
-  .vol-pause .ico-lecture,
-  [data-vol].pause .vol-pause .ico-pause {
-    display: none;
-  }
-  [data-vol].pause .vol-pause .ico-lecture {
-    display: block;
-  }
   /* Robin floats gently, like the dot above the title. */
   .flotte {
     filter: drop-shadow(0 18px 24px color-mix(in srgb, var(--color-black) 45%, transparent));
@@ -701,34 +555,6 @@ const champs = [
       opacity: 0;
       transform: scale(0.96);
     }
-  }
-  .soiree.pause .bs {
-    animation-play-state: paused;
-  }
-  .soiree-pause {
-    position: absolute;
-    bottom: 16px;
-    left: 16px;
-    display: grid;
-    place-items: center;
-    width: 38px;
-    height: 38px;
-    border-radius: 999px;
-    background: color-mix(in srgb, var(--color-night) 70%, transparent);
-    backdrop-filter: blur(8px);
-    color: var(--color-cream);
-    cursor: pointer;
-  }
-  .soiree-pause:focus-visible {
-    outline: 2px solid var(--color-cream);
-    outline-offset: 2px;
-  }
-  .soiree-pause .ico-lecture,
-  .soiree.pause .soiree-pause .ico-pause {
-    display: none;
-  }
-  .soiree.pause .soiree-pause .ico-lecture {
-    display: block;
   }
   /* On small screens, the bubble keeps its place above Robin, smaller. */
   @media (max-width: 47.99rem) {

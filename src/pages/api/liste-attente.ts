@@ -38,7 +38,8 @@ export const POST: APIRoute = async ({ request, redirect }) => {
     return formulaire ? retour(false) : json(400, { ok: false, error: 'invalid' });
   }
   // Honeypot: a bot filled the hidden field. Pretend it worked, record nothing.
-  if (texte(body.website)) return formulaire ? retour(true) : json(200, { ok: true });
+  // Honeypot (`hatch_hp`, a name no browser autofills): a bot that fills it is told « ok » and dropped.
+  if (texte(body.hatch_hp)) return formulaire ? retour(true) : json(200, { ok: true });
 
   const f = {
     prenom: texte(body.prenom, 80),

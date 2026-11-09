@@ -24,7 +24,7 @@ lead: 'For the owner of an independent restaurant and for the head of a franchis
 espaces:
   independant:
     kicker: 'Independent restaurant'
-    titre: 'Robin, your AI business partner'
+    titre: 'Robin, your AI partner'
     texte: 'You run one or two restaurants and you do everything yourself. Robin knows your restaurant, checks in with you every week and prepares what you need.'
     cta: 'Meet Robin'
     alt: 'A small independent bistro in voxels: behind the counter, the owner checks his phone, with Robin perched beside him.'

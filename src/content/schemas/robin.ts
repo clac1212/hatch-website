@@ -2,9 +2,6 @@ import { z } from 'astro/zod';
 
 const texte = z.string().min(1);
 
-/** Screen-reader labels of a looping animation's pause button, swapped by the inline script. */
-const pause = z.strictObject({ pause: texte, lecture: texte });
-
 /** A waitlist form field: its label and example value (type and autocomplete live in the view). */
 const champ = z.strictObject({ label: texte, placeholder: texte });
 
@@ -22,14 +19,14 @@ export const schema = z.strictObject({
     cta: texte,
     /** aria-label of Robin's flying loop above the title. */
     video: texte,
-    pause,
   }),
+  /** The footer under the page: the line under the logo (the call to action is the hero's). */
+  pied: z.strictObject({ signature: texte }),
   /** The evening scene under the hero: the bistro video and Robin's messages popping one by one. */
   soiree: z.strictObject({
     video: texte,
     /** aria-label of the list of messages. */
     label: texte,
-    pause,
     /** Exactly three: the CSS loop (19.5 s, one bubble every 6.5 s) is timed for three bubbles. */
     messages: z.array(z.strictObject({ txt: texte, lien: texte.optional() })).length(3),
   }),

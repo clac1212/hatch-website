@@ -8,16 +8,12 @@ hero:
   intro: "You do everything, on your own. Robin is the right hand you don't have: he knows your restaurant, follows up with you and gets the work ready."
   cta: 'Join the waitlist'
   video: 'Robin, a voxel robin, flies in, waves, takes notes, checks a receipt, gives a thumbs up and flies off.'
-  pause:
-    pause: "Pause Robin's animation"
-    lecture: "Play Robin's animation"
 
+pied:
+  signature: 'Robin, your AI partner, on WhatsApp.'
 soiree:
   video: 'Evening, closing time at a small voxel bistro: Robin, perched on the counter, goes over the day with the owner, who is looking at his phone.'
   label: "Robin's messages tonight"
-  pause:
-    pause: 'Pause the animation'
-    lecture: 'Play the animation'
   messages:
     - txt: 'Service is over! 🎉 Here’s your recap of the evening. You’ll find the details in the dashboard we built together.'
       lien: 'Dashboard'
@@ -95,10 +91,10 @@ beta:
   champs:
     prenom: { label: 'First name', placeholder: 'Karim' }
     nom: { label: 'Last name', placeholder: 'Benali' }
-    restaurant: { label: 'Restaurant name', placeholder: 'Le Petit Comptoir' }
-    site: { label: 'Website', placeholder: 'lepetitcomptoir.fr' }
+    restaurant: { label: 'Restaurant name', placeholder: 'Chez Karim' }
+    site: { label: 'Website', placeholder: 'exemple.fr' }
     whatsapp: { label: 'WhatsApp number', placeholder: '+33 6 12 34 56 78' }
-    email: { label: 'Email', placeholder: 'karim@lepetitcomptoir.fr' }
+    email: { label: 'Email', placeholder: 'karim@exemple.fr' }
   bouton: 'Join the waitlist'
   mention: 'Free during the beta. No commitment.'
   messages:
