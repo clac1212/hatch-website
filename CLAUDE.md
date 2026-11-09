@@ -108,7 +108,7 @@ Signature sections today: the home hero rebus (`AccueilPage`), the Robin evening
   - accent `orange`, `orange-txt`, `orange-hover`, `orange-tint`, `copper`.
 - **Scene palette** (`whatsapp*`, `mail*`, `metal*`, `trad-*`, `statut-*`, `client-*`, `robin*`, `scene`, `mur`, `galet`, `faq`, `gray-*`, `amber-*`, `success*`, `navy`, `glass`): only inside mockups and illustrations (phone and tablet screens, scenes), never for page surfaces or page text.
 - **`orange` (#F87A01) is for flat fills only.** Never as text, never white text on it (2.7:1). Orange text uses `orange-txt` (on light) or `peach` (on `night`).
-- No green outside WhatsApp mockups. No decorative gradients or icons. Relief comes from the `line` border; shadows `shadow-1` to `shadow-3` only.
+- No green outside WhatsApp mockups. No decorative gradients or icons. Relief comes from the `line` border; shadows `shadow-1` to `shadow-3`, plus `shadow-orange` under the primary button only.
 - Translucent white text on `night` needs a contrast floor: `/60` minimum for uppercase labels, `/75` for body copy.
 - **Type.** Families: `font-display` (Fraunces: titles, numbers), `font-sans` (Inter: body), `font-mono` (Departure Mono: kickers, sources, labels). Fraunces titles are weight **600**. One size token per level, never a pixel size:
 
@@ -125,15 +125,15 @@ Signature sections today: the home hero rebus (`AccueilPage`), the Robin evening
   | Source, legal line        | `text-source`  | 11 px                   |
 
 - Containers `max-w-site` (1312 px, every section's left edge) and `max-w-prose` (760 px, running text). Easing `ease-hatch`.
-- Radii, section spacing and button shape: see the pending decisions below.
+- **Buttons: always `<Button>`, a pill in every variant** (`orange` primary, `secondary`, `ink`, `cream`), sizes `sm` | `lg`, the orange glow is `shadow-orange` / `shadow-orange-lg` (César 09/11). Never a hand-made button.
+- Radii (other than buttons) and section spacing: see the pending decisions below.
 - **Resets and element-wide defaults live in `@layer base { ... }`**: an unlayered rule outranks utilities in Tailwind v4 and silently breaks them.
 
 ### Pending decisions (fill in, then delete this list)
 
-1. Button shape: one shape for every `Button` variant (pill or `rounded-btn`).
-2. Card radius: one token for every card.
-3. Navigation: one component for the whole site (today `Nav` and `NavAccueil`).
-4. H1 family: Fraunces 600 everywhere, then update the writing rule in « Content rules ».
+1. Card radius: one token for every card.
+2. Navigation: one component for the whole site (today `Nav` and `NavAccueil`).
+3. H1 family: Fraunces 600 everywhere, then update the writing rule in « Content rules ».
 
 ### Guardrails
 

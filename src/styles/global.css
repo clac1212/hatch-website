@@ -120,6 +120,9 @@
   --shadow-1: 0 4px 14px #22190c0a;
   --shadow-2: 0 6px 26px #140f231f;
   --shadow-3: 0 22px 60px #08061457;
+  /* the orange glow under the primary button (sm, lg) */
+  --shadow-orange: 0 6px 16px rgb(248 122 1 / 0.35);
+  --shadow-orange-lg: 0 10px 24px rgb(248 122 1 / 0.4);
 
   --container-site: 82rem; /* 1312 px = 1440 mockup − 2 × 64 px gutters */
   --container-prose: 47.5rem; /* 760 px, max body text width */
