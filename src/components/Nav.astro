@@ -13,12 +13,11 @@ import { appUrls, routes, otherLocale, useTranslations, type Locale, type Paths 
  * - `legal`: back home and the language only.
  * `surPlace`: the page carries the sections itself (anchors stay on the page, the logo goes back to its
  * top, a « ← Home » link appears).
- * The glass takes the color of what it floats over, like Apple's Liquid Glass: a script reads the
- * background under the pill as the page scrolls, tints the glass with it (`--teinte`) and switches the
- * text to cream over a dark one (`data-ton`). A section whose look is an image rather than its
- * background color declares it with `data-nav-fond="clair" | "sombre"`. `tone` only sets the first
- * paint, before the script runs.
- * Wide screens fold the section links away on scroll down; small ones get them in a menu.
+ * Real glass, like Apple's Liquid Glass: nearly transparent, blurred and refracting, so the page's own
+ * colors show through it; nothing is painted in. Only the content adapts: a script reads the background
+ * under the pill as the page scrolls and switches text and logo to cream over a dark one (`data-ton`),
+ * the logo to ink over a vivid one (`data-vif`). A section whose look is an image rather than its
+ * background color declares it with `data-nav-fond="clair" | "sombre"`. `tone` sets the first paint.
  */
 interface Props {
   locale: Locale;
@@ -73,7 +72,6 @@ const survol = 'hover:bg-current/10';
       'vitre pointer-events-auto flex w-full max-w-max items-center gap-1.5 rounded-full py-2 pr-2 pl-5 transition-[filter] duration-500 max-sm:justify-between md:pl-6 [&.defile]:drop-shadow-[0_10px_24px_rgb(20_10_0/0.18)]',
     ]}
     data-ton={sombre ? 'sombre' : 'clair'}
-    style={sombre ? '--teinte: var(--color-night)' : undefined}
   >
     <a href={surPlace ? '#' : home} aria-label={t('a11y.home')} class="shrink-0">
       <Logo class="n-logo-jour w-[80px] md:w-[92px]" />
@@ -208,15 +206,21 @@ const survol = 'hover:bg-current/10';
 </header>
 
 <style>
-  /* The glass, tinted by what it floats over (--teinte, set by the script); text follows the tone. */
+  /* The glass lets the background through: a faint white veil only, the blur and refraction come
+     from .vitre (global.css, src/scripts/vitre.ts). No hard rim: just a hairline catching the light. */
   #nav {
-    --teinte: var(--color-white);
-    background-color: color-mix(in srgb, var(--teinte) 55%, transparent);
+    background-color: color-mix(in srgb, var(--color-white) 12%, transparent);
     color: var(--color-ink);
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, var(--color-white) 22%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--color-white) 10%, transparent),
+      0 10px 30px color-mix(in srgb, var(--color-shadow) 14%, transparent);
     transition:
-      background-color 0.45s var(--ease-hatch),
       color 0.45s var(--ease-hatch),
       filter 0.5s;
+  }
+  #nav::before {
+    display: none;
   }
   #nav[data-ton='sombre'] {
     color: var(--color-cream);
@@ -329,17 +333,16 @@ const survol = 'hover:bg-current/10';
     }
     return getComputedStyle(document.body).backgroundColor;
   }
-  let derniereTeinte = '';
+  let dernierFond = '';
   let prevu = false;
-  function teinter() {
+  function accorder() {
     prevu = false;
     const fond = fondSous();
-    if (fond === derniereTeinte) return;
-    derniereTeinte = fond;
+    if (fond === dernierFond) return;
+    dernierFond = fond;
     const [r, g, b] = rgba(fond).map((v) => v / 255);
     const lin = (c: number) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
     const luminance = 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
-    nav.style.setProperty('--teinte', fond);
     nav.dataset.ton = luminance < 0.2 ? 'sombre' : 'clair';
     // A vivid background (the orange Security band): the orange logo would vanish, it turns ink.
     const max = Math.max(r, g, b);
@@ -348,12 +351,12 @@ const survol = 'hover:bg-current/10';
   const planifier = () => {
     if (!prevu) {
       prevu = true;
-      requestAnimationFrame(teinter);
+      requestAnimationFrame(accorder);
     }
   };
   addEventListener('scroll', planifier, { passive: true });
   addEventListener('resize', planifier);
-  teinter();
+  accorder();
   large.addEventListener('change', () => plier(nav.classList.contains('replie')));
   nav.addEventListener('focusin', () => plier(false));
   maj();
