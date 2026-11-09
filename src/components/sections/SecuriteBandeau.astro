@@ -2,9 +2,9 @@
 /**
  * Security on the home page (the crossroads), under the two spaces: a compact band, not the Security
  * page itself (César 09/11). The orange grain of the Security page, its title and lead, its four themes
- * as four illustrated cards (the voxel character of each theme on a tinted panel, then the title and
- * one line), and a link to the full page. For access control, a miniature of the page's role screen:
- * what a crew member sees.
+ * as a band (César 09/11: compact): the head and the link on the left, the four promises on the right,
+ * each a slim card with its voxel character on a small tinted stage, its title and one line. For
+ * access control, the three roles of the page's access screen, the crew member's highlighted.
  * Content: the Security page's (src/content/pages/security/{fr,en}.yaml); the link's label lives in
  * src/content/sections/accueil/{fr,en}.yaml under `securite`.
  */
@@ -31,12 +31,6 @@ const ui = (await section('accueil', locale)).securite;
 const bg = await getImage({ src: fond, format: 'webp', width: 1600, quality: 70 });
 const AGENTS: Record<'jay' | 'owl' | 'finch', ImageMetadata> = { jay, owl, finch };
 const TEINTES = { jay: 'bg-sand', owl: 'bg-stone', finch: 'bg-peach', ecran: 'bg-cream-2' };
-const num = (i: number) => String(i + 1).padStart(2, '0');
-// The miniature role screen: the last role (a crew member), on the rows that are shared.
-const role = screen.roles.length - 1;
-const lignes = screen.rows.flatMap((r) =>
-  r.access ? [{ label: r.label, etat: r.access[role] }] : [],
-);
 ---
 
 <Section
@@ -46,130 +40,88 @@ const lignes = screen.rows.flatMap((r) =>
   class="bg-cover bg-center"
   style={`background-image:url(${bg.src})`}
 >
-  <div class="flex flex-col gap-10 lg:gap-12">
-    <EnTete id="securite-titre" titre={hero.title} intro={hero.lead} />
+  <div class="grid items-center gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
+    <div class="flex flex-col items-start gap-8">
+      <EnTete id="securite-titre" titre={hero.title} intro={hero.lead} />
+      <!-- exception: the underlined text link (also on the 404) is not a DS component yet -->
+      <a
+        href={routes.security[locale]}
+        class="border-b-[1.5px] border-ink pb-[3px] text-caption font-semibold transition-colors hover:border-transparent"
+      >
+        {ui.lien}
+        <span aria-hidden="true">→</span>
+      </a>
+    </div>
 
-    <ul class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+    <ul class="grid gap-4 sm:grid-cols-2">
       {
-        sections.map((s, i) => (
-          <li class="flex flex-col overflow-hidden rounded-card bg-surface text-ink shadow-carte">
-            <div class:list={['visuel grid place-items-center', TEINTES[s.visual]]}>
+        sections.map((s) => (
+          <li class="flex items-center gap-4 rounded-card bg-surface p-3 pr-5 text-ink shadow-carte">
+            <div class:list={['vignette grid shrink-0 place-items-center', TEINTES[s.visual]]}>
               {s.visual === 'ecran' ? (
-                <div class="acces" aria-hidden="true">
-                  <p class="acces-barre">
-                    <b>{screen.app}</b>
-                    <span>
-                      {screen.viewing} {screen.roles[role]}
-                    </span>
-                  </p>
-                  <ul>
-                    {lignes.slice(0, 3).map((l) => (
-                      <li>
-                        <span>{l.label}</span>
-                        <span class:list={['etat', l.etat]}>{screen.states[l.etat]}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                <ul class="roles" aria-hidden="true">
+                  {screen.roles.map((r, k) => (
+                    <li class:list={{ on: k === screen.roles.length - 1 }}>{r}</li>
+                  ))}
+                </ul>
               ) : (
                 <Picture
                   src={AGENTS[s.visual]}
                   alt={hero.alts[s.visual]}
-                  height={360}
+                  height={192}
                   densities={[1, 2]}
                   formats={['avif', 'webp']}
                   loading="lazy"
-                  class="visuel-img"
+                  class="vignette-img"
                 />
               )}
             </div>
-            <div class="flex flex-1 flex-col gap-3 p-6 lg:p-7">
-              <span class="font-mono text-kicker text-orange-txt">{num(i)}</span>
+            <div class="flex min-w-0 flex-col gap-1">
               <h3 class="font-display text-card font-semibold text-balance">{s.title}</h3>
-              <p class="text-body text-soft">{s.subtitle}</p>
+              <p class="text-caption text-soft">{s.subtitle}</p>
             </div>
           </li>
         ))
       }
     </ul>
-
-    <!-- exception: the underlined text link (also on the 404) is not a DS component yet -->
-    <a
-      href={routes.security[locale]}
-      class="self-start border-b-[1.5px] border-ink pb-[3px] text-caption font-semibold transition-colors hover:border-transparent"
-    >
-      {ui.lien}
-      <span aria-hidden="true">→</span>
-    </a>
   </div>
 </Section>
 
 <style>
-  /* The tinted stage of each card, its voxel character standing in it. */
-  .visuel {
-    aspect-ratio: 4 / 3;
-    padding: 7%;
+  /* The small tinted stage of each promise, concentric with its card (card radius − 12 px padding). */
+  .vignette {
+    width: 6rem;
+    aspect-ratio: 1;
+    padding: 6px;
     overflow: hidden;
+    border-radius: calc(var(--radius-card) - 12px);
+    corner-shape: squircle;
   }
-  /* The picture fills the stage without ever stretching it: all four stages stay 4:3. */
-  .visuel > :global(picture),
-  .visuel > :global(img) {
+  .vignette > :global(picture) {
     width: 100%;
     height: 100%;
-    min-height: 0;
   }
-  .visuel :global(.visuel-img) {
+  .vignette :global(.vignette-img) {
     width: 100%;
     height: 100%;
     object-fit: contain;
   }
-  /* The miniature role screen (scene: its sizes are the mockup's own). */
-  .acces {
-    width: 100%;
-    padding: 12px;
-    border-radius: 16px;
-    background: var(--color-surface);
-    box-shadow: var(--shadow-2);
-    font: 500 11px/1.3 var(--font-sans);
-  }
-  .acces-barre {
-    display: flex;
-    justify-content: space-between;
-    gap: 8px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--color-line);
-    color: var(--color-soft);
-  }
-  .acces-barre b {
-    color: var(--color-ink);
-  }
-  .acces ul {
+  /* Access control: the three roles, the crew member's highlighted (scene sizes). */
+  .roles {
     display: grid;
-    gap: 6px;
-    padding-top: 8px;
+    gap: 4px;
+    font: 600 10px/1 var(--font-sans);
   }
-  .acces li {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    color: var(--color-ink);
-  }
-  .etat {
-    padding: 3px 8px;
+  .roles li {
+    padding: 4px 8px;
     border-radius: 999px;
-    font-weight: 600;
+    background: var(--color-surface);
+    color: var(--color-soft);
+    text-align: center;
     white-space: nowrap;
   }
-  .etat.visible {
-    background: var(--color-orange-tint);
-    color: var(--color-orange-txt);
-  }
-  .etat.perimetre {
-    background: var(--color-sand);
-  }
-  .etat.masque {
-    background: var(--color-cream-2);
-    color: var(--color-muted);
+  .roles li.on {
+    background: var(--color-ink);
+    color: var(--color-cream);
   }
 </style>
