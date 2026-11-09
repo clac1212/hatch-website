@@ -362,7 +362,7 @@ const champs = [
         <!-- Without JS the form still posts (POST, so nothing lands in the URL); with JS the inline
              script validates, then sends JSON and swaps the form for the confirmation. -->
         <form
-          class="flex flex-col gap-4 rounded-card bg-cream p-6 text-ink sm:p-8 lg:p-10"
+          class="flex flex-col gap-4 rounded-panneau bg-cream p-6 text-ink sm:p-8 lg:p-10"
           action="/api/liste-attente"
           method="post"
           novalidate
@@ -613,7 +613,8 @@ const champs = [
     position: relative;
     overflow: hidden;
     aspect-ratio: 16 / 9;
-    border-radius: var(--radius-card);
+    border-radius: var(--radius-panneau);
+    corner-shape: squircle;
     background: var(--color-night-2);
     box-shadow: 0 0 0 1px var(--color-line-night);
   }

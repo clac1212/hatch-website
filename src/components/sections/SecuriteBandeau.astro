@@ -30,7 +30,7 @@ const num = (i: number) => String(i + 1).padStart(2, '0');
     <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
       {
         sections.map((s, i) => (
-          <li class="flex flex-col gap-3 rounded-card bg-surface p-6 text-ink shadow-1 lg:p-7">
+          <li class="flex flex-col gap-3 rounded-card bg-surface p-6 text-ink shadow-carte lg:p-7">
             <span class="font-mono text-kicker text-orange-txt">{num(i)}</span>
             <h3 class="font-display text-card font-semibold text-balance">{s.title}</h3>
             <p class="text-body text-soft">{s.subtitle}</p>
