@@ -90,7 +90,8 @@
 
   /* Type scale — fluid between mobile and the 1440 px desktop mockups */
   --text-h1: clamp(2.25rem, 1.4rem + 3.4vw, 4rem);
-  --text-h1--line-height: 1.1;
+  --text-h1--line-height: 1.08;
+  --text-h1--letter-spacing: -0.015em;
   --text-section: clamp(1.875rem, 1.5rem + 1.5vw, 2.5rem);
   --text-section--line-height: 1.12;
   --text-section--letter-spacing: -0.0125em;

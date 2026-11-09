@@ -68,7 +68,7 @@ pnpm format:check
 - FR and EN must have **identical keys**. The Zod schemas are strict objects, so a missing or extra key fails the build.
 - A new page gets an entry in `routes` (`src/i18n/ui.ts`) with its URL in both locales, and a file under `src/pages/` and `src/pages/en/`.
 - Writing rules from the DS:
-  - one H1 per page, in Departure Mono, stating a fact; exception: the home hero title is in Fraunces 600 (more legible over the map, César 01/10), and so are the agent pages' H1s (César 12/10);
+  - one H1 per page, stating a fact, in Fraunces 600 (`font-display text-h1 font-semibold`) on every page (César 09/11); Departure Mono stays for kickers, sources and labels. The long-sentence H1s of the networks hero and the agent pages are smaller, as named exceptions;
   - no kicker by default (César 09/11: a kicker that rephrases the title reads as AI-made); a kicker only when it adds what the title lacks: the audience (the home doors), a number or category (« 01 · Partage & hébergement »), a status (« Bêta »);
   - agents presented by job first, speaking in the first person; exception: the agent pages (`/agents/<slug>`) are Patrick's copy (Notion « 08 · Pages agents »), in the third person and taken word for word (César 09/10), only the agent's `pitch` stays in the first person; except the problem block, rewritten landing-page style: a short title naming the pain, one or two concrete sentences, no « a network told us » (César 12/10);
   - every number carries a source;
@@ -130,10 +130,6 @@ Signature sections today: the home hero rebus (`AccueilPage`), the Robin evening
 - **Radii: three levels** (César 09/11): `rounded-sm` (8 px: inputs, tags, menu items), `rounded-card` (24 px: every card and panel, small or large), `rounded-full` (buttons, avatars, pills). Something set inside a card takes a smaller radius or none; an image flush with the card edge inherits its corners. Radii inside mockups (phone screens, chat bubbles, app icons) belong to the scene.
 - Section spacing: one vertical rhythm through `Section` (to come with the layout layer).
 - **Resets and element-wide defaults live in `@layer base { ... }`**: an unlayered rule outranks utilities in Tailwind v4 and silently breaks them.
-
-### Pending decisions (fill in, then delete this list)
-
-1. H1 family: Fraunces 600 everywhere, then update the writing rule in « Content rules ».
 
 ### Guardrails
 
