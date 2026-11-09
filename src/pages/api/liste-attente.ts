@@ -83,11 +83,14 @@ export const POST: APIRoute = async ({ request, redirect }) => {
 
   const slack = async () => {
     if (!SLACK_WEBHOOK_LISTE_ATTENTE) return false;
+    // Slack reads `<…>` as a mention or a link: escaped, a typed `<!channel>` or
+    // `<https://…|label>` stays plain text instead of pinging the channel or hiding a link.
+    const s = (v: string) => v.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const lignes = [
       `*Nouvelle inscription Robin* (${f.locale.toUpperCase()})`,
-      `${f.prenom} ${f.nom} · ${f.restaurant}`,
-      `WhatsApp : ${f.whatsapp} · ${f.email}`,
-      site ? `Site : ${site}` : '',
+      `${s(f.prenom)} ${s(f.nom)} · ${s(f.restaurant)}`,
+      `WhatsApp : ${s(f.whatsapp)} · ${s(f.email)}`,
+      site ? `Site : ${s(site)}` : '',
     ].filter(Boolean);
     const res = await fetch(SLACK_WEBHOOK_LISTE_ATTENTE, {
       method: 'POST',
