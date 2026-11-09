@@ -1128,9 +1128,19 @@ const champs = [
     .ecran {
       transition: none;
     }
-    .bs {
+    /* No rotation: the first bubble stays on screen; the others, which share its grid cell, are
+       visually hidden but still read by screen readers. */
+    .bs:first-child {
       animation: none;
       opacity: 1;
+    }
+    .bs + .bs {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
     }
   }
 </style>
