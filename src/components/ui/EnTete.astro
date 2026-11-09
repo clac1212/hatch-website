@@ -1,0 +1,42 @@
+---
+/**
+ * The head of a section (DS component): an optional kicker, the title, an optional lead.
+ * Colors come from the enclosing `Section` (text color, `--doux` for the lead).
+ * - `kicker`: only when it adds what the title lacks (audience, number, status), never a rephrasing.
+ * - `niveau`: `h2` by default; `h1` for a page's hero.
+ * - `align`: `gauche` (default) or `centre`.
+ * - `id`: the title's id, for the section's `aria-labelledby`.
+ */
+interface Props {
+  titre: string;
+  kicker?: string;
+  intro?: string;
+  niveau?: 'h1' | 'h2';
+  align?: 'gauche' | 'centre';
+  id?: string;
+  class?: string;
+}
+const { titre, kicker, intro, niveau = 'h2', align = 'gauche', id, class: className } = Astro.props;
+const Titre = niveau;
+const centre = align === 'centre';
+---
+
+<header
+  class:list={[
+    'flex max-w-titre flex-col gap-4',
+    centre ? 'mx-auto items-center text-center' : 'items-start',
+    className,
+  ]}
+>
+  {kicker && <p class="font-mono text-kicker text-(--doux) uppercase">{kicker}</p>}
+  <Titre
+    id={id}
+    class:list={[
+      'font-display font-semibold text-balance',
+      niveau === 'h1' ? 'text-h1' : 'text-section',
+    ]}
+  >
+    {titre}
+  </Titre>
+  {intro && <p class="max-w-lead text-punch text-(--doux)">{intro}</p>}
+</header>

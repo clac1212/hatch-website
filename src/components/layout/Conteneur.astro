@@ -1,0 +1,15 @@
+---
+/**
+ * The site's one container (DS layout layer): 1312 px of content at 1440, the same left edge for
+ * every section. `prose` narrows it to running-text width (760 px).
+ */
+interface Props {
+  prose?: boolean;
+  class?: string;
+}
+const { prose = false, class: className } = Astro.props;
+---
+
+<div class:list={['conteneur', prose && 'max-w-prose', className]}>
+  <slot />
+</div>

@@ -1,0 +1,46 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import Conteneur from './Conteneur.astro';
+
+/**
+ * A page section (DS layout layer): its background tone, the site's vertical rhythm (`py-section`)
+ * and, unless `pleine`, the site's container around its content.
+ * - `ton`: the background, which also sets the text color (cream on dark tones, ink on light ones)
+ *   and `--doux`, the softer text color for leads and secondary lines (`text-(--doux)`).
+ * - `rythme`: `normal` (both edges), `haut` / `bas` (one edge only, when two sections share a
+ *   background and must not double their gap), `aucun` (a section that sets its own spacing).
+ * - `pleine`: no container, the content runs edge to edge (a full-bleed visual).
+ * Any other attribute (id, aria-labelledby, data-*) lands on the <section>.
+ */
+type Ton = 'cream' | 'cream-2' | 'surface' | 'night' | 'black' | 'orange';
+interface Props extends HTMLAttributes<'section'> {
+  ton?: Ton;
+  rythme?: 'normal' | 'haut' | 'bas' | 'aucun';
+  pleine?: boolean;
+}
+
+const { ton = 'cream', rythme = 'normal', pleine = false, class: className, ...rest } = Astro.props;
+
+const TONS: Record<Ton, string> = {
+  cream: 'bg-cream text-ink [--doux:var(--color-soft)]',
+  'cream-2': 'bg-cream-2 text-ink [--doux:var(--color-soft)]',
+  surface: 'bg-surface text-ink [--doux:var(--color-soft)]',
+  night: 'bg-night text-cream [--doux:color-mix(in_srgb,var(--color-cream)_75%,transparent)]',
+  black: 'bg-black text-cream [--doux:color-mix(in_srgb,var(--color-cream)_75%,transparent)]',
+  // Orange is a flat fill: ink text on it (6.8:1), never white.
+  orange: 'bg-orange text-ink [--doux:var(--color-ink)]',
+};
+const RYTHMES = { normal: 'py-section', haut: 'pt-section', bas: 'pb-section', aucun: '' };
+---
+
+<section class:list={[TONS[ton], RYTHMES[rythme], className]} {...rest}>
+  {
+    pleine ? (
+      <slot />
+    ) : (
+      <Conteneur>
+        <slot />
+      </Conteneur>
+    )
+  }
+</section>

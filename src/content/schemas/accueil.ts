@@ -41,12 +41,9 @@ export const schema = z.strictObject({
   lead: texte,
   /** The two doors: independent restaurant (Robin), network (the agents). */
   espaces: z.strictObject({ independant: espace, reseau: espace }),
-  /** UI strings of the Security block (src/components/sections/SecuriteLivre.astro). */
+  /** UI strings of the Security band (src/components/sections/SecuriteBandeau.astro). */
   securite: z.strictObject({
     /** Link to the full Security page. */
     lien: texte,
-    /** aria-labels of the arrows that turn the pages. */
-    precedent: texte,
-    suivant: texte,
   }),
 });

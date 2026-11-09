@@ -1,0 +1,51 @@
+---
+/**
+ * Security on the home page (the crossroads), under the two spaces: a compact band, not the Security
+ * page itself (César 09/11). The title and lead of the Security page, its four themes as four cards
+ * (title + one line), and a link to the full page. Flat orange, no grain.
+ * Content: the Security page's (src/content/pages/security/{fr,en}.yaml); the link's label lives in
+ * src/content/sections/accueil/{fr,en}.yaml under `securite`.
+ */
+import { getEntry } from 'astro:content';
+import Section from '../layout/Section.astro';
+import EnTete from '../ui/EnTete.astro';
+import { section } from '../../content/section';
+import { routes, type Locale } from '../../i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const entry = await getEntry('securityPage', locale);
+if (!entry) throw new Error(`Missing src/content/pages/security/${locale}.yaml`);
+const { hero, sections } = entry.data;
+const ui = (await section('accueil', locale)).securite;
+const num = (i: number) => String(i + 1).padStart(2, '0');
+---
+
+<Section id="securite" ton="orange" aria-labelledby="securite-titre">
+  <div class="flex flex-col gap-10 lg:gap-12">
+    <EnTete id="securite-titre" titre={hero.title} intro={hero.lead} />
+
+    <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
+      {
+        sections.map((s, i) => (
+          <li class="flex flex-col gap-3 rounded-card bg-surface p-6 text-ink shadow-1 lg:p-7">
+            <span class="font-mono text-kicker text-orange-txt">{num(i)}</span>
+            <h3 class="font-display text-card font-semibold text-balance">{s.title}</h3>
+            <p class="text-body text-soft">{s.subtitle}</p>
+          </li>
+        ))
+      }
+    </ul>
+
+    <!-- exception: the underlined text link (also on the 404) is not a DS component yet -->
+    <a
+      href={routes.security[locale]}
+      class="self-start border-b-[1.5px] border-ink pb-[3px] text-caption font-semibold transition-colors hover:border-transparent"
+    >
+      {ui.lien}
+      <span aria-hidden="true">→</span>
+    </a>
+  </div>
+</Section>

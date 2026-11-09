@@ -14,7 +14,8 @@ import type { HTMLAttributes } from 'astro/types';
  * All are "vif": they lift on hover, the arrow slides and a light sweep crosses them.
  */
 interface Props extends HTMLAttributes<'a'> {
-  href: string;
+  /** No href: the button is drawn inside a link that is already clickable (a card), as a <span>. */
+  href?: string;
   variant?: 'orange' | 'secondary' | 'ink' | 'cream';
   size?: 'sm' | 'lg';
   block?: boolean;
@@ -28,9 +29,10 @@ const {
   class: className,
   ...rest
 } = Astro.props;
+const Tag = href ? 'a' : 'span';
 ---
 
-<a
+<Tag
   href={href}
   class:list={[
     'btn-vif inline-flex items-center rounded-full font-bold whitespace-nowrap',
@@ -61,4 +63,4 @@ const {
   >
     <path d="M5 12h14M12 5l7 7-7 7"></path>
   </svg>
-</a>
+</Tag>
