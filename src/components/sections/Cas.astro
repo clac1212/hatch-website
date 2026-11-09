@@ -173,7 +173,7 @@ const fill = (s: string, vars: Record<string, string>) =>
   .tranche {
     position: relative;
     overflow: hidden;
-    border-radius: 28px;
+    border-radius: var(--radius-card);
     background-color: var(--marque);
     color: var(--color-white);
   }
@@ -187,7 +187,7 @@ const fill = (s: string, vars: Record<string, string>) =>
   .ferme:focus-visible {
     outline: 2px solid var(--color-white);
     outline-offset: -6px;
-    border-radius: 28px;
+    border-radius: var(--radius-card);
   }
   .avatar {
     display: flex;
@@ -288,7 +288,7 @@ const fill = (s: string, vars: Record<string, string>) =>
       gap: 10px;
     }
     .tranche {
-      border-radius: 22px;
+      border-radius: var(--radius-card);
     }
     .ferme {
       width: 100%;

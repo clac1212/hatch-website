@@ -114,9 +114,10 @@
   --text-source--letter-spacing: 0.12em;
 
   /* Shapes — relief comes from the border, not the shadow. Four depth levels max (0–3). */
-  --radius-btn: 8px;
-  --radius-card: 16px;
-  --radius-glass: 18px;
+  /* Radius scale (DS decision 2, César 09/11): sm for small controls, card for every card and panel,
+     full (Tailwind) for buttons, avatars, pills. Something set inside a card takes a smaller radius or none. */
+  --radius-sm: 8px;
+  --radius-card: 24px;
   --shadow-1: 0 4px 14px #22190c0a;
   --shadow-2: 0 6px 26px #140f231f;
   --shadow-3: 0 22px 60px #08061457;

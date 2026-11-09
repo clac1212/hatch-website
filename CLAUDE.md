@@ -126,14 +126,14 @@ Signature sections today: the home hero rebus (`AccueilPage`), the Robin evening
 
 - Containers `max-w-site` (1312 px, every section's left edge) and `max-w-prose` (760 px, running text). Easing `ease-hatch`.
 - **Buttons: always `<Button>`, a pill in every variant** (`orange` primary, `secondary`, `ink`, `cream`), sizes `sm` | `lg`, the orange glow is `shadow-orange` / `shadow-orange-lg` (César 09/11). Never a hand-made button.
-- Radii (other than buttons) and section spacing: see the pending decisions below.
+- **Radii: three levels** (César 09/11): `rounded-sm` (8 px: inputs, tags, menu items), `rounded-card` (24 px: every card and panel, small or large), `rounded-full` (buttons, avatars, pills). Something set inside a card takes a smaller radius or none; an image flush with the card edge inherits its corners. Radii inside mockups (phone screens, chat bubbles, app icons) belong to the scene.
+- Section spacing: one vertical rhythm through `Section` (to come with the layout layer).
 - **Resets and element-wide defaults live in `@layer base { ... }`**: an unlayered rule outranks utilities in Tailwind v4 and silently breaks them.
 
 ### Pending decisions (fill in, then delete this list)
 
-1. Card radius: one token for every card.
-2. Navigation: one component for the whole site (today `Nav` and `NavAccueil`).
-3. H1 family: Fraunces 600 everywhere, then update the writing rule in « Content rules ».
+1. Navigation: one component for the whole site (today `Nav` and `NavAccueil`).
+2. H1 family: Fraunces 600 everywhere, then update the writing rule in « Content rules ».
 
 ### Guardrails
 

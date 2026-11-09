@@ -55,7 +55,7 @@ const textes = JSON.stringify({ reste: c.reste, notes: c.notes });
         data-textes={textes}
         method="dialog"
         novalidate
-        class="flex min-w-0 flex-col gap-9 rounded-[28px] bg-surface p-6 shadow-1 ring-1 ring-line sm:p-8 lg:rounded-[36px] lg:p-10"
+        class="flex min-w-0 flex-col gap-9 rounded-card bg-surface p-6 shadow-1 ring-1 ring-line sm:p-8 lg:p-10"
       >
         <!-- 1 · Agents -->
         <fieldset class="flex min-w-0 flex-col gap-4">
@@ -265,7 +265,7 @@ const textes = JSON.stringify({ reste: c.reste, notes: c.notes });
 
       <!-- How it works -->
       <aside
-        class="flex flex-col gap-6 rounded-[28px] bg-night p-7 text-cream lg:sticky lg:top-28 lg:rounded-[36px] lg:p-8"
+        class="flex flex-col gap-6 rounded-card bg-night p-7 text-cream lg:sticky lg:top-28 lg:p-8"
       >
         <span class="font-mono text-[12px] tracking-[0.16em] text-peach uppercase"
           >{c.deroule.kicker}</span
@@ -557,7 +557,7 @@ const textes = JSON.stringify({ reste: c.reste, notes: c.notes });
     flex-direction: column;
     gap: 14px;
     padding: 20px 18px 18px;
-    border-radius: 20px;
+    border-radius: var(--radius-card);
     background: var(--color-surface-2);
     box-shadow: inset 0 0 0 1px var(--color-line);
     cursor: pointer;

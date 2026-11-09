@@ -351,7 +351,7 @@ const champs = [
         <div class="mt-12 grid w-full gap-4 md:grid-cols-3">
           {
             confiance.cartes.map((c, i) => (
-              <article class="flex flex-col items-start gap-3 rounded-[24px] bg-night-2 p-7 ring-1 ring-robin/60 lg:p-8">
+              <article class="flex flex-col items-start gap-3 rounded-card bg-night-2 p-7 ring-1 ring-robin/60 lg:p-8">
                 <span class="font-mono text-[12px] tracking-[0.08em] text-cream/60">0{i + 1}</span>
                 <h3 class="font-display text-[22px] leading-tight font-medium">{c.titre}</h3>
                 <p class="text-[15px] leading-6 text-cream/75">{c.texte}</p>
@@ -381,7 +381,7 @@ const champs = [
         <!-- Without JS the form still posts (POST, so nothing lands in the URL); with JS the inline
              script validates, then sends JSON and swaps the form for the confirmation. -->
         <form
-          class="flex flex-col gap-4 rounded-[28px] bg-cream p-6 text-ink sm:p-8 lg:rounded-[36px] lg:p-10"
+          class="flex flex-col gap-4 rounded-card bg-cream p-6 text-ink sm:p-8 lg:p-10"
           action="/api/liste-attente"
           method="post"
           novalidate
@@ -632,7 +632,7 @@ const champs = [
     position: relative;
     overflow: hidden;
     aspect-ratio: 16 / 9;
-    border-radius: 28px;
+    border-radius: var(--radius-card);
     background: var(--color-night-2);
     box-shadow: 0 0 0 1px var(--color-line-night);
   }
