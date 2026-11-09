@@ -95,7 +95,7 @@ pnpm format:check
 ## Motion and accessibility
 
 - Pinned scroll sections share one engine (`src/scripts/pistes.ts`, lot 4). Every animation respects `prefers-reduced-motion`, and content stays readable without JS.
-- Real `<a>`/`<button>`, one `h1` then `h2`/`h3`, landmarks, a pause control on anything that auto-plays in a loop; an animation that plays once and stops on its last state needs none (the agent pages' scenarios, César 09/10). Living details that repeat (the agent pages' walls) stay under 5 s in total, so they need no control either (WCAG 2.2.2). Pixel-font labels are real text, never vectorised SVG.
+- Real `<a>`/`<button>`, one `h1` then `h2`/`h3`, landmarks. No pause button on animations, even looping ones (César 09/11: « personne fait ça »); `prefers-reduced-motion` is the only motion control. Pixel-font labels are real text, never vectorised SVG.
 - Budget: < 3 MB on first load of the home. Below-the-fold images lazy-load through `<Image>`/`<Picture>`.
 
 ## Git
