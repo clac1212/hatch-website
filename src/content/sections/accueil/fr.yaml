@@ -26,18 +26,12 @@ espaces:
     kicker: 'Restaurant indépendant'
     titre: 'Robin, votre associé IA'
     texte: 'Vous tenez un ou deux restaurants et vous faites tout vous-même. Robin connaît votre maison, revient vers vous chaque semaine et vous prépare ce dont vous avez besoin.'
-    bulle:
-      de: 'Robin'
-      texte: 'Le service est fini ! 🎉 Je te fais le point de la soirée.'
     cta: 'Découvrir Robin'
     alt: 'Un petit bistrot indépendant en voxels : derrière le comptoir, le patron consulte son téléphone, Robin perché à côté de lui.'
   reseau:
     kicker: 'Réseau, franchise, succursales'
     titre: 'Vos collaborateurs IA pour piloter votre réseau'
     texte: "Animation, documentation, audits, formation, ouvertures : une équipe d'agents qui travaille pour le siège et répond à chaque établissement."
-    bulle:
-      de: 'Peep'
-      texte: "Le burger d'automne sort lundi : fiche recette envoyée aux 24 restaurants."
     cta: 'Découvrir les agents'
     alt: 'Un réseau en voxels : le siège au centre, huit restaurants de la même enseigne autour, et les sept agents Hatch OS dans les rues du réseau.'
 securite:

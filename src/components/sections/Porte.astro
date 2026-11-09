@@ -1,12 +1,9 @@
 ---
 /**
- * One of the home page's two doors (signature section, César 09/11): the voxel illustration fills the
- * whole card, a WhatsApp bubble from the space's agent floats over it (what the product does, shown
- * rather than told), and a glass plate at the bottom carries the audience, the title and the button.
+ * One of the home page's two doors (signature section, César 09/11): the whole voxel illustration on
+ * top (2:1), then the audience, the title, one or two lines and the button on the card's tone.
  * The whole card is the link; the button is drawn as a <span>.
- * - `ton`: the plate's glass, `clair` (ink text) or `sombre` (night glass, cream text).
- * - `bulle`: where the bubble sits, in % of the card (`x`, `y` of its top left corner), next to the
- *   character who sends it.
+ * - `ton`: `clair` (cream card, ink text) or `sombre` (night card, cream text).
  */
 import { Picture } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
@@ -21,11 +18,9 @@ interface Props {
   titre: string;
   texte: string;
   cta: string;
-  message: { de: string; texte: string };
   ton: 'clair' | 'sombre';
-  bulle: { x: number; y: number };
 }
-const { href, image, alt, kicker, titre, texte, cta, message, ton, bulle } = Astro.props;
+const { href, image, alt, kicker, titre, texte, cta, ton } = Astro.props;
 const sombre = ton === 'sombre';
 ---
 
@@ -36,7 +31,7 @@ const sombre = ton === 'sombre';
   class:list={['porte flex flex-col', sombre ? 'porte-sombre' : 'porte-claire']}
   data-rv-groupe
 >
-  <!-- The illustration, with the agent's WhatsApp message next to the character who sends it -->
+  <!-- The illustration -->
   <div class="porte-image relative overflow-clip">
     <Picture
       src={image}
@@ -46,12 +41,6 @@ const sombre = ton === 'sombre';
       formats={['avif', 'webp']}
       class="carte-zoom size-full object-cover object-[50%_40%]"
     />
-
-    <!-- exception: the bubble's place in the illustration is set per card -->
-    <p class="bulle" style={`--x:${bulle.x}%;--y:${bulle.y}%`} data-rv>
-      <b>{message.de}</b>
-      {message.texte}
-    </p>
   </div>
 
   <div
@@ -156,25 +145,5 @@ const sombre = ton === 'sombre';
   }
   :global(html[data-porte='plaque']) :global(.carte-lien:hover) .plaque {
     translate: 0 -4px;
-  }
-
-  /* An incoming WhatsApp bubble (scene sizes): white, its tail at the bottom left, toward the agent. */
-  .bulle {
-    position: absolute;
-    left: var(--x);
-    top: var(--y);
-    max-width: min(17rem, 60%);
-    padding: 10px 14px 11px;
-    border-radius: 18px 18px 18px 4px;
-    background: var(--color-surface);
-    box-shadow: var(--shadow-2);
-    font: 400 var(--text-caption) / 1.4 var(--font-sans);
-    color: var(--color-ink);
-  }
-  .bulle b {
-    display: block;
-    margin-bottom: 2px;
-    font-weight: 600;
-    color: var(--color-orange-txt);
   }
 </style>

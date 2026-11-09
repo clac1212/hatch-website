@@ -26,18 +26,12 @@ espaces:
     kicker: 'Independent restaurant'
     titre: 'Robin, your AI business partner'
     texte: 'You run one or two restaurants and you do everything yourself. Robin knows your restaurant, checks in with you every week and prepares what you need.'
-    bulle:
-      de: 'Robin'
-      texte: "Service is over! 🎉 Here's your evening recap."
     cta: 'Meet Robin'
     alt: 'A small independent bistro in voxels: behind the counter, the owner checks his phone, with Robin perched beside him.'
   reseau:
     kicker: 'Network, franchise, company-owned'
     titre: 'Your AI teammates to run your network'
     texte: 'Network life, documents, audits, training, openings: a team of agents that works for head office and answers every location.'
-    bulle:
-      de: 'Peep'
-      texte: 'The autumn burger launches Monday: recipe card sent to all 24 restaurants.'
     cta: 'Meet the agents'
     alt: "A network in voxels: head office in the centre, eight restaurants of the same brand around it, and the seven Hatch OS agents in the network's streets."
 securite:

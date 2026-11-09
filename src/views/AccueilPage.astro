@@ -155,7 +155,7 @@ const reseauxUrl = routes.reseaux[locale];
     </div>
   </Section>
 
-  <!-- 2 · The two doors: each a voxel world, its agent's message, a glass plate -->
+  <!-- 2 · The two doors: each a voxel world, then who it is for -->
   <Section ton="cream">
     <div class="grid gap-5 md:grid-cols-2">
       <Porte
@@ -166,9 +166,7 @@ const reseauxUrl = routes.reseaux[locale];
         titre={espaces.independant.titre}
         texte={espaces.independant.texte}
         cta={espaces.independant.cta}
-        message={espaces.independant.bulle}
         ton="clair"
-        bulle={{ x: 50, y: 5 }}
       />
       <Porte
         href={routes.reseaux[locale]}
@@ -178,9 +176,7 @@ const reseauxUrl = routes.reseaux[locale];
         titre={espaces.reseau.titre}
         texte={espaces.reseau.texte}
         cta={espaces.reseau.cta}
-        message={espaces.reseau.bulle}
         ton="sombre"
-        bulle={{ x: 22, y: 6 }}
       />
     </div>
   </Section>
