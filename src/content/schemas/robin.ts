@@ -33,18 +33,8 @@ export const schema = z.strictObject({
     /** Exactly three: the CSS loop (19.5 s, one bubble every 6.5 s) is timed for three bubbles. */
     messages: z.array(z.strictObject({ txt: texte, lien: texte.optional() })).length(3),
   }),
-  /** The sticky in-page nav pill. */
-  pilule: z.strictObject({
-    label: texte,
-    statut: texte,
-    fait: texte,
-    semaine: texte,
-    canaux: texte,
-    cta: texte,
-  }),
-  fait: z.strictObject({ kicker: texte, titre: texte }),
+  fait: z.strictObject({ titre: texte }),
   semaine: z.strictObject({
-    kicker: texte,
     titre: texte,
     /** aria-label of the tablist. */
     frise: texte,
@@ -55,7 +45,6 @@ export const schema = z.strictObject({
   }),
   /** Where to find him: the WhatsApp thread in the phone. */
   canaux: z.strictObject({
-    kicker: texte,
     titre: texte,
     texte,
     telephone: z.strictObject({

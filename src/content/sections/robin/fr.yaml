@@ -24,20 +24,10 @@ soiree:
     - txt: "Le tartare de bœuf est parti très vite ce soir 🔥. J'ai croisé les ventes avec ton stock et ajusté la commande Metro de demain : plus de bœuf 🥩, moins de saumon 🐟."
     - txt: "Lina t'a répondu par mail pour l'extra de demain : elle confirme sa présence 👍. Je prépare son contrat d'extra et sa fiche de paie en avance."
 
-pilule:
-  label: 'Sur cette page'
-  statut: 'en ligne'
-  fait: "Ce qu'il fait"
-  semaine: 'Une semaine'
-  canaux: 'Où le trouver'
-  cta: "Rejoindre la liste d'attente"
-
 fait:
-  kicker: 'Ce que fait Robin'
   titre: 'Pas un logiciel de plus. Un associé qui connaît la maison.'
 
 semaine:
-  kicker: 'Une semaine avec Robin'
   titre: 'Du lundi matin au dimanche soir.'
   frise: 'Jours de la semaine'
   jours:
@@ -73,7 +63,6 @@ semaine:
       bulle: 'Tu me demandais si on reste ouvert de 14 h à 18 h : en semaine, le créneau ne couvre pas les salaires. On en parle demain ?'
 
 canaux:
-  kicker: 'Où le trouver'
   titre: 'Là où vous êtes déjà.'
   texte: 'Pendant la bêta, Robin vit dans WhatsApp. Ensuite, il aura sa propre application, pensée pour lui, toujours à portée de main.'
   telephone:

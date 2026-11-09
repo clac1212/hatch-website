@@ -50,6 +50,14 @@ const fr = {
   'nav.login': 'Se connecter',
   /** Robin and network pages: back to the home page (the crossroads). */
   'nav.back': 'Accueil',
+  /** Home nav: the two spaces of the site. */
+  'nav.independants': 'Indépendants',
+  'nav.reseaux': 'Réseaux',
+  /** Robin nav: its sections, and its one call to action (the beta waitlist). */
+  'nav.robin.features': 'Fonctionnalités',
+  'nav.robin.daily': 'Au quotidien',
+  'nav.robin.whatsapp': 'Sur WhatsApp',
+  'cta.waitlist': "Rejoindre la liste d'attente",
   /** Pause control of the animated Europe map (network page hero). */
   'hero.mapPause': "Mettre l'animation de la carte en pause",
   'hero.mapPlay': "Relancer l'animation de la carte",
@@ -83,6 +91,12 @@ const en: Record<keyof typeof fr, string> = {
   'cta.try': 'Try Hatch OS',
   'nav.login': 'Log in',
   'nav.back': 'Home',
+  'nav.independants': 'Independents',
+  'nav.reseaux': 'Networks',
+  'nav.robin.features': 'Features',
+  'nav.robin.daily': 'Day to day',
+  'nav.robin.whatsapp': 'On WhatsApp',
+  'cta.waitlist': 'Join the waitlist',
   'hero.mapPause': 'Pause the map animation',
   'hero.mapPlay': 'Play the map animation',
   'lang.switch': 'Français',

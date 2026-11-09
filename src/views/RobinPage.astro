@@ -29,7 +29,7 @@ interface Props {
 }
 
 const { locale } = Astro.props;
-const { seo, hero, soiree, pilule, fait, semaine, canaux, confiance, beta } = await section(
+const { seo, hero, soiree, fait, semaine, canaux, confiance, beta } = await section(
   'robin',
   locale,
 );
@@ -55,7 +55,7 @@ const champs = [
   espace
   locale={locale}
   paths={routes.robin}
-  nav="accueil"
+  nav="robin"
   navTone="night"
   pied={pied}
   piedEpure
@@ -185,27 +185,12 @@ const champs = [
       </div>
     </section>
 
-    <!-- 2 · The sticky nav pill (dots) -->
-    <nav class="pilule-zone" aria-label={pilule.label}>
-      <div class="pilule">
-        <a href="#robin" class="pilule-nom">
-          <span class="pastille" aria-hidden="true"></span>
-          Robin <span class="pilule-statut">{pilule.statut}</span>
-        </a>
-        <a href="#fait">{pilule.fait}</a>
-        <a href="#semaine">{pilule.semaine}</a>
-        <a href="#canaux">{pilule.canaux}</a>
-        <a href="#beta" class="pilule-cta">{pilule.cta}</a>
-      </div>
-    </nav>
-
     <!-- 3 · What Robin does: alternating rows, a WhatsApp situation in a tinted card -->
     <section
       id="fait"
       class="mx-auto flex max-w-[1180px] flex-col gap-12 px-4 py-20 sm:px-6 lg:gap-16 lg:py-28"
     >
       <div class="flex max-w-[640px] flex-col gap-4">
-        <span class="font-mono text-kicker text-cream/60 uppercase">{fait.kicker}</span>
         <h2
           class="font-display text-[34px] leading-[1.08] font-medium tracking-[-0.02em] lg:text-[48px]"
         >
@@ -222,9 +207,8 @@ const champs = [
       data-semaine
     >
       <div class="mx-auto flex max-w-[980px] flex-col items-center text-center">
-        <span class="font-mono text-kicker text-cream/60 uppercase">{semaine.kicker}</span>
         <h2
-          class="mt-4 max-w-[18ch] font-display text-[34px] leading-[1.08] font-medium tracking-[-0.02em] lg:text-[48px]"
+          class="max-w-[18ch] font-display text-[34px] leading-[1.08] font-medium tracking-[-0.02em] lg:text-[48px]"
         >
           {semaine.titre}
         </h2>
@@ -298,9 +282,8 @@ const champs = [
     <!-- 5 · Where to find him: the WhatsApp phone (no app yet) -->
     <section id="canaux" class="border-t border-line-night px-4 py-20 sm:px-6 lg:py-28" data-canaux>
       <div class="mx-auto flex max-w-[980px] flex-col items-center text-center">
-        <span class="font-mono text-kicker text-cream/60 uppercase">{canaux.kicker}</span>
         <h2
-          class="mt-4 font-display text-[34px] leading-[1.08] font-medium tracking-[-0.02em] lg:text-[48px]"
+          class="font-display text-[34px] leading-[1.08] font-medium tracking-[-0.02em] lg:text-[48px]"
         >
           {canaux.titre}
         </h2>
@@ -761,87 +744,6 @@ const champs = [
     }
   }
 
-  /* The sticky pill: under the fixed nav, it follows the scroll. */
-  .pilule-zone {
-    position: sticky;
-    top: 84px;
-    z-index: 50;
-    display: flex;
-    justify-content: center;
-    padding: 0 16px;
-    pointer-events: none;
-  }
-  .pilule {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 6px;
-    border-radius: 999px;
-    background: color-mix(in srgb, var(--color-night-2) 88%, transparent);
-    backdrop-filter: blur(12px);
-    box-shadow: 0 0 0 1px var(--color-line-night);
-    font-size: 13.5px;
-    pointer-events: auto;
-    overflow-x: auto;
-    max-width: 100%;
-  }
-  .pilule a {
-    padding: 8px 14px;
-    border-radius: 999px;
-    color: color-mix(in srgb, var(--color-cream) 75%, transparent);
-    white-space: nowrap;
-    transition: color 0.2s;
-  }
-  .pilule a:hover {
-    color: var(--color-cream);
-  }
-  .pilule .pilule-nom {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding-left: 6px;
-    font-weight: 700;
-    color: var(--color-cream);
-  }
-  /* Robin's "online" dot: a breathing orange circle, like ChatGPT's dot. */
-  .pastille {
-    position: relative;
-    width: 10px;
-    height: 10px;
-    margin: 0 2px 0 4px;
-    border-radius: 999px;
-    background: var(--color-orange);
-  }
-  .pastille::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 999px;
-    background: var(--color-orange);
-    animation: pastille 2.4s ease-out infinite;
-  }
-  @keyframes pastille {
-    0% {
-      transform: scale(1);
-      opacity: 0.6;
-    }
-    70%,
-    100% {
-      transform: scale(2.6);
-      opacity: 0;
-    }
-  }
-  .pilule-statut {
-    font: 400 11px/1 var(--font-mono);
-    letter-spacing: 0.06em;
-    color: color-mix(in srgb, var(--color-cream) 60%, transparent);
-  }
-  .pilule .pilule-cta {
-    background: var(--color-cream);
-    color: var(--color-ink);
-    font-weight: 700;
-  }
-
   /* A week: the scene (Robin + bubble), the timeline, the detail. */
   .scene {
     display: flex;
@@ -1119,8 +1021,7 @@ const champs = [
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .flotte,
-    .pastille::after {
+    .flotte {
       animation: none;
     }
     .bulle,

@@ -69,11 +69,11 @@ pnpm format:check
 - A new page gets an entry in `routes` (`src/i18n/ui.ts`) with its URL in both locales, and a file under `src/pages/` and `src/pages/en/`.
 - Writing rules from the DS:
   - one H1 per page, in Departure Mono, stating a fact; exception: the home hero title is in Fraunces 600 (more legible over the map, César 01/10), and so are the agent pages' H1s (César 12/10);
-  - a kicker naming the section's function;
+  - no kicker by default (César 09/11: a kicker that rephrases the title reads as AI-made); a kicker only when it adds what the title lacks: the audience (the home doors), a number or category (« 01 · Partage & hébergement »), a status (« Bêta »);
   - agents presented by job first, speaking in the first person; exception: the agent pages (`/agents/<slug>`) are Patrick's copy (Notion « 08 · Pages agents »), in the third person and taken word for word (César 09/10), only the agent's `pitch` stays in the first person; except the problem block, rewritten landing-page style: a short title naming the pain, one or two concrete sentences, no « a network told us » (César 12/10);
   - every number carries a source;
   - no em dash inside a sentence, no « opérationnel en quelques minutes ».
-- Two calls to action, the classic SaaS pair (César 06/10): the demo, primary (`Button variant="orange"`, « Réserver une démo » / « Book a demo » → `/demo`, Cal.com), and access to the platform, secondary: « Se connecter » / « Log in » as a button in the home and Robin nav (`NavAccueil`, `appUrls.login`; the app's /auth page also lets a newcomer sign up), « Essayer Hatch OS » / « Try Hatch OS » as a `secondary` button in the hero (`appUrls.signup`). Every other CTA (pricing, footer, inner pages) is the demo alone. App URLs live in `appUrls` (src/i18n/ui.ts).
+- Calls to action, one per space (César 06/10, 09/11): networks, the demo (`Button variant="orange"`, « Réserver une démo » / « Book a demo » → `/demo`, Cal.com), plus « Essayer Hatch OS » / « Try Hatch OS » as a `secondary` button in the networks hero (`appUrls.signup`); Robin, the beta waitlist (« Rejoindre la liste d'attente », → `#beta`); home, « Se connecter » / « Log in » in the nav (`appUrls.login`; the app's /auth page also lets a newcomer sign up). Robin shows no sign-in: independents have no account yet. Every other CTA (pricing, footer, inner pages) is the demo alone. App URLs live in `appUrls` (src/i18n/ui.ts).
 
 ## Design system (DS Hatch OS v4)
 
@@ -126,14 +126,14 @@ Signature sections today: the home hero rebus (`AccueilPage`), the Robin evening
 
 - Containers `max-w-site` (1312 px, every section's left edge) and `max-w-prose` (760 px, running text). Easing `ease-hatch`.
 - **Buttons: always `<Button>`, a pill in every variant** (`orange` primary, `secondary`, `ink`, `cream`), sizes `sm` | `lg`, the orange glow is `shadow-orange` / `shadow-orange-lg` (César 09/11). Never a hand-made button.
+- **Navigation: one component, `Nav`** (César 09/11): the floating glass pill on every page, `tone="night"` (dark glass) over dark pages. Its content follows one pattern, logo · ← Home · the space's sections · language · the space's one CTA; Base picks it with `nav` (`accueil`, `robin`, `reseau`, `legal`). No second in-page nav. Nav labels name what a visitor looks for (« Fonctionnalités », « Au quotidien »), never the page's inner jargon.
 - **Radii: three levels** (César 09/11): `rounded-sm` (8 px: inputs, tags, menu items), `rounded-card` (24 px: every card and panel, small or large), `rounded-full` (buttons, avatars, pills). Something set inside a card takes a smaller radius or none; an image flush with the card edge inherits its corners. Radii inside mockups (phone screens, chat bubbles, app icons) belong to the scene.
 - Section spacing: one vertical rhythm through `Section` (to come with the layout layer).
 - **Resets and element-wide defaults live in `@layer base { ... }`**: an unlayered rule outranks utilities in Tailwind v4 and silently breaks them.
 
 ### Pending decisions (fill in, then delete this list)
 
-1. Navigation: one component for the whole site (today `Nav` and `NavAccueil`).
-2. H1 family: Fraunces 600 everywhere, then update the writing rule in « Content rules ».
+1. H1 family: Fraunces 600 everywhere, then update the writing rule in « Content rules ».
 
 ### Guardrails
 

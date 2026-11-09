@@ -24,20 +24,10 @@ soiree:
     - txt: 'The beef tartare sold out fast tonight 🔥. I cross-checked sales with your stock and adjusted tomorrow’s Metro order: more beef 🥩, less salmon 🐟.'
     - txt: 'Lina replied by email about tomorrow’s extra shift: she’s confirmed 👍. I’m preparing her extra contract and her payslip in advance.'
 
-pilule:
-  label: 'On this page'
-  statut: 'online'
-  fait: 'What he does'
-  semaine: 'A week'
-  canaux: 'Where to find him'
-  cta: 'Join the waitlist'
-
 fait:
-  kicker: 'What Robin does'
   titre: 'Not one more piece of software. A partner who knows your restaurant.'
 
 semaine:
-  kicker: 'A week with Robin'
   titre: 'From Monday morning to Sunday night.'
   frise: 'Days of the week'
   jours:
@@ -73,7 +63,6 @@ semaine:
       bulle: 'You asked whether we should stay open from 2 to 6 pm: on weekdays, that slot doesn’t cover the wages. Shall we talk tomorrow?'
 
 canaux:
-  kicker: 'Where to find him'
   titre: 'Right where you already are.'
   texte: "During the beta, Robin lives in WhatsApp. Later, he'll have his own app, built for him, always within reach."
   telephone:

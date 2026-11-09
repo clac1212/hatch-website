@@ -23,7 +23,6 @@ import { Font } from 'astro:assets';
 import SpeedInsights from '@vercel/speed-insights/astro';
 import Analytics from '../components/Analytics.astro';
 import Nav from '../components/Nav.astro';
-import NavAccueil from '../components/NavAccueil.astro';
 import Footer, { type ScenePied } from '../components/Footer.astro';
 import { locales, otherLocale, useTranslations, type Locale, type Paths } from '../i18n/ui';
 import { BRAND, organization, serializeJsonLd, type JsonLdNode } from '../seo/jsonld';
@@ -41,11 +40,11 @@ interface Props {
   ogType?: 'website' | 'article';
   jsonLd?: JsonLdNode[];
   noindex?: boolean;
-  /** Which nav to show: the network space's (default) or the home / independents' minimal one. */
-  nav?: 'reseau' | 'accueil' | 'legal';
-  /** A space of the site (Robin, network): logo back to the top, plus a link back to the home. */
+  /** Which space the nav serves (its links and call to action); see components/Nav.astro. */
+  nav?: 'reseau' | 'accueil' | 'robin' | 'legal';
+  /** The page carries its space's sections: nav anchors stay on the page, plus a link back home. */
   espace?: boolean;
-  /** Tone of the home nav: `night` over a black hero. */
+  /** Tone of the nav: `night` over a dark page. */
   navTone?: 'day' | 'night';
   /** A footer scene of the page's own (image + its list); the voxel building by default. */
   pied?: ScenePied;
@@ -136,15 +135,7 @@ const structuredData = serializeJsonLd([
     >
       {t('a11y.skip')}
     </a>
-    {
-      nav === 'legal' ? (
-        <NavAccueil locale={locale} paths={paths} seul />
-      ) : nav === 'accueil' ? (
-        <NavAccueil locale={locale} paths={paths} tone={navTone} espace={espace} />
-      ) : (
-        <Nav locale={locale} paths={paths} espace={espace} />
-      )
-    }
+    <Nav locale={locale} paths={paths} espace={nav} surPlace={espace} tone={navTone} />
     <main id="contenu">
       <slot />
     </main>
