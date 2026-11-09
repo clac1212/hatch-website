@@ -16,17 +16,24 @@ interface Props {
   color: string;
   /** Shadow cast by each block on the image above. */
   shadow?: string;
+  /**
+   * `eclats` (default): an uneven band whose blocks break loose and scatter upwards (the old map hero).
+   * `marches`: clean voxel steps, runs of 3 to 9 cells one or two cells high, no loose block (the home
+   * hero, César 09/11: quieter, more crafted).
+   */
+  forme?: 'eclats' | 'marches';
   class?: string;
 }
 
 const {
+  forme = 'eclats',
   color,
   shadow = 'color-mix(in srgb, var(--color-ink) 12%, transparent)',
   class: className,
 } = Astro.props;
 
-const CELL = 5;
-const COLS = 288; // 1440 px
+const CELL = forme === 'marches' ? 8 : 5;
+const COLS = 1440 / CELL; // one 1440 px tile
 const ROWS = 6;
 /** Shadow offset, in px of the tile: a fifth of a cell, like the light of the voxel renders. */
 const OMBRE = 1;
@@ -55,6 +62,20 @@ const plein: boolean[][] = Array.from({ length: ROWS }, (_, y) =>
     return hasard() < 0.2 * (1 - reste) ** 1.8;
   }),
 );
+
+// Clean steps: runs of 3 to 9 cells, each one or two cells higher or lower than the last (0 to 3).
+if (forme === 'marches') {
+  let x = 0;
+  let h = 1;
+  while (x < COLS) {
+    const run = 3 + Math.floor(hasard() * 7);
+    h = Math.max(0, Math.min(3, h + (hasard() < 0.5 ? -1 : 1)));
+    for (let i = x; i < Math.min(COLS, x + run); i++) {
+      for (let y = 0; y < ROWS; y++) plein[y][i] = y < h;
+    }
+    x += run;
+  }
+}
 
 const H = ROWS * CELL;
 const W = COLS * CELL;
