@@ -239,6 +239,13 @@
  * in Tailwind v4 and silently breaks them.
  */
 @layer base {
+  /* WhatsApp iOS mock-ups (ui/WhatsApp, robin/Semaine): the system font of an iPhone and the shape
+     of a bubble's tail (a mask, the bubble's own color shows through). */
+  :root {
+    --font-ios:
+      -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', system-ui, sans-serif;
+    --wa-queue: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 14'%3E%3Cpath d='M0 0v14h9c-4-.6-6.6-3.6-7.2-8.2L1.4 0z'/%3E%3C/svg%3E");
+  }
   html {
     background-color: var(--color-cream);
     color: var(--color-ink);
@@ -444,6 +451,43 @@
     left: 0;
     top: 0;
     transform-origin: 0 0;
+  }
+
+  /*
+   * The fill bar of tabs that advance on their own (src/scripts/avance.ts): a track on the tone's
+   * rule color, filled in orange over the active tab's turn. The component places the track
+   * (position, size) and sets `--avance-origine` (left for a horizontal bar, top for a vertical one).
+   */
+  .avance-barre {
+    position: absolute;
+    overflow: clip;
+    border-radius: 2px;
+    background: var(--filet, var(--color-line));
+  }
+  .avance-barre > i {
+    position: absolute;
+    inset: 0;
+    background: var(--color-orange);
+    transform: scale(0);
+    transform-origin: var(--avance-origine, left);
+  }
+  .en-cours .avance-barre > i {
+    transform: none;
+  }
+  .auto .en-cours .avance-barre > i {
+    animation: avance-tour var(--avance-duree, 9s) linear both;
+  }
+  .auto:is(.pause, .hors) .en-cours .avance-barre > i {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes avance-tour {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: none;
   }
 }
 

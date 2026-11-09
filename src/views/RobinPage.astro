@@ -18,6 +18,7 @@ import Section from '../components/layout/Section.astro';
 import Iphone from '../components/ui/Iphone.astro';
 import Ipad from '../components/ui/Ipad.astro';
 import Situations from '../components/robin/Situations.astro';
+import Semaine from '../components/robin/Semaine.astro';
 import { section } from '../content/section';
 import { routes, type Locale } from '../i18n/ui';
 import portrait from '../assets/portraits/robin.jpg';
@@ -150,69 +151,10 @@ const champs = [
     </Section>
 
     <!-- 4 · A week with Robin: the day timeline (the dots "day") -->
-    <Section id="semaine" ton="night" data-semaine>
-      <div class="flex flex-col items-center text-center">
-        <EnTete titre={semaine.titre} align="centre" />
-
-        <!-- Robin and his bubble, which change with the day -->
-        <div class="scene mt-12">
-          <!-- Robin changes outfit with the day: coffee on Monday, crate on Tuesday, calendar on
-               Wednesday, chef's hat on Thursday, bell on Friday, nightcap on Sunday. -->
-          <div class="flotte jour-av">
-            {
-              poses.map((src, i) => (
-                <Image
-                  src={src}
-                  alt=""
-                  widths={[120, 240]}
-                  sizes="120px"
-                  class:list={['pose', i === 0 && 'on']}
-                  data-j={i}
-                />
-              ))
-            }
-          </div>
-          <div class="bulles">
-            {
-              semaine.jours.map((j, i) => (
-                <p class:list={['bulle', i === 0 && 'on']} data-j={i}>
-                  {j.bulle}
-                </p>
-              ))
-            }
-          </div>
-        </div>
-
-        <!-- The timeline -->
-        <div class="frise mt-10 w-full" role="tablist" aria-label={semaine.frise}>
-          {
-            semaine.jours.map((j, i) => (
-              <button
-                type="button"
-                role="tab"
-                class="jour"
-                aria-selected={i === 0 ? 'true' : 'false'}
-                aria-controls="semaine-detail"
-                data-j={i}
-              >
-                <span class="jour-point" aria-hidden="true" />
-                <span class="jour-nom">{j.jour}</span>
-                <span class="jour-heure">{j.heure}</span>
-              </button>
-            ))
-          }
-        </div>
-
-        <div id="semaine-detail" class="details mt-10" aria-live="polite">
-          {
-            semaine.jours.map((j, i) => (
-              <div class:list={['detail', i === 0 && 'on']} data-j={i}>
-                <h3 class="font-display text-card font-semibold">{j.titre}</h3>
-                <p class="mx-auto mt-3 max-w-lead text-body text-(--doux)">{j.texte}</p>
-              </div>
-            ))
-          }
-        </div>
+    <Section id="semaine" ton="night">
+      <EnTete titre={semaine.titre} align="centre" />
+      <div class="mt-10 lg:mt-12">
+        <Semaine frise={semaine.frise} jours={semaine.jours} poses={poses} />
       </div>
     </Section>
 
@@ -341,29 +283,6 @@ const champs = [
         v.play().catch(function () {});
       });
     })();
-    // A week with Robin: clicking a day changes the bubble and the detail. Without JS, Monday stays
-    // visible.
-    (function () {
-      function onglets(root, attr) {
-        if (!root) return;
-        var tabs = [].slice.call(root.querySelectorAll('[role="tab"]'));
-        var panneaux = [].slice.call(root.querySelectorAll('[' + attr + ']:not([role="tab"])'));
-        tabs.forEach(function (t) {
-          t.addEventListener('click', function () {
-            var v = t.getAttribute(attr);
-            tabs.forEach(function (u) {
-              u.setAttribute('aria-selected', u === t ? 'true' : 'false');
-            });
-            panneaux.forEach(function (p) {
-              var on = p.getAttribute(attr) === v;
-              p.classList.toggle('on', on);
-              p.setAttribute('aria-hidden', on ? 'false' : 'true');
-            });
-          });
-        });
-      }
-      onglets(document.querySelector('[data-semaine]'), 'data-j');
-    })();
     // The beta waitlist: checks the required fields and the email, posts JSON to /api/liste-attente,
     // and on success swaps the fields for the confirmation. Every message comes from the form's
     // data attributes and lands in the aria-live status line.
@@ -455,21 +374,6 @@ const champs = [
 </Base>
 
 <style>
-  /* Robin floats gently, like the dot above the title. */
-  .flotte {
-    filter: drop-shadow(0 18px 24px color-mix(in srgb, var(--color-black) 45%, transparent));
-    animation: flotte 5s ease-in-out infinite;
-  }
-  @keyframes flotte {
-    0%,
-    100% {
-      transform: translateY(0) rotate(-2deg);
-    }
-    50% {
-      transform: translateY(-10px) rotate(2deg);
-    }
-  }
-
   /* The evening scene: the video fills the iPad's screen, which hangs over the next section. */
   .soiree {
     margin-bottom: calc(-1 * var(--debord));
@@ -564,125 +468,6 @@ const champs = [
       padding: 4px 7px;
       font-size: 10px;
     }
-  }
-
-  /* A week: the scene (Robin + bubble), the timeline, the detail. */
-  .scene {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-  }
-  .jour-av {
-    display: grid;
-    width: 120px;
-    height: 120px;
-    overflow: hidden;
-    border-radius: 999px;
-    background: var(--color-cream-2);
-  }
-  .jour-av :global(.pose) {
-    grid-area: 1 / 1;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0;
-    scale: 0.92;
-    transition:
-      opacity 0.3s var(--ease-doux),
-      scale 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-  .jour-av :global(.pose.on) {
-    opacity: 1;
-    scale: 1;
-  }
-  .bulles {
-    display: grid;
-    min-height: 74px;
-  }
-  .bulle {
-    grid-area: 1 / 1;
-    max-width: 380px;
-    padding: 14px 18px;
-    border-radius: 18px;
-    background: var(--color-surface);
-    box-shadow: var(--shadow-2);
-    color: var(--color-ink);
-    font: 500 15px/1.45 var(--font-sans);
-    opacity: 0;
-    translate: 0 8px;
-    transition:
-      opacity 0.3s var(--ease-doux),
-      translate 0.4s var(--ease-doux);
-  }
-  .bulle.on {
-    opacity: 1;
-    translate: 0 0;
-  }
-  .frise {
-    position: relative;
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-  }
-  .frise::before {
-    content: '';
-    position: absolute;
-    top: 7px;
-    left: 8%;
-    right: 8%;
-    height: 1px;
-    background: var(--filet);
-  }
-  .jour {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    padding-bottom: 6px;
-    cursor: pointer;
-  }
-  .jour-point {
-    width: 15px;
-    height: 15px;
-    border-radius: 999px;
-    background: var(--fond);
-    box-shadow: inset 0 0 0 1.5px color-mix(in srgb, currentColor 45%, transparent);
-    transition:
-      background-color 0.2s,
-      box-shadow 0.2s;
-  }
-  .jour-nom {
-    font: 600 14px/1 var(--font-sans);
-    color: color-mix(in srgb, currentColor 70%, transparent);
-  }
-  .jour-heure {
-    font: 400 11px/1 var(--font-mono);
-    letter-spacing: 0.06em;
-    color: color-mix(in srgb, currentColor 60%, transparent);
-  }
-  .jour[aria-selected='true'] .jour-point {
-    background: var(--color-orange);
-    box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-orange) 25%, transparent);
-  }
-  .jour[aria-selected='true'] .jour-nom {
-    color: currentColor;
-  }
-  .jour:focus-visible {
-    outline: 2px solid currentColor;
-    outline-offset: 4px;
-    border-radius: 8px;
-  }
-  .details {
-    display: grid;
-  }
-  .detail {
-    grid-area: 1 / 1;
-    opacity: 0;
-    transition: opacity 0.3s var(--ease-doux);
-  }
-  .detail.on {
-    opacity: 1;
   }
 
   /* The phone screen. */
@@ -844,11 +629,6 @@ const champs = [
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .flotte {
-      animation: none;
-    }
-    .bulle,
-    .detail,
     .ecran {
       transition: none;
     }

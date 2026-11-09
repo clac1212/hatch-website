@@ -1,0 +1,299 @@
+---
+/**
+ * "From Monday morning to Sunday night" (signature section, César 09/11): a row of day tabs, then
+ * one panel. On the left, Robin whole in the day's outfit, on his own cream backdrop; on the right,
+ * the message he sends that day (a WhatsApp bubble on the chat's wall), then what it is about.
+ * The days advance on their own like the features above (src/scripts/avance.ts), a click stops it.
+ * Changing day is a crossfade, nothing floats. Without JS: Monday.
+ */
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Carte from '../ui/Carte.astro';
+import Heure from '../ui/WhatsAppHeure.astro';
+
+interface Props {
+  /** aria-label of the tab row. */
+  frise: string;
+  jours: { jour: string; heure: string; titre: string; texte: string; bulle: string }[];
+  /** Robin's outfit per day, in the order of `jours`. */
+  poses: ImageMetadata[];
+}
+const { frise, jours, poses } = Astro.props;
+
+/** The time as WhatsApp prints it: « 8 h 30 » → « 08:30 », « 8:30 am » → « 8:30 AM ». */
+const horloge = (h: string) => {
+  const fr = h.match(/^(\d{1,2}) h(?: (\d{2}))?$/);
+  return fr ? `${fr[1].padStart(2, '0')}:${fr[2] ?? '00'}` : h.toUpperCase();
+};
+---
+
+<div class="semaine" data-semaine>
+  <div class="jours" role="tablist" aria-label={frise}>
+    {
+      jours.map((j, i) => (
+        <button
+          type="button"
+          role="tab"
+          id={`semaine-onglet-${i}`}
+          class="jour"
+          aria-selected={i === 0 ? 'true' : 'false'}
+          aria-controls={`semaine-jour-${i}`}
+          tabindex={i === 0 ? 0 : -1}
+        >
+          <span class="jour-nom">{j.jour}</span>
+          <span class="jour-heure font-mono">{j.heure}</span>
+          <span class="jour-barre avance-barre" aria-hidden="true">
+            <i />
+          </span>
+        </button>
+      ))
+    }
+  </div>
+
+  <Carte variante="surface" taille="panneau" class="panneau">
+    <div class="poses" aria-hidden="true">
+      {
+        poses.map((src, i) => (
+          <Image
+            src={src}
+            alt=""
+            widths={[400]}
+            sizes="(min-width: 64rem) 400px, 100vw"
+            class:list={['pose', i === 0 && 'on']}
+          />
+        ))
+      }
+    </div>
+
+    <div class="textes">
+      {
+        jours.map((j, i) => (
+          <div
+            class:list={['texte', i === 0 && 'on']}
+            id={`semaine-jour-${i}`}
+            role="tabpanel"
+            aria-labelledby={`semaine-onglet-${i}`}
+          >
+            <div class="fil">
+              <p class="bulle">
+                {j.bulle}
+                <Heure heure={horloge(j.heure)} />
+              </p>
+            </div>
+            <h3 class="mt-7 font-display text-card font-semibold">{j.titre}</h3>
+            <p class="mt-2 text-body text-(--doux)">{j.texte}</p>
+          </div>
+        ))
+      }
+    </div>
+  </Carte>
+</div>
+
+<script>
+  import { avance } from '../../scripts/avance';
+
+  const racine = document.querySelector<HTMLElement>('[data-semaine]');
+  if (racine) {
+    const onglets = [...racine.querySelectorAll<HTMLElement>('[role="tab"]')];
+    const poses = [...racine.querySelectorAll<HTMLElement>('.pose')];
+    const textes = [...racine.querySelectorAll<HTMLElement>('[role="tabpanel"]')];
+    const rangee = racine.querySelector<HTMLElement>('.jours')!;
+    racine.classList.add('js');
+    avance(
+      racine,
+      onglets,
+      (i) => {
+        onglets.forEach((o, k) => {
+          o.setAttribute('aria-selected', String(k === i));
+          o.tabIndex = k === i ? 0 : -1;
+        });
+        poses.forEach((p, k) => p.classList.toggle('on', k === i));
+        textes.forEach((t, k) => t.classList.toggle('on', k === i));
+        // Phones: the tab row follows the active day (scrolls the row only).
+        if (rangee.scrollWidth > rangee.clientWidth) {
+          rangee.scrollTo({
+            left: onglets[i].offsetLeft - onglets[0].offsetLeft,
+            behavior: 'smooth',
+          });
+        }
+      },
+      { pause: racine.querySelector('.panneau') ?? undefined },
+    );
+    // Arrow keys move between days, as in any tab list.
+    rangee.addEventListener('keydown', (e) => {
+      const k = onglets.indexOf(document.activeElement as HTMLElement);
+      if (k < 0 || (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft')) return;
+      const suivant =
+        onglets[(k + (e.key === 'ArrowRight' ? 1 : -1) + onglets.length) % onglets.length];
+      suivant.focus();
+      suivant.click();
+    });
+  }
+</script>
+
+<style>
+  .semaine {
+    --avance-duree: 7s;
+    display: grid;
+    gap: 20px;
+    max-width: 64rem;
+    margin-inline: auto;
+  }
+
+  /* The days: a row of tabs, the active one on the card's color, its bar filling. */
+  /* exception: on phones the row scrolls under the page gutters (the conteneur's own clamp) */
+  .jours {
+    display: flex;
+    gap: 6px;
+    margin-inline: calc(-1 * clamp(1.25rem, 4.4vw, 4rem));
+    padding-inline: clamp(1.25rem, 4.4vw, 4rem);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .jour {
+    position: relative;
+    display: grid;
+    flex: 1 0 auto;
+    justify-items: center;
+    gap: 4px;
+    padding: 12px 18px 16px;
+    border-radius: var(--radius-card-sm);
+    color: var(--doux);
+    cursor: pointer;
+    transition:
+      background-color 0.25s var(--ease-hatch),
+      color 0.25s var(--ease-hatch);
+  }
+  .jour:hover {
+    color: var(--color-cream);
+  }
+  .jour[aria-selected='true'] {
+    background: var(--color-night-2);
+    color: var(--color-cream);
+  }
+  .jour:focus-visible {
+    outline: 2px solid var(--color-orange);
+    outline-offset: 2px;
+  }
+  .jour-nom {
+    font-weight: 600;
+    font-size: var(--text-body);
+    line-height: 1;
+  }
+  .jour-heure {
+    font-size: var(--text-source);
+    letter-spacing: 0.06em;
+  }
+  .jour-barre {
+    --avance-origine: left;
+    left: 18px;
+    right: 18px;
+    bottom: 7px;
+    height: 2px;
+    opacity: 0;
+  }
+  .jour[aria-selected='true'] .jour-barre {
+    opacity: 1;
+  }
+
+  /* The panel: Robin on the left, the day's message and text on the right. */
+  .semaine :global(.panneau) {
+    display: grid;
+    overflow: clip;
+  }
+  .poses {
+    display: grid;
+    aspect-ratio: 4 / 3;
+    background: var(--color-cream-2);
+  }
+  .poses :global(.pose) {
+    grid-area: 1 / 1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 35%;
+    opacity: 0;
+    transition: opacity 0.45s var(--ease-hatch);
+  }
+  .poses :global(.pose.on) {
+    opacity: 1;
+  }
+  .textes {
+    display: grid;
+    padding: 28px 24px 32px;
+  }
+  .texte {
+    grid-area: 1 / 1;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.35s var(--ease-hatch),
+      visibility 0s 0.35s;
+  }
+  .texte.on {
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0.1s, 0s;
+  }
+  @media (width >= 48rem) {
+    .jours {
+      margin: 0;
+      padding: 0;
+      overflow: visible;
+    }
+    .semaine :global(.panneau) {
+      grid-template-columns: minmax(0, 26rem) minmax(0, 1fr);
+    }
+    .poses {
+      aspect-ratio: auto;
+      min-height: 26rem;
+    }
+    .textes {
+      align-content: center;
+      padding: 40px 48px;
+    }
+  }
+
+  /* The day's message: a WhatsApp bubble on the chat's wall (scene palette). */
+  .fil {
+    padding: 14px;
+    border-radius: var(--radius-card-sm);
+    background: var(--color-whatsapp-wall);
+  }
+  .bulle {
+    position: relative;
+    max-width: 30rem;
+    padding: 8px 12px 9px;
+    border-radius: 14px 14px 14px 4px;
+    background: var(--color-white);
+    box-shadow: 0 1px 1px color-mix(in srgb, var(--color-black) 12%, transparent);
+    color: var(--color-whatsapp-ink);
+    font: 400 var(--text-body) / 1.4 var(--font-ios);
+  }
+  /* The iOS tail (--wa-queue, shared with ui/WhatsApp). */
+  .bulle::after {
+    content: '';
+    position: absolute;
+    left: -7px;
+    bottom: 0;
+    width: 9px;
+    height: 14px;
+    background: inherit;
+    scale: -1 1;
+    mask: var(--wa-queue) no-repeat center / 100% 100%;
+  }
+  .bulle :global(.wa-h) {
+    float: right;
+    margin: 8px -2px -4px 12px;
+    font-size: 11px;
+    line-height: 1;
+    color: var(--color-whatsapp-meta);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .poses :global(.pose),
+    .texte {
+      transition: none;
+    }
+  }
+</style>

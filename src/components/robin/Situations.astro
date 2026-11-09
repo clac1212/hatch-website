@@ -43,7 +43,7 @@ const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7,
       situations.map((s, i) => (
         <li class:list={['fn', i === 0 && 'on']} data-fn={i}>
           <button type="button" class="fn-btn" aria-pressed={i === 0 ? 'true' : 'false'}>
-            <span class="fn-barre" aria-hidden="true">
+            <span class="fn-barre avance-barre" aria-hidden="true">
               <i />
             </span>
             <span class="fn-num font-mono text-kicker">0{i + 1}</span>
@@ -304,172 +304,164 @@ const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7,
   </div>
 </div>
 
-<script is:inline data-keep>
+<script>
+  import { avance } from '../../scripts/avance';
+
   // Each scene is a list of steps { t: ms, on: [states to turn on, 'name' or 'name:class'],
   // off: [states to turn off], tap: the target the thumb taps }. 'tete' is the shared chat header.
   // Fast on purpose (César 09/11): the whole chat is on screen within ~4 s, then it is read.
-  (function () {
-    var SCENARIOS = {
-      0: [
-        { t: 150, on: ['tete:ecrit'] },
-        { t: 550, on: ['a'], off: ['tete:ecrit'] },
-        { t: 1200, tap: 'lien' },
-        { t: 1500, on: ['tete:ecrit'] },
-        { t: 1950, on: ['c'], off: ['tete:ecrit'] },
-        { t: 2350, on: ['tete:ecrit'] },
-        { t: 2750, on: ['d'], off: ['tete:ecrit'] },
-        { t: 3150, on: ['e'] },
-      ],
-      1: [
-        { t: 150, on: ['a'] },
-        { t: 450, on: ['tete:ecrit'] },
-        { t: 850, on: ['b'], off: ['tete:ecrit'] },
-        { t: 1100, on: ['l0:lu'] },
-        { t: 1350, on: ['l0:ok', 'l1:lu'] },
-        { t: 1600, on: ['l1:ok', 'l2:lu'] },
-        { t: 1900, on: ['l2:ecart'] },
-        { t: 2300, on: ['c', 'd'] },
-        { t: 2900, tap: 'oui' },
-        { t: 3200, on: ['e'] },
-        { t: 3400, on: ['tete:ecrit'] },
-        { t: 3800, on: ['f'], off: ['tete:ecrit'] },
-      ],
-      2: [
-        { t: 150, on: ['a'] },
-        { t: 450, on: ['tete:ecrit'] },
-        { t: 1100, on: ['b'], off: ['tete:ecrit'] },
-        { t: 1400, on: ['g:lu'] },
-      ],
-      3: [
-        { t: 150, on: ['a'] },
-        { t: 500, on: ['tete:ecrit'] },
-        { t: 900, on: ['b'], off: ['tete:ecrit'] },
-        { t: 1100, on: ['c0'] },
-        { t: 1300, on: ['c1'] },
-        { t: 1500, on: ['c2'] },
-        { t: 1700, on: ['c3'] },
-        { t: 2000, on: ['tampon'] },
-        { t: 2300, on: ['d'] },
-        { t: 2900, tap: 'envoyer' },
-        { t: 3200, on: ['e'] },
-        { t: 3400, on: ['tete:ecrit'] },
-        { t: 3800, on: ['f'], off: ['tete:ecrit'] },
-      ],
-    };
-    var SORTIE = 450; // ms, the outgoing chat's slide (matches the CSS)
-    var reduit = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var racine = document.querySelector('[data-fonctions]');
-    if (!racine) return;
-    var ecran = racine.querySelector('.wai-zone');
-    var tete = racine.querySelector('[data-tete]');
-    var doigt = racine.querySelector('.doigt');
+  type Etape = { t: number; on?: string[]; off?: string[]; tap?: string };
+const SCENARIOS: Record<string, Etape[]> = {
+    0: [
+      { t: 150, on: ['tete:ecrit'] },
+      { t: 550, on: ['a'], off: ['tete:ecrit'] },
+      { t: 1200, tap: 'lien' },
+      { t: 1500, on: ['tete:ecrit'] },
+      { t: 1950, on: ['c'], off: ['tete:ecrit'] },
+      { t: 2350, on: ['tete:ecrit'] },
+      { t: 2750, on: ['d'], off: ['tete:ecrit'] },
+      { t: 3150, on: ['e'] },
+    ],
+    1: [
+      { t: 150, on: ['a'] },
+      { t: 450, on: ['tete:ecrit'] },
+      { t: 850, on: ['b'], off: ['tete:ecrit'] },
+      { t: 1100, on: ['l0:lu'] },
+      { t: 1350, on: ['l0:ok', 'l1:lu'] },
+      { t: 1600, on: ['l1:ok', 'l2:lu'] },
+      { t: 1900, on: ['l2:ecart'] },
+      { t: 2300, on: ['c', 'd'] },
+      { t: 2900, tap: 'oui' },
+      { t: 3200, on: ['e'] },
+      { t: 3400, on: ['tete:ecrit'] },
+      { t: 3800, on: ['f'], off: ['tete:ecrit'] },
+    ],
+    2: [
+      { t: 150, on: ['a'] },
+      { t: 450, on: ['tete:ecrit'] },
+      { t: 1100, on: ['b'], off: ['tete:ecrit'] },
+      { t: 1400, on: ['g:lu'] },
+    ],
+    3: [
+      { t: 150, on: ['a'] },
+      { t: 500, on: ['tete:ecrit'] },
+      { t: 900, on: ['b'], off: ['tete:ecrit'] },
+      { t: 1100, on: ['c0'] },
+      { t: 1300, on: ['c1'] },
+      { t: 1500, on: ['c2'] },
+      { t: 1700, on: ['c3'] },
+      { t: 2000, on: ['tampon'] },
+      { t: 2300, on: ['d'] },
+      { t: 2900, tap: 'envoyer' },
+      { t: 3200, on: ['e'] },
+      { t: 3400, on: ['tete:ecrit'] },
+      { t: 3800, on: ['f'], off: ['tete:ecrit'] },
+    ],
+  };
+  const SORTIE = 450; // ms, the outgoing chat's slide (matches the CSS)
+  const reduit = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const racine = document.querySelector<HTMLElement>('[data-fonctions]');
 
-    function scene(fil) {
-      var etapes = SCENARIOS[fil.getAttribute('data-situ')] || [];
-      var minuteries = [];
-      var allumes = [];
-      function el(nom) {
-        return nom === 'tete' ? tete : fil.querySelector('[data-etat="' + nom + '"]');
-      }
-      function basculer(spec, oui) {
-        var p = spec.split(':');
-        var e = el(p[0]);
+  if (racine) {
+    const ecran = racine.querySelector<HTMLElement>('.wai-zone')!;
+    const tete = racine.querySelector<HTMLElement>('[data-tete]')!;
+    const doigt = racine.querySelector<HTMLElement>('.doigt');
+
+    const scene = (fil: HTMLElement) => {
+      const etapes = SCENARIOS[fil.dataset.situ ?? ''] ?? [];
+      let minuteries: number[] = [];
+      let allumes: [Element, string][] = [];
+      const el = (nom: string) =>
+        nom === 'tete' ? tete : fil.querySelector<HTMLElement>(`[data-etat="${nom}"]`);
+
+      // The iOS tail sits on the last visible bubble of each speaker's group.
+      const queues = () => {
+        const vus = [...fil.querySelectorAll<HTMLElement>('.b.on, .wa-choix.on')];
+        vus.forEach((b, k) => {
+          const suivant = vus[k + 1];
+          const cote = b.classList.contains('out');
+          const fin =
+            b.classList.contains('b') &&
+            !b.classList.contains('avec-choix') &&
+            (!suivant ||
+              !suivant.classList.contains('b') ||
+              suivant.classList.contains('out') !== cote);
+          b.classList.toggle('fin', fin);
+        });
+      };
+      const basculer = (spec: string, oui: boolean) => {
+        const [nom, cls = 'on'] = spec.split(':');
+        const e = el(nom);
         if (!e) return;
-        var cls = p[1] || 'on';
         e.classList.toggle(cls, oui);
         if (oui && e !== tete) {
           allumes.push([e, cls]);
           queues();
           fil.scrollTo({ top: fil.scrollHeight, behavior: reduit ? 'auto' : 'smooth' });
         }
-      }
-      // The iOS tail sits on the last visible bubble of each speaker's group.
-      function queues() {
-        var vus = [].slice.call(fil.querySelectorAll('.b.on, .wa-choix.on'));
-        vus.forEach(function (b, k) {
-          var suivant = vus[k + 1];
-          var cote = b.classList.contains('out');
-          var fin =
-            b.classList.contains('b') &&
-            !b.classList.contains('avec-choix') &&
-            (!suivant || !suivant.classList.contains('b') || suivant.classList.contains('out') !== cote);
-          b.classList.toggle('fin', fin);
-        });
-      }
-      function taper(nom) {
-        var c = fil.querySelector('[data-cible="' + nom + '"]');
+      };
+      const taper = (nom: string) => {
+        const c = fil.querySelector<HTMLElement>(`[data-cible="${nom}"]`);
         if (!c || !doigt) return;
-        var r = ecran.getBoundingClientRect();
-        var b = c.getBoundingClientRect();
-        doigt.style.setProperty('--x', b.left - r.left + b.width / 2 + 'px');
-        doigt.style.setProperty('--y', b.top - r.top + b.height / 2 + 'px');
+        const r = ecran.getBoundingClientRect();
+        const b = c.getBoundingClientRect();
+        doigt.style.setProperty('--x', `${b.left - r.left + b.width / 2}px`);
+        doigt.style.setProperty('--y', `${b.top - r.top + b.height / 2}px`);
         c.classList.add('presse');
-        c.parentElement.classList.add('fait');
-        allumes.push([c, 'presse'], [c.parentElement, 'fait']);
+        c.parentElement!.classList.add('fait');
+        allumes.push([c, 'presse'], [c.parentElement!, 'fait']);
         doigt.classList.remove('tape');
         void doigt.offsetWidth;
         doigt.classList.add('tape');
-      }
-      function appliquer(e, sansDoigt) {
-        (e.on || []).forEach(function (n) {
-          basculer(n, true);
-        });
-        (e.off || []).forEach(function (n) {
-          basculer(n, false);
-        });
+      };
+      const appliquer = (e: Etape, sansDoigt = false) => {
+        e.on?.forEach((n) => basculer(n, true));
+        e.off?.forEach((n) => basculer(n, false));
         if (e.tap && !sansDoigt) taper(e.tap);
-      }
-      function vider() {
+      };
+      const vider = () => {
         minuteries.forEach(clearTimeout);
         minuteries = [];
-        allumes.forEach(function (a) {
-          a[0].classList.remove(a[1]);
-        });
+        allumes.forEach(([e, cls]) => e.classList.remove(cls));
         allumes = [];
-      }
+      };
       return {
-        fil: fil,
-        jouer: function () {
+        fil,
+        jouer() {
           vider();
           fil.scrollTop = 0;
           if (reduit) {
-            etapes.forEach(function (e) {
-              appliquer(e, true);
-            });
-            fil.querySelectorAll('.wa-choix').forEach(function (c) {
-              c.classList.add('fait');
-            });
+            etapes.forEach((e) => appliquer(e, true));
+            fil.querySelectorAll('.wa-choix').forEach((c) => c.classList.add('fait'));
             tete.classList.remove('ecrit');
             return;
           }
-          etapes.forEach(function (e) {
-            minuteries.push(setTimeout(appliquer, e.t, e));
-          });
+          minuteries = etapes.map((e) => window.setTimeout(() => appliquer(e), e.t));
         },
         // Once its slide-out is over, so the outgoing chat does not empty while it leaves.
-        ranger: function () {
+        ranger() {
           minuteries.forEach(clearTimeout);
-          minuteries = [setTimeout(vider, SORTIE)];
+          minuteries = [window.setTimeout(vider, SORTIE)];
         },
       };
-    }
+    };
 
     racine.classList.add('js');
-    var scenes = [].slice.call(racine.querySelectorAll('[data-situ]')).map(scene);
-    var items = [].slice.call(racine.querySelectorAll('[data-fn]'));
-    var liste = racine.querySelector('.liste');
-    var details = [].slice.call(racine.querySelectorAll('.fn-detail p'));
-    var actif = -1;
+    const scenes = [...racine.querySelectorAll<HTMLElement>('[data-situ]')].map(scene);
+    const items = [...racine.querySelectorAll<HTMLElement>('[data-fn]')];
+    const liste = racine.querySelector<HTMLElement>('.liste')!;
+    const details = [...racine.querySelectorAll<HTMLElement>('.fn-detail p')];
+    const tel = racine.querySelector<HTMLElement>('.tel-zone')!;
+    let actif = -1;
 
-    function activer(i) {
-      if (i === actif) return;
-      var avant = actif;
+    const activer = (i: number) => {
+      const avant = actif;
       actif = i;
       tete.classList.remove('ecrit');
-      if (doigt) doigt.classList.remove('tape');
-      items.forEach(function (it, k) {
+      doigt?.classList.remove('tape');
+      items.forEach((it, k) => {
         it.classList.toggle('on', k === i);
-        it.querySelector('button').setAttribute('aria-pressed', k === i ? 'true' : 'false');
+        it.querySelector('button')!.setAttribute('aria-pressed', String(k === i));
       });
       // Phones: the tab row follows the active tab (scrolls the row only, never the page).
       if (liste.scrollWidth > liste.clientWidth) {
@@ -478,46 +470,22 @@ const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7,
           behavior: reduit ? 'auto' : 'smooth',
         });
       }
-      details.forEach(function (d, k) {
-        d.classList.toggle('on', k === i);
-      });
-      scenes.forEach(function (sc, k) {
+      details.forEach((d, k) => d.classList.toggle('on', k === i));
+      scenes.forEach((sc, k) => {
         sc.fil.classList.toggle('on', k === i);
         sc.fil.classList.toggle('sort', k === avant);
       });
       if (avant > -1) scenes[avant].ranger();
       scenes[i].jouer();
-    }
+    };
 
-    // Autoplay: the active feature's bar fills (CSS), at its end the next one takes over. A click
-    // picks a feature and stops it; the bar pauses while the section is off screen or the pointer
-    // is on the phone (someone scrolling the chat by hand).
-    if (!reduit) racine.classList.add('auto');
-    items.forEach(function (it, k) {
-      it.querySelector('button').addEventListener('click', function () {
-        racine.classList.remove('auto');
-        activer(k);
-      });
-      it.querySelector('.fn-barre i').addEventListener('animationend', function () {
-        if (racine.classList.contains('auto') && k === actif) activer((k + 1) % items.length);
-      });
-    });
-    var tel = racine.querySelector('.tel-zone');
-    tel.addEventListener('pointerenter', function () {
-      racine.classList.add('pause');
-    });
-    tel.addEventListener('pointerleave', function () {
-      racine.classList.remove('pause');
-    });
-    new IntersectionObserver(
-      function (entries) {
-        var vu = entries[0].isIntersecting;
-        racine.classList.toggle('hors', !vu);
-        if (vu && actif === -1) activer(0);
-      },
-      { threshold: 0.4 },
-    ).observe(tel);
-  })();
+    avance(
+      racine,
+      items.map((it) => it.querySelector('button')!),
+      activer,
+      { vue: tel, pause: tel },
+    );
+  }
 </script>
 
 <style>
@@ -554,30 +522,11 @@ const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7,
   .fn.on .fn-num {
     color: var(--color-orange-txt);
   }
-  /* The bar: a track along the item, the active one fills over its turn. */
-  .fn-barre {
-    position: absolute;
-    overflow: clip;
-    background: var(--filet);
-    border-radius: 2px;
+  /* The bar (shared, global.css .avance-barre): placed here along the item. One feature's turn:
+     the chat plays in ~4 s, then stays to be read. */
+  .fonctions {
+    --avance-duree: 9s;
   }
-  .fn-barre i {
-    position: absolute;
-    inset: 0;
-    background: var(--color-orange);
-    transform: scale(0);
-  }
-  .fn.on .fn-barre i {
-    transform: none;
-  }
-  .fonctions.auto .fn.on .fn-barre i {
-    /* exception: one feature's turn, the chat plays in ~4 s then stays to be read */
-    animation: tour 9s linear both;
-  }
-  .fonctions.auto:is(.pause, .hors) .fn.on .fn-barre i {
-    animation-play-state: paused;
-  }
-
   /* Phones: a row of tabs (number + title), the active text under it, the phone below. */
   .fn {
     flex: none;
@@ -602,8 +551,8 @@ const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7,
     bottom: 6px;
     height: 2px;
   }
-  .fn-barre i {
-    transform-origin: left;
+  .fn-barre {
+    --avance-origine: left;
   }
   .fn-plie {
     display: none;
@@ -683,8 +632,8 @@ const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7,
       width: 2px;
       height: auto;
     }
-    .fn-barre i {
-      transform-origin: top;
+    .fn-barre {
+      --avance-origine: top;
     }
     .fn-plie {
       display: grid;
@@ -697,14 +646,6 @@ const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7,
     }
     .fn.on .fn-plie {
       grid-template-rows: 1fr;
-    }
-  }
-  @keyframes tour {
-    from {
-      transform: scale(0);
-    }
-    to {
-      transform: scale(1);
     }
   }
 
