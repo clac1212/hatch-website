@@ -118,6 +118,7 @@
   /* Radius scale (DS decision 2, César 09/11): sm for small controls, card for every card and panel,
      full (Tailwind) for buttons, avatars, pills. Something set inside a card takes a smaller radius or none. */
   --radius-sm: 8px;
+  --radius-card-sm: 24px; /* narrow cards, tabs, menus: 40 px would turn them into pills */
   --radius-card: 40px; /* drawn as a squircle: soft, generous corners (César 09/11) */
   --radius-panneau: 64px; /* the large objects: home doors, forms, big scenes */
   --shadow-1: 0 4px 14px #22190c0a;
@@ -156,10 +157,34 @@
 /* Card corners are squircles (continuous curvature, like Apple's), not circle arcs: smoother, less
    « default web ». Browsers without corner-shape keep the plain radius. César 09/11. */
 @layer utilities {
+  /* The card carries its radius in --r, so what sits inside can be concentric (rounded-interieur).
+     Its pseudo-elements (rings, rims) take the same squircle, or they would draw a circle arc over it. */
+  .rounded-card-sm,
   .rounded-card,
-  .rounded-panneau {
+  .rounded-panneau,
+  .rounded-card-sm::before,
+  .rounded-card-sm::after,
+  .rounded-card::before,
+  .rounded-card::after,
+  .rounded-panneau::before,
+  .rounded-panneau::after {
     corner-shape: squircle;
   }
+  .rounded-card-sm {
+    --r: var(--radius-card-sm);
+  }
+  .rounded-card {
+    --r: var(--radius-card);
+  }
+  .rounded-panneau {
+    --r: var(--radius-panneau);
+  }
+}
+/* Something set inside a card, `--inset` away from its edge (12 px by default): its radius is the
+   card's minus that gap, so both curves stay parallel. Never pick an inner radius by hand. */
+@utility rounded-interieur {
+  border-radius: max(calc(var(--r, var(--radius-card)) - var(--inset, 12px)), var(--radius-sm));
+  corner-shape: squircle;
 }
 
 /* Layout layer (DS, César 09/11). The site's one container: 1312 px of content at 1440, the same left
@@ -264,6 +289,7 @@
     position: absolute;
     inset: 0;
     border-radius: inherit;
+    corner-shape: inherit; /* the rim follows a squircle card too */
     padding: 1.5px;
     pointer-events: none;
     background: linear-gradient(

@@ -50,7 +50,7 @@ const sombre = ton === 'sombre';
 
   <div
     class:list={[
-      'plaque vitre m-3 flex flex-col items-start gap-2 p-5 lg:m-4 lg:p-7',
+      'plaque vitre rounded-interieur m-3 flex flex-col items-start gap-2 p-5 lg:m-4 lg:p-7',
       sombre ? 'plaque-sombre text-cream' : 'text-ink',
     ]}
   >
@@ -76,15 +76,14 @@ const sombre = ton === 'sombre';
     translate: 0 -4px;
     box-shadow: var(--shadow-3);
   }
-  /* The plate: the card's glass, concentric with it (panel radius minus its margin). */
+  /* The plate: the card's glass, concentric with it (rounded-interieur, --inset = its margin). */
   .plaque {
-    border-radius: calc(var(--radius-panneau) - 12px);
-    corner-shape: squircle;
+    --inset: 12px;
     transition: translate 0.5s var(--ease-hatch);
   }
   @media (width >= 64rem) {
     .plaque {
-      border-radius: calc(var(--radius-panneau) - 16px);
+      --inset: 16px;
     }
   }
   .porte:hover .plaque {

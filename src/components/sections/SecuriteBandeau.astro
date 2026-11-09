@@ -57,7 +57,12 @@ const TEINTES = { jay: 'bg-sand', owl: 'bg-stone', finch: 'bg-peach', ecran: 'bg
       {
         sections.map((s) => (
           <li class="flex items-center gap-4 rounded-card bg-surface p-3 pr-5 text-ink shadow-carte">
-            <div class:list={['vignette grid shrink-0 place-items-center', TEINTES[s.visual]]}>
+            <div
+              class:list={[
+                'vignette rounded-interieur grid shrink-0 place-items-center',
+                TEINTES[s.visual],
+              ]}
+            >
               {s.visual === 'ecran' ? (
                 <ul class="roles" aria-hidden="true">
                   {screen.roles.map((r, k) => (
@@ -94,8 +99,6 @@ const TEINTES = { jay: 'bg-sand', owl: 'bg-stone', finch: 'bg-peach', ecran: 'bg
     aspect-ratio: 1;
     padding: 6px;
     overflow: hidden;
-    border-radius: calc(var(--radius-card) - 12px);
-    corner-shape: squircle;
   }
   .vignette > :global(picture) {
     width: 100%;

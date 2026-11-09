@@ -177,6 +177,11 @@ const fill = (s: string, vars: Record<string, string>) =>
     corner-shape: squircle;
     background-color: var(--marque);
     color: var(--color-white);
+    transition: border-radius 0.4s var(--ease-hatch);
+  }
+  /* A closed slice is a narrow tab: the small card radius, or it would read as a pill. */
+  .tranche:not([data-ouvert]) {
+    border-radius: var(--radius-card-sm);
   }
 
   .ferme {
@@ -188,7 +193,7 @@ const fill = (s: string, vars: Record<string, string>) =>
   .ferme:focus-visible {
     outline: 2px solid var(--color-white);
     outline-offset: -6px;
-    border-radius: var(--radius-card);
+    border-radius: var(--radius-card-sm);
     corner-shape: squircle;
   }
   .avatar {
