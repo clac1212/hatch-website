@@ -56,7 +56,7 @@ pnpm format:check
 | Short UI strings, routes per locale | `src/i18n/ui.ts`                                                                                                   |
 | Design tokens                       | `src/styles/global.css` under `@theme`                                                                             |
 | Layout, nav, footer                 | `src/layouts/Base.astro`, `src/components/{Nav,Footer}.astro`                                                      |
-| DS primitives                       | `src/components/ui/` (Button, Logo…), mirroring the Pencil components                                              |
+| DS primitives                       | `src/components/ui/` (Button, Logo…), mirroring the Pencil components; layout in `src/components/layout/`          |
 | Home sections                       | `src/components/sections/*.astro`, one component per section                                                       |
 | Page bodies shared by FR and EN     | `src/views/*.astro`; `src/pages/**` files only pick the locale                                                     |
 | Images                              | `src/assets/` (optimised by Astro), never `public/` unless it must stay raw                                        |
@@ -75,22 +75,70 @@ pnpm format:check
   - no em dash inside a sentence, no « opérationnel en quelques minutes ».
 - Two calls to action, the classic SaaS pair (César 06/10): the demo, primary (`Button variant="orange"`, « Réserver une démo » / « Book a demo » → `/demo`, Cal.com), and access to the platform, secondary: « Se connecter » / « Log in » as a button in the home and Robin nav (`NavAccueil`, `appUrls.login`; the app's /auth page also lets a newcomer sign up), « Essayer Hatch OS » / « Try Hatch OS » as a `secondary` button in the hero (`appUrls.signup`). Every other CTA (pricing, footer, inner pages) is the demo alone. App URLs live in `appUrls` (src/i18n/ui.ts).
 
-## Styling (DS Hatch OS v4)
+## Design system (DS Hatch OS v4)
 
-- Tailwind utilities backed by the `@theme` tokens. The default Tailwind palette is wiped (`--color-*: initial`), so only brand colors exist. A new color gets added to `@theme` first; never inline a raw hex.
-- Colors:
-  - `cream`, `cream-2`, `surface`, `surface-2`, `sand`, `night`, `night-2`, `line-night` ;
-  - `ink`, `soft`, `line` ;
-  - `orange`, `orange-txt`, `orange-hover`, `orange-tint`, `copper` ;
-  - `white`.
-- **`orange` (#F87A01) is for flat fills only.** Never use it as text, and never put white text on it (2.7:1). Orange text uses `orange-txt`.
-- No green in surfaces, text or rules. No decorative gradients or icons. Relief comes from the `line` border; shadows `shadow-1` to `shadow-3` only.
-- Type utilities:
-  - families `font-mono` (Departure Mono: H1, kickers, sources), `font-display` (Fraunces: section titles, numbers), `font-sans` (Inter: body) ;
-  - sizes `text-h1`, `text-section`, `text-card`, `text-stat`, `text-punch`, `text-body`, `text-caption`, `text-kicker`, `text-source`.
-- Radii `rounded-btn` (8), `rounded-card` (16), `rounded-glass` (18), `rounded-full`. Containers `max-w-site` (1312 px), `max-w-prose` (760 px). Easing `ease-hatch`.
-- **Resets and element-wide defaults must live in `@layer base { ... }`**: an unlayered rule outranks utilities in Tailwind v4 and silently breaks them.
+One design system in five layers. Consistency comes from a shared vocabulary (tokens) and a shared rhythm (layout); identity comes from a few signature sections that get their own art direction. The approach follows today's practice: three-tier tokens, fluid scales (Utopia), and CUBE CSS (composition is free, vocabulary is fixed, exceptions are named). César 09/11.
+
+> **Status (Nov 2026): being rolled out on `refactor/harmonisation-site`.** Pages not yet migrated still carry raw values (`text-[34px]`, `rounded-[36px]`, `max-w-[1180px]`…). Never copy them: use the layer that should provide the value.
+
+### The five layers
+
+| Layer                 | Where                                                 | What                                                                                    | Freedom                                                   |
+| --------------------- | ----------------------------------------------------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| 1. Tokens             | `src/styles/global.css`, `@theme`                     | colors, type scale, section spacing, radii, shadows, containers, easing                 | none: a missing value becomes a token first, then is used |
+| 2. Layout             | `src/components/layout/`                              | `Section` (background tone + vertical rhythm), `Conteneur` (`max-w-site` + gutters)     | none on rhythm and left edge                              |
+| 3. DS components      | `src/components/ui/`, mirroring the Pencil components | `Button`, `Kicker`, `EnTete` (kicker + title + lead), `Carte`, `Logo`, `Iphone`, `Ipad` | only through their variants                               |
+| 4. Standard sections  | `src/components/sections/`, `src/components/agents/`… | assembled from layers 1 to 3                                                            | layout free, vocabulary fixed                             |
+| 5. Signature sections | listed below                                          | the staged moments that carry the site's identity                                       | free inside their scoped `<style>`, under the three rules |
+
+Signature sections today: the home hero rebus (`AccueilPage`), the Robin evening, week and phone (`RobinPage`, `robin/Situations`), the networks hero map (`sections/Hero`), the pricing composer (`sections/TarifsFormulaire`), the agent pages' scenes, problem objects and walls (`components/agents/`). Making a new section a signature one is César's call.
+
+### The three rules of a signature section
+
+1. **Inside the system wherever it exists.** Wrapped in a `Section`; tokens for color, type, radius and shadow. Only the staging is bespoke: positions, timings, mockup dimensions.
+2. **Every bespoke value is named.** It carries a `/* exception: why */` comment (or `<!-- exception: why -->` in markup) and stays in the component, never in global CSS.
+3. **Rule of two.** The second time an exception gets copied (the WhatsApp chrome, a control, a card shape…), it is promoted to layer 1, 2 or 3.
+
+### Tokens
+
+- The default Tailwind palette is wiped (`--color-*: initial`): only our colors exist. A new color is added to `@theme` first; never inline a raw hex.
+- **Brand colors**, usable anywhere:
+  - surfaces `cream`, `cream-2`, `surface`, `surface-2`, `sand`, `night`, `night-2`, `black` (footer only), `peach`, `peach-2` ;
+  - text and rules `ink`, `soft`, `muted`, `line`, `line-night`, `white` ;
+  - accent `orange`, `orange-txt`, `orange-hover`, `orange-tint`, `copper`.
+- **Scene palette** (`whatsapp*`, `mail*`, `metal*`, `trad-*`, `statut-*`, `client-*`, `robin*`, `scene`, `mur`, `galet`, `faq`, `gray-*`, `amber-*`, `success*`, `navy`, `glass`): only inside mockups and illustrations (phone and tablet screens, scenes), never for page surfaces or page text.
+- **`orange` (#F87A01) is for flat fills only.** Never as text, never white text on it (2.7:1). Orange text uses `orange-txt` (on light) or `peach` (on `night`).
+- No green outside WhatsApp mockups. No decorative gradients or icons. Relief comes from the `line` border; shadows `shadow-1` to `shadow-3` only.
 - Translucent white text on `night` needs a contrast floor: `/60` minimum for uppercase labels, `/75` for body copy.
+- **Type.** Families: `font-display` (Fraunces: titles, numbers), `font-sans` (Inter: body), `font-mono` (Departure Mono: kickers, sources, labels). Fraunces titles are weight **600**. One size token per level, never a pixel size:
+
+  | Level                     | Token          | Size (mobile → 1440 px) |
+  | ------------------------- | -------------- | ----------------------- |
+  | H1                        | `text-h1`      | 36 → 64 px              |
+  | Section title (H2)        | `text-section` | 30 → 40 px              |
+  | Card / sub-title (H3)     | `text-card`    | 22 px                   |
+  | Big number                | `text-stat`    | 40 → 56 px              |
+  | Lead (text under a title) | `text-punch`   | 19 px                   |
+  | Body                      | `text-body`    | 17 px                   |
+  | Small text, form labels   | `text-caption` | 14 px                   |
+  | Kicker                    | `text-kicker`  | 13 px, uppercase mono   |
+  | Source, legal line        | `text-source`  | 11 px                   |
+
+- Containers `max-w-site` (1312 px, every section's left edge) and `max-w-prose` (760 px, running text). Easing `ease-hatch`.
+- Radii, section spacing and button shape: see the pending decisions below.
+- **Resets and element-wide defaults live in `@layer base { ... }`**: an unlayered rule outranks utilities in Tailwind v4 and silently breaks them.
+
+### Pending decisions (fill in, then delete this list)
+
+1. Button shape: one shape for every `Button` variant (pill or `rounded-btn`).
+2. Card radius: one token for every card.
+3. Navigation: one component for the whole site (today `Nav` and `NavAccueil`).
+4. H1 family: Fraunces 600 everywhere, then update the writing rule in « Content rules ».
+
+### Guardrails
+
+- `pnpm check:ds` (to come, run by `pnpm build`): fails on raw values in markup (`text-[…px]`, `rounded-[…]`, `max-w-[…px]`, raw hex, `font-bold` on a Fraunces title) unless the line carries an `exception` comment.
+- `/_ds` (to come, dev only, out of the build and the sitemap): every token and DS component on one page, to check against Pencil at a glance.
 
 ## Motion and accessibility
 
