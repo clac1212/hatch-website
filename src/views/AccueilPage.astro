@@ -99,7 +99,7 @@ const reseauxUrl = routes.reseaux[locale];
          that changes word by word. The avatar changes with it: it is the agent doing that job. -->
     <h1
       id="accueil-titre"
-      class="rebus w-full font-display text-[30px] leading-[1.08] font-medium tracking-[-0.015em] sm:text-[38px] lg:text-[clamp(38px,3.2vw,46px)] text-cream"
+      class="rebus w-full font-display text-h1 font-semibold tracking-[-0.015em] text-cream"
       data-rebus
       data-prefixe={prefixe}
     >
@@ -142,7 +142,7 @@ const reseauxUrl = routes.reseaux[locale];
         }
       </span>
     </h1>
-    <p class="max-w-[440px] text-[12px] leading-5 text-white lg:text-[13px] lg:leading-5">
+    <p class="max-w-[34rem] text-punch text-cream/75">
       {lead}
     </p>
   </section>
@@ -166,13 +166,13 @@ const reseauxUrl = routes.reseaux[locale];
           />
         </div>
         <div class="flex flex-1 flex-col gap-3 px-6 pt-6 pb-7 lg:px-9 lg:pt-8 lg:pb-9">
-          <span class="font-mono text-[12px] tracking-[0.16em] text-orange-txt uppercase">
+          <span class="font-mono text-kicker text-orange-txt uppercase">
             {espaces.independant.kicker}
           </span>
-          <h2 class="font-display text-[28px] leading-[1.1] font-semibold text-ink lg:text-[36px]">
+          <h2 class="font-display text-section font-semibold text-ink">
             {espaces.independant.titre}
           </h2>
-          <p class="text-[15px] leading-6 text-soft">
+          <p class="text-body text-soft">
             {espaces.independant.texte}
           </p>
           <span class="mt-auto pt-3">
@@ -202,15 +202,13 @@ const reseauxUrl = routes.reseaux[locale];
           />
         </div>
         <div class="flex flex-1 flex-col gap-3 px-6 pt-6 pb-7 lg:px-9 lg:pt-8 lg:pb-9">
-          <span class="font-mono text-[12px] tracking-[0.16em] text-peach uppercase">
+          <span class="font-mono text-kicker text-peach uppercase">
             {espaces.reseau.kicker}
           </span>
-          <h2
-            class="font-display text-[28px] leading-[1.1] font-semibold text-cream lg:text-[36px]"
-          >
+          <h2 class="font-display text-section font-semibold text-cream">
             {espaces.reseau.titre}
           </h2>
-          <p class="text-[15px] leading-6 text-cream/75">
+          <p class="text-body text-cream/75">
             {espaces.reseau.texte}
           </p>
           <span class="mt-auto pt-3">

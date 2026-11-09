@@ -46,7 +46,7 @@ const num = (i: number) => String(i + 1).padStart(2, '0');
       <p class="font-mono text-kicker text-night uppercase">{hero.kicker}</p>
       <h2
         id="secu-livre-titre"
-        class="max-w-[18ch] font-display text-[34px] leading-[1.05] font-bold tracking-[-0.02em] text-night lg:text-[52px]"
+        class="max-w-[18ch] font-display text-section font-semibold text-night"
       >
         {hero.title}
       </h2>
@@ -70,7 +70,7 @@ const num = (i: number) => String(i + 1).padStart(2, '0');
               data-aller={p.section}
             >
               <span class="font-mono text-kicker text-night/70 uppercase">{num(p.section)}</span>
-              <span class="font-display text-card font-bold text-night">{p.label}</span>
+              <span class="font-display text-card font-semibold text-night">{p.label}</span>
             </button>
           ))
         }
@@ -99,7 +99,7 @@ const num = (i: number) => String(i + 1).padStart(2, '0');
                   <p class="font-mono text-kicker text-white/60 uppercase">
                     {num(i)} · {sec.kicker}
                   </p>
-                  <h3 id={`secu-${i}`} class="font-display text-section font-bold text-white">
+                  <h3 id={`secu-${i}`} class="font-display text-card font-semibold text-white">
                     {sec.title}
                   </h3>
                   <p class="text-body text-white/75">{sec.subtitle}</p>
@@ -159,7 +159,7 @@ const num = (i: number) => String(i + 1).padStart(2, '0');
                   <p class="font-mono text-kicker text-orange-txt uppercase">
                     {num(i)} · {sec.kicker}
                   </p>
-                  <h3 id={`secu-${i}`} class="font-display text-section font-bold text-ink">
+                  <h3 id={`secu-${i}`} class="font-display text-card font-semibold text-ink">
                     {sec.title}
                   </h3>
                   <p class="text-body text-soft">{sec.subtitle}</p>
