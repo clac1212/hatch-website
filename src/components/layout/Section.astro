@@ -1,6 +1,7 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 import Conteneur from './Conteneur.astro';
+import { fondOrange } from './fond';
 
 /**
  * A page section (DS layout layer): its background tone, the site's vertical rhythm (`py-section`)
@@ -20,7 +21,14 @@ interface Props extends HTMLAttributes<'section'> {
   pleine?: boolean;
 }
 
-const { ton = 'cream', rythme = 'normal', pleine = false, class: className, ...rest } = Astro.props;
+const {
+  ton = 'cream',
+  rythme = 'normal',
+  pleine = false,
+  class: className,
+  style,
+  ...rest
+} = Astro.props;
 
 const TONS: Record<Ton, string> = {
   cream:
@@ -33,14 +41,19 @@ const TONS: Record<Ton, string> = {
     'bg-night text-cream [--doux:color-mix(in_srgb,var(--color-cream)_75%,transparent)] [--filet:var(--color-line-night)] [--fond:var(--color-night)]',
   black:
     'bg-black text-cream [--doux:color-mix(in_srgb,var(--color-cream)_75%,transparent)] [--filet:var(--color-line-night)] [--fond:var(--color-black)]',
-  // Orange is a flat fill: ink text on it (6.8:1), never white.
+  // Orange is a flat fill under a fine grain (layout/fond.ts): ink text on it (6.8:1), never white.
   orange:
-    'bg-orange text-ink [--doux:var(--color-ink)] [--filet:var(--color-ink)] [--fond:var(--color-orange)]',
+    'bg-orange bg-cover bg-center text-ink [--doux:var(--color-ink)] [--filet:var(--color-ink)] [--fond:var(--color-orange)]',
 };
 const RYTHMES = { normal: 'py-section', haut: 'pt-section', bas: 'pb-section', aucun: '' };
+const grain = ton === 'orange' ? await fondOrange() : undefined;
 ---
 
-<section class:list={[TONS[ton], RYTHMES[rythme], className]} {...rest}>
+<section
+  class:list={[TONS[ton], RYTHMES[rythme], className]}
+  style={[grain, style].filter(Boolean).join(';') || undefined}
+  {...rest}
+>
   {
     pleine ? (
       <slot />

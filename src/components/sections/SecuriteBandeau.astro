@@ -9,12 +9,11 @@
  * src/content/sections/accueil/{fr,en}.yaml under `securite`.
  */
 import { getEntry } from 'astro:content';
-import { Picture, getImage } from 'astro:assets';
+import { Picture } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import Section from '../layout/Section.astro';
 import EnTete from '../ui/EnTete.astro';
 import Carte from '../ui/Carte.astro';
-import fond from '../../assets/securite/fond-orange-grain.jpg';
 import jay from '../../assets/securite/jay.png';
 import owl from '../../assets/securite/owl.png';
 import finch from '../../assets/securite/finch.png';
@@ -29,18 +28,11 @@ const entry = await getEntry('securityPage', locale);
 if (!entry) throw new Error(`Missing src/content/pages/security/${locale}.yaml`);
 const { hero, sections, screen } = entry.data;
 const ui = (await section('accueil', locale)).securite;
-const bg = await getImage({ src: fond, format: 'webp', width: 1600, quality: 70 });
 const AGENTS: Record<'jay' | 'owl' | 'finch', ImageMetadata> = { jay, owl, finch };
 const TEINTES = { jay: 'bg-sand', owl: 'bg-stone', finch: 'bg-peach', ecran: 'bg-cream-2' };
 ---
 
-<Section
-  id="securite"
-  ton="orange"
-  aria-labelledby="securite-titre"
-  class="bg-cover bg-center"
-  style={`background-image:url(${bg.src})`}
->
+<Section id="securite" ton="orange" aria-labelledby="securite-titre">
   <div class="grid items-center gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
     <div class="flex flex-col items-start gap-8">
       <EnTete id="securite-titre" titre={hero.title} intro={hero.lead} />
