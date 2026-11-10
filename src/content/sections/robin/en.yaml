@@ -196,12 +196,14 @@ confiance:
   titre: 'By your side, under your control.'
   cartes:
     - titre: 'Your data stays yours'
-      texte: 'Hosted in Europe, never used to train an AI. You choose what Robin sees.'
+      texte: 'Hosted in Europe, GDPR compliant, never used to train an AI. You choose what Robin sees.'
+      alt: 'Robin, the voxel bird, holds the key to a safe locked with a padlock, a European flag on top'
     - titre: 'He suggests, you decide'
       texte: 'Robin prepares, you approve. He never promises anything on your behalf, and nothing goes out to a supplier or an employee without your OK.'
-    - titre: 'He talks like you'
-      texte: 'Short messages, no jargon. He answers in text or voice notes, in the tone you use with him.'
-
+      alt: 'Robin holds out a sheet on a tray, the rubber stamp beside him waits for your approval'
+    - titre: 'He learns on his own'
+      texte: 'Nothing to set up: he picks up your suppliers, your prices and your habits as you talk. The more you talk to him, the better he knows the place.'
+      alt: 'Robin reads an open notebook, a stack of books beside him'
 beta:
   kicker: 'Beta'
   titre: 'Want to use Robin? Join the waitlist.'

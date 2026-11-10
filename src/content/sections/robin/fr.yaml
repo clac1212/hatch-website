@@ -196,12 +196,14 @@ confiance:
   titre: 'À vos côtés, sous votre contrôle.'
   cartes:
     - titre: 'Vos données restent les vôtres'
-      texte: 'Hébergées en Europe, jamais utilisées pour entraîner une IA. Vous choisissez ce que Robin voit.'
+      texte: 'Hébergées en Europe, conformes au RGPD, jamais utilisées pour entraîner une IA. Vous choisissez ce que Robin voit.'
+      alt: 'Robin, l’oiseau voxel, tient la clé d’un coffre-fort fermé par un cadenas, un drapeau européen dessus'
     - titre: 'Il propose, vous décidez'
       texte: 'Robin prépare, vous validez. Il ne promet rien à votre place, et rien ne part chez un fournisseur ou un salarié sans votre accord.'
-    - titre: 'Il parle comme vous'
-      texte: 'Des messages courts, sans jargon. Il vous répond à l’écrit comme en vocal, sur le ton que vous prenez avec lui.'
-
+      alt: 'Robin tend une feuille sur un plateau, le tampon posé à côté attend votre accord'
+    - titre: 'Il apprend tout seul'
+      texte: 'Rien à paramétrer : il retient vos fournisseurs, vos prix et vos habitudes au fil des échanges. Plus vous lui parlez, mieux il connaît la maison.'
+      alt: 'Robin lit un carnet ouvert, une pile de livres à côté de lui'
 beta:
   kicker: 'Bêta'
   titre: "Vous souhaitez utiliser Robin ? Inscrivez-vous sur la liste d'attente."

@@ -23,6 +23,9 @@ import { section } from '../content/section';
 import { routes, type Locale } from '../i18n/ui';
 import portrait from '../assets/portraits/robin.jpg';
 import soir from '../assets/robin/soir.jpg';
+import confianceSecurite from '../assets/robin/confiance/securite.jpg';
+import confianceDecide from '../assets/robin/confiance/decide.jpg';
+import confianceApprend from '../assets/robin/confiance/apprend.jpg';
 import poseLun from '../assets/robin/semaine/lun.jpg';
 import poseMar from '../assets/robin/semaine/mar.jpg';
 import poseMer from '../assets/robin/semaine/mer.jpg';
@@ -52,6 +55,9 @@ const pied = { image: rungis, ...(await section('piedDePage', locale)).scenes.ro
 
 /** Robin, one outfit per day of the timeline (same order as `semaine.jours`). */
 const poses = [poseLun, poseMar, poseMer, poseJeu, poseVen, poseDim];
+
+/** The trust cards' voxel Robins, in the order of `confiance.cartes`. */
+const illustrationsConfiance = [confianceSecurite, confianceDecide, confianceApprend];
 
 /** The waitlist fields, in display order; the website is the only optional one. */
 const champs = [
@@ -169,21 +175,26 @@ const champs = [
       </div>
     </Section>
 
-    <!-- 6 · Trust: on the dark background, three cards outlined in the blue of Robin's feathers. -->
+    <!-- 6 · Trust: three promises, each shown by a voxel Robin (data under lock, the stamp that waits
+         for you, the notebook he keeps). Light cards, the illustration set inside each one. -->
     <Section id="confiance" ton="cream">
       <div class="flex flex-col items-center">
         <EnTete titre={confiance.titre} align="centre" />
         <div class="mt-12 grid w-full gap-4 md:grid-cols-3">
           {
             confiance.cartes.map((c, i) => (
-              <Carte
-                as="article"
-                variante="nuit"
-                class="flex flex-col items-start gap-3 p-7 lg:p-8"
-              >
-                <span class="font-mono text-kicker text-(--doux)">0{i + 1}</span>
-                <h3 class="font-display text-card font-semibold">{c.titre}</h3>
-                <p class="text-body text-(--doux)">{c.texte}</p>
+              <Carte as="article" class="flex flex-col p-3 [--inset:12px]">
+                <Image
+                  src={illustrationsConfiance[i]}
+                  alt={c.alt}
+                  widths={[400, 800]}
+                  sizes="(min-width: 768px) 400px, 100vw"
+                  class="aspect-4/3 w-full rounded-interieur bg-robin-studio object-cover"
+                />
+                <div class="flex flex-col gap-2 px-4 pt-5 pb-5 lg:px-5">
+                  <h3 class="font-display text-card font-semibold">{c.titre}</h3>
+                  <p class="text-body text-(--doux)">{c.texte}</p>
+                </div>
               </Carte>
             ))
           }

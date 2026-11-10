@@ -96,7 +96,8 @@ export const schema = z.strictObject({
   }),
   confiance: z.strictObject({
     titre: texte,
-    cartes: z.array(z.strictObject({ titre: texte, texte })).length(3),
+    /** Data, decisions, learning: each card has its voxel Robin (alt = what he does). */
+    cartes: z.array(z.strictObject({ titre: texte, texte, alt: texte })).length(3),
   }),
   beta: z.strictObject({
     kicker: texte,
