@@ -9,9 +9,9 @@
  *      the credit request drafted on a "yes".
  *   3. Helps you decide: "worth staying open 2 to 6?", the answer with a chart.
  *   4. Does the prep work: a voice note, the temp contract filled from the template, sent on approval.
- * Each feature is a day of the same chat. The active one plays fast (~4 s) and stays to be read;
- * the list advances on its own until a click picks one. Without JS or with reduced motion: the
- * first chat in its final state. Situations from the Bilal interview (Robin discovery, 05/11).
+ * Four rows, text and phone alternating sides (César 10/11: unfolded, nobody clicks). Each chat
+ * plays once (~4 s) when its phone comes into view and stays to be read. Without JS or with
+ * reduced motion: every chat in its final state. Situations from the Bilal interview (Robin discovery, 05/11).
  * Copy in src/content/sections/robinSituations/{fr,en}.yaml; the numbers are illustrative.
  */
 import { Image } from 'astro:assets';
@@ -36,47 +36,27 @@ const situations = t.situations;
 const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7, 9, 5];
 ---
 
-<div class="fonctions" data-fonctions>
-  <!-- The four features: each lights in turn (a bar fills, then the next one), a click picks one -->
-  <ol class="liste" role="list">
-    {
-      situations.map((s, i) => (
-        <li class:list={['fn', i === 0 && 'on']} data-fn={i}>
-          <button type="button" class="fn-btn" aria-pressed={i === 0 ? 'true' : 'false'}>
-            <span class="fn-barre avance-barre" aria-hidden="true">
-              <i />
-            </span>
-            <span class="fn-num font-mono text-kicker">0{i + 1}</span>
-            <span class="fn-titre font-display font-semibold">{s.titre}</span>
-            <span class="fn-plie">
-              <span class="fn-texte text-body text-(--doux)">{s.texte}</span>
-            </span>
-          </button>
-        </li>
-      ))
-    }
-  </ol>
-  <!-- On phones the list is a row of tabs: the active feature's text sits under it -->
-  <div class="fn-detail text-body text-(--doux)">
-    {situations.map((s, i) => <p class:list={[i === 0 && 'on']}>{s.texte}</p>)}
-  </div>
-
-  <!-- One realistic phone: one chat with Robin, each feature a day of it, slid in like WhatsApp -->
-  <div class="tel-zone">
-    <Iphone class="tel">
-      <WhatsApp
-        contact={conversation.contact}
-        statut={conversation.enLigne}
-        ecrit={conversation.ecrit}
-        avatar={portrait}
-        saisie={conversation.saisie}
-        ariaLabel={conversation.ariaLabel}
-      >
-        {
-          situations.map((s, i) => {
-            const h = s.moment.heure;
-            return (
-              <div class:list={['wa-fil', i === 0 && 'on']} data-situ={i}>
+<div class="rangees" data-fonctions>
+  {
+    situations.map((s, i) => {
+      const h = s.moment.heure;
+      return (
+        <article class:list={['rangee', i % 2 === 1 && 'inverse']}>
+          <div class="r-texte">
+            <h3 class="font-display text-section font-semibold text-balance">{s.titre}</h3>
+            <p class="mt-4 max-w-lead text-punch text-(--doux)">{s.texte}</p>
+          </div>
+          <div class:list={['r-scene', i % 2 === 1 ? 'teinte-b' : 'teinte-a']}>
+            <Iphone class="tel">
+              <WhatsApp
+                contact={conversation.contact}
+                statut={conversation.enLigne}
+                ecrit={conversation.ecrit}
+                avatar={portrait}
+                saisie={conversation.saisie}
+                ariaLabel={conversation.ariaLabel}
+              >
+                <div class="wa-fil" data-situ={i}>
                 <span class="wa-jour">{s.moment.jour}</span>
 
                 {i === 0 && (
@@ -294,21 +274,20 @@ const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7,
                     </p>
                   </>
                 )}
-              </div>
-            );
-          })
-        }
-        <span class="doigt" aria-hidden="true" />
-      </WhatsApp>
-    </Iphone>
-  </div>
+                </div>
+                <span class="doigt" aria-hidden="true" />
+              </WhatsApp>
+            </Iphone>
+          </div>
+        </article>
+      );
+    })
+  }
 </div>
 
 <script>
-  import { avance } from '../../scripts/avance';
-
   // Each scene is a list of steps { t: ms, on: [states to turn on, 'name' or 'name:class'],
-  // off: [states to turn off], tap: the target the thumb taps }. 'tete' is the shared chat header.
+  // off: [states to turn off], tap: the target the thumb taps }. 'tete' is the chat's header.
   // Fast on purpose (César 09/11): the whole chat is on screen within ~4 s, then it is read.
   type Etape = { t: number; on?: string[]; off?: string[]; tap?: string };
 const SCENARIOS: Record<string, Etape[]> = {
@@ -358,322 +337,135 @@ const SCENARIOS: Record<string, Etape[]> = {
       { t: 3800, on: ['f'], off: ['tete:ecrit'] },
     ],
   };
-  const SORTIE = 450; // ms, the outgoing chat's slide (matches the CSS)
   const reduit = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const racine = document.querySelector<HTMLElement>('[data-fonctions]');
 
-  if (racine) {
-    const ecran = racine.querySelector<HTMLElement>('.wai-zone')!;
-    const tete = racine.querySelector<HTMLElement>('[data-tete]')!;
-    const doigt = racine.querySelector<HTMLElement>('.doigt');
+  // One chat per row: it plays once when its phone comes into view, then stays to be read.
+  const scene = (fil: HTMLElement) => {
+    const etapes = SCENARIOS[fil.dataset.situ ?? ''] ?? [];
+    const ecran = fil.closest<HTMLElement>('.wai-zone')!;
+    const tete = fil.closest('.wai')!.querySelector<HTMLElement>('[data-tete]')!;
+    const doigt = ecran.querySelector<HTMLElement>('.doigt');
+    const el = (nom: string) =>
+      nom === 'tete' ? tete : fil.querySelector<HTMLElement>(`[data-etat="${nom}"]`);
 
-    const scene = (fil: HTMLElement) => {
-      const etapes = SCENARIOS[fil.dataset.situ ?? ''] ?? [];
-      let minuteries: number[] = [];
-      let allumes: [Element, string][] = [];
-      const el = (nom: string) =>
-        nom === 'tete' ? tete : fil.querySelector<HTMLElement>(`[data-etat="${nom}"]`);
-
-      // The iOS tail sits on the last visible bubble of each speaker's group.
-      const queues = () => {
-        const vus = [...fil.querySelectorAll<HTMLElement>('.b.on, .wa-choix.on')];
-        vus.forEach((b, k) => {
-          const suivant = vus[k + 1];
-          const cote = b.classList.contains('out');
-          const fin =
-            b.classList.contains('b') &&
-            !b.classList.contains('avec-choix') &&
-            (!suivant ||
-              !suivant.classList.contains('b') ||
-              suivant.classList.contains('out') !== cote);
-          b.classList.toggle('fin', fin);
-        });
-      };
-      const basculer = (spec: string, oui: boolean) => {
-        const [nom, cls = 'on'] = spec.split(':');
-        const e = el(nom);
-        if (!e) return;
-        e.classList.toggle(cls, oui);
-        if (oui && e !== tete) {
-          allumes.push([e, cls]);
-          queues();
-          fil.scrollTo({ top: fil.scrollHeight, behavior: reduit ? 'auto' : 'smooth' });
-        }
-      };
-      const taper = (nom: string) => {
-        const c = fil.querySelector<HTMLElement>(`[data-cible="${nom}"]`);
-        if (!c || !doigt) return;
-        const r = ecran.getBoundingClientRect();
-        const b = c.getBoundingClientRect();
-        doigt.style.setProperty('--x', `${b.left - r.left + b.width / 2}px`);
-        doigt.style.setProperty('--y', `${b.top - r.top + b.height / 2}px`);
-        c.classList.add('presse');
-        c.parentElement!.classList.add('fait');
-        allumes.push([c, 'presse'], [c.parentElement!, 'fait']);
-        doigt.classList.remove('tape');
-        void doigt.offsetWidth;
-        doigt.classList.add('tape');
-      };
-      const appliquer = (e: Etape, sansDoigt = false) => {
-        e.on?.forEach((n) => basculer(n, true));
-        e.off?.forEach((n) => basculer(n, false));
-        if (e.tap && !sansDoigt) taper(e.tap);
-      };
-      const vider = () => {
-        minuteries.forEach(clearTimeout);
-        minuteries = [];
-        allumes.forEach(([e, cls]) => e.classList.remove(cls));
-        allumes = [];
-      };
-      return {
-        fil,
-        jouer() {
-          vider();
-          fil.scrollTop = 0;
-          if (reduit) {
-            etapes.forEach((e) => appliquer(e, true));
-            fil.querySelectorAll('.wa-choix').forEach((c) => c.classList.add('fait'));
-            tete.classList.remove('ecrit');
-            return;
-          }
-          minuteries = etapes.map((e) => window.setTimeout(() => appliquer(e), e.t));
-        },
-        // Once its slide-out is over, so the outgoing chat does not empty while it leaves.
-        ranger() {
-          minuteries.forEach(clearTimeout);
-          minuteries = [window.setTimeout(vider, SORTIE)];
-        },
-      };
-    };
-
-    racine.classList.add('js');
-    const scenes = [...racine.querySelectorAll<HTMLElement>('[data-situ]')].map(scene);
-    const items = [...racine.querySelectorAll<HTMLElement>('[data-fn]')];
-    const liste = racine.querySelector<HTMLElement>('.liste')!;
-    const details = [...racine.querySelectorAll<HTMLElement>('.fn-detail p')];
-    const tel = racine.querySelector<HTMLElement>('.tel-zone')!;
-    let actif = -1;
-
-    const activer = (i: number) => {
-      const avant = actif;
-      actif = i;
-      tete.classList.remove('ecrit');
-      doigt?.classList.remove('tape');
-      items.forEach((it, k) => {
-        it.classList.toggle('on', k === i);
-        it.querySelector('button')!.setAttribute('aria-pressed', String(k === i));
+    // The iOS tail sits on the last visible bubble of each speaker's group.
+    const queues = () => {
+      const vus = [...fil.querySelectorAll<HTMLElement>('.b.on, .wa-choix.on')];
+      vus.forEach((b, k) => {
+        const suivant = vus[k + 1];
+        const cote = b.classList.contains('out');
+        const fin =
+          b.classList.contains('b') &&
+          !b.classList.contains('avec-choix') &&
+          (!suivant ||
+            !suivant.classList.contains('b') ||
+            suivant.classList.contains('out') !== cote);
+        b.classList.toggle('fin', fin);
       });
-      // Phones: the tab row follows the active tab (scrolls the row only, never the page).
-      if (liste.scrollWidth > liste.clientWidth) {
-        liste.scrollTo({
-          left: items[i].offsetLeft - items[0].offsetLeft,
-          behavior: reduit ? 'auto' : 'smooth',
-        });
+    };
+    const basculer = (spec: string, oui: boolean) => {
+      const [nom, cls = 'on'] = spec.split(':');
+      const e = el(nom);
+      if (!e) return;
+      e.classList.toggle(cls, oui);
+      if (oui && e !== tete) {
+        queues();
+        fil.scrollTo({ top: fil.scrollHeight, behavior: reduit ? 'auto' : 'smooth' });
       }
-      details.forEach((d, k) => d.classList.toggle('on', k === i));
-      scenes.forEach((sc, k) => {
-        sc.fil.classList.toggle('on', k === i);
-        sc.fil.classList.toggle('sort', k === avant);
-      });
-      if (avant > -1) scenes[avant].ranger();
-      scenes[i].jouer();
     };
+    const taper = (nom: string) => {
+      const c = fil.querySelector<HTMLElement>(`[data-cible="${nom}"]`);
+      if (!c || !doigt) return;
+      const r = ecran.getBoundingClientRect();
+      const b = c.getBoundingClientRect();
+      doigt.style.setProperty('--x', `${b.left - r.left + b.width / 2}px`);
+      doigt.style.setProperty('--y', `${b.top - r.top + b.height / 2}px`);
+      c.classList.add('presse');
+      c.parentElement!.classList.add('fait');
+      doigt.classList.remove('tape');
+      void doigt.offsetWidth;
+      doigt.classList.add('tape');
+    };
+    const appliquer = (e: Etape, sansDoigt = false) => {
+      e.on?.forEach((n) => basculer(n, true));
+      e.off?.forEach((n) => basculer(n, false));
+      if (e.tap && !sansDoigt) taper(e.tap);
+    };
+    return () => {
+      if (reduit) {
+        etapes.forEach((e) => appliquer(e, true));
+        fil.querySelectorAll('.wa-choix').forEach((c) => c.classList.add('fait'));
+        tete.classList.remove('ecrit');
+        return;
+      }
+      etapes.forEach((e) => window.setTimeout(() => appliquer(e), e.t));
+    };
+  };
 
-    avance(
-      racine,
-      items.map((it) => it.querySelector('button')!),
-      activer,
-      { vue: tel, pause: tel },
+  if (racine) {
+    racine.classList.add('js');
+    const obs = new IntersectionObserver(
+      (entrees) => {
+        for (const e of entrees) {
+          if (!e.isIntersecting) continue;
+          obs.unobserve(e.target);
+          jouer.get(e.target)?.();
+        }
+      },
+      { threshold: 0.45 },
     );
+    const jouer = new Map<Element, () => void>();
+    racine.querySelectorAll<HTMLElement>('[data-situ]').forEach((fil) => {
+      const tel = fil.closest('.tel')!;
+      jouer.set(tel, scene(fil));
+      obs.observe(tel);
+    });
   }
 </script>
 
 <style>
-  /* --- The list beside the phone --- */
-  .fonctions {
+  /* --- Four rows, text and phone, alternating sides --- */
+  .rangees {
     display: grid;
-    gap: 24px;
+    gap: clamp(3.5rem, 2rem + 4vw, 6rem);
   }
-  /* exception: the tab row scrolls under the page gutters (the conteneur's own clamp) */
-  .liste {
-    display: flex;
-    gap: 8px;
-    margin-inline: calc(-1 * clamp(1.25rem, 4.4vw, 4rem));
-    padding-inline: clamp(1.25rem, 4.4vw, 4rem);
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .fn-btn {
-    position: relative;
+  .rangee {
     display: grid;
-    justify-items: start;
-    width: 100%;
-    text-align: left;
-    cursor: pointer;
+    gap: 32px;
+    align-items: center;
   }
-  .fn-btn:focus-visible {
-    outline: 2px solid var(--color-orange);
-    outline-offset: 4px;
-    border-radius: var(--radius-sm);
-  }
-  .fn-num {
-    color: var(--doux);
-  }
-  .fn.on .fn-num {
-    color: var(--color-orange-txt);
-  }
-  /* The bar (shared, global.css .avance-barre): placed here along the item. One feature's turn:
-     the chat plays in ~4 s, then stays to be read. */
-  .fonctions {
-    --avance-duree: 9s;
-  }
-  /* Phones: a row of tabs (number + title), the active text under it, the phone below. */
-  .fn {
-    flex: none;
-  }
-  .fn-btn {
-    gap: 2px;
-    padding: 12px 16px 14px;
-    border-radius: var(--radius-card-sm);
-    background: color-mix(in srgb, var(--color-ink) 5%, transparent);
-  }
-  .fn.on .fn-btn {
-    background: var(--color-surface);
-    box-shadow: var(--shadow-1);
-  }
-  .fn-titre {
-    font-size: var(--text-body); /* a tab label: four card titles would not fit in a row */
-    white-space: nowrap;
-  }
-  .fn-barre {
-    left: 16px;
-    right: 16px;
-    bottom: 6px;
-    height: 2px;
-  }
-  .fn-barre {
-    --avance-origine: left;
-  }
-  .fn-plie {
-    display: none;
-  }
-  .fn-detail {
+  /* The phone on a tinted panel that anchors it. */
+  .r-scene {
     display: grid;
-    min-height: 3lh;
+    place-items: center;
+    padding: 40px 20px;
+    border-radius: var(--radius-panneau);
+    corner-shape: squircle;
   }
-  .fn-detail p {
-    grid-area: 1 / 1;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.35s var(--ease-hatch);
+  .teinte-a {
+    background: var(--color-cream-2);
   }
-  .fn-detail p.on {
-    opacity: 1;
-    visibility: visible;
+  .teinte-b {
+    background: var(--color-peach-2);
   }
-  .tel-zone {
-    display: flex;
-    justify-content: center;
+  .r-scene :global(.tel) {
+    width: min(290px, 78vw);
   }
-  .tel-zone :global(.tel) {
-    width: min(320px, 82vw);
-  }
-
-  /* Wide screens: the list on the left, every title visible, the active one opens its text. */
   @media (width >= 64rem) {
-    .fonctions {
-      grid-template-columns: minmax(0, 28rem) auto;
-      justify-content: center;
-      align-items: center;
-      column-gap: 96px;
+    .rangee {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: clamp(3rem, 6vw, 7rem);
     }
-    .liste {
-      flex-direction: column;
-      gap: 4px;
-      margin: 0;
-      padding: 0;
-      overflow: visible;
+    .rangee.inverse .r-texte {
+      order: 2;
     }
-    .fn-detail {
-      display: none;
-    }
-    .tel-zone {
-      grid-row: 1 / span 2;
-      grid-column: 2;
-    }
-    .tel-zone :global(.tel) {
-      width: 350px;
-    }
-    .fn-btn {
-      gap: 6px;
-      padding: 18px 0 18px 28px;
-      border-radius: 0;
-      background: none;
-      opacity: 0.55;
-      transition: opacity 0.3s var(--ease-hatch);
-    }
-    .fn.on .fn-btn {
-      background: none;
-      box-shadow: none;
-      opacity: 1;
-    }
-    .fn-btn:hover {
-      opacity: 1;
-    }
-    .fn-titre {
-      font-size: var(--text-card);
-      white-space: normal;
-    }
-    .fn-barre {
-      left: 0;
-      right: auto;
-      top: 18px;
-      bottom: 18px;
-      width: 2px;
-      height: auto;
-    }
-    .fn-barre {
-      --avance-origine: top;
-    }
-    .fn-plie {
-      display: grid;
-      grid-template-rows: 0fr;
-      transition: grid-template-rows 0.45s var(--ease-hatch);
-    }
-    .fn-plie > span {
-      overflow: hidden;
-      padding-top: 4px;
-    }
-    .fn.on .fn-plie {
-      grid-template-rows: 1fr;
+    .r-scene {
+      padding: 48px;
     }
   }
 
-  /* --- The phone: the four days of the chat slide in between the shared bars --- */
-  /* Without JS only the first day shows; with JS the active one slides in from the right and the
-     outgoing one leaves to the left. */
-  .tel-zone :global(.wa-fil:not(.on)) {
-    display: none;
-  }
-  .js .tel-zone :global(.wa-fil) {
-    display: flex;
-    opacity: 0;
-    visibility: hidden;
-    translate: 3em 0;
-    transition:
-      opacity 0.3s var(--ease-hatch),
-      translate 0.45s var(--ease-hatch),
-      visibility 0s 0.45s;
-  }
-  .js .tel-zone :global(.wa-fil.sort) {
-    translate: -3em 0;
-  }
-  .js .tel-zone :global(.wa-fil.on) {
-    opacity: 1;
-    visibility: visible;
-    translate: 0 0;
-    transition-delay: 0.08s, 0.08s, 0s;
-  }
+  /* --- The chats --- */
   /* Messages arrive one by one with JS; without it, they are all there. */
   .js .b,
   .js .wa-choix {
@@ -1089,7 +881,6 @@ const SCENARIOS: Record<string, Etape[]> = {
     .js .wa-choix.on {
       animation: none;
     }
-    .js .tel-zone :global(.wa-fil),
     .coche,
     .barre i,
     .js .val,
