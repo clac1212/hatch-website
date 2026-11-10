@@ -1,14 +1,13 @@
 ---
 /**
- * "From Monday morning to Sunday night" (signature section, César 09/11): Robin in the day's outfit,
- * the message he sends that day in a bubble above him, the week's timeline under him and what the
- * day is about. The timeline runs on its own: the line fills from one day to the next
- * (src/scripts/avance.ts), a click on a day stops it. Changing day is a crossfade in place, nothing
- * moves or floats. Without JS: Monday.
+ * "From Monday morning to Sunday night" (signature section, César 09/11, reworked 10/11 to match the
+ * site's art direction): on one side Robin in the day's outfit, in a round frame as in the hero, his
+ * message above him in a cream card; on the other what the day is about, then the week's timeline
+ * with square pixel dots. The timeline runs on its own: a fine ring around Robin and the line fill
+ * from one day to the next (src/scripts/avance.ts), a click on a day stops it. Without JS: Monday.
  */
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
-import Heure from '../ui/WhatsAppHeure.astro';
 
 interface Props {
   /** aria-label of the timeline. */
@@ -33,23 +32,23 @@ const horloge = (h: string) => {
     <div class="bulles">
       {
         jours.map((j, i) => (
-          <p class:list={['bulle', i === 0 && 'on']} aria-hidden={i === 0 ? undefined : 'true'}>
-            {j.bulle}
-            <Heure heure={horloge(j.heure)} />
-          </p>
+          <div class:list={['bulle', i === 0 && 'on']} aria-hidden={i === 0 ? undefined : 'true'}>
+            <p class="bulle-tete font-mono text-source uppercase">Robin · {horloge(j.heure)}</p>
+            <p class="mt-1.5 text-body">{j.bulle}</p>
+          </div>
         ))
       }
     </div>
-    <!-- Robin in a round frame; around it, a ring fills over the day's turn, then the next day's
-         outfit takes over. One ring per day, so each restarts with its day. -->
+    <!-- Robin in a round frame, as in the page's hero; around it, a fine ring fills over the day's
+         turn, then the next day's outfit takes over. One ring per day, so each restarts with its day. -->
     <div class="robin" aria-hidden="true">
       <svg class="anneau piste" viewBox="0 0 100 100">
-        <circle cx="50" cy="50" r="48"></circle>
+        <circle cx="50" cy="50" r="49"></circle>
       </svg>
       {
         jours.map((_, i) => (
           <svg class:list={['anneau', i === 0 && 'on']} viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="48" pathLength="100" />
+            <circle cx="50" cy="50" r="49" pathLength="100" />
           </svg>
         ))
       }
@@ -59,8 +58,8 @@ const horloge = (h: string) => {
             <Image
               src={src}
               alt=""
-              widths={[200, 400]}
-              sizes="200px"
+              widths={[320, 640]}
+              sizes="320px"
               class:list={['pose', i === 0 && 'on']}
             />
           ))
@@ -69,44 +68,48 @@ const horloge = (h: string) => {
     </div>
   </div>
 
-  <!-- The timeline: each day carries the segment to the next one, the active one fills. -->
-  <div class="frise" role="tablist" aria-label={frise}>
-    {
-      jours.map((j, i) => (
-        <button
-          type="button"
-          role="tab"
-          id={`semaine-onglet-${i}`}
-          class="jour"
-          aria-selected={i === 0 ? 'true' : 'false'}
-          aria-controls={`semaine-jour-${i}`}
-          tabindex={i === 0 ? 0 : -1}
-        >
-          <span class="segment avance-barre" aria-hidden="true">
-            <i />
-          </span>
-          <span class="point" aria-hidden="true" />
-          <span class="jour-nom">{j.jour}</span>
-          <span class="jour-heure font-mono">{j.heure}</span>
-        </button>
-      ))
-    }
-  </div>
+  <div class="cote">
+    <!-- What the day is about: the sense comes first. -->
+    <div class="details">
+      {
+        jours.map((j, i) => (
+          <div
+            class:list={['detail', i === 0 && 'on']}
+            id={`semaine-jour-${i}`}
+            role="tabpanel"
+            aria-labelledby={`semaine-onglet-${i}`}
+          >
+            <h3 class="font-display text-section font-semibold text-balance">{j.titre}</h3>
+            <p class="mt-4 max-w-lead text-punch text-(--doux)">{j.texte}</p>
+          </div>
+        ))
+      }
+    </div>
 
-  <div class="details">
-    {
-      jours.map((j, i) => (
-        <div
-          class:list={['detail', i === 0 && 'on']}
-          id={`semaine-jour-${i}`}
-          role="tabpanel"
-          aria-labelledby={`semaine-onglet-${i}`}
-        >
-          <h3 class="font-display text-card font-semibold">{j.titre}</h3>
-          <p class="mx-auto mt-2 max-w-lead text-body text-(--doux)">{j.texte}</p>
-        </div>
-      ))
-    }
+    <!-- The timeline: square pixel dots (the voxel's grain), each day carries the segment to the
+         next one, the active one fills. -->
+    <div class="frise" role="tablist" aria-label={frise}>
+      {
+        jours.map((j, i) => (
+          <button
+            type="button"
+            role="tab"
+            id={`semaine-onglet-${i}`}
+            class="jour"
+            aria-selected={i === 0 ? 'true' : 'false'}
+            aria-controls={`semaine-jour-${i}`}
+            tabindex={i === 0 ? 0 : -1}
+          >
+            <span class="segment avance-barre" aria-hidden="true">
+              <i />
+            </span>
+            <span class="point" aria-hidden="true" />
+            <span class="jour-nom font-mono text-kicker uppercase">{j.jour}</span>
+            <span class="jour-heure font-mono text-source">{horloge(j.heure)}</span>
+          </button>
+        ))
+      }
+    </div>
   </div>
 </div>
 
@@ -155,10 +158,9 @@ const horloge = (h: string) => {
 <style>
   .semaine {
     --avance-duree: 7s;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    gap: 56px;
     align-items: center;
-    text-align: center;
   }
 
   /* --- Robin and his bubble --- */
@@ -166,58 +168,61 @@ const horloge = (h: string) => {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 18px;
-    width: 100%;
+    gap: 22px;
   }
   .bulles {
     display: grid;
     align-items: end;
     justify-items: center;
-    width: min(100%, 27rem);
+    width: min(100%, 26rem);
   }
-  /* A WhatsApp bubble (white, iOS font, its time), its point aimed down at Robin. */
+  /* Robin's message, in the site's vocabulary: a cream card, its sender and time in mono, its point
+     aimed at Robin. It comes in once the new outfit is there. */
   .bulle {
     position: relative;
     grid-area: 1 / 1;
-    padding: 10px 14px 11px;
-    border-radius: 18px;
-    background: var(--color-white);
-    box-shadow: var(--shadow-2);
-    color: var(--color-whatsapp-ink);
-    font: 400 var(--text-body) / 1.4 var(--font-ios);
-    text-align: left;
+    padding: 16px 20px 18px;
+    border-radius: var(--radius-card-sm);
+    corner-shape: squircle;
+    background: var(--color-cream);
+    box-shadow: var(--shadow-3);
+    color: var(--color-ink);
     opacity: 0;
-    transition: opacity 0.4s var(--ease-hatch);
+    translate: 0 6px;
+    transition:
+      opacity 0.3s var(--ease-hatch),
+      translate 0.3s var(--ease-hatch);
   }
   .bulle.on {
     opacity: 1;
+    translate: none;
+    transition-duration: 0.5s;
+    transition-delay: 0.25s;
   }
   .bulle::after {
     content: '';
     position: absolute;
     left: 50%;
     top: calc(100% - 1px);
-    width: 18px;
-    height: 10px;
+    width: 22px;
+    height: 12px;
     background: inherit;
     translate: -50% 0;
     /* exception: the point of a speech bubble, a curved notch */
     mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 10'%3E%3Cpath d='M0 0h18c-4.2.8-7 3.8-9 10C7 3.8 4.2.8 0 0z'/%3E%3C/svg%3E")
       no-repeat center / 100% 100%;
   }
-  .bulle :global(.wa-h) {
-    float: right;
-    margin: 9px -2px -4px 12px;
-    font-size: 11px;
-    line-height: 1;
-    color: var(--color-whatsapp-meta);
+  .bulle-tete {
+    color: var(--color-orange-txt);
+    letter-spacing: 0.06em;
   }
-  /* Robin in a round frame, a ring around it. */
+  /* Robin in a round frame, a fine ring around it, detached by a gap. */
   .robin {
     position: relative;
     display: grid;
     place-items: center;
-    width: 196px;
+    /* exception: the stage's size, the scene's one figure */
+    width: 248px;
     aspect-ratio: 1;
   }
   .anneau {
@@ -225,7 +230,7 @@ const horloge = (h: string) => {
     inset: 0;
     rotate: -90deg;
     fill: none;
-    stroke-width: 2.5;
+    stroke-width: 1.2;
   }
   .piste circle {
     stroke: var(--filet);
@@ -252,12 +257,12 @@ const horloge = (h: string) => {
   }
   .rond {
     display: grid;
-    width: calc(100% - 22px);
+    /* exception: the gap between the disc and its ring */
+    width: calc(100% - 28px);
     aspect-ratio: 1;
     overflow: clip;
     border-radius: 999px;
-    background: var(--color-cream-2);
-    box-shadow: var(--shadow-3);
+    background: var(--color-robin-studio);
   }
   /* The next outfit comes in softly over the last one. */
   .rond :global(.pose) {
@@ -265,33 +270,58 @@ const horloge = (h: string) => {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: 50% 30%;
+    /* exception: the outfit is framed tight; set lower and smaller so the whole Robin fits the disc,
+       his props included, as in the hero */
+    transform-origin: 50% 100%;
+    translate: 0 4%;
     opacity: 0;
-    scale: 1.08;
+    scale: 0.94;
     transition:
       opacity 0.6s var(--ease-hatch),
       scale 0.9s var(--ease-hatch);
   }
   .rond :global(.pose.on) {
     opacity: 1;
-    scale: 1;
+    scale: 0.86;
+  }
+
+  /* --- What the day is about --- */
+  .details {
+    display: grid;
+  }
+  .detail {
+    grid-area: 1 / 1;
+    opacity: 0;
+    translate: 0 8px;
+    visibility: hidden;
+    transition:
+      opacity 0.3s var(--ease-hatch),
+      translate 0.3s var(--ease-hatch),
+      visibility 0s 0.3s;
+  }
+  .detail.on {
+    opacity: 1;
+    translate: none;
+    visibility: visible;
+    transition-duration: 0.5s;
+    transition-delay: 0.1s;
   }
 
   /* --- The timeline --- */
   .frise {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
-    width: min(100%, 52rem);
-    margin-top: 48px;
+    margin-top: 44px;
   }
   .jour {
     position: relative;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     gap: 6px;
     padding-bottom: 4px;
     color: var(--doux);
+    text-align: left;
     cursor: pointer;
     transition: color 0.25s var(--ease-hatch);
   }
@@ -308,10 +338,11 @@ const horloge = (h: string) => {
      while the week runs on its own, empty once a click stopped it. */
   .segment {
     --avance-origine: left;
-    top: 6px;
-    left: 50%;
+    top: 4px;
+    left: 0;
     width: 100%;
     height: 2px;
+    background: color-mix(in srgb, var(--color-cream) 18%, transparent);
   }
   .jour:last-child .segment {
     width: 0;
@@ -322,63 +353,41 @@ const horloge = (h: string) => {
   .passe .segment > i {
     transform: none;
   }
+  /* exception: a square dot, the pixel of the voxel */
   .point {
     position: relative;
-    width: 14px;
-    height: 14px;
-    border-radius: 999px;
+    width: 10px;
+    height: 10px;
     background: var(--fond);
-    box-shadow: inset 0 0 0 2px var(--filet);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-cream) 35%, transparent);
     transition:
       background-color 0.25s,
       box-shadow 0.25s;
   }
   .passe .point {
-    background: var(--color-orange);
+    background: var(--color-peach);
     box-shadow: none;
   }
   .jour[aria-selected='true'] .point {
     background: var(--color-orange);
-    box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-orange) 25%, transparent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-orange) 25%, transparent);
   }
   .jour-nom {
-    margin-top: 4px;
-    font-weight: 600;
-    font-size: var(--text-caption);
+    margin-top: 8px;
     line-height: 1;
   }
   .jour-heure {
-    font-size: var(--text-source);
     letter-spacing: 0.04em;
     color: var(--doux);
   }
 
-  /* --- What the day is about --- */
-  .details {
-    display: grid;
-    width: 100%;
-    margin-top: 36px;
-  }
-  .detail {
-    grid-area: 1 / 1;
-    opacity: 0;
-    visibility: hidden;
-    transition:
-      opacity 0.35s var(--ease-hatch),
-      visibility 0s 0.35s;
-  }
-  .detail.on {
-    opacity: 1;
-    visibility: visible;
-    transition-delay: 0s;
-  }
-
-  @media (width >= 48rem) {
-    .robin {
-      width: 224px;
+  @media (width >= 64rem) {
+    .semaine {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      gap: clamp(3rem, 6vw, 6.5rem);
     }
-    .jour-nom {
-      font-size: var(--text-body);
+    .robin {
+      width: 300px;
     }
   }
 
@@ -387,6 +396,7 @@ const horloge = (h: string) => {
     .rond :global(.pose),
     .detail {
       transition: none;
+      translate: none;
     }
   }
 </style>

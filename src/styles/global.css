@@ -80,6 +80,7 @@
   --color-whatsapp-xls: #1d6f42;
   --color-robin: #506785; /* Robin's blue-grey plumage: accents on the Robin page (5.4:1 on cream) */
   --color-robin-tint: #e4ebf3; /* its pale wash, behind Robin's portraits */
+  --color-robin-studio: #f3e8d6; /* the backdrop of Robin's outfit renders (semaine/*.jpg), so a disc behind them shows no seam */
 
   /* Agent pages (Pencil "Page agent" v3/v4, César 10/10): light greys of the feature wall and the
      cards, and the status colours of the product mock-ups (rows, chips, translations). */
