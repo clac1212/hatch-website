@@ -416,8 +416,9 @@ const {
     flex-direction: column;
     gap: 0.13em;
     padding: 0.6em 0.95em 0.8em;
+    /* The chat scrolls first, then the page takes over (native scroll chaining): no
+       overscroll-behavior: contain, which would trap the wheel over every mockup. */
     overflow-y: auto;
-    overscroll-behavior: contain;
     scrollbar-width: none;
   }
   /* Like the app, a short chat sits at the bottom, against the input bar. */
