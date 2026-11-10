@@ -17,6 +17,7 @@
  */
 import { Image } from 'astro:assets';
 import portrait from '../../assets/portraits/robin.jpg';
+import Carte from '../ui/Carte.astro';
 import WhatsApp from '../ui/WhatsApp.astro';
 import Heure from '../ui/WhatsAppHeure.astro';
 import { section } from '../../content/section';
@@ -47,7 +48,8 @@ const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7,
             <h3 class="font-display text-section font-semibold text-balance">{s.titre}</h3>
             <p class="mt-4 max-w-lead text-punch text-(--doux)">{s.texte}</p>
           </div>
-          <div class="fn-chat">
+          <Carte class="fn-cadre">
+            <div class="fn-chat rounded-interieur">
               <WhatsApp
                 nu
                 contact={conversation.contact}
@@ -278,7 +280,8 @@ const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7,
                 </div>
                 <span class="doigt" aria-hidden="true" />
               </WhatsApp>
-          </div>
+            </div>
+          </Carte>
         </article>
       );
     })
@@ -436,15 +439,18 @@ const SCENARIOS: Record<string, Etape[]> = {
     gap: 28px;
     align-items: center;
   }
-  /* The chat window: the conversation on its wallpaper, a fixed height so every row has the same
-     rhythm; the oldest messages fade out at the top as new ones arrive. */
+  /* The chat in a frame (César 10/11): a DS card, the chat window set inside it, concentric
+     (rounded-interieur, --inset = the frame's padding). The card draws the one edge and the shadow;
+     the window only clips the chat, nothing inside it takes a radius of its own. */
+  .fn :global(.fn-cadre) {
+    --inset: 10px;
+    padding: var(--inset);
+  }
+  /* A fixed height so every row has the same rhythm; the oldest messages fade out at the top. */
   .fn-chat {
     /* exception: the window's height, enough for the longest exchange's last messages */
     height: 400px;
     overflow: clip;
-    border-radius: var(--radius-card);
-    corner-shape: squircle;
-    box-shadow: var(--shadow-2);
   }
   @media (width >= 64rem) {
     .fn {
