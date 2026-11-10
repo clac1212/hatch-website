@@ -6,13 +6,13 @@ import { appUrls, routes, otherLocale, useTranslations, type Locale, type Paths 
 /**
  * The site's only nav (DS decision 3, César 09/11): a floating glass pill, the same on every page;
  * only its content changes with the space it serves.
- *   logo · ← Home · the space's sections · language · the space's one call to action
+ *   logo (always back to the home page, César 10/11: no « ← Home » link) · the space's sections ·
+ *   language · the space's one call to action
  * - `accueil` (/): the two spaces (independents → Robin, networks), and « Se connecter ».
  * - `robin`: Robin's sections, and the beta waitlist (no sign-in: independents have no account yet).
  * - `reseau` (/reseaux and its inner pages: agents, demo, security…): agents, customers, pricing, demo.
- * - `legal`: back home and the language only.
- * `surPlace`: the page carries the sections itself (anchors stay on the page, the logo goes back to its
- * top, a « ← Home » link appears).
+ * - `legal`: the language only.
+ * `surPlace`: the page carries the sections itself (anchors stay on the page).
  * Real glass, like Apple's Liquid Glass: nearly transparent, blurred and refracting, so the page's own
  * colors show through it; nothing is painted in. Only the content adapts: a script reads the background
  * under the pill as the page scrolls and switches text and logo to cream over a dark one (`data-ton`),
@@ -57,7 +57,6 @@ const cta = {
   reseau: { href: routes.demo[locale], label: t('cta.demo'), variant: 'orange' },
   legal: null,
 }[espace] as { href: string; label: string; variant: 'orange' | 'ink' | 'cream' } | null;
-const retour = surPlace || espace === 'legal';
 
 const lien =
   'rounded-full px-3.5 py-2.5 text-caption font-semibold whitespace-nowrap transition-colors duration-300';
@@ -73,32 +72,10 @@ const survol = 'hover:bg-current/10';
     ]}
     data-ton={sombre ? 'sombre' : 'clair'}
   >
-    <a href={surPlace ? '#' : home} aria-label={t('a11y.home')} class="shrink-0">
+    <a href={home} aria-label={t('a11y.home')} class="shrink-0">
       <Logo class="n-logo-jour w-[80px] md:w-[92px]" />
       <Logo tone="night" class="n-logo-nuit w-[80px] md:w-[92px]" />
     </a>
-    {
-      retour && (
-        <a
-          href={home}
-          class:list={['ml-2 hidden items-center gap-1 lg:inline-flex', lien, survol, 'n-attenue']}
-        >
-          <svg
-            viewBox="0 0 24 24"
-            class="size-3.5"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.4"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M15 6l-6 6 6 6" />
-          </svg>
-          {t('nav.back')}
-        </a>
-      )
-    }
     <div class="n-pli n-liens hidden items-center lg:flex" data-pli>
       <span class="n-sep mx-2 h-[22px] w-px shrink-0" aria-hidden="true"></span>
       <ul class="flex items-center gap-0.5">
@@ -165,18 +142,6 @@ const survol = 'hover:bg-current/10';
         class="absolute top-full right-0 mt-3 w-64 rounded-card-sm border border-line bg-surface p-2 text-ink shadow-3"
       >
         <ul class="flex flex-col">
-          {
-            retour && (
-              <li>
-                <a
-                  href={home}
-                  class="block rounded-sm px-3 py-2.5 font-semibold hover:bg-orange-tint"
-                >
-                  ← {t('nav.back')}
-                </a>
-              </li>
-            )
-          }
           {
             liens.map((l) => (
               <li>

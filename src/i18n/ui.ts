@@ -49,7 +49,6 @@ const fr = {
   /** Nav: sign-in to the app (its /auth page also lets a newcomer sign up). */
   'nav.login': 'Se connecter',
   /** Robin and network pages: back to the home page (the crossroads). */
-  'nav.back': 'Accueil',
   /** Home nav: the two spaces of the site. */
   'nav.independants': 'Indépendants',
   'nav.reseaux': 'Réseaux',
@@ -90,7 +89,6 @@ const en: Record<keyof typeof fr, string> = {
   'cta.demo': 'Book a demo',
   'cta.try': 'Try Hatch OS',
   'nav.login': 'Log in',
-  'nav.back': 'Home',
   'nav.independants': 'Independents',
   'nav.reseaux': 'Networks',
   'nav.robin.features': 'Features',
