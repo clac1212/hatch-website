@@ -3,7 +3,7 @@ import { Image, Picture } from 'astro:assets';
 import Button from '../ui/Button.astro';
 import LisierePixel from '../ui/LisierePixel.astro';
 import { section } from '../../content/section';
-import { appUrls, routes, useTranslations, type Locale } from '../../i18n/ui';
+import { routes, useTranslations, type Locale } from '../../i18n/ui';
 import carteFrance from '../../assets/hero/carte-v5-1.jpg';
 import carteEurope from '../../assets/hero/carte-europe.jpg';
 import grain from '../../assets/hero/grain.png';
@@ -305,11 +305,10 @@ const tick =
       >
         {data.lead}
       </p>
-      <!-- Two calls to action (César 06/10): the demo first, then trying the platform (its signup). -->
+      <!-- The demo alone (the platform's sign-in lives on the home page's nav). Same size as the nav's
+           demo pill (César 06/10): the title carries the weight, not the buttons. -->
       <div class="flex flex-wrap gap-3">
-        <!-- Same size as the nav's demo pill (César 06/10): the title carries the weight, not the buttons. -->
         <Button href={routes.demo[locale]} variant="orange">{t('cta.demo')}</Button>
-        <Button href={appUrls.signup} variant="secondary">{t('cta.try')}</Button>
       </div>
     </div>
   </div>
