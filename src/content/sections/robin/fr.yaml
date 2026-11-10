@@ -60,7 +60,7 @@ semaine:
 
 canaux:
   titre: 'Là où vous êtes déjà.'
-  texte: 'Pendant la bêta, Robin vit dans WhatsApp. Ensuite, il aura sa propre application, pensée pour lui, toujours à portée de main.'
+  texte: 'Robin vit dans WhatsApp, entre votre équipe et vos fournisseurs. Rien à installer, rien à apprendre : vous lui écrivez ou lui laissez un vocal, entre deux services.'
   telephone:
     ariaLabel: 'WhatsApp sur le téléphone de Karim, sa discussion avec Robin ouverte'
     app:
@@ -199,8 +199,8 @@ confiance:
       texte: 'Hébergées en Europe, jamais utilisées pour entraîner une IA. Vous choisissez ce que Robin voit.'
     - titre: 'Il propose, vous décidez'
       texte: 'Robin prépare, vous validez. Il ne promet rien à votre place, et rien ne part chez un fournisseur ou un salarié sans votre accord.'
-    - titre: 'Dans une appli que vous connaissez'
-      texte: "Pas de logiciel à installer pendant la bêta : Robin vous écrit sur WhatsApp, à l'écrit ou en vocal."
+    - titre: 'Il parle comme vous'
+      texte: 'Des messages courts, sans jargon. Il vous répond à l’écrit comme en vocal, sur le ton que vous prenez avec lui.'
 
 beta:
   kicker: 'Bêta'

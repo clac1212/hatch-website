@@ -60,7 +60,7 @@ semaine:
 
 canaux:
   titre: 'Right where you already are.'
-  texte: "During the beta, Robin lives in WhatsApp. Later, he'll have his own app, built for him, always within reach."
+  texte: 'Robin lives in WhatsApp, between your team and your suppliers. Nothing to install, nothing to learn: text him or leave a voice note, between services.'
   telephone:
     ariaLabel: 'WhatsApp on Karim’s phone, his chat with Robin open'
     app:
@@ -199,8 +199,8 @@ confiance:
       texte: 'Hosted in Europe, never used to train an AI. You choose what Robin sees.'
     - titre: 'He suggests, you decide'
       texte: 'Robin prepares, you approve. He never promises anything on your behalf, and nothing goes out to a supplier or an employee without your OK.'
-    - titre: 'In an app you already know'
-      texte: 'No software to install during the beta: Robin messages you on WhatsApp, in text or voice notes.'
+    - titre: 'He talks like you'
+      texte: 'Short messages, no jargon. He answers in text or voice notes, in the tone you use with him.'
 
 beta:
   kicker: 'Beta'
