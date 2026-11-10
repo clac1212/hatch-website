@@ -176,14 +176,14 @@ const champs = [
     </Section>
 
     <!-- 6 · Trust: three promises, each shown by a voxel Robin (data under lock, the stamp that waits
-         for you, the notebook he keeps). Light cards, the illustration set inside each one. -->
+         for you, the notebook he keeps). Dark cards, the illustration set inside each one. -->
     <Section id="confiance" ton="cream">
       <div class="flex flex-col items-center">
         <EnTete titre={confiance.titre} align="centre" />
         <div class="mt-12 grid w-full gap-4 md:grid-cols-3">
           {
             confiance.cartes.map((c, i) => (
-              <Carte as="article" class="flex flex-col p-3 [--inset:12px]">
+              <Carte as="article" variante="nuit" class="flex flex-col p-3 [--inset:12px]">
                 <Image
                   src={illustrationsConfiance[i]}
                   alt={c.alt}
