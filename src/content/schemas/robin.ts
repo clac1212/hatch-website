@@ -40,24 +40,58 @@ export const schema = z.strictObject({
       .array(z.strictObject({ jour: texte, heure: texte, titre: texte, texte, bulle: texte }))
       .length(6),
   }),
-  /** Where to find him: the WhatsApp thread in the phone. */
+  /** Where to find him: a WhatsApp you can browse, Robin's chat first, a few others (easter eggs). */
   canaux: z.strictObject({
     titre: texte,
     texte,
+    /** The line that invites to browse the phone. */
+    indice: texte,
     telephone: z.strictObject({
-      statut: texte,
-      jour: texte,
-      messages: z
+      ariaLabel: texte,
+      /** WhatsApp's own words: the chats list, its filters, the tab bar. */
+      app: z.strictObject({
+        titre: texte,
+        recherche: texte,
+        filtres: z.array(texte).length(4),
+        onglets: z.array(texte).length(5),
+        /** aria-label of the back chevron. */
+        retour: texte,
+        ecrit: texte,
+        saisie: texte,
+        /** The date chip of today's messages: the list shows their time instead. */
+        aujourdhui: texte,
+      }),
+      discussions: z
         .array(
           z.strictObject({
-            qui: z.enum(['robin', 'patron']),
-            txt: texte,
-            /** An attached file: its name and the line under it. */
-            doc: texte.optional(),
-            meta: texte.optional(),
+            nom: texte,
+            /** Robin, a Hatch agent (its portrait), or WhatsApp's default avatar. */
+            avatar: z.enum(['robin', 'peep', 'owl', 'personne', 'groupe', 'entreprise']),
+            /** Under the name, in the chat's header. */
+            statut: texte,
+            epingle: z.boolean().optional(),
+            nonLus: z.number().int().min(0),
+            jour: texte,
+            messages: z
+              .array(
+                z.strictObject({
+                  qui: z.enum(['in', 'out']),
+                  /** In a group: who wrote it. */
+                  auteur: texte.optional(),
+                  txt: texte,
+                  heure: texte,
+                  /** An attached file: its name and the line under it. */
+                  doc: z.strictObject({ nom: texte, meta: texte }).optional(),
+                  /** A link with its preview (a Hatch page). */
+                  lien: z
+                    .strictObject({ titre: texte, sousTitre: texte, domaine: texte, url: texte })
+                    .optional(),
+                }),
+              )
+              .min(1),
           }),
         )
-        .min(1),
+        .min(2),
     }),
   }),
   confiance: z.strictObject({

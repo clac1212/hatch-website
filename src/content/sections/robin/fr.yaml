@@ -61,18 +61,117 @@ semaine:
 canaux:
   titre: 'Là où vous êtes déjà.'
   texte: 'Pendant la bêta, Robin vit dans WhatsApp. Ensuite, il aura sa propre application, pensée pour lui, toujours à portée de main.'
+  indice: 'Le téléphone est à vous : revenez aux discussions, ouvrez-en d’autres.'
   telephone:
-    statut: 'en ligne'
-    jour: 'Lundi'
-    messages:
-      - qui: robin
-        txt: 'Bonjour Karim, voici le point de la semaine. J’ai rapproché les livraisons et les factures : il manque 2 kg de bœuf chez Metro, la demande d’avoir est prête.'
-      - qui: patron
-        txt: 'Envoie-la. Et fais le contrat de Lina pour samedi'
-      - qui: robin
-        txt: "C'est fait, à partir de ton modèle. Relis-le avant que je l'envoie."
-        doc: "Contrat d'extra · Lina.pdf"
-        meta: 'Ton modèle · prêt à signer'
+    ariaLabel: 'WhatsApp sur le téléphone de Karim, sa discussion avec Robin ouverte'
+    app:
+      titre: 'Discussions'
+      recherche: 'Rechercher'
+      filtres: ['Toutes', 'Non lues', 'Favoris', 'Groupes']
+      onglets: ['Actus', 'Appels', 'Communautés', 'Discussions', 'Réglages']
+      retour: 'Retour aux discussions'
+      ecrit: 'écrit…'
+      saisie: 'Message'
+      aujourdhui: "Aujourd'hui"
+    discussions:
+      - nom: 'Robin'
+        avatar: robin
+        statut: 'en ligne'
+        epingle: true
+        nonLus: 0
+        jour: "Aujourd'hui"
+        messages:
+          - qui: in
+            txt: 'Bonjour Karim, voici le point de la semaine. J’ai rapproché les livraisons et les factures : il manque 2 kg de bœuf chez Metro, la demande d’avoir est prête.'
+            heure: '08:30'
+          - qui: out
+            txt: 'Envoie-la. Et fais le contrat de Lina pour samedi'
+            heure: '08:31'
+          - qui: in
+            txt: "C'est fait, à partir de ton modèle. Relis-le avant que je l'envoie."
+            heure: '08:33'
+            doc:
+              nom: "Contrat d'extra · Lina.pdf"
+              meta: '2 pages · PDF · prêt à signer'
+      - nom: 'Équipe · Le Petit Comptoir'
+        avatar: groupe
+        statut: 'Inès, Lina, Thomas, vous'
+        nonLus: 2
+        jour: "Aujourd'hui"
+        messages:
+          - qui: in
+            auteur: 'Inès'
+            txt: 'Livraison Metro arrivée, je range 📦'
+            heure: '07:52'
+          - qui: in
+            auteur: 'Thomas'
+            txt: 'Karim, je peux poser samedi ?'
+            heure: '08:12'
+      - nom: 'Lina (extra)'
+        avatar: personne
+        statut: 'en ligne'
+        nonLus: 1
+        jour: "Aujourd'hui"
+        messages:
+          - qui: in
+            txt: 'Contrat signé ✍️ À samedi !'
+            heure: '09:12'
+      - nom: 'Sylvain · Expert-comptable'
+        avatar: personne
+        statut: 'vu aujourd’hui à 08:05'
+        nonLus: 1
+        jour: "Aujourd'hui"
+        messages:
+          - qui: out
+            txt: 'Voilà la compta d’octobre, préparée par Robin.'
+            heure: '07:58'
+          - qui: in
+            txt: 'Bien reçu le fichier de Robin. Rien à redire, pour une fois 👌'
+            heure: '08:05'
+      - nom: 'Metro'
+        avatar: entreprise
+        statut: 'Compte professionnel'
+        nonLus: 0
+        jour: "Aujourd'hui"
+        messages:
+          - qui: in
+            txt: 'Votre demande d’avoir (bœuf, 2 kg) a été acceptée. Il apparaîtra sur votre prochaine facture.'
+            heure: '09:05'
+      - nom: 'Peep'
+        avatar: peep
+        statut: 'Agent Hatch OS'
+        nonLus: 1
+        jour: 'Hier'
+        messages:
+          - qui: in
+            txt: 'Psst. Le jour où tu ouvres un deuxième resto, je m’occupe de tes équipes 😉'
+            heure: '22:47'
+            lien:
+              titre: 'Hatch OS · pour les réseaux'
+              sousTitre: 'Les agents IA des réseaux de restauration'
+              domaine: 'gethatch.io'
+              url: '/reseaux'
+      - nom: 'Owl'
+        avatar: owl
+        statut: 'Agent Hatch OS'
+        nonLus: 0
+        jour: 'Hier'
+        messages:
+          - qui: out
+            txt: 'Owl, t’es là ?'
+            heure: '20:14'
+          - qui: in
+            txt: 'Chut, je suis en plein service. 🦉'
+            heure: '20:14'
+      - nom: 'Maman'
+        avatar: personne
+        statut: 'vu hier à 23:02'
+        nonLus: 1
+        jour: 'Hier'
+        messages:
+          - qui: in
+            txt: 'Tu manges quand ? Pas que des sandwichs debout hein ❤️'
+            heure: '23:02'
 
 confiance:
   titre: 'À vos côtés, sous votre contrôle.'

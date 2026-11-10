@@ -15,7 +15,7 @@ import Carte from '../components/ui/Carte.astro';
 import Button from '../components/ui/Button.astro';
 import EnTete from '../components/ui/EnTete.astro';
 import Section from '../components/layout/Section.astro';
-import Iphone from '../components/ui/Iphone.astro';
+import Telephone from '../components/robin/Telephone.astro';
 import Ipad from '../components/ui/Ipad.astro';
 import Situations from '../components/robin/Situations.astro';
 import Semaine from '../components/robin/Semaine.astro';
@@ -157,38 +157,14 @@ const champs = [
     </Section>
 
     <!-- 5 · Where to find him: the WhatsApp phone (no app yet) -->
-    <Section id="canaux" ton="cream-2" data-canaux>
-      <div class="flex flex-col items-center text-center">
-        <EnTete titre={canaux.titre} intro={canaux.texte} align="centre" />
-
-        <div class="telephone mt-10 w-full max-w-[320px]">
-          <Iphone>
-            <!-- WhatsApp -->
-            <div class="ecran wa on" data-c="0">
-              <div class="wa-statut" aria-hidden="true"><span>8:31</span><span>●●● ▮</span></div>
-              <header class="wa-barre">
-                <span class="wa-retour" aria-hidden="true">‹</span>
-                <Image src={portrait} alt="" width={40} densities={[1, 2]} class="wa-av" />
-                <span class="wa-contact"><b>Robin</b><span>{canaux.telephone.statut}</span></span>
-              </header>
-              <div class="wa-fil">
-                <p class="wa-jour">{canaux.telephone.jour}</p>
-                {
-                  canaux.telephone.messages.map((m) => (
-                    <div class:list={['wa-msg', m.qui, m.doc && 'wa-doc']}>
-                      {m.doc && (
-                        <span class="wa-fichier">
-                          <b>{m.doc}</b>
-                          <span>{m.meta}</span>
-                        </span>
-                      )}
-                      {m.txt}
-                    </div>
-                  ))
-                }
-              </div>
-            </div>
-          </Iphone>
+    <Section id="canaux" ton="cream-2">
+      <div class="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+        <div>
+          <EnTete titre={canaux.titre} intro={canaux.texte} />
+          <p class="mt-6 text-caption text-(--doux)">{canaux.indice}</p>
+        </div>
+        <div class="flex justify-center">
+          <Telephone locale={locale} />
         </div>
       </div>
     </Section>
@@ -468,118 +444,6 @@ const champs = [
     }
   }
 
-  /* The phone screen. */
-  .ecran {
-    --pt: calc(100cqw / 370);
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    opacity: 0;
-    transition: opacity 0.35s var(--ease-doux);
-    text-align: left;
-  }
-  .ecran.on {
-    opacity: 1;
-  }
-
-  /* WhatsApp in the iPhone, same proportions as the demo mock-ups. */
-  .wa {
-    container-type: inline-size;
-    background: var(--color-whatsapp-wall);
-    font: 400 calc(15 * var(--pt)) / 1.35 var(--font-sans);
-    color: var(--color-ink);
-  }
-  .wa-statut {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: calc(54 * var(--pt));
-    padding: calc(4 * var(--pt)) calc(34 * var(--pt)) 0 calc(48 * var(--pt));
-    font: 600 calc(16 * var(--pt)) / 1 var(--font-sans);
-    background: var(--color-surface);
-  }
-  .wa-barre {
-    display: flex;
-    align-items: center;
-    gap: calc(10 * var(--pt));
-    padding: calc(6 * var(--pt)) calc(16 * var(--pt)) calc(9 * var(--pt)) calc(10 * var(--pt));
-    background: var(--color-surface);
-    box-shadow: 0 1px 0 var(--color-line);
-  }
-  .wa-retour {
-    font-size: calc(30 * var(--pt));
-    line-height: 1;
-  }
-  .wa-barre :global(.wa-av) {
-    width: calc(38 * var(--pt));
-    height: calc(38 * var(--pt));
-    object-fit: cover;
-    border-radius: 999px;
-    background: var(--color-cream);
-  }
-  .wa-contact {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.2;
-  }
-  .wa-contact b {
-    font-size: calc(17 * var(--pt));
-  }
-  .wa-contact span {
-    font-size: calc(13 * var(--pt));
-    color: var(--color-soft);
-  }
-  .wa-fil {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    justify-content: flex-end;
-    gap: calc(8 * var(--pt));
-    padding: calc(10 * var(--pt)) calc(10 * var(--pt)) calc(16 * var(--pt));
-  }
-  .wa-jour {
-    align-self: center;
-    margin-bottom: auto;
-    padding: calc(5 * var(--pt)) calc(12 * var(--pt));
-    border-radius: calc(9 * var(--pt));
-    background: var(--color-surface);
-    box-shadow: var(--shadow-1);
-    font: 500 calc(12 * var(--pt)) / 1.2 var(--font-sans);
-    color: var(--color-soft);
-  }
-  .wa-msg {
-    max-width: 84%;
-    padding: calc(8 * var(--pt)) calc(11 * var(--pt));
-    border-radius: calc(10 * var(--pt));
-    box-shadow: 0 1px 0.5px color-mix(in srgb, var(--color-black) 13%, transparent);
-  }
-  .wa-msg.robin {
-    align-self: flex-start;
-    background: var(--color-surface);
-    border-top-left-radius: 0;
-  }
-  .wa-msg.patron {
-    align-self: flex-end;
-    background: var(--color-whatsapp);
-    border-top-right-radius: 0;
-  }
-  .wa-fichier {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: calc(6 * var(--pt));
-    padding: calc(10 * var(--pt)) calc(12 * var(--pt));
-    border-radius: calc(8 * var(--pt));
-    background: var(--color-gray-50);
-    border-left: calc(4 * var(--pt)) solid var(--color-statut-rouge);
-  }
-  .wa-fichier span {
-    font-size: calc(12 * var(--pt));
-    color: var(--color-soft);
-  }
-
-  /* Beta form. */
   .champ {
     display: flex;
     flex-direction: column;
@@ -627,9 +491,6 @@ const champs = [
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .ecran {
-      transition: none;
-    }
     /* No rotation: the first bubble stays on screen; the others, which share its grid cell, are
        visually hidden but still read by screen readers. */
     .bs:first-child {

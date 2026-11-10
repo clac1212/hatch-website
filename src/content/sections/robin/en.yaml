@@ -61,18 +61,117 @@ semaine:
 canaux:
   titre: 'Right where you already are.'
   texte: "During the beta, Robin lives in WhatsApp. Later, he'll have his own app, built for him, always within reach."
+  indice: 'The phone is yours: go back to the chats, open others.'
   telephone:
-    statut: 'online'
-    jour: 'Monday'
-    messages:
-      - qui: robin
-        txt: 'Morning Karim, here’s your weekly recap. I matched deliveries and invoices: Metro is 2 kg of beef short, the credit note request is ready.'
-      - qui: patron
-        txt: 'Send it. And do Lina’s contract for Saturday'
-      - qui: robin
-        txt: 'Done, from your template. Check it before I send it.'
-        doc: 'Extra contract · Lina.pdf'
-        meta: 'Your template · ready to sign'
+    ariaLabel: 'WhatsApp on Karim’s phone, his chat with Robin open'
+    app:
+      titre: 'Chats'
+      recherche: 'Search'
+      filtres: ['All', 'Unread', 'Favourites', 'Groups']
+      onglets: ['Updates', 'Calls', 'Communities', 'Chats', 'Settings']
+      retour: 'Back to chats'
+      ecrit: 'typing…'
+      saisie: 'Message'
+      aujourdhui: 'Today'
+    discussions:
+      - nom: 'Robin'
+        avatar: robin
+        statut: 'online'
+        epingle: true
+        nonLus: 0
+        jour: 'Today'
+        messages:
+          - qui: in
+            txt: 'Morning Karim, here’s your weekly recap. I matched deliveries and invoices: Metro is 2 kg of beef short, the credit note request is ready.'
+            heure: '8:30 AM'
+          - qui: out
+            txt: 'Send it. And do Lina’s contract for Saturday'
+            heure: '8:31 AM'
+          - qui: in
+            txt: 'Done, from your template. Check it before I send it.'
+            heure: '8:33 AM'
+            doc:
+              nom: 'Extra contract · Lina.pdf'
+              meta: '2 pages · PDF · ready to sign'
+      - nom: 'Team · Le Petit Comptoir'
+        avatar: groupe
+        statut: 'Inès, Lina, Thomas, you'
+        nonLus: 2
+        jour: 'Today'
+        messages:
+          - qui: in
+            auteur: 'Inès'
+            txt: 'Metro delivery’s in, putting it away 📦'
+            heure: '7:52 AM'
+          - qui: in
+            auteur: 'Thomas'
+            txt: 'Karim, can I take Saturday off?'
+            heure: '8:12 AM'
+      - nom: 'Lina (extra)'
+        avatar: personne
+        statut: 'online'
+        nonLus: 1
+        jour: 'Today'
+        messages:
+          - qui: in
+            txt: 'Contract signed ✍️ See you Saturday!'
+            heure: '9:12 AM'
+      - nom: 'Sylvain · Accountant'
+        avatar: personne
+        statut: 'last seen today at 8:05 AM'
+        nonLus: 1
+        jour: 'Today'
+        messages:
+          - qui: out
+            txt: 'Here are the October books, prepared by Robin.'
+            heure: '7:58 AM'
+          - qui: in
+            txt: 'Got Robin’s file. Nothing to fix, for once 👌'
+            heure: '8:05 AM'
+      - nom: 'Metro'
+        avatar: entreprise
+        statut: 'Business account'
+        nonLus: 0
+        jour: 'Today'
+        messages:
+          - qui: in
+            txt: 'Your credit note request (beef, 2 kg) has been accepted. It will show on your next invoice.'
+            heure: '9:05 AM'
+      - nom: 'Peep'
+        avatar: peep
+        statut: 'Hatch OS agent'
+        nonLus: 1
+        jour: 'Yesterday'
+        messages:
+          - qui: in
+            txt: 'Psst. The day you open a second restaurant, I’ll take care of your teams 😉'
+            heure: '10:47 PM'
+            lien:
+              titre: 'Hatch OS · for networks'
+              sousTitre: 'AI agents for restaurant networks'
+              domaine: 'gethatch.io'
+              url: '/en/networks'
+      - nom: 'Owl'
+        avatar: owl
+        statut: 'Hatch OS agent'
+        nonLus: 0
+        jour: 'Yesterday'
+        messages:
+          - qui: out
+            txt: 'Owl, you there?'
+            heure: '8:14 PM'
+          - qui: in
+            txt: 'Shh, I’m in the middle of service. 🦉'
+            heure: '8:14 PM'
+      - nom: 'Mum'
+        avatar: personne
+        statut: 'last seen yesterday at 11:02 PM'
+        nonLus: 1
+        jour: 'Yesterday'
+        messages:
+          - qui: in
+            txt: 'When are you eating? Not just sandwiches standing up ❤️'
+            heure: '11:02 PM'
 
 confiance:
   titre: 'By your side, under your control.'

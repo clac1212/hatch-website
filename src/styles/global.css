@@ -69,6 +69,8 @@
   --color-whatsapp-wall: #efeae2; /* chat background */
   --color-whatsapp-tick: #53bdeb; /* read receipts */
   --color-whatsapp-teal: #008069; /* app bar and reply buttons */
+  --color-whatsapp-avatar: #dfe5e7; /* default avatar behind the white silhouette */
+  --color-whatsapp-unread: #1daa61; /* unread count and its time in the chats list */
   /* WhatsApp iOS, light mode (ui/WhatsApp.astro): text, timestamps, bars, links, file icons. */
   --color-whatsapp-ink: #111b21;
   --color-whatsapp-meta: #667781;
