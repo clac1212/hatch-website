@@ -1,0 +1,13 @@
+---
+import GuidePage from '../../../views/GuidePage.astro';
+import { guideSlug, publishedGuides } from '../../../content/pages/guides';
+
+/** One page per published guide (drafts only under `pnpm dev`). */
+export async function getStaticPaths() {
+  return (await publishedGuides('en')).map((g) => ({ params: { slug: guideSlug(g.id) } }));
+}
+
+const slug = Astro.params.slug!;
+---
+
+<GuidePage locale="en" slug={slug} />

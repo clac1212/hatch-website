@@ -12,6 +12,12 @@ export const appUrls = {
   login: 'https://app.gethatch.io/auth',
 };
 
+/**
+ * Peep's demo WhatsApp number (digits only, country code first, e.g. `33612345678`), for the
+ * « Écrire à Peep » card of /ressources. Empty until validated: the card is then not rendered.
+ */
+export const demoWhatsapp = '';
+
 export const routes = {
   home: { fr: '/', en: '/en' },
   /** The franchise-network space (the former one-page home, its sections and pricing). */
@@ -25,12 +31,20 @@ export const routes = {
   privacy: { fr: '/confidentialite', en: '/en/privacy' },
   mentions: { fr: '/mentions-legales', en: '/en/legal-notice' },
   sansFiltre: { fr: '/sans-filtre', en: '/en/unfiltered' },
+  /** Resources for both audiences: templates, guides (/ressources/<slug>), the glossary. */
+  ressources: { fr: '/ressources', en: '/en/resources' },
+  glossaire: { fr: '/ressources/glossaire', en: '/en/resources/glossary' },
 } as const satisfies Record<string, Record<Locale, string>>;
 export type Paths = Record<Locale, string>;
 
 /** Pages generated per entry: an agent (`src/content/agents`). */
 export const entryRoutes = {
   agents: (slug: string): Paths => ({ fr: `/agents/${slug}`, en: `/en/agents/${slug}` }),
+  /** A guide (`src/content/ressources/<locale>/<slug>.md`), same slug in both locales. */
+  guides: (slug: string): Paths => ({
+    fr: `${routes.ressources.fr}/${slug}`,
+    en: `${routes.ressources.en}/${slug}`,
+  }),
 };
 
 /** Short UI strings (nav, footer, buttons, accessibility labels). Marketing copy lives in src/content/. */
@@ -43,6 +57,11 @@ const fr = {
   'nav.cases': 'Cas clients',
   'nav.pricing': 'Tarifs',
   'nav.security': 'Sécurité',
+  'nav.resources': 'Ressources',
+  /** Audience badges of the resources (templates, guides, glossary terms). */
+  'public.independant': 'Indépendant',
+  'public.reseau': 'Réseau',
+  'public.tous': 'Tous',
   'cta.demo': 'Réserver une démo',
   /** Secondary CTA of the hero: the app's signup, for a newcomer (the demo is the primary). */
   'cta.try': 'Essayer Hatch OS',
@@ -79,6 +98,10 @@ const en: Record<keyof typeof fr, string> = {
   'nav.cases': 'Customers',
   'nav.pricing': 'Pricing',
   'nav.security': 'Security',
+  'nav.resources': 'Resources',
+  'public.independant': 'Independent',
+  'public.reseau': 'Network',
+  'public.tous': 'Everyone',
   'cta.demo': 'Book a demo',
   'cta.try': 'Try Hatch OS',
   'nav.login': 'Log in',

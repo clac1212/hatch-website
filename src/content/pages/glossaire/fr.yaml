@@ -1,0 +1,32 @@
+seo:
+  title: 'Glossaire de la restauration et de la franchise | Hatch OS'
+  description: 'Coût de revient, ratio matière, HACCP, DIP, redevance : les termes de la restauration et de la franchise, chacun défini en une ou deux phrases.'
+kicker: 'Glossaire'
+titre: 'Les mots du métier, définis simplement.'
+chapeau: 'Les termes qui reviennent en cuisine, chez le fournisseur et dans un contrat de franchise.'
+# Les ancres sont stables : ne jamais les changer une fois publiées (des liens pointent dessus).
+termes:
+  - mot: 'Coût de revient'
+    definition: "Ce que coûtent les ingrédients d'une portion. C'est la base pour fixer le prix d'un plat."
+    public: independant
+    ancre: cout-de-revient
+  - mot: 'Ratio matière'
+    definition: "La part des achats de matières premières dans le chiffre d'affaires."
+    public: independant
+    ancre: ratio-matiere
+  - mot: 'Avoir'
+    definition: "Le document du fournisseur qui annule tout ou partie d'une facture, par exemple pour une marchandise manquante."
+    public: independant
+    ancre: avoir
+  - mot: 'HACCP'
+    definition: 'Méthode d’analyse des dangers et de maîtrise des points critiques, la base des règles d’hygiène en cuisine.'
+    public: tous
+    ancre: haccp
+  - mot: 'DIP'
+    definition: 'Document d’information précontractuelle. Le franchiseur le remet au candidat au moins 20 jours avant la signature.'
+    public: reseau
+    ancre: dip
+  - mot: 'Redevance'
+    definition: "Somme versée régulièrement par le franchisé au franchiseur, souvent un pourcentage du chiffre d'affaires."
+    public: reseau
+    ancre: redevance

@@ -1,0 +1,32 @@
+seo:
+  title: 'Restaurant and franchise glossary | Hatch OS'
+  description: 'Plate cost, food cost ratio, HACCP, disclosure document, royalty: the terms of the restaurant and franchise trades, each defined in a sentence or two.'
+kicker: 'Glossary'
+titre: 'The words of the trade, simply defined.'
+chapeau: 'The terms that come up in the kitchen, with suppliers and in a franchise agreement.'
+# Anchors are stable: never change one once published (links point at them).
+termes:
+  - mot: 'Plate cost'
+    definition: 'What the ingredients of one portion cost. It is the basis for pricing a dish.'
+    public: independant
+    ancre: plate-cost
+  - mot: 'Food cost ratio'
+    definition: 'The share of raw material purchases in revenue.'
+    public: independant
+    ancre: food-cost-ratio
+  - mot: 'Credit note'
+    definition: 'The supplier’s document that cancels all or part of an invoice, for example for missing goods.'
+    public: independant
+    ancre: credit-note
+  - mot: 'HACCP'
+    definition: 'Hazard Analysis and Critical Control Points, the method behind kitchen hygiene rules.'
+    public: tous
+    ancre: haccp
+  - mot: 'Disclosure document (DIP)'
+    definition: 'The pre-contractual information document. In France, the franchisor hands it to the candidate at least 20 days before signing.'
+    public: reseau
+    ancre: disclosure-document
+  - mot: 'Royalty'
+    definition: 'A sum the franchisee pays the franchisor at regular intervals, often a percentage of revenue.'
+    public: reseau
+    ancre: royalty

@@ -1,0 +1,111 @@
+seo:
+  title: 'Resources for restaurant owners and networks | Hatch OS'
+  description: 'Downloadable templates, guides and a glossary for independent restaurant owners and franchise networks. Free to use, no form and no email required.'
+
+hero:
+  kicker: 'Resources'
+  titre: 'What restaurant owners actually use, free to access.'
+  chapeau: 'Templates, guides and a glossary, whether you run a bistro or a network of 50 restaurants. Read and download everything with no form and no email.'
+  filtre: 'Filter the resources'
+  filtres:
+    tout: 'All'
+    independant: 'I run a restaurant'
+    reseau: 'I run a network'
+
+action:
+  kicker: 'In action'
+  titre: 'Two agents, on WhatsApp.'
+  robin:
+    titre: 'Robin, for independents'
+    texte: 'He matches the delivery note with the invoice, finds the gap and prepares the credit note request. You say yes.'
+    statut: 'online'
+    cta: 'Join the waitlist'
+  peep:
+    titre: 'Peep, for networks'
+    texte: 'He answers your crew from your own procedures, and quotes the document the answer comes from.'
+    statut: 'online'
+    mention: 'Example on BunBun, a fictional brand'
+    messages:
+      - qui: equipier
+        txt: 'How much goes in the cash float at opening?'
+      - qui: peep
+        txt: '€150: €100 in 5 and 10 notes, €50 in coins. Count it with your manager before the first customer.'
+        source: 'Source: BunBun operations manual, opening the restaurant'
+    cta: 'Message Peep on WhatsApp'
+    preRempli: 'Hi Peep, how much goes in the cash float at opening?'
+
+modeles:
+  kicker: 'Templates'
+  titre: 'Templates ready to fill in.'
+  texte: 'Download, fill in, adapt to your place. No form, no email.'
+  telecharger: 'Download the template'
+  liste:
+    - public: independant
+      titre: 'Recipe card and plate cost'
+      texte: 'Weights, the price of each ingredient and the cost per portion, worked out for you.'
+      formats:
+        - format: Sheets
+    - public: independant
+      titre: 'Delivery receiving checklist'
+      texte: 'What to check before signing the delivery note: quantities, temperatures, dates, packaging.'
+      formats:
+        - format: PDF
+    - public: tous
+      titre: 'Food safety plan outline'
+      texte: 'The sections an inspector expects, to complete with your own procedures.'
+      formats:
+        - format: Docs
+    - public: reseau
+      titre: 'Operations manual outline'
+      texte: 'The outline of a manual crews actually read: opening, service, closing, hygiene.'
+      formats:
+        - format: Docs
+    - public: reseau
+      titre: 'Weighted hygiene and quality audit grid'
+      texte: 'Every point scored and weighted, to compare restaurants visit after visit.'
+      formats:
+        - format: Sheets
+    - public: reseau
+      titre: 'Franchise restaurant opening checklist'
+      texte: 'From signing to the first service, the steps for the franchisee and the head office to tick off.'
+      formats:
+        - format: PDF
+        - format: Sheets
+
+guides:
+  kicker: 'Guides'
+  titre: 'Guides, one trade at a time.'
+  texte: 'One practical method per topic, and a source for every number.'
+
+glossaire:
+  kicker: 'Glossary'
+  titre: 'The words of the trade.'
+  texte: 'The terms that come up in the kitchen, with suppliers and in a franchise agreement.'
+  lien: 'See the full glossary'
+
+sansFiltre:
+  kicker: 'Unfiltered'
+  titre: 'What we ship, every month.'
+  texte: 'The Hatch OS monthly journal: what the team actually shipped, no teasing and no phantom roadmap.'
+  lien: 'All editions'
+
+sorties:
+  independant:
+    kicker: 'Independent'
+    titre: 'You run one or two restaurants'
+    texte: 'Robin checks your invoices, works out what your dishes cost and sends you the weekly recap, on WhatsApp.'
+    cta: 'Join the waitlist'
+  reseau:
+    kicker: 'Network'
+    titre: 'You run a network'
+    texte: 'Seven agents for network life, training, documentation, quality and the development of your restaurants.'
+
+guide:
+  retour: 'Resources'
+  lecture: '{n} min read'
+  majLe: 'Updated on'
+  faq: 'Frequently asked questions'
+  sources: 'Sources'
+  luLe: 'read on'
+  agents: 'The agents who handle it'
+  agentLien: "See {name}'s page"

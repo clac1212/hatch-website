@@ -1,0 +1,530 @@
+---
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
+import { getEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Button from '../components/ui/Button.astro';
+import Badge from '../components/ressources/Badge.astro';
+import Sorties from '../components/ressources/Sorties.astro';
+import { sortedEditions } from '../content/pages/editions';
+import { guideSlug, publishedGuides } from '../content/pages/guides';
+import { fill } from '../components/pages/format';
+import { BRAND, breadcrumbList } from '../seo/jsonld';
+import { demoWhatsapp, entryRoutes, routes, type Locale } from '../i18n/ui';
+import portraitRobin from '../assets/portraits/robin.jpg';
+import portraitPeep from '../assets/portraits/peep.jpg';
+
+/**
+ * /ressources (/en/resources): what both audiences can take away, independents (Robin) and
+ * networks (the agents). In order: header and audience filter, the two agents in action on
+ * WhatsApp, the templates, the guides, a glossary preview, the latest Sans Filtre editions, the two
+ * ways out. Copy in src/content/pages/ressources/<locale>.yaml.
+ *
+ * The filter is progressive enhancement: without JS every card shows and the buttons stay hidden.
+ * Each card carries `data-public` (independant | reseau | tous); `tous` cards show under every
+ * filter, and a group left without a visible card hides with its section. The choice lives in the
+ * hash (#restaurant, #reseau), so a filtered view can be shared.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const ui = (await getEntry('ressourcesPage', locale))?.data;
+if (!ui) throw new Error(`Missing src/content/pages/ressources/${locale}.yaml`);
+const situations = (await getEntry('robinSituations', locale))?.data;
+if (!situations) throw new Error(`Missing src/content/sections/robinSituations/${locale}.yaml`);
+const glossaire = (await getEntry('glossairePage', locale))?.data;
+if (!glossaire) throw new Error(`Missing src/content/pages/glossaire/${locale}.yaml`);
+
+const { hero, action, modeles, sansFiltre } = ui;
+const facture = situations.facture;
+
+/** Peep's card waits for a validated demo number (src/i18n/ui.ts). */
+const waPeep = demoWhatsapp
+  ? `https://wa.me/${demoWhatsapp}?text=${encodeURIComponent(action.peep.preRempli)}`
+  : undefined;
+
+/** Templates with at least one file in public/ressources/; the others are not shown yet. */
+const dossier = join(process.cwd(), 'public', 'ressources');
+const disponibles = modeles.liste
+  .map((m) => ({
+    ...m,
+    formats: m.formats.flatMap((f) =>
+      f.fichier && existsSync(join(dossier, f.fichier))
+        ? [{ format: f.format, href: `/ressources/${f.fichier}` }]
+        : [],
+    ),
+  }))
+  .filter((m) => m.formats.length > 0);
+
+const guides = (await publishedGuides(locale)).map((g) => ({
+  ...g.data,
+  href: entryRoutes.guides(guideSlug(g.id))[locale],
+}));
+
+/** The glossary preview: its first eight terms, alphabetically. */
+const termes = [...glossaire.termes].sort((a, b) => a.mot.localeCompare(b.mot, locale)).slice(0, 8);
+
+const editions = (await sortedEditions()).slice(0, 3).map((e) => ({
+  numero: e.data.edition,
+  ...e.data[locale],
+  href: `${routes.sansFiltre[locale]}/${e.data.edition}`,
+}));
+
+const site = Astro.site!;
+const jsonLd = [
+  breadcrumbList(site, [
+    { name: BRAND, path: routes.home[locale] },
+    { name: hero.kicker, path: routes.ressources[locale] },
+  ]),
+];
+
+/** Shared look of the section headings. */
+const kicker = 'font-mono text-kicker text-orange-txt uppercase';
+const h2 = 'font-display text-section font-bold text-balance text-ink';
+---
+
+<Base
+  locale={locale}
+  paths={routes.ressources}
+  title={ui.seo.title}
+  description={ui.seo.description}
+  nav="accueil"
+  piedEpure
+  jsonLd={jsonLd}
+>
+  <!-- 1 · Header and audience filter -->
+  <section class="px-4 pt-32 pb-14 sm:px-6 lg:pt-40 lg:pb-20">
+    <div class="mx-auto flex max-w-site flex-col gap-6">
+      <span class={kicker}>{hero.kicker}</span>
+      <h1
+        class="max-w-[22ch] font-mono text-[clamp(2rem,1.3rem+2.8vw,3.5rem)] leading-[1.1] text-balance text-ink"
+      >
+        {hero.titre}
+      </h1>
+      <p class="max-w-[60ch] text-punch text-soft">{hero.chapeau}</p>
+      <div class="filtre mt-4 flex flex-wrap gap-2" role="group" aria-label={hero.filtre} hidden>
+        <button type="button" data-filtre="" aria-pressed="true">{hero.filtres.tout}</button>
+        <button type="button" data-filtre="independant" aria-pressed="false">
+          {hero.filtres.independant}
+        </button>
+        <button type="button" data-filtre="reseau" aria-pressed="false">
+          {hero.filtres.reseau}
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 · In action: Robin (independents) and Peep (networks) on WhatsApp -->
+  <section class="bg-night px-4 py-20 text-cream sm:px-6 lg:py-28" data-filtre-section>
+    <div class="mx-auto flex max-w-site flex-col gap-10">
+      <div class="flex flex-col gap-4">
+        <span class="font-mono text-kicker text-cream/60 uppercase">{action.kicker}</span>
+        <h2 class="font-display text-section font-bold text-balance">{action.titre}</h2>
+      </div>
+      <div
+        class:list={['grid gap-5', waPeep ? 'lg:grid-cols-2' : 'max-w-[640px]']}
+        data-filtre-groupe
+      >
+        <article class="carte-action" data-public="independant">
+          <header class="flex items-center gap-4">
+            <Image src={portraitRobin} alt="" width={56} densities={[1, 2]} class="avatar" />
+            <div class="flex flex-col gap-1">
+              <h3 class="font-display text-card font-semibold">{action.robin.titre}</h3>
+              <span class="text-caption text-cream/60">{action.robin.statut}</span>
+            </div>
+          </header>
+          <p class="text-cream/75">{action.robin.texte}</p>
+          <div class="fil" aria-label={situations.conversation.ariaLabel} role="group">
+            <div class="msg moi">
+              <span class="piece">
+                <b class="font-mono text-source uppercase">{facture.photo.titre}</b>
+              </span>
+              {facture.photo.legende}
+            </div>
+            <div class="msg agent">{facture.ecart}</div>
+            <div class="msg moi">{facture.reponse}</div>
+            <div class="msg agent">
+              <span class="piece doc">
+                <span class="font-mono text-source">{facture.avoir.type}</span>
+                <b>{facture.avoir.nom}</b>
+                <span class="text-[0.75rem] text-soft">{facture.avoir.statut}</span>
+              </span>
+            </div>
+          </div>
+          <div class="mt-auto pt-2">
+            <Button href={`${routes.robin[locale]}#beta`} variant="cream">
+              {action.robin.cta}
+            </Button>
+          </div>
+        </article>
+
+        {
+          waPeep && (
+            <article class="carte-action" data-public="reseau">
+              <header class="flex items-center gap-4">
+                <Image src={portraitPeep} alt="" width={56} densities={[1, 2]} class="avatar" />
+                <div class="flex flex-col gap-1">
+                  <h3 class="font-display text-card font-semibold">{action.peep.titre}</h3>
+                  <span class="text-caption text-cream/60">{action.peep.statut}</span>
+                </div>
+              </header>
+              <p class="text-cream/75">{action.peep.texte}</p>
+              <div class="fil" role="group" aria-label={action.peep.mention}>
+                {action.peep.messages.map((m) => (
+                  <div class:list={['msg', m.qui === 'peep' ? 'agent' : 'moi']}>
+                    {m.txt}
+                    {m.source && (
+                      <span class="mt-2 block font-mono text-source text-soft">{m.source}</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <p class="font-mono text-source text-cream/60 uppercase">{action.peep.mention}</p>
+              <div class="mt-auto pt-2">
+                <Button href={waPeep} variant="cream" target="_blank" rel="noopener">
+                  {action.peep.cta}
+                </Button>
+              </div>
+            </article>
+          )
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 · Templates to download, no form nor email (hidden until a file exists) -->
+  {
+    disponibles.length > 0 && (
+      <section class="px-4 py-20 sm:px-6 lg:py-28" data-filtre-section>
+        <div class="mx-auto flex max-w-site flex-col gap-10">
+          <div class="flex flex-col gap-4">
+            <span class={kicker}>{modeles.kicker}</span>
+            <h2 class={h2}>{modeles.titre}</h2>
+            <p class="max-w-[60ch] text-soft">{modeles.texte}</p>
+          </div>
+          <ul class="grid gap-5 md:grid-cols-2 lg:grid-cols-3" data-filtre-groupe>
+            {disponibles.map((m) => (
+              <li class="carte" data-public={m.public}>
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <Badge locale={locale} public={m.public} />
+                  <span class="font-mono text-source text-soft uppercase">
+                    {m.formats.map((f) => f.format).join(' · ')}
+                  </span>
+                </div>
+                <h3 class="font-display text-card font-semibold text-ink">{m.titre}</h3>
+                <p class="text-caption text-soft">{m.texte}</p>
+                <div class="mt-auto flex flex-wrap gap-x-5 gap-y-2 pt-2">
+                  {m.formats.map((f) => (
+                    <a href={f.href} download class="lien">
+                      {modeles.telecharger}
+                      {m.formats.length > 1 && <span> ({f.format})</span>}
+                    </a>
+                  ))}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- 4 · Guides (published ones only) -->
+  {
+    guides.length > 0 && (
+      <section class="px-4 py-20 sm:px-6 lg:py-28" data-filtre-section>
+        <div class="mx-auto flex max-w-site flex-col gap-10">
+          <div class="flex flex-col gap-4">
+            <span class={kicker}>{ui.guides.kicker}</span>
+            <h2 class={h2}>{ui.guides.titre}</h2>
+            <p class="max-w-[60ch] text-soft">{ui.guides.texte}</p>
+          </div>
+          <ul class="grid gap-5 md:grid-cols-2 lg:grid-cols-3" data-filtre-groupe>
+            {guides.map((g) => (
+              <li class="contents" data-public={g.public}>
+                <a href={g.href} class="carte carte-lien">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <Badge locale={locale} public={g.public} />
+                    <span class="font-mono text-source text-soft uppercase">{g.metier}</span>
+                  </div>
+                  <h3 class="font-display text-card font-semibold text-balance text-ink">
+                    {g.title}
+                  </h3>
+                  <span class="mt-auto font-mono text-source text-soft uppercase">
+                    {fill(ui.guide.lecture, { n: String(g.readingMinutes) })}
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- 5 · Glossary preview -->
+  <section class="border-t border-line px-4 py-20 sm:px-6 lg:py-28" data-filtre-section>
+    <div class="mx-auto flex max-w-site flex-col gap-10">
+      <div class="flex flex-col gap-4">
+        <span class={kicker}>{ui.glossaire.kicker}</span>
+        <h2 class={h2}>{ui.glossaire.titre}</h2>
+        <p class="max-w-[60ch] text-soft">{ui.glossaire.texte}</p>
+      </div>
+      <ul class="grid gap-x-10 gap-y-2 md:grid-cols-2" data-filtre-groupe>
+        {
+          termes.map((x) => (
+            <li data-public={x.public}>
+              <a href={`${routes.glossaire[locale]}#${x.ancre}`} class="terme">
+                <span class="flex flex-wrap items-center gap-3">
+                  <b class="font-display text-[1.25rem] font-semibold text-ink">{x.mot}</b>
+                  <Badge locale={locale} public={x.public} />
+                </span>
+                <span class="text-caption text-soft">{x.definition}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <a href={routes.glossaire[locale]} class="lien w-max">{ui.glossaire.lien}</a>
+    </div>
+  </section>
+
+  <!-- 6 · Sans Filtre: the latest editions, straight from the editions collection -->
+  <section class="px-4 pb-20 sm:px-6 lg:pb-28">
+    <div
+      class="mx-auto grid max-w-site gap-10 rounded-card bg-sand p-7 sm:p-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:p-14"
+    >
+      <div class="flex flex-col gap-4">
+        <span class="font-mono text-kicker text-ink/70 uppercase">{sansFiltre.kicker}</span>
+        <h2 class={h2}>{sansFiltre.titre}</h2>
+        <p class="max-w-[46ch] text-soft">{sansFiltre.texte}</p>
+        <a href={routes.sansFiltre[locale]} class="lien mt-2 w-max">{sansFiltre.lien}</a>
+      </div>
+      <ol class="flex flex-col">
+        {
+          editions.map((e) => (
+            <li class="border-t border-ink/15 first:border-t-0">
+              <a href={e.href} class="edition">
+                <span class="font-mono text-source text-ink/70 uppercase">
+                  {e.numero} · {e.month}
+                </span>
+                <span class="font-display text-[1.25rem] leading-snug font-semibold text-ink">
+                  {e.issueTitle}
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- 7 · The two ways out -->
+  <section class="px-4 pb-24 sm:px-6 lg:pb-32" data-filtre-section>
+    <div class="mx-auto max-w-site">
+      <Sorties locale={locale} public="tous" filtrable />
+    </div>
+  </section>
+</Base>
+
+<style>
+  .filtre button {
+    border-radius: 999px;
+    padding: 0.625rem 1.125rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-ink);
+    box-shadow: inset 0 0 0 1px var(--color-line);
+    background: var(--color-surface);
+    transition:
+      background-color 0.2s var(--ease-hatch),
+      color 0.2s var(--ease-hatch);
+  }
+  .filtre button:hover {
+    background: var(--color-orange-tint);
+  }
+  .filtre button[aria-pressed='true'] {
+    background: var(--color-ink);
+    color: var(--color-cream);
+    box-shadow: none;
+  }
+  .filtre button:focus-visible,
+  .lien:focus-visible,
+  .carte-lien:focus-visible,
+  .terme:focus-visible,
+  .edition:focus-visible {
+    outline: 2px solid var(--color-orange-txt);
+    outline-offset: 3px;
+  }
+
+  /* « En action »: one card per agent on the night band, its exchange on the WhatsApp wall. */
+  .carte-action {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: 1.75rem;
+    border-radius: var(--radius-card);
+    background: var(--color-night-2);
+    box-shadow: inset 0 0 0 1px var(--color-line-night);
+  }
+  @media (width >= 40rem) {
+    .carte-action {
+      padding: 2.25rem;
+    }
+  }
+  .carte-action :global(.avatar) {
+    width: 56px;
+    height: 56px;
+    border-radius: 999px;
+    object-fit: cover;
+    background: var(--color-cream);
+  }
+  .fil {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-radius: 14px;
+    background: var(--color-whatsapp-wall);
+    color: var(--color-ink);
+    font-size: 0.9375rem;
+    line-height: 1.4;
+  }
+  .msg {
+    max-width: 86%;
+    padding: 0.5rem 0.75rem;
+    border-radius: 10px;
+    box-shadow: 0 1px 0.5px color-mix(in srgb, var(--color-black) 13%, transparent);
+  }
+  .msg.agent {
+    align-self: flex-start;
+    background: var(--color-surface);
+    border-top-left-radius: 0;
+  }
+  .msg.moi {
+    align-self: flex-end;
+    background: var(--color-whatsapp);
+    border-top-right-radius: 0;
+  }
+  .piece {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    margin-bottom: 0.375rem;
+    padding: 0.625rem 0.75rem;
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--color-white) 55%, transparent);
+  }
+  .piece.doc {
+    margin-bottom: 0;
+    background: var(--color-gray-50);
+    border-left: 4px solid var(--color-statut-rouge);
+  }
+
+  /* Templates, guides. */
+  .carte {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    padding: 1.5rem;
+    border-radius: var(--radius-card);
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
+  }
+  .carte-lien {
+    min-height: 13rem;
+    transition:
+      box-shadow 0.3s var(--ease-hatch),
+      transform 0.3s var(--ease-hatch);
+  }
+  .carte-lien:hover {
+    box-shadow: var(--shadow-2);
+    transform: translateY(-2px);
+  }
+  .lien {
+    font-weight: 600;
+    color: var(--color-orange-txt);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+  .lien:hover {
+    color: var(--color-orange-hover);
+  }
+
+  /* Glossary preview and Sans Filtre editions. */
+  .terme,
+  .edition {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    padding: 1rem 0;
+  }
+  .terme {
+    border-bottom: 1px solid var(--color-line);
+  }
+  .terme:hover b,
+  .edition:hover span:last-child {
+    color: var(--color-orange-txt);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .carte-lien,
+    .filtre button {
+      transition: none;
+    }
+    .carte-lien:hover {
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  type Filtre = '' | 'independant' | 'reseau';
+  /** Hash of each filter, so a filtered view can be shared. */
+  const HASH: Record<Filtre, string> = { '': '', independant: '#restaurant', reseau: '#reseau' };
+
+  const groupe = document.querySelector<HTMLElement>('.filtre');
+  if (groupe) {
+    const boutons = [...groupe.querySelectorAll<HTMLButtonElement>('[data-filtre]')];
+    const cartes = [...document.querySelectorAll<HTMLElement>('[data-public]')];
+    const sections = [...document.querySelectorAll<HTMLElement>('[data-filtre-section]')];
+
+    const depuisHash = (): Filtre =>
+      location.hash === HASH.independant
+        ? 'independant'
+        : location.hash === HASH.reseau
+          ? 'reseau'
+          : '';
+
+    const appliquer = (filtre: Filtre) => {
+      for (const b of boutons) b.setAttribute('aria-pressed', String(b.dataset.filtre === filtre));
+      for (const c of cartes) {
+        const p = c.dataset.public;
+        c.hidden = filtre !== '' && p !== 'tous' && p !== filtre;
+      }
+      // A section whose groups are all left empty hides too.
+      for (const s of sections) {
+        const groupes = [...s.querySelectorAll<HTMLElement>('[data-filtre-groupe]')];
+        s.hidden =
+          groupes.length > 0 &&
+          groupes.every((g) => !g.querySelector('[data-public]:not([hidden])'));
+      }
+    };
+
+    for (const b of boutons) {
+      b.addEventListener('click', () => {
+        const filtre = (b.dataset.filtre ?? '') as Filtre;
+        // replaceState: the hash changes without jumping to an anchor nor piling up history.
+        history.replaceState(null, '', HASH[filtre] || location.pathname + location.search);
+        appliquer(filtre);
+      });
+    }
+    addEventListener('hashchange', () => appliquer(depuisHash()));
+    groupe.hidden = false;
+    appliquer(depuisHash());
+  }
+</script>

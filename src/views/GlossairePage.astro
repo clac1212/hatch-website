@@ -1,0 +1,117 @@
+---
+import { getEntry } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Badge from '../components/ressources/Badge.astro';
+import Sorties from '../components/ressources/Sorties.astro';
+import { BRAND, breadcrumbList, languageTag } from '../seo/jsonld';
+import { routes, type Locale } from '../i18n/ui';
+
+/**
+ * The glossary (/ressources/glossaire, /en/resources/glossary): every term in alphabetical order,
+ * each with its stable anchor (linked from the /ressources preview) and its audience badge.
+ * Content: src/content/pages/glossaire/<locale>.yaml.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const g = (await getEntry('glossairePage', locale))?.data;
+if (!g) throw new Error(`Missing src/content/pages/glossaire/${locale}.yaml`);
+const ui = (await getEntry('ressourcesPage', locale))?.data;
+if (!ui) throw new Error(`Missing src/content/pages/ressources/${locale}.yaml`);
+const termes = [...g.termes].sort((a, b) => a.mot.localeCompare(b.mot, locale));
+
+const site = Astro.site!;
+const url = new URL(routes.glossaire[locale], site).href;
+const jsonLd = [
+  breadcrumbList(site, [
+    { name: BRAND, path: routes.home[locale] },
+    { name: ui.guide.retour, path: routes.ressources[locale] },
+    { name: g.kicker, path: routes.glossaire[locale] },
+  ]),
+  {
+    '@type': 'DefinedTermSet',
+    '@id': `${url}#glossaire`,
+    name: g.titre,
+    inLanguage: languageTag[locale],
+    hasDefinedTerm: termes.map((x) => ({
+      '@type': 'DefinedTerm',
+      '@id': `${url}#${x.ancre}`,
+      name: x.mot,
+      description: x.definition,
+    })),
+  },
+];
+---
+
+<Base
+  locale={locale}
+  paths={routes.glossaire}
+  title={g.seo.title}
+  description={g.seo.description}
+  nav="accueil"
+  piedEpure
+  jsonLd={jsonLd}
+>
+  <div class="px-4 pt-32 pb-20 sm:px-6 lg:pt-40">
+    <header class="mx-auto flex max-w-prose flex-col gap-5">
+      <a href={routes.ressources[locale]} class="retour w-max text-caption font-semibold text-soft">
+        ‹ {ui.guide.retour}
+      </a>
+      <span class="font-mono text-kicker text-orange-txt uppercase">{g.kicker}</span>
+      <h1
+        class="font-mono text-[clamp(1.875rem,1.3rem+2.2vw,3rem)] leading-[1.12] text-balance text-ink"
+      >
+        {g.titre}
+      </h1>
+      <p class="text-punch text-soft">{g.chapeau}</p>
+    </header>
+
+    <dl class="mx-auto mt-12 max-w-prose border-t border-line">
+      {
+        termes.map((x) => (
+          <div id={x.ancre} class="terme">
+            <dt class="flex flex-wrap items-center gap-3">
+              <a href={`#${x.ancre}`} class="font-display text-[1.375rem] font-semibold text-ink">
+                {x.mot}
+              </a>
+              <Badge locale={locale} public={x.public} />
+            </dt>
+            <dd class="mt-2 text-soft">{x.definition}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+
+  <section class="px-4 pb-24 sm:px-6 lg:pb-32">
+    <div class="mx-auto max-w-site">
+      <Sorties locale={locale} public="tous" />
+    </div>
+  </section>
+</Base>
+
+<style>
+  .terme {
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--color-line);
+    scroll-margin-top: 6rem;
+  }
+  /* The term reached through its anchor stands out. */
+  .terme:target {
+    background: var(--color-orange-tint);
+    box-shadow:
+      -1rem 0 0 var(--color-orange-tint),
+      1rem 0 0 var(--color-orange-tint);
+  }
+  .terme a:hover,
+  .retour:hover {
+    color: var(--color-orange-txt);
+  }
+  .terme a:focus-visible,
+  .retour:focus-visible {
+    outline: 2px solid var(--color-orange-txt);
+    outline-offset: 3px;
+  }
+</style>

@@ -1,0 +1,396 @@
+---
+import { getEntry, render } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Badge from '../components/ressources/Badge.astro';
+import Sorties from '../components/ressources/Sorties.astro';
+import { avatars } from '../components/pages/agent-visuels';
+import { centres } from '../components/agents/visuels';
+import { fill, longDate } from '../components/pages/format';
+import { BRAND, breadcrumbList, languageTag, organizationId } from '../seo/jsonld';
+import { entryRoutes, routes, type Locale } from '../i18n/ui';
+
+/**
+ * A guide of /ressources (/ressources/<slug>, /en/resources/<slug>): kicker, H1 in Departure Mono
+ * (the general rule, no exception here), chapeau, the Markdown body, its FAQ as <details>, its
+ * sources, a card per agent it names, then the way out matching its audience (the demo for
+ * networks, the Robin waitlist for independents, both for everyone).
+ * Content: src/content/ressources/<locale>/<slug>.md; shared labels: `guide` of
+ * src/content/pages/ressources/<locale>.yaml.
+ */
+interface Props {
+  locale: Locale;
+  slug: string;
+}
+
+const { locale, slug } = Astro.props;
+const entry = await getEntry('ressources', `${locale}/${slug}`);
+if (!entry) throw new Error(`Missing src/content/ressources/${locale}/${slug}.md`);
+const ui = (await getEntry('ressourcesPage', locale))?.data;
+if (!ui) throw new Error(`Missing src/content/pages/ressources/${locale}.yaml`);
+const { Content } = await render(entry);
+const g = entry.data;
+const l = ui.guide;
+const paths = entryRoutes.guides(slug);
+
+/** The agents it names, with their page once published. */
+const agents = await Promise.all(
+  (g.agents ?? []).map(async (a) => {
+    const e = await getEntry('agents', `${locale}/${a}`);
+    if (!e) throw new Error(`Missing src/content/agents/${locale}/${a}.md`);
+    const publiee = !!e.data.page && !e.data.page.brouillon;
+    return {
+      slug: a,
+      name: e.data.name,
+      job: e.data.job,
+      pitch: e.data.pitch,
+      href: publiee ? entryRoutes.agents(a)[locale] : undefined,
+    };
+  }),
+);
+
+const site = Astro.site!;
+const url = new URL(paths[locale], site).href;
+const jsonLd = [
+  breadcrumbList(site, [
+    { name: BRAND, path: routes.home[locale] },
+    { name: l.retour, path: routes.ressources[locale] },
+    { name: g.title, path: paths[locale] },
+  ]),
+  {
+    '@type': 'Article',
+    '@id': `${url}#article`,
+    mainEntityOfPage: url,
+    headline: g.title,
+    description: g.description,
+    inLanguage: languageTag[locale],
+    dateModified: g.updatedAt,
+    author: { '@id': organizationId(site) },
+    publisher: { '@id': organizationId(site) },
+  },
+  ...(g.faq.length > 0
+    ? [
+        {
+          '@type': 'FAQPage',
+          '@id': `${url}#faq`,
+          mainEntity: g.faq.map((q) => ({
+            '@type': 'Question',
+            name: q.question,
+            acceptedAnswer: { '@type': 'Answer', text: q.reponse },
+          })),
+        },
+      ]
+    : []),
+];
+---
+
+<Base
+  locale={locale}
+  paths={paths}
+  title={`${g.title} | ${BRAND}`}
+  description={g.description}
+  ogType="article"
+  nav="accueil"
+  piedEpure
+  jsonLd={jsonLd}
+  noindex={g.brouillon}
+>
+  <article class="px-4 pt-32 pb-20 sm:px-6 lg:pt-40">
+    <header class="mx-auto flex max-w-prose flex-col gap-5">
+      <a href={routes.ressources[locale]} class="retour w-max text-caption font-semibold text-soft">
+        ‹ {l.retour}
+      </a>
+      <span class="font-mono text-kicker text-orange-txt uppercase">{g.kicker}</span>
+      <h1
+        class="font-mono text-[clamp(1.875rem,1.3rem+2.2vw,3rem)] leading-[1.12] text-balance text-ink"
+      >
+        {g.title}
+      </h1>
+      <p class="text-punch text-soft">{g.chapeau}</p>
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line pb-6">
+        <Badge locale={locale} public={g.public} />
+        <span class="font-mono text-source text-soft uppercase">{g.metier}</span>
+        <span class="font-mono text-source text-soft uppercase">
+          {fill(l.lecture, { n: String(g.readingMinutes) })}
+        </span>
+        <span class="font-mono text-source text-soft uppercase">
+          {l.majLe}
+          <time datetime={g.updatedAt}>{longDate(g.updatedAt, locale)}</time>
+        </span>
+      </div>
+    </header>
+
+    <div class="corps mx-auto mt-10 max-w-prose">
+      <Content />
+    </div>
+
+    {
+      g.faq.length > 0 && (
+        <section class="mx-auto mt-16 max-w-prose" aria-labelledby="guide-faq">
+          <h2 id="guide-faq" class="font-display text-[1.75rem] font-bold text-ink">
+            {l.faq}
+          </h2>
+          <div class="mt-6 border-t border-line">
+            {g.faq.map((q) => (
+              <details class="question">
+                <summary>
+                  <span>{q.question}</span>
+                  <span class="plus" aria-hidden="true" />
+                </summary>
+                <p class="pb-5 text-soft">{q.reponse}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+      )
+    }
+
+    {
+      g.sources.length > 0 && (
+        <section class="mx-auto mt-14 max-w-prose" aria-labelledby="guide-sources">
+          <h2 id="guide-sources" class="font-mono text-kicker text-soft uppercase">
+            {l.sources}
+          </h2>
+          <ol class="mt-4 flex list-decimal flex-col gap-2 pl-5 font-mono text-source text-soft">
+            {g.sources.map((s) => (
+              <li>
+                {s.affirmation} · {l.luLe} <time datetime={s.luLe}>{longDate(s.luLe, locale)}</time>{' '}
+                ·{' '}
+                <a href={s.url} rel="noopener" class="break-all underline underline-offset-2">
+                  {new URL(s.url).hostname.replace(/^www\./, '')}
+                </a>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )
+    }
+
+    {
+      agents.length > 0 && (
+        <section class="mx-auto mt-16 max-w-prose" aria-labelledby="guide-agents">
+          <h2 id="guide-agents" class="font-display text-[1.75rem] font-bold text-ink">
+            {l.agents}
+          </h2>
+          <ul class="mt-6 flex flex-col gap-3">
+            {agents.map((a) => {
+              const Tag = a.href ? 'a' : 'div';
+              return (
+                <li>
+                  <Tag href={a.href} class="agent">
+                    <span class="agent-av" style={`background-color:${centres[a.slug].fond}`}>
+                      <Image
+                        src={avatars[a.slug]}
+                        alt=""
+                        width={56}
+                        densities={[1, 2]}
+                        class="size-14 object-contain"
+                      />
+                    </span>
+                    <span class="flex flex-1 flex-col gap-1">
+                      <span class="flex flex-wrap items-baseline gap-x-3">
+                        <b class="font-display text-[1.25rem] text-ink">{a.name}</b>
+                        <span class="font-mono text-source text-soft uppercase">{a.job}</span>
+                      </span>
+                      <span class="text-caption text-soft">{a.pitch}</span>
+                      {a.href && <span class="sr-only">{fill(l.agentLien, { name: a.name })}</span>}
+                    </span>
+                  </Tag>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )
+    }
+  </article>
+
+  <section class="px-4 pb-24 sm:px-6 lg:pb-32">
+    <div class="mx-auto max-w-site">
+      <Sorties locale={locale} public={g.public} />
+    </div>
+  </section>
+</Base>
+
+<style>
+  .retour:hover {
+    color: var(--color-orange-txt);
+  }
+  .retour:focus-visible,
+  .agent:focus-visible,
+  .question summary:focus-visible {
+    outline: 2px solid var(--color-orange-txt);
+    outline-offset: 3px;
+  }
+
+  /* Markdown body: element selectors are unavoidable here, the HTML comes from the renderer. */
+  .corps {
+    font-size: var(--text-body);
+    line-height: 1.7;
+    color: var(--color-soft);
+  }
+  .corps :global(h2) {
+    margin: 3rem 0 0.875rem;
+    font-family: var(--font-display);
+    font-size: 1.625rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: var(--color-ink);
+    text-wrap: balance;
+  }
+  .corps :global(h3) {
+    margin: 2rem 0 0.625rem;
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+  .corps :global(:is(h2, h3):first-child) {
+    margin-top: 0;
+  }
+  .corps :global(:is(p, ul, ol, blockquote)) {
+    margin: 0 0 1rem;
+  }
+  .corps :global(ul) {
+    padding-left: 1.25rem;
+    list-style: disc;
+  }
+  .corps :global(ol) {
+    padding-left: 1.25rem;
+    list-style: decimal;
+  }
+  .corps :global(li) {
+    margin-bottom: 0.4rem;
+    padding-left: 0.25rem;
+  }
+  .corps :global(li::marker) {
+    color: var(--color-orange-txt);
+  }
+  .corps :global(strong) {
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+  .corps :global(a) {
+    color: var(--color-orange-txt);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+  .corps :global(a:hover) {
+    color: var(--color-orange-hover);
+  }
+  .corps :global(blockquote) {
+    padding: 0.25rem 0 0.25rem 1.25rem;
+    border-left: 2px solid var(--color-line);
+    color: var(--color-ink);
+  }
+  /* Tables: readable on desktop, scrolling sideways in their own frame on phones (never the page). */
+  .corps :global(table) {
+    display: block;
+    max-width: 100%;
+    margin: 1.5rem 0;
+    overflow-x: auto;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-btn);
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--color-surface);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    font-variant-numeric: tabular-nums;
+  }
+  .corps :global(th) {
+    border-bottom: 1px solid var(--color-line);
+    background: var(--color-surface-2);
+    padding: 0.7rem 1rem;
+    text-align: left;
+    white-space: nowrap;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-soft);
+  }
+  .corps :global(td) {
+    min-width: 8rem;
+    border-bottom: 1px solid var(--color-line);
+    padding: 0.7rem 1rem;
+    vertical-align: top;
+    color: var(--color-ink);
+  }
+  .corps :global(tr:last-child td) {
+    border-bottom: 0;
+  }
+
+  /* FAQ: native <details>, the « + » turns into « − » when open. */
+  .question {
+    border-bottom: 1px solid var(--color-line);
+  }
+  .question summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.125rem 0;
+    cursor: pointer;
+    list-style: none;
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+  .question summary::-webkit-details-marker {
+    display: none;
+  }
+  .plus {
+    position: relative;
+    flex: none;
+    width: 14px;
+    height: 14px;
+  }
+  .plus::before,
+  .plus::after {
+    content: '';
+    position: absolute;
+    inset: 6px 0 auto;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--color-orange-txt);
+    transition: transform 0.25s var(--ease-hatch);
+  }
+  .plus::after {
+    transform: rotate(90deg);
+  }
+  .question[open] .plus::after {
+    transform: rotate(0deg);
+  }
+
+  /* The agents it names. */
+  .agent {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem 1rem 1rem;
+    border-radius: 20px;
+    background: var(--color-galet);
+    transition: box-shadow 0.3s var(--ease-hatch);
+  }
+  a.agent:hover {
+    box-shadow: inset 0 0 0 2px var(--color-orange);
+  }
+  .agent-av {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 72px;
+    height: 72px;
+    border-radius: 16px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .plus::before,
+    .plus::after,
+    .agent {
+      transition: none;
+    }
+  }
+</style>
