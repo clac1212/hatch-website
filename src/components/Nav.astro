@@ -76,8 +76,7 @@ const survol = 'hover:bg-current/10';
       <Logo class="n-logo-jour w-[80px] md:w-[92px]" />
       <Logo tone="night" class="n-logo-nuit w-[80px] md:w-[92px]" />
     </a>
-    <div class="n-pli n-liens hidden items-center lg:flex" data-pli>
-      <span class="n-sep mx-2 h-[22px] w-px shrink-0" aria-hidden="true"></span>
+    <div class="n-pli n-liens ml-4 hidden items-center lg:flex" data-pli>
       <ul class="flex items-center gap-0.5">
         {
           liens.map((l) => (
@@ -192,9 +191,6 @@ const survol = 'hover:bg-current/10';
   }
   .n-attenue {
     color: color-mix(in srgb, currentColor 68%, transparent);
-  }
-  .n-sep {
-    background: color-mix(in srgb, currentColor 20%, transparent);
   }
   /* The logos are rendered by Logo.astro, out of this component's scope. */
   #nav :global(.n-logo-nuit),
