@@ -9,16 +9,14 @@
  *      the credit request drafted on a "yes".
  *   3. Helps you decide: "worth staying open 2 to 6?", the answer with a chart.
  *   4. Does the prep work: a voice note, the temp contract filled from the template, sent on approval.
- * A bento of four cards (César 10/11: unfolded, nobody clicks; not four whole phones, too tall):
- * wide and narrow, dark and light. Each card holds its title, its text and a window on its WhatsApp
- * chat (ui/WhatsApp `nu`). Each chat plays once (~4 s) when its window comes into view, then
+ * Four rows one after the other (César 10/11: unfolded, nobody clicks; no phones, too tall): the
+ * title and text, beside them a window on the WhatsApp chat (ui/WhatsApp `nu`), sides alternating. Each chat plays once (~4 s) when its window comes into view, then
  * stays to be read and can be scrolled. Without JS or with
  * reduced motion: every chat in its final state. Situations from the Bilal interview (Robin discovery, 05/11).
  * Copy in src/content/sections/robinSituations/{fr,en}.yaml; the numbers are illustrative.
  */
 import { Image } from 'astro:assets';
 import portrait from '../../assets/portraits/robin.jpg';
-import Carte from '../ui/Carte.astro';
 import WhatsApp from '../ui/WhatsApp.astro';
 import Heure from '../ui/WhatsAppHeure.astro';
 import { section } from '../../content/section';
@@ -34,9 +32,6 @@ const { conversation, connexion, facture, decision, preparation } = t;
 
 const situations = t.situations;
 
-/** The bento: wide, narrow, then narrow, wide; dark and light cards in a checkerboard. */
-const large = (i: number) => i === 0 || i === 3;
-const sombre = (i: number) => i === 0 || i === 3;
 
 /** Heights of the voice note's waveform bars. */
 const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7, 9, 5];
@@ -47,16 +42,12 @@ const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7,
     situations.map((s, i) => {
       const h = s.moment.heure;
       return (
-        <Carte
-          as="article"
-          variante={sombre(i) ? 'nuit' : 'surface'}
-          class:list={['fn', large(i) ? 'fn-large' : 'fn-etroite']}
-        >
+        <article class:list={['fn', i % 2 === 1 && 'inverse']}>
           <div class="fn-texte">
-            <h3 class="font-display text-card font-semibold text-balance">{s.titre}</h3>
-            <p class="mt-2 max-w-lead text-body text-(--doux)">{s.texte}</p>
+            <h3 class="font-display text-section font-semibold text-balance">{s.titre}</h3>
+            <p class="mt-4 max-w-lead text-punch text-(--doux)">{s.texte}</p>
           </div>
-          <div class="fn-chat rounded-interieur">
+          <div class="fn-chat">
               <WhatsApp
                 nu
                 contact={conversation.contact}
@@ -288,7 +279,7 @@ const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7,
                 <span class="doigt" aria-hidden="true" />
               </WhatsApp>
           </div>
-        </Carte>
+        </article>
       );
     })
   }
@@ -435,45 +426,36 @@ const SCENARIOS: Record<string, Etape[]> = {
 </script>
 
 <style>
-  /* --- The bento: four cards, wide and narrow, dark and light --- */
+  /* --- Four rows one after the other: the text, the chat window beside it, sides alternating --- */
   .grille {
     display: grid;
-    gap: 16px;
+    gap: clamp(3rem, 1.5rem + 4vw, 5.5rem);
   }
-  .grille :global(.fn) {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    padding: 28px 24px 24px;
+  .fn {
+    display: grid;
+    gap: 28px;
+    align-items: center;
   }
-  .fn-texte {
-    padding-inline: 4px;
-  }
-  /* The chat window: the conversation on its wallpaper, a fixed height, inset in the card. */
+  /* The chat window: the conversation on its wallpaper, a fixed height so every row has the same
+     rhythm; the oldest messages fade out at the top as new ones arrive. */
   .fn-chat {
     /* exception: the window's height, enough for the longest exchange's last messages */
-    height: 380px;
-    margin-top: auto;
+    height: 400px;
     overflow: clip;
-    --inset: 24px; /* the card's side padding: the window's corners stay concentric */
+    border-radius: var(--radius-card);
+    corner-shape: squircle;
+    box-shadow: var(--shadow-2);
   }
   @media (width >= 64rem) {
-    .grille {
-      grid-template-columns: repeat(12, minmax(0, 1fr));
-      gap: 20px;
+    .fn {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+      gap: clamp(3rem, 6vw, 6.5rem);
     }
-    .grille :global(.fn-large) {
-      grid-column: span 7;
-    }
-    .grille :global(.fn-etroite) {
-      grid-column: span 5;
-    }
-    .grille :global(.fn) {
-      padding: 36px 32px 32px;
+    .fn.inverse .fn-texte {
+      order: 2;
     }
     .fn-chat {
-      height: 400px;
-      --inset: 32px;
+      height: 420px;
     }
   }
 
