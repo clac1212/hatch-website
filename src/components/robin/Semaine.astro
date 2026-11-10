@@ -2,12 +2,10 @@
 /**
  * "From Monday morning to Sunday night" (signature section, César 09/11, reworked 10/11). Under the
  * section title, what the day is about in one line; then Robin in the day's outfit, in a round frame
- * as in the hero, his message above him in a cream card; then the week's timeline, square pixel dots.
- * The week runs on its own, in one continuous motion: the timeline's line fills from Monday to
- * Sunday and the ring around Robin over each day; as the line reaches a day, his outfit, message and
- * line change. A click jumps to that day and the week runs on from there. The motion pauses off
- * screen and while the pointer is on Robin. With reduced motion: no run, clicks switch days.
- * Without JS: Monday.
+ * as in the hero, his message beside him in a cream card; then the week's timeline, square pixel
+ * dots. The week runs on its own, one line filling from Monday to Sunday, then again; as the line
+ * reaches a day, Robin's outfit, his message and the line change. A click jumps to a day and the
+ * week runs on from there. With reduced motion: no run, clicks switch days. Without JS: Monday.
  */
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
@@ -45,9 +43,24 @@ const horloge = (h: string) => {
     }
   </div>
 
-  <!-- Robin and his message of the day: every bubble and outfit share one cell, so the stage never
-       changes size from one day to the next. -->
+  <!-- Robin and, beside him, his message of the day: every bubble and outfit share one cell, so the
+       stage never changes size from one day to the next. -->
   <div class="scene">
+    <div class="robin" aria-hidden="true">
+      <div class="rond">
+        {
+          poses.map((src, i) => (
+            <Image
+              src={src}
+              alt=""
+              widths={[200, 400]}
+              sizes="184px"
+              class:list={['pose', i === 0 && 'on']}
+            />
+          ))
+        }
+      </div>
+    </div>
     <div class="bulles">
       {
         jours.map((j, i) => (
@@ -57,25 +70,6 @@ const horloge = (h: string) => {
           </div>
         ))
       }
-    </div>
-    <div class="robin" aria-hidden="true">
-      <svg class="anneau" viewBox="0 0 100 100">
-        <circle class="anneau-piste" cx="50" cy="50" r="49"></circle>
-        <circle class="anneau-plein" cx="50" cy="50" r="49" pathLength="100"></circle>
-      </svg>
-      <div class="rond">
-        {
-          poses.map((src, i) => (
-            <Image
-              src={src}
-              alt=""
-              widths={[320, 640]}
-              sizes="300px"
-              class:list={['pose', i === 0 && 'on']}
-            />
-          ))
-        }
-      </div>
     </div>
   </div>
 
@@ -94,8 +88,8 @@ const horloge = (h: string) => {
           tabindex={i === 0 ? 0 : -1}
         >
           <span class="point" aria-hidden="true" />
-          <span class="jour-nom font-mono text-kicker uppercase">{j.jour}</span>
-          <span class="jour-heure font-mono text-source">{horloge(j.heure)}</span>
+          <span class="jour-nom font-mono text-body uppercase">{j.jour}</span>
+          <span class="jour-heure font-mono text-caption">{horloge(j.heure)}</span>
         </button>
       ))
     }
@@ -111,7 +105,6 @@ const horloge = (h: string) => {
     const bulles = [...racine.querySelectorAll<HTMLElement>('.bulle')];
     const changent = [...bulles, ...racine.querySelectorAll<HTMLElement>('.pose, .detail')];
     const ligne = racine.querySelector<HTMLElement>('.ligne > i')!;
-    const anneau = racine.querySelector<SVGCircleElement>('.anneau-plein')!;
     const n = onglets.length;
     const reduit = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -136,15 +129,14 @@ const horloge = (h: string) => {
       const i = Math.floor(t);
       montrer(i);
       ligne.style.transform = `scaleX(${Math.min(t, n - 1) / (n - 1)})`;
-      anneau.style.strokeDashoffset = String(100 * (1 - (t - i)));
     };
     for (const sel of ['.bulle', '.pose', '.detail'])
       racine.querySelectorAll<HTMLElement>(sel).forEach((e, k) => (e.dataset.jour = String(k)));
 
-    // A click jumps to the day; the week runs on from there (with reduced motion, the ring stays full).
+    // A click jumps to the day; the week runs on from there.
     onglets.forEach((o, k) =>
       o.addEventListener('click', () => {
-        t = reduit ? k + 0.999 : k;
+        t = k;
         peindre();
       }),
     );
@@ -158,32 +150,25 @@ const horloge = (h: string) => {
       suivant.click();
     });
 
-    if (reduit) {
-      t = 0.999;
-      peindre();
-    } else {
-      let visible = false;
-      let survol = false;
+    peindre();
+    if (!reduit) {
+      // It runs once the section is first seen, then never stops.
       let avant = 0;
       const tour = (now: number) => {
-        if (visible && !survol) {
-          t = (t + (now - avant) / JOUR) % n;
-          peindre();
-        }
+        t = (t + (now - avant) / JOUR) % n;
         avant = now;
+        peindre();
         requestAnimationFrame(tour);
       };
-      const scene = racine.querySelector('.scene')!;
-      scene.addEventListener('pointerenter', () => (survol = true));
-      scene.addEventListener('pointerleave', () => (survol = false));
-      new IntersectionObserver(([e]) => (visible = e.isIntersecting), { threshold: 0.4 }).observe(
-        racine,
-      );
-      peindre();
-      requestAnimationFrame((now) => {
-        avant = now;
-        requestAnimationFrame(tour);
+      const vue = new IntersectionObserver(([e]) => {
+        if (!e.isIntersecting) return;
+        vue.disconnect();
+        requestAnimationFrame((now) => {
+          avant = now;
+          requestAnimationFrame(tour);
+        });
       });
+      vue.observe(racine);
     }
   }
 </script>
@@ -227,17 +212,16 @@ const horloge = (h: string) => {
   /* --- Robin and his bubble --- */
   .scene {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 22px;
+    justify-content: center;
+    gap: 20px;
     width: 100%;
-    margin-top: 48px;
+    margin-top: 40px;
   }
   .bulles {
     display: grid;
-    align-items: end;
-    justify-items: center;
-    width: min(100%, 27rem);
+    align-items: center;
+    flex: 0 1 24rem;
   }
   /* Robin's message, in the site's vocabulary: a cream card, its sender and time in mono, its point
      aimed at Robin. It comes in once the new outfit is there. */
@@ -263,52 +247,33 @@ const horloge = (h: string) => {
     transition-duration: 0.5s;
     transition-delay: 0.25s;
   }
+  /* Its point, on the left, aimed at Robin. */
   .bulle::after {
     content: '';
     position: absolute;
-    left: 50%;
-    top: calc(100% - 1px);
-    width: 22px;
-    height: 12px;
+    top: 50%;
+    right: calc(100% - 1px);
+    width: 12px;
+    height: 22px;
     background: inherit;
-    translate: -50% 0;
+    translate: 0 -50%;
     /* exception: the point of a speech bubble, a curved notch */
-    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 10'%3E%3Cpath d='M0 0h18c-4.2.8-7 3.8-9 10C7 3.8 4.2.8 0 0z'/%3E%3C/svg%3E")
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 18'%3E%3Cpath d='M10 0v18c-.8-4.2-3.8-7-10-9C6.2 7 9.2 4.2 10 0z'/%3E%3C/svg%3E")
       no-repeat center / 100% 100%;
   }
   .bulle-tete {
     color: var(--color-orange-txt);
     letter-spacing: 0.06em;
   }
-  /* Robin in a round frame, a fine ring around it, detached by a gap. */
+  /* Robin in a round frame, as in the hero. */
   .robin {
-    position: relative;
-    display: grid;
-    place-items: center;
+    flex: none;
     /* exception: the stage's size, the scene's one figure */
-    width: 232px;
-    aspect-ratio: 1;
-  }
-  .anneau {
-    position: absolute;
-    inset: 0;
-    rotate: -90deg;
-    fill: none;
-    stroke-width: 1.2;
-  }
-  .anneau-piste {
-    stroke: var(--filet);
-  }
-  .anneau-plein {
-    stroke: var(--color-orange);
-    stroke-linecap: round;
-    stroke-dasharray: 100;
-    stroke-dashoffset: 0;
+    width: 88px;
   }
   .rond {
     display: grid;
-    /* exception: the gap between the disc and its ring */
-    width: calc(100% - 26px);
+    width: 100%;
     aspect-ratio: 1;
     overflow: clip;
     border-radius: 999px;
@@ -340,13 +305,13 @@ const horloge = (h: string) => {
     position: relative;
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
-    width: min(100%, 48rem);
-    margin-top: 48px;
+    width: min(100%, 60rem);
+    margin-top: 56px;
   }
   /* One line from the first dot to the last (each dot sits mid-column). */
   .ligne {
     position: absolute;
-    top: 4px;
+    top: 5px;
     left: calc(100% / 12);
     right: calc(100% / 12);
     height: 2px;
@@ -383,8 +348,8 @@ const horloge = (h: string) => {
   /* exception: a square dot, the pixel of the voxel */
   .point {
     position: relative;
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
     background: var(--fond);
     box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-cream) 35%, transparent);
     transition:
@@ -409,8 +374,11 @@ const horloge = (h: string) => {
   }
 
   @media (width >= 48rem) {
+    .scene {
+      gap: 36px;
+    }
     .robin {
-      width: 272px;
+      width: 184px;
     }
   }
 
