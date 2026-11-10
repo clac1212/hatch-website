@@ -29,7 +29,6 @@ if (!entry) throw new Error(`Missing src/content/pages/security/${locale}.yaml`)
 const { hero, sections, screen } = entry.data;
 const ui = (await section('accueil', locale)).securite;
 const AGENTS: Record<'jay' | 'owl' | 'finch', ImageMetadata> = { jay, owl, finch };
-const TEINTES = { jay: 'bg-sand', owl: 'bg-stone', finch: 'bg-peach', ecran: 'bg-cream-2' };
 ---
 
 <Section id="securite" ton="orange" aria-labelledby="securite-titre">
@@ -49,15 +48,11 @@ const TEINTES = { jay: 'bg-sand', owl: 'bg-stone', finch: 'bg-peach', ecran: 'bg
     <ul class="grid gap-4 sm:grid-cols-2">
       {
         sections.map((s) => (
-          <Carte as="li" class="flex items-center gap-4 p-3 pr-5">
-            <div
-              class:list={[
-                'vignette rounded-interieur grid shrink-0 place-items-center',
-                TEINTES[s.visual],
-              ]}
-            >
+          <Carte as="li" class="flex flex-col gap-5 p-6">
+            {/* The illustration sits on the card itself, no frame of its own. */}
+            <div class="illus" aria-hidden={s.visual === 'ecran' ? 'true' : undefined}>
               {s.visual === 'ecran' ? (
-                <ul class="roles" aria-hidden="true">
+                <ul class="roles">
                   {screen.roles.map((r, k) => (
                     <li class:list={{ on: k === screen.roles.length - 1 }}>{r}</li>
                   ))}
@@ -66,15 +61,15 @@ const TEINTES = { jay: 'bg-sand', owl: 'bg-stone', finch: 'bg-peach', ecran: 'bg
                 <Picture
                   src={AGENTS[s.visual]}
                   alt={hero.alts[s.visual]}
-                  height={192}
+                  height={224}
                   densities={[1, 2]}
                   formats={['avif', 'webp']}
                   loading="lazy"
-                  class="vignette-img"
+                  class="illus-img"
                 />
               )}
             </div>
-            <div class="flex min-w-0 flex-col gap-1">
+            <div class="flex flex-col gap-1.5">
               <h3 class="font-display text-card font-semibold text-balance">{s.title}</h3>
               <p class="text-caption text-soft">{s.subtitle}</p>
             </div>
@@ -86,32 +81,30 @@ const TEINTES = { jay: 'bg-sand', owl: 'bg-stone', finch: 'bg-peach', ecran: 'bg
 </Section>
 
 <style>
-  /* The small tinted stage of each promise, concentric with its card (card radius − 12 px padding). */
-  .vignette {
-    width: 6rem;
-    aspect-ratio: 1;
-    padding: 6px;
-    overflow: hidden;
+  /* exception: the illustrations' height, one line of figures across the four cards */
+  .illus {
+    display: flex;
+    align-items: flex-end;
+    height: 7rem;
   }
-  .vignette > :global(picture) {
-    width: 100%;
+  .illus > :global(picture) {
     height: 100%;
   }
-  .vignette :global(.vignette-img) {
-    width: 100%;
+  .illus :global(.illus-img) {
+    width: auto;
     height: 100%;
     object-fit: contain;
   }
-  /* Access control: the three roles, the crew member's highlighted (scene sizes). */
+  /* The access levels, drawn as the app's role pills. */
   .roles {
     display: grid;
-    gap: 4px;
-    font: 600 10px/1 var(--font-sans);
+    gap: 5px;
+    font: 600 11px/1 var(--font-sans);
   }
   .roles li {
-    padding: 4px 8px;
+    padding: 5px 12px;
     border-radius: 999px;
-    background: var(--color-surface);
+    background: var(--color-cream-2);
     color: var(--color-soft);
     text-align: center;
     white-space: nowrap;
