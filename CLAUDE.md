@@ -73,7 +73,7 @@ pnpm format:check
   - agents presented by job first, speaking in the first person; exception: the agent pages (`/agents/<slug>`) are Patrick's copy (Notion « 08 · Pages agents »), in the third person and taken word for word (César 09/10), only the agent's `pitch` stays in the first person; except the problem block, rewritten landing-page style: a short title naming the pain, one or two concrete sentences, no « a network told us » (César 12/10);
   - every number carries a source;
   - no em dash inside a sentence, no « opérationnel en quelques minutes ».
-- Two calls to action, the classic SaaS pair (César 06/10): the demo, primary (`Button variant="orange"`, « Réserver une démo » / « Book a demo » → `/demo`, Cal.com), and access to the platform, secondary: « Se connecter » / « Log in » as a button in the home and Robin nav (`NavAccueil`, `appUrls.login`; the app's /auth page also lets a newcomer sign up), « Essayer Hatch OS » / « Try Hatch OS » as a `secondary` button in the hero (`appUrls.signup`). Every other CTA (pricing, footer, inner pages) is the demo alone. App URLs live in `appUrls` (src/i18n/ui.ts).
+- Two calls to action, the classic SaaS pair (César 06/10): the demo, primary (`Button variant="orange"`, « Réserver une démo » / « Book a demo » → `/demo`, Cal.com), and access to the platform, secondary: « Se connecter » / « Log in » as a button in the home and Robin nav (`NavAccueil`, `appUrls.login`; the app's /auth page also lets a newcomer sign up); the networks hero carries the demo alone (Patrick 10/11). Every other CTA (pricing, footer, inner pages) is the demo alone. App URLs live in `appUrls` (src/i18n/ui.ts).
 
 ## Styling (DS Hatch OS v4)
 
