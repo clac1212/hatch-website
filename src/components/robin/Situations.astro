@@ -9,14 +9,16 @@
  *      the credit request drafted on a "yes".
  *   3. Helps you decide: "worth staying open 2 to 6?", the answer with a chart.
  *   4. Does the prep work: a voice note, the temp contract filled from the template, sent on approval.
- * Four rows, text and phone alternating sides (César 10/11: unfolded, nobody clicks). Each chat
- * plays once (~4 s) when its phone comes into view and stays to be read. Without JS or with
+ * A bento of four cards (César 10/11: unfolded, nobody clicks; not four whole phones, too tall):
+ * wide and narrow, dark and light. Each card holds its title, its text and a window on its WhatsApp
+ * chat (ui/WhatsApp `nu`). Each chat plays once (~4 s) when its window comes into view, then
+ * stays to be read and can be scrolled. Without JS or with
  * reduced motion: every chat in its final state. Situations from the Bilal interview (Robin discovery, 05/11).
  * Copy in src/content/sections/robinSituations/{fr,en}.yaml; the numbers are illustrative.
  */
 import { Image } from 'astro:assets';
 import portrait from '../../assets/portraits/robin.jpg';
-import Iphone from '../ui/Iphone.astro';
+import Carte from '../ui/Carte.astro';
 import WhatsApp from '../ui/WhatsApp.astro';
 import Heure from '../ui/WhatsAppHeure.astro';
 import { section } from '../../content/section';
@@ -32,23 +34,31 @@ const { conversation, connexion, facture, decision, preparation } = t;
 
 const situations = t.situations;
 
+/** The bento: wide, narrow, then narrow, wide; dark and light cards in a checkerboard. */
+const large = (i: number) => i === 0 || i === 3;
+const sombre = (i: number) => i === 0 || i === 3;
+
 /** Heights of the voice note's waveform bars. */
 const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7, 9, 5];
 ---
 
-<div class="rangees" data-fonctions>
+<div class="grille" data-fonctions>
   {
     situations.map((s, i) => {
       const h = s.moment.heure;
       return (
-        <article class:list={['rangee', i % 2 === 1 && 'inverse']}>
-          <div class="r-texte">
-            <h3 class="font-display text-section font-semibold text-balance">{s.titre}</h3>
-            <p class="mt-4 max-w-lead text-punch text-(--doux)">{s.texte}</p>
+        <Carte
+          as="article"
+          variante={sombre(i) ? 'nuit' : 'surface'}
+          class:list={['fn', large(i) ? 'fn-large' : 'fn-etroite']}
+        >
+          <div class="fn-texte">
+            <h3 class="font-display text-card font-semibold text-balance">{s.titre}</h3>
+            <p class="mt-2 max-w-lead text-body text-(--doux)">{s.texte}</p>
           </div>
-          <div class:list={['r-scene', i % 2 === 1 ? 'teinte-b' : 'teinte-a']}>
-            <Iphone class="tel">
+          <div class="fn-chat rounded-interieur">
               <WhatsApp
+                nu
                 contact={conversation.contact}
                 statut={conversation.enLigne}
                 ecrit={conversation.ecrit}
@@ -277,9 +287,8 @@ const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7,
                 </div>
                 <span class="doigt" aria-hidden="true" />
               </WhatsApp>
-            </Iphone>
           </div>
-        </article>
+        </Carte>
       );
     })
   }
@@ -344,7 +353,8 @@ const SCENARIOS: Record<string, Etape[]> = {
   const scene = (fil: HTMLElement) => {
     const etapes = SCENARIOS[fil.dataset.situ ?? ''] ?? [];
     const ecran = fil.closest<HTMLElement>('.wai-zone')!;
-    const tete = fil.closest('.wai')!.querySelector<HTMLElement>('[data-tete]')!;
+    // The bare chat has no header: the « typing » steps then do nothing.
+    const tete = fil.closest('.wai')!.querySelector<HTMLElement>('[data-tete]');
     const doigt = ecran.querySelector<HTMLElement>('.doigt');
     const el = (nom: string) =>
       nom === 'tete' ? tete : fil.querySelector<HTMLElement>(`[data-etat="${nom}"]`);
@@ -396,7 +406,7 @@ const SCENARIOS: Record<string, Etape[]> = {
       if (reduit) {
         etapes.forEach((e) => appliquer(e, true));
         fil.querySelectorAll('.wa-choix').forEach((c) => c.classList.add('fait'));
-        tete.classList.remove('ecrit');
+        tete?.classList.remove('ecrit');
         return;
       }
       etapes.forEach((e) => window.setTimeout(() => appliquer(e), e.t));
@@ -417,51 +427,53 @@ const SCENARIOS: Record<string, Etape[]> = {
     );
     const jouer = new Map<Element, () => void>();
     racine.querySelectorAll<HTMLElement>('[data-situ]').forEach((fil) => {
-      const tel = fil.closest('.tel')!;
-      jouer.set(tel, scene(fil));
-      obs.observe(tel);
+      const fenetre = fil.closest('.fn-chat')!;
+      jouer.set(fenetre, scene(fil));
+      obs.observe(fenetre);
     });
   }
 </script>
 
 <style>
-  /* --- Four rows, text and phone, alternating sides --- */
-  .rangees {
+  /* --- The bento: four cards, wide and narrow, dark and light --- */
+  .grille {
     display: grid;
-    gap: clamp(3.5rem, 2rem + 4vw, 6rem);
+    gap: 16px;
   }
-  .rangee {
-    display: grid;
-    gap: 32px;
-    align-items: center;
+  .grille :global(.fn) {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 28px 24px 24px;
   }
-  /* The phone on a tinted panel that anchors it. */
-  .r-scene {
-    display: grid;
-    place-items: center;
-    padding: 40px 20px;
-    border-radius: var(--radius-panneau);
-    corner-shape: squircle;
+  .fn-texte {
+    padding-inline: 4px;
   }
-  .teinte-a {
-    background: var(--color-cream-2);
-  }
-  .teinte-b {
-    background: var(--color-peach-2);
-  }
-  .r-scene :global(.tel) {
-    width: min(290px, 78vw);
+  /* The chat window: the conversation on its wallpaper, a fixed height, inset in the card. */
+  .fn-chat {
+    /* exception: the window's height, enough for the longest exchange's last messages */
+    height: 380px;
+    margin-top: auto;
+    overflow: clip;
+    --inset: 24px; /* the card's side padding: the window's corners stay concentric */
   }
   @media (width >= 64rem) {
-    .rangee {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
-      gap: clamp(3rem, 6vw, 7rem);
+    .grille {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 20px;
     }
-    .rangee.inverse .r-texte {
-      order: 2;
+    .grille :global(.fn-large) {
+      grid-column: span 7;
     }
-    .r-scene {
-      padding: 48px;
+    .grille :global(.fn-etroite) {
+      grid-column: span 5;
+    }
+    .grille :global(.fn) {
+      padding: 36px 32px 32px;
+    }
+    .fn-chat {
+      height: 400px;
+      --inset: 32px;
     }
   }
 

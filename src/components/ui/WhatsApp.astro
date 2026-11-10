@@ -16,6 +16,7 @@
  * - `.wa-apercu`: a link preview; `.wa-doc`: a document row (`.wa-doc-ico.pdf | .xls`);
  * - `.wa-choix`: reply buttons under a bubble (the bubble gets `.avec-choix`), `.fait` once tapped.
  * - `[data-tete]` on the header: add `.ecrit` to show the typing status.
+ * With `nu`, only the wallpaper and the chat (no status bar, header or input bar).
  */
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
@@ -32,6 +33,11 @@ interface Props {
   /** Clock of the status bar. */
   heure?: string;
   ariaLabel?: string;
+  /**
+   * `nu`: the chat alone, without the phone's bars (a window on the wallpaper that fills its box,
+   * messages at a fixed reading size, the oldest fading out at the top as new ones arrive).
+   */
+  nu?: boolean;
 }
 const {
   contact,
@@ -42,150 +48,178 @@ const {
   nonLus = 3,
   heure = '9:41',
   ariaLabel,
+  nu = false,
 } = Astro.props;
 ---
 
-<div class="wai" aria-label={ariaLabel}>
-  <div class="wai-statut" aria-hidden="true">
-    <span class="wai-horloge">{heure}</span>
-    <span class="wai-capteurs">
-      <svg viewBox="0 0 18 12"
-        ><rect x="0" y="8" width="3" height="4" rx="1"></rect><rect
-          x="5"
-          y="5.5"
-          width="3"
-          height="6.5"
-          rx="1"></rect><rect x="10" y="3" width="3" height="9" rx="1"></rect><rect
-          x="15"
-          y="0"
-          width="3"
-          height="12"
-          rx="1"></rect></svg
-      >
-      <svg viewBox="0 0 16 12"
-        ><path
-          d="M8 2.6c2.3 0 4.4.9 6 2.4l1.1-1.2A10.2 10.2 0 0 0 8 1 10.2 10.2 0 0 0 .9 3.8L2 5c1.6-1.5 3.7-2.4 6-2.4Zm0 3.3c1.4 0 2.6.5 3.6 1.4l1.1-1.2A6.9 6.9 0 0 0 8 4.3a6.9 6.9 0 0 0-4.7 1.8l1.1 1.2c1-.9 2.2-1.4 3.6-1.4Zm0 3.2c.5 0 1 .2 1.3.5L8 11 6.7 9.6c.3-.3.8-.5 1.3-.5Z"
-        ></path></svg
-      >
-      <svg viewBox="0 0 27 12" class="wai-batterie"
-        ><rect
-          x=".5"
-          y=".5"
-          width="23"
-          height="11"
-          rx="3.5"
-          fill="none"
-          stroke="currentColor"
-          opacity=".4"></rect><rect x="2" y="2" width="17" height="8" rx="2"></rect><path
-          d="M25 4v4c.8-.3 1.3-1.1 1.3-2S25.8 4.3 25 4Z"
-          opacity=".45"></path></svg
-      >
-    </span>
-  </div>
+<div class:list={['wai', nu && 'nu']} aria-label={ariaLabel}>
+  {
+    !nu && (
+      <>
+        <div class="wai-statut" aria-hidden="true">
+          <span class="wai-horloge">{heure}</span>
+          <span class="wai-capteurs">
+            <svg viewBox="0 0 18 12">
+              <>
+                <rect x="0" y="8" width="3" height="4" rx="1" />
+                <rect x="5" y="5.5" width="3" height="6.5" rx="1" />
+                <rect x="10" y="3" width="3" height="9" rx="1" />
+                <rect x="15" y="0" width="3" height="12" rx="1" />
+              </>
+            </svg>
+            <svg viewBox="0 0 16 12">
+              <path d="M8 2.6c2.3 0 4.4.9 6 2.4l1.1-1.2A10.2 10.2 0 0 0 8 1 10.2 10.2 0 0 0 .9 3.8L2 5c1.6-1.5 3.7-2.4 6-2.4Zm0 3.3c1.4 0 2.6.5 3.6 1.4l1.1-1.2A6.9 6.9 0 0 0 8 4.3a6.9 6.9 0 0 0-4.7 1.8l1.1 1.2c1-.9 2.2-1.4 3.6-1.4Zm0 3.2c.5 0 1 .2 1.3.5L8 11 6.7 9.6c.3-.3.8-.5 1.3-.5Z" />
+            </svg>
+            <svg viewBox="0 0 27 12" class="wai-batterie">
+              <>
+                <rect
+                  x=".5"
+                  y=".5"
+                  width="23"
+                  height="11"
+                  rx="3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  opacity=".4"
+                />
+                <rect x="2" y="2" width="17" height="8" rx="2" />
+                <path d="M25 4v4c.8-.3 1.3-1.1 1.3-2S25.8 4.3 25 4Z" opacity=".45" />
+              </>
+            </svg>
+          </span>
+        </div>
 
-  <header class="wai-tete" data-tete>
-    <span class="wai-retour" aria-hidden="true">
-      <svg viewBox="0 0 12 20"
-        ><path
-          d="M10 2 2 10l8 8"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2.4"
-          stroke-linecap="round"
-          stroke-linejoin="round"></path></svg
-      >
-      <span>{nonLus}</span>
-    </span>
-    <Image src={avatar} alt="" width={40} densities={[1, 2]} class="wai-av" />
-    <span class="wai-qui">
-      <b>{contact}</b>
-      <span class="wai-st-ligne">{statut}</span>
-      <span class="wai-st-ecrit">{ecrit}</span>
-    </span>
-    <span class="wai-actions" aria-hidden="true">
-      <svg viewBox="0 0 26 18"
-        ><rect
-          x="1.2"
-          y="2"
-          width="16"
-          height="14"
-          rx="3.5"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.8"></rect><path
-          d="m18.5 7.2 5.2-3.3c.6-.4 1.4 0 1.4.8v8.6c0 .8-.8 1.2-1.4.8l-5.2-3.3"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.8"
-          stroke-linejoin="round"></path></svg
-      >
-      <svg viewBox="0 0 20 20"
-        ><path
-          d="M5.6 1.8 7.8 6c.3.6.1 1.3-.4 1.7L6.2 8.6a11 11 0 0 0 5.2 5.2l.9-1.2c.4-.5 1.1-.7 1.7-.4l4.2 2.2c.6.3.9 1 .7 1.6-.6 1.9-2.3 3.1-4.3 2.9C8 18.3 1.7 12 1.1 5.6.9 3.6 2.1 1.9 4 1.3c.6-.2 1.3.1 1.6.5Z"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.7"
-          stroke-linejoin="round"></path></svg
-      >
-    </span>
-  </header>
+        <header class="wai-tete" data-tete>
+          <span class="wai-retour" aria-hidden="true">
+            <svg viewBox="0 0 12 20">
+              <path
+                d="M10 2 2 10l8 8"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.4"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <span>{nonLus}</span>
+          </span>
+          <Image src={avatar} alt="" width={40} densities={[1, 2]} class="wai-av" />
+          <span class="wai-qui">
+            <b>{contact}</b>
+            <span class="wai-st-ligne">{statut}</span>
+            <span class="wai-st-ecrit">{ecrit}</span>
+          </span>
+          <span class="wai-actions" aria-hidden="true">
+            <svg viewBox="0 0 26 18">
+              <>
+                <rect
+                  x="1.2"
+                  y="2"
+                  width="16"
+                  height="14"
+                  rx="3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                />
+                <path
+                  d="m18.5 7.2 5.2-3.3c.6-.4 1.4 0 1.4.8v8.6c0 .8-.8 1.2-1.4.8l-5.2-3.3"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linejoin="round"
+                />
+              </>
+            </svg>
+            <svg viewBox="0 0 20 20">
+              <path
+                d="M5.6 1.8 7.8 6c.3.6.1 1.3-.4 1.7L6.2 8.6a11 11 0 0 0 5.2 5.2l.9-1.2c.4-.5 1.1-.7 1.7-.4l4.2 2.2c.6.3.9 1 .7 1.6-.6 1.9-2.3 3.1-4.3 2.9C8 18.3 1.7 12 1.1 5.6.9 3.6 2.1 1.9 4 1.3c.6-.2 1.3.1 1.6.5Z"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </span>
+        </header>
+      </>
+    )
+  }
 
   <div class="wai-zone">
     <slot />
   </div>
 
-  <div class="wai-saisie" aria-hidden="true">
-    <svg viewBox="0 0 20 20" class="wai-plus"
-      ><path
-        d="M10 3v14M3 10h14"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.9"
-        stroke-linecap="round"></path></svg
-    >
-    <span class="wai-champ">
-      <span>{saisie}</span>
-      <svg viewBox="0 0 20 20"
-        ><path
-          d="M17 11.5V5a3 3 0 0 0-3-3H5a3 3 0 0 0-3 3v9a3 3 0 0 0 3 3h6.5M17 11.5 11.5 17M17 11.5h-3.5a2 2 0 0 0-2 2V17"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.6"
-          stroke-linejoin="round"></path></svg
-      >
-    </span>
-    <svg viewBox="0 0 22 20"
-      ><path
-        d="M2 6.5c0-1.1.9-2 2-2h2.6l1.6-2.3c.2-.3.5-.4.8-.4h4c.3 0 .6.1.8.4l1.6 2.3H18c1.1 0 2 .9 2 2V16c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2Z"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.7"
-        stroke-linejoin="round"></path><circle
-        cx="11"
-        cy="11"
-        r="3.6"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.7"></circle></svg
-    >
-    <svg viewBox="0 0 16 22"
-      ><rect
-        x="4.5"
-        y="1.5"
-        width="7"
-        height="12"
-        rx="3.5"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.7"></rect><path
-        d="M1.5 10.5a6.5 6.5 0 0 0 13 0M8 17v3.5"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.7"
-        stroke-linecap="round"></path></svg
-    >
-  </div>
-  <span class="wai-accueil" aria-hidden="true"></span>
+  {
+    !nu && (
+      <>
+        <div class="wai-saisie" aria-hidden="true">
+          <svg viewBox="0 0 20 20" class="wai-plus">
+            <path
+              d="M10 3v14M3 10h14"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+            />
+          </svg>
+          <span class="wai-champ">
+            <span>{saisie}</span>
+            <svg viewBox="0 0 20 20">
+              <path
+                d="M17 11.5V5a3 3 0 0 0-3-3H5a3 3 0 0 0-3 3v9a3 3 0 0 0 3 3h6.5M17 11.5 11.5 17M17 11.5h-3.5a2 2 0 0 0-2 2V17"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </span>
+          <svg viewBox="0 0 22 20">
+            <>
+              <path
+                d="M2 6.5c0-1.1.9-2 2-2h2.6l1.6-2.3c.2-.3.5-.4.8-.4h4c.3 0 .6.1.8.4l1.6 2.3H18c1.1 0 2 .9 2 2V16c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2Z"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+              />
+              <circle
+                cx="11"
+                cy="11"
+                r="3.6"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+              />
+            </>
+          </svg>
+          <svg viewBox="0 0 16 22">
+            <>
+              <rect
+                x="4.5"
+                y="1.5"
+                width="7"
+                height="12"
+                rx="3.5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+              />
+              <path
+                d="M1.5 10.5a6.5 6.5 0 0 0 13 0M8 17v3.5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+              />
+            </>
+          </svg>
+        </div>
+        <span class="wai-accueil" aria-hidden="true" />
+      </>
+    )
+  }
 </div>
 
 <style>
@@ -306,6 +340,26 @@ const {
     position: relative;
     flex: 1;
     min-height: 0;
+  }
+
+  /* The chat alone: fills its box at reading size; what scrolls past fades out at the top. */
+  .wai.nu {
+    position: relative;
+    inset: auto;
+    height: 100%;
+    font-size: 15px; /* exception: the bare chat is read on the page, not inside a scaled phone */
+    border-radius: inherit;
+  }
+  /* Bubbles keep a phone's measure, even in a wide window. */
+  .wai.nu :global(.b) {
+    max-width: min(80%, 23em);
+  }
+  .wai.nu :global(.b.avec-choix),
+  .wai.nu :global(.wa-choix) {
+    width: min(80%, 21em);
+  }
+  .wai.nu .wai-zone {
+    mask-image: linear-gradient(to bottom, transparent, var(--color-black) 3em);
   }
 
   /* Input bar and home indicator. */
