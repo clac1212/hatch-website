@@ -61,7 +61,6 @@ semaine:
 canaux:
   titre: 'Right where you already are.'
   texte: "During the beta, Robin lives in WhatsApp. Later, he'll have his own app, built for him, always within reach."
-  indice: 'The phone is yours: go back to the chats, open others.'
   telephone:
     ariaLabel: 'WhatsApp on Karim’s phone, his chat with Robin open'
     app:
@@ -79,9 +78,29 @@ canaux:
         statut: 'online'
         epingle: true
         nonLus: 0
-        jour: 'Today'
         messages:
+          - jour: 'Thursday'
+            qui: in
+            txt: 'Beef went up 8% at Metro. Your tartare drops below your target margin: 64% instead of 70%.'
+            heure: '3:05 PM'
+          - qui: out
+            txt: 'Give me options'
+            heure: '3:20 PM'
           - qui: in
+            txt: 'Two: price it at €17.50, or serve 160 g instead of 180 g. Either puts you back at 70%.'
+            heure: '3:21 PM'
+          - qui: out
+            txt: '€17.50, I’ll change the menu'
+            heure: '3:34 PM'
+          - jour: 'Yesterday'
+            qui: in
+            txt: 'You asked whether to stay open from 2 to 6 pm: on weekdays, that slot doesn’t cover the wages. Talk tomorrow?'
+            heure: '9:00 PM'
+          - qui: out
+            txt: 'Yes, tomorrow 👍'
+            heure: '9:42 PM'
+          - jour: 'Today'
+            qui: in
             txt: 'Morning Karim, here’s your weekly recap. I matched deliveries and invoices: Metro is 2 kg of beef short, the credit note request is ready.'
             heure: '8:30 AM'
           - qui: out
@@ -97,9 +116,9 @@ canaux:
         avatar: groupe
         statut: 'Inès, Lina, Thomas, you'
         nonLus: 2
-        jour: 'Today'
         messages:
-          - qui: in
+          - jour: 'Today'
+            qui: in
             auteur: 'Inès'
             txt: 'Metro delivery’s in, putting it away 📦'
             heure: '7:52 AM'
@@ -111,18 +130,18 @@ canaux:
         avatar: personne
         statut: 'online'
         nonLus: 1
-        jour: 'Today'
         messages:
-          - qui: in
+          - jour: 'Today'
+            qui: in
             txt: 'Contract signed ✍️ See you Saturday!'
             heure: '9:12 AM'
       - nom: 'Sylvain · Accountant'
         avatar: personne
         statut: 'last seen today at 8:05 AM'
         nonLus: 1
-        jour: 'Today'
         messages:
-          - qui: out
+          - jour: 'Today'
+            qui: out
             txt: 'Here are the October books, prepared by Robin.'
             heure: '7:58 AM'
           - qui: in
@@ -132,18 +151,18 @@ canaux:
         avatar: entreprise
         statut: 'Business account'
         nonLus: 0
-        jour: 'Today'
         messages:
-          - qui: in
+          - jour: 'Today'
+            qui: in
             txt: 'Your credit note request (beef, 2 kg) has been accepted. It will show on your next invoice.'
             heure: '9:05 AM'
       - nom: 'Peep'
         avatar: peep
         statut: 'Hatch OS agent'
         nonLus: 1
-        jour: 'Yesterday'
         messages:
-          - qui: in
+          - jour: 'Yesterday'
+            qui: in
             txt: 'Psst. The day you open a second restaurant, I’ll take care of your teams 😉'
             heure: '10:47 PM'
             lien:
@@ -155,9 +174,9 @@ canaux:
         avatar: owl
         statut: 'Hatch OS agent'
         nonLus: 0
-        jour: 'Yesterday'
         messages:
-          - qui: out
+          - jour: 'Yesterday'
+            qui: out
             txt: 'Owl, you there?'
             heure: '8:14 PM'
           - qui: in
@@ -167,9 +186,9 @@ canaux:
         avatar: personne
         statut: 'last seen yesterday at 11:02 PM'
         nonLus: 1
-        jour: 'Yesterday'
         messages:
-          - qui: in
+          - jour: 'Yesterday'
+            qui: in
             txt: 'When are you eating? Not just sandwiches standing up ❤️'
             heure: '11:02 PM'
 

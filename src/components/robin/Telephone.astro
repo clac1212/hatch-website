@@ -1,8 +1,8 @@
 ---
 /**
  * Karim's phone (Robin page, « Sur WhatsApp », César 10/11): a WhatsApp you can browse. It opens on
- * the chat with Robin, which plays once when the phone comes into view (he types, the messages come
- * in). The back chevron leads to the chats list (ui/WhatsAppDiscussions): the people around a
+ * the chat with Robin: the days before are there (scroll up), today's messages play once when the
+ * phone comes into view (he types, they come in). The back chevron leads to the chats list (ui/WhatsAppDiscussions): the people around a
  * restaurant (the team, the extra, the accountant, Metro, his mum) and two Hatch agents as easter
  * eggs, Peep pointing to Hatch for networks, Owl busy during service. Tapping a chat slides it in
  * from the right as on iOS; opening it clears its unread badge.
@@ -32,6 +32,8 @@ const { app } = telephone;
 const PORTRAITS: Record<string, ImageMetadata> = { robin, peep, owl };
 const discussions = telephone.discussions.map((d, i) => {
   const dernier = d.messages.at(-1)!;
+  /** The day of the last messages: the last date chip. */
+  const jour = d.messages.findLast((m) => m.jour)!.jour!;
   return {
     ...d,
     id: `wa-${i}`,
@@ -40,7 +42,7 @@ const discussions = telephone.discussions.map((d, i) => {
     apercu: dernier.txt,
     auteur: dernier.auteur,
     sortant: dernier.qui === 'out',
-    quand: d.jour === app.aujourdhui ? dernier.heure : d.jour,
+    quand: jour === app.aujourdhui ? dernier.heure : jour,
   };
 });
 /** Unread chats, as the back chevron of an open chat counts them (the open one excluded). */
@@ -78,41 +80,43 @@ const nonLuesSauf = (id: string) => discussions.filter((d) => d.id !== id && d.n
               retour={app.retour}
             >
               <div class="wa-fil" data-fil={i === 0 ? 'joue' : undefined}>
-                <span class="wa-jour">{d.jour}</span>
                 {d.messages.map((m, k) => (
-                  <div
-                    class:list={[
-                      'b',
-                      m.qui,
-                      m.qui !== d.messages[k + 1]?.qui && 'fin',
-                      m.auteur && 'avec-auteur',
-                    ]}
-                  >
-                    {m.auteur && <b class="wa-auteur">{m.auteur}</b>}
-                    {m.lien && (
-                      <a class="wa-apercu" href={m.lien.url}>
-                        <Image src={hatch} alt="" width={64} densities={[1, 2]} />
-                        <span>
-                          <b>{m.lien.titre}</b>
-                          <span>{m.lien.sousTitre}</span>
-                          <span class="dom">{m.lien.domaine}</span>
+                  <>
+                    {m.jour && <span class="wa-jour">{m.jour}</span>}
+                    <div
+                      class:list={[
+                        'b',
+                        m.qui,
+                        (m.qui !== d.messages[k + 1]?.qui || d.messages[k + 1]?.jour) && 'fin',
+                        m.auteur && 'avec-auteur',
+                      ]}
+                    >
+                      {m.auteur && <b class="wa-auteur">{m.auteur}</b>}
+                      {m.lien && (
+                        <a class="wa-apercu" href={m.lien.url}>
+                          <Image src={hatch} alt="" width={64} densities={[1, 2]} />
+                          <span>
+                            <b>{m.lien.titre}</b>
+                            <span>{m.lien.sousTitre}</span>
+                            <span class="dom">{m.lien.domaine}</span>
+                          </span>
+                        </a>
+                      )}
+                      {m.doc && (
+                        <span class="wa-doc">
+                          <span class="wa-doc-ico pdf">
+                            <span>PDF</span>
+                          </span>
+                          <span>
+                            <span>{m.doc.nom}</span>
+                            <span class="meta">{m.doc.meta}</span>
+                          </span>
                         </span>
-                      </a>
-                    )}
-                    {m.doc && (
-                      <span class="wa-doc">
-                        <span class="wa-doc-ico pdf">
-                          <span>PDF</span>
-                        </span>
-                        <span>
-                          <span>{m.doc.nom}</span>
-                          <span class="meta">{m.doc.meta}</span>
-                        </span>
-                      </span>
-                    )}
-                    {m.txt}
-                    <Heure heure={m.heure} lu={m.qui === 'out'} />
-                  </div>
+                      )}
+                      {m.txt}
+                      <Heure heure={m.heure} lu={m.qui === 'out'} />
+                    </div>
+                  </>
                 ))}
               </div>
             </WhatsApp>
@@ -187,7 +191,9 @@ const nonLuesSauf = (id: string) => discussions.filter((d) => d.id !== id && d.n
     // Robin's chat plays once, the first time the phone is in view: he types, each message comes in.
     const fil = racine.querySelector<HTMLElement>('[data-fil="joue"]')!;
     const tete = fil.closest('.wai')!.querySelector('[data-tete]')!;
-    const bulles = [...fil.querySelectorAll<HTMLElement>('.b')];
+    // Only today's messages play (after the last date chip); the days before are already there.
+    const bulles = [...fil.querySelectorAll<HTMLElement>('.wa-jour:last-of-type ~ .b')];
+    fil.scrollTop = fil.scrollHeight;
     if (!reduit) {
       bulles.forEach((b) => b.classList.add('attend'));
       const vue = new IntersectionObserver(
@@ -215,10 +221,11 @@ const nonLuesSauf = (id: string) => discussions.filter((d) => d.id !== id && d.n
 </script>
 
 <style>
+  /* A fixed width, so a content-sized grid column around it gets its size. */
   .telephone {
-    width: 100%;
     /* exception: the phone's width, the mock-up read at a glance */
-    max-width: 340px;
+    width: 340px;
+    max-width: 100%;
   }
   .app {
     position: absolute;

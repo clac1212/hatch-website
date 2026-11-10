@@ -392,6 +392,10 @@ const Retour = retour ? 'button' : 'span';
     font-weight: 500;
     color: var(--color-whatsapp-meta);
   }
+  /* Only the first chip pushes a short chat down; the next days follow on. */
+  .wai :global(.wa-jour ~ .wa-jour) {
+    margin-top: 0.55em;
+  }
 
   .wai :global(.b) {
     position: relative;

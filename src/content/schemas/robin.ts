@@ -44,8 +44,6 @@ export const schema = z.strictObject({
   canaux: z.strictObject({
     titre: texte,
     texte,
-    /** The line that invites to browse the phone. */
-    indice: texte,
     telephone: z.strictObject({
       ariaLabel: texte,
       /** WhatsApp's own words: the chats list, its filters, the tab bar. */
@@ -71,10 +69,11 @@ export const schema = z.strictObject({
             statut: texte,
             epingle: z.boolean().optional(),
             nonLus: z.number().int().min(0),
-            jour: texte,
+            /** Each day opens with its date chip (`jour`), the first message included. */
             messages: z
               .array(
                 z.strictObject({
+                  jour: texte.optional(),
                   qui: z.enum(['in', 'out']),
                   /** In a group: who wrote it. */
                   auteur: texte.optional(),
@@ -88,7 +87,8 @@ export const schema = z.strictObject({
                     .optional(),
                 }),
               )
-              .min(1),
+              .min(1)
+              .refine((m) => m[0].jour, 'the first message opens its day (jour)'),
           }),
         )
         .min(2),

@@ -61,7 +61,6 @@ semaine:
 canaux:
   titre: 'Là où vous êtes déjà.'
   texte: 'Pendant la bêta, Robin vit dans WhatsApp. Ensuite, il aura sa propre application, pensée pour lui, toujours à portée de main.'
-  indice: 'Le téléphone est à vous : revenez aux discussions, ouvrez-en d’autres.'
   telephone:
     ariaLabel: 'WhatsApp sur le téléphone de Karim, sa discussion avec Robin ouverte'
     app:
@@ -79,9 +78,29 @@ canaux:
         statut: 'en ligne'
         epingle: true
         nonLus: 0
-        jour: "Aujourd'hui"
         messages:
+          - jour: 'Jeudi'
+            qui: in
+            txt: 'Le bœuf a pris 8 % chez Metro. Ton tartare passe sous ta marge cible : 64 % au lieu de 70 %.'
+            heure: '15:05'
+          - qui: out
+            txt: 'Propose-moi quelque chose'
+            heure: '15:20'
           - qui: in
+            txt: 'Deux pistes : le passer à 17,50 €, ou le servir en 160 g au lieu de 180 g. Les deux te remettent à 70 %.'
+            heure: '15:21'
+          - qui: out
+            txt: '17,50 €, je change la carte'
+            heure: '15:34'
+          - jour: 'Hier'
+            qui: in
+            txt: 'Tu me demandais si on reste ouvert de 14 h à 18 h : en semaine, le créneau ne couvre pas les salaires. On en parle demain ?'
+            heure: '21:00'
+          - qui: out
+            txt: 'Oui, demain 👍'
+            heure: '21:42'
+          - jour: "Aujourd'hui"
+            qui: in
             txt: 'Bonjour Karim, voici le point de la semaine. J’ai rapproché les livraisons et les factures : il manque 2 kg de bœuf chez Metro, la demande d’avoir est prête.'
             heure: '08:30'
           - qui: out
@@ -97,9 +116,9 @@ canaux:
         avatar: groupe
         statut: 'Inès, Lina, Thomas, vous'
         nonLus: 2
-        jour: "Aujourd'hui"
         messages:
-          - qui: in
+          - jour: "Aujourd'hui"
+            qui: in
             auteur: 'Inès'
             txt: 'Livraison Metro arrivée, je range 📦'
             heure: '07:52'
@@ -111,18 +130,18 @@ canaux:
         avatar: personne
         statut: 'en ligne'
         nonLus: 1
-        jour: "Aujourd'hui"
         messages:
-          - qui: in
+          - jour: "Aujourd'hui"
+            qui: in
             txt: 'Contrat signé ✍️ À samedi !'
             heure: '09:12'
       - nom: 'Sylvain · Expert-comptable'
         avatar: personne
         statut: 'vu aujourd’hui à 08:05'
         nonLus: 1
-        jour: "Aujourd'hui"
         messages:
-          - qui: out
+          - jour: "Aujourd'hui"
+            qui: out
             txt: 'Voilà la compta d’octobre, préparée par Robin.'
             heure: '07:58'
           - qui: in
@@ -132,18 +151,18 @@ canaux:
         avatar: entreprise
         statut: 'Compte professionnel'
         nonLus: 0
-        jour: "Aujourd'hui"
         messages:
-          - qui: in
+          - jour: "Aujourd'hui"
+            qui: in
             txt: 'Votre demande d’avoir (bœuf, 2 kg) a été acceptée. Il apparaîtra sur votre prochaine facture.'
             heure: '09:05'
       - nom: 'Peep'
         avatar: peep
         statut: 'Agent Hatch OS'
         nonLus: 1
-        jour: 'Hier'
         messages:
-          - qui: in
+          - jour: 'Hier'
+            qui: in
             txt: 'Psst. Le jour où tu ouvres un deuxième resto, je m’occupe de tes équipes 😉'
             heure: '22:47'
             lien:
@@ -155,9 +174,9 @@ canaux:
         avatar: owl
         statut: 'Agent Hatch OS'
         nonLus: 0
-        jour: 'Hier'
         messages:
-          - qui: out
+          - jour: 'Hier'
+            qui: out
             txt: 'Owl, t’es là ?'
             heure: '20:14'
           - qui: in
@@ -167,9 +186,9 @@ canaux:
         avatar: personne
         statut: 'vu hier à 23:02'
         nonLus: 1
-        jour: 'Hier'
         messages:
-          - qui: in
+          - jour: 'Hier'
+            qui: in
             txt: 'Tu manges quand ? Pas que des sandwichs debout hein ❤️'
             heure: '23:02'
 

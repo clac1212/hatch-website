@@ -158,11 +158,11 @@ const champs = [
 
     <!-- 5 · Where to find him: the WhatsApp phone (no app yet) -->
     <Section id="canaux" ton="cream-2">
-      <div class="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-        <div>
-          <EnTete titre={canaux.titre} intro={canaux.texte} />
-          <p class="mt-6 text-caption text-(--doux)">{canaux.indice}</p>
-        </div>
+      <!-- The text and the phone side by side, as one group in the middle of the page. -->
+      <div
+        class="grid items-center justify-center gap-12 lg:grid-cols-[minmax(0,30rem)_auto] lg:gap-24"
+      >
+        <EnTete titre={canaux.titre} intro={canaux.texte} />
         <div class="flex justify-center">
           <Telephone locale={locale} />
         </div>
