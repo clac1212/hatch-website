@@ -216,6 +216,17 @@
   padding-bottom: clamp(4rem, 2.6rem + 4.4vw, 7rem);
 }
 
+/* The orange's grain (César 10/11): a fine noise, drawn by the browser (SVG fractal noise) so it stays
+   sharp at every size and density, tiled, blended soft-light into the flat orange so the color itself
+   does not move. Used by layout/Section (ton="orange") and the security page's hero. */
+@utility fond-grain {
+  background-color: var(--color-orange);
+  /* exception: the noise tile, a filter and not a color */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 1'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='1.15' intercept='-.075'/%3E%3CfeFuncG type='linear' slope='1.15' intercept='-.075'/%3E%3CfeFuncB type='linear' slope='1.15' intercept='-.075'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 200px;
+  background-blend-mode: soft-light;
+}
+
 /* Container of the agent pages: 1280 px of content at 1440, as in the Pencil mock-ups. */
 @utility wrap-agent {
   width: 100%;

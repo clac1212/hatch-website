@@ -5,7 +5,6 @@ import type { ImageMetadata } from 'astro';
 import Base from '../layouts/Base.astro';
 import Button from '../components/ui/Button.astro';
 import Ipad from '../components/ui/Ipad.astro';
-import { fondOrange } from '../components/layout/fond';
 import jay from '../assets/securite/jay.png';
 import owl from '../assets/securite/owl.png';
 import finch from '../assets/securite/finch.png';
@@ -35,7 +34,6 @@ const entry = await getEntry('securityPage', locale);
 if (!entry) throw new Error(`Missing src/content/pages/security/${locale}.yaml`);
 const { seo, hero, sections, screen, contact } = entry.data;
 const wrap = 'mx-auto w-full max-w-site px-6 md:px-12';
-const grain = await fondOrange();
 const AGENTS: Record<'jay' | 'owl' | 'finch', ImageMetadata> = { jay, owl, finch };
 /** Tint behind each agent, from the warm side of the palette (as the agent cards of the home). */
 const TEINTES = { jay: 'bg-sand', owl: 'bg-stone', finch: 'bg-peach' };
@@ -44,7 +42,7 @@ const num = (i: number) => String(i + 1).padStart(2, '0');
 ---
 
 <Base locale={locale} paths={routes.security} title={seo.title} description={seo.description}>
-  <header class="bg-orange bg-cover bg-center pt-32 pb-16 md:pt-40 md:pb-20" style={grain}>
+  <header class="fond-grain pt-32 pb-16 md:pt-40 md:pb-20">
     <div class:list={[wrap, 'flex flex-col items-start gap-6']} data-rv-groupe>
       <p class="font-mono text-kicker text-night uppercase" data-rv>{hero.kicker}</p>
       <h1 class="max-w-[16ch] font-display text-h1 font-semibold text-night" data-rv>
