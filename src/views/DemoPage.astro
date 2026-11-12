@@ -87,7 +87,6 @@ const portraits = { peep, owl, jay, lark, finch, pecker, sparrow };
                 id={`d-${o.id}`}
                 name="agents"
                 value={valeur(o)}
-                checked={o.id === 'socle'}
                 class="sr-only"
               />
               <span class="troupe" aria-hidden="true">
@@ -152,13 +151,21 @@ const portraits = { peep, owl, jay, lark, finch, pecker, sparrow };
         </h2>
         <p class="text-caption text-muted">{d.agendaHint}</p>
       </div>
-      <div class="relative mt-4 min-h-[650px]">
+      <div id="cal-zone" class="relative mt-4 min-h-[650px]">
         <p
           id="cal-attente"
           class="absolute inset-x-0 top-24 text-center font-mono text-caption text-muted uppercase"
           aria-live="polite"
         >
           {d.agendaFallback}
+        </p>
+        <!-- Until something is ticked above, no slot can be booked. -->
+        <p
+          id="cal-verrou"
+          class="mx-auto max-w-[420px] px-4 py-14 text-center text-body text-soft"
+          hidden
+        >
+          {d.agents.verrou}
         </p>
         <div
           id="cal-inline"
@@ -167,7 +174,7 @@ const portraits = { peep, owl, jay, lark, finch, pecker, sparrow };
         >
         </div>
       </div>
-      <p class="px-2 pt-3 text-caption">
+      <p id="cal-lien" class="px-2 pt-3 text-caption">
         <a
           href={`https://cal.com/${calLink}`}
           target="_blank"
@@ -448,7 +455,7 @@ const portraits = { peep, owl, jay, lark, finch, pecker, sparrow };
   if (base.notes) choix.hidden = true;
   const cases = [...choix.querySelectorAll<HTMLInputElement>('input[name="agents"]')];
   const inconnu = choix.querySelector<HTMLInputElement>('input[name="agents-inconnu"]')!;
-  // A hidden step adds nothing (its Core is checked by default, the pricing form already chose).
+  // A hidden step adds nothing: the pricing form already sent its choice in the notes.
   const choisis = () =>
     choix.hidden
       ? []
@@ -457,9 +464,24 @@ const portraits = { peep, owl, jay, lark, finch, pecker, sparrow };
         : cases.filter((c) => c.checked).map((c) => c.value);
 
   /** (Re)draws the agenda with the current answers: Cal.com reads its prefill only on load. */
+  const attente = document.getElementById('cal-attente')!;
+  const verrouAgenda = document.getElementById('cal-verrou')!;
+  const lienAgenda = document.getElementById('cal-lien')!;
+  const zone = document.getElementById('cal-zone')!;
+  let charge = false; // the agenda loaded once: no more « loading » line over it
   const monter = () => {
     const config = { ...base };
     const liste = choisis().join(', ');
+    // No choice yet (and the step is shown): the agenda stays closed, so nobody books blind.
+    const ferme = !choix.hidden && !liste;
+    verrouAgenda.hidden = !ferme;
+    zone.classList.toggle('min-h-[650px]', !ferme);
+    lienAgenda.hidden = ferme;
+    attente.hidden = ferme || charge;
+    if (ferme) {
+      el.replaceChildren();
+      return;
+    }
     if (liste) {
       config.agents = liste;
       const ligne = `${choix.dataset.note} ${liste}`;
@@ -482,15 +504,15 @@ const portraits = { peep, owl, jay, lark, finch, pecker, sparrow };
   socle.addEventListener('click', (ev) => {
     if (carteSocle.classList.contains('verrou')) ev.preventDefault();
   });
-  let attente: number | undefined;
+  let delai: number | undefined;
   choix.addEventListener('change', (ev) => {
     const cible = ev.target as HTMLInputElement;
     // « Not sure yet » and the offers exclude each other (the Core included).
     if (cible === inconnu && inconnu.checked) cases.forEach((c) => (c.checked = false));
     if (cible !== inconnu && cible.checked) inconnu.checked = false;
     verrouiller();
-    clearTimeout(attente);
-    attente = window.setTimeout(monter, 500);
+    clearTimeout(delai);
+    delai = window.setTimeout(monter, 500);
   });
   verrouiller();
   monter();
@@ -590,7 +612,10 @@ const portraits = { peep, owl, jay, lark, finch, pecker, sparrow };
   });
   Cal('on', {
     action: 'linkReady',
-    callback: () => document.getElementById('cal-attente')?.remove(),
+    callback: () => {
+      charge = true;
+      attente.hidden = true;
+    },
   });
   // The site's conversion: Cal.com confirmed the booking.
   Cal('on', {

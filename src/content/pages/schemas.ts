@@ -29,6 +29,8 @@ export const demoPage = z.strictObject({
     inconnu: z.string(),
     /** Line written in the booking notes, followed by the picked agents. */
     note: z.string(),
+    /** Shown in place of the agenda until at least one choice is ticked. */
+    verrou: z.string(),
   }),
 });
 
