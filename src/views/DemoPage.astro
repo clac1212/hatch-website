@@ -1,8 +1,13 @@
 ---
 import { getEntry } from 'astro:content';
-import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
-import { avatars } from '../components/pages/agent-visuels';
+import peep from '../assets/portraits/peep.jpg';
+import owl from '../assets/portraits/owl.jpg';
+import jay from '../assets/portraits/jay.jpg';
+import lark from '../assets/portraits/lark.jpg';
+import finch from '../assets/portraits/finch.jpg';
+import pecker from '../assets/portraits/pecker.jpg';
+import sparrow from '../assets/portraits/sparrow.jpg';
 import { section } from '../content/section';
 import { routes, type Locale } from '../i18n/ui';
 
@@ -27,6 +32,8 @@ const c = await section('tarifsFormulaire', locale);
 /** What the booking receives for each offer: the Core spelled out with its four agents. */
 const valeur = (o: (typeof c.offres)[number]) =>
   o.id === 'socle' ? `${c.notes.socle} (${o.agents.map((ag) => ag.nom).join(', ')})` : o.nom;
+/** As in the pricing form, each agent faces us in a circle and waves when its offer is checked. */
+const portraits = { peep, owl, jay, lark, finch, pecker, sparrow };
 ---
 
 <Base locale={locale} paths={routes.demo} title={d.seo.title} description={d.seo.description}>
@@ -51,13 +58,27 @@ const valeur = (o: (typeof c.offres)[number]) =>
       data-note={d.agents.note}
     >
       <legend class="sr-only">{d.agents.titre}</legend>
-      <div class="flex flex-col gap-1 px-1" aria-hidden="true">
-        <p class="font-display text-[24px] leading-tight font-bold text-ink md:text-[28px]">
-          {d.agents.titre}
-        </p>
-        <p class="text-caption text-soft">{d.agents.aide}</p>
+      <div class="flex items-start justify-between gap-4 px-1">
+        <div class="flex flex-col gap-1" aria-hidden="true">
+          <p class="font-display text-[24px] leading-tight font-bold text-ink md:text-[28px]">
+            {d.agents.titre}
+          </p>
+          <p class="text-caption text-soft">{d.agents.aide}</p>
+        </div>
+        <button
+          type="button"
+          class="anim-pause"
+          data-anim-pause
+          data-label-pause={c.pause.pause}
+          data-label-reprendre={c.pause.reprendre}
+          aria-pressed="false"
+          hidden
+        >
+          <span class="ap-ico" aria-hidden="true"></span>
+          <span class="sr-only" data-anim-label>{c.pause.pause}</span>
+        </button>
       </div>
-      <div class="mt-5 grid gap-3 sm:grid-cols-3">
+      <div class="mt-5 grid gap-3 sm:grid-cols-3" data-equipe>
         {
           c.offres.map((o) => (
             <label class:list={['choix', o.id === 'socle' && 'socle sm:col-span-3']}>
@@ -69,24 +90,26 @@ const valeur = (o: (typeof c.offres)[number]) =>
                 checked={o.id === 'socle'}
                 class="sr-only"
               />
-              {o.id === 'socle' && (
-                <span class="troupe" aria-hidden="true">
-                  {o.agents.map((ag) => (
-                    <span class="membre">
-                      <Image
-                        src={avatars[ag.id]}
-                        alt=""
-                        width={64}
-                        densities={[1, 2]}
-                        class="rond"
+              <span class="troupe" aria-hidden="true">
+                {o.agents.map((ag, k) => (
+                  <span class="membre" style={`--k:${k}`}>
+                    <span class="rond">
+                      <video
+                        src={`/anim/${ag.id}-geste.mp4`}
+                        poster={portraits[ag.id].src}
+                        muted
+                        playsinline
+                        preload="none"
                       />
+                    </span>
+                    {o.id === 'socle' && (
                       <span class="membre-nom">
                         <b>{ag.nom}</b> {ag.role}
                       </span>
-                    </span>
-                  ))}
-                </span>
-              )}
+                    )}
+                  </span>
+                ))}
+              </span>
               <span class="flex min-w-0 flex-col gap-1">
                 {(o.id === 'finch' || o.id === 'pecker') && (
                   <span class="avec-socle">
@@ -186,12 +209,10 @@ const valeur = (o: (typeof c.offres)[number]) =>
     outline: 2px solid var(--color-orange-txt);
     outline-offset: 3px;
   }
-  /* The Core: its four agents in a row, text beside them on wide screens, below otherwise. */
+  /* Agents face us, each in a circle; when their offer is checked, they rise a little and wave. */
   .troupe {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 8px;
-    max-width: 360px;
+    display: flex;
+    gap: 18px;
     margin-right: 30px; /* room for the check mark, top right */
   }
   .membre {
@@ -199,36 +220,38 @@ const valeur = (o: (typeof c.offres)[number]) =>
     min-width: 0;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
   }
   .rond {
+    display: block;
+    width: 84px;
+    height: 84px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--color-cream-2);
+    box-shadow: 0 0 0 3px var(--color-surface);
+    transition: translate 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--k) * 60ms);
+  }
+  .rond video {
     width: 100%;
-    max-width: 64px;
-    height: auto;
-    aspect-ratio: 1;
-    object-fit: contain;
+    height: 100%;
+    object-fit: cover;
+  }
+  .choix:has(input:checked) .rond {
+    translate: 0 -4px;
   }
   .membre-nom {
-    font-size: 12px;
+    font-size: 12.5px;
     line-height: 1.25;
     text-align: center;
     color: var(--color-soft);
   }
   .membre-nom b {
     display: block;
-    font-size: 13.5px;
+    font-size: 14px;
     color: var(--color-ink);
   }
-  @media (max-width: 30rem) {
-    /* Phone: the four share the card width (the check mark sits above the text column). */
-    .troupe {
-      gap: 4px;
-      margin-right: 26px;
-    }
-    .membre-nom {
-      font-size: 11px;
-    }
-  }
+  /* The Core: the four in a row, text beside them on wide screens, below otherwise. */
   @media (min-width: 64rem) {
     .socle {
       flex-direction: row;
@@ -238,9 +261,68 @@ const valeur = (o: (typeof c.offres)[number]) =>
     }
     .socle .troupe {
       flex: none;
-      width: 340px;
       margin-right: 0;
     }
+  }
+  @media (max-width: 30rem) {
+    /* Phone: the four of the Core share the card width, names wrap under their circle. */
+    .socle .troupe {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 4px;
+      margin-right: 26px;
+    }
+    .socle .rond {
+      width: 100%;
+      max-width: 64px;
+      height: auto;
+      aspect-ratio: 1;
+    }
+    .socle .membre-nom {
+      font-size: 11px;
+    }
+    .socle .membre-nom b {
+      font-size: 12.5px;
+    }
+  }
+  /* Discreet pause for the waves, icon only (its label is for screen readers), like the
+     pricing form's. */
+  .anim-pause {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1px var(--color-line);
+    color: var(--color-soft);
+    cursor: pointer;
+  }
+  .anim-pause[hidden] {
+    display: none;
+  }
+  .anim-pause:hover,
+  .anim-pause:focus-visible {
+    color: var(--color-ink);
+  }
+  .anim-pause:focus-visible {
+    outline: 2px solid var(--color-orange-txt);
+    outline-offset: 2px;
+  }
+  .ap-ico {
+    width: 8px;
+    height: 9px;
+    border-left: 3px solid currentColor;
+    border-right: 3px solid currentColor;
+  }
+  .anim-pause[aria-pressed='true'] .ap-ico {
+    width: 0;
+    height: 0;
+    border-left: 8px solid currentColor;
+    border-right: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
   }
   /* Finch and Pecker add to the Core; the locked Core says so. */
   .avec-socle {
@@ -292,7 +374,8 @@ const valeur = (o: (typeof c.offres)[number]) =>
     color: var(--color-ink);
   }
   @media (prefers-reduced-motion: reduce) {
-    .choix {
+    .choix,
+    .rond {
       transition: none;
     }
   }
@@ -411,6 +494,78 @@ const valeur = (o: (typeof c.offres)[number]) =>
   });
   verrouiller();
   monter();
+
+  // The team feels alive, as in the pricing form: checking (or hovering) an offer plays its agents'
+  // wave, then each checked agent waves again now and then (6 to 10 s). Since it repeats, a button
+  // pauses everything (WCAG 2.2.2). Reduced motion: no wave, no button.
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const bouton = choix.querySelector<HTMLButtonElement>('[data-anim-pause]')!;
+    const label = choix.querySelector<HTMLElement>('[data-anim-label]')!;
+    const cartes = [...choix.querySelectorAll<HTMLLabelElement>('[data-equipe] .choix')].filter(
+      (carte) => carte.querySelector('video'),
+    );
+    const minuteurs = new Map<HTMLVideoElement, number>();
+    let enPause = false;
+    const arreter = (v: HTMLVideoElement) => clearTimeout(minuteurs.get(v));
+    const jouer = (v: HTMLVideoElement) => {
+      if (enPause) return;
+      arreter(v);
+      v.currentTime = 0;
+      v.play().catch(() => {});
+    };
+    const videos = (carte: Element) => [...carte.querySelectorAll('video')];
+    const geste = (carte: Element) =>
+      videos(carte).forEach((v, k) => {
+        arreter(v);
+        minuteurs.set(
+          v,
+          window.setTimeout(() => jouer(v), k * 220),
+        );
+      });
+    let n = 0;
+    for (const carte of cartes) {
+      const input = carte.querySelector('input')!;
+      for (const v of videos(carte)) {
+        const rythme = 6000 + (n++ % 5) * 900;
+        // Wave over: if still checked, the agent does it again a bit later.
+        v.addEventListener('ended', () => {
+          arreter(v);
+          if (!input.checked || enPause) return;
+          minuteurs.set(
+            v,
+            window.setTimeout(() => input.checked && jouer(v), rythme + Math.random() * 1500),
+          );
+        });
+      }
+      input.addEventListener('change', () => input.checked && geste(carte));
+      carte.addEventListener('mouseenter', () => geste(carte));
+    }
+    bouton.hidden = false;
+    bouton.addEventListener('click', () => {
+      enPause = !enPause;
+      bouton.setAttribute('aria-pressed', String(enPause));
+      label.textContent = bouton.dataset[enPause ? 'labelReprendre' : 'labelPause'] ?? '';
+      for (const carte of cartes) {
+        videos(carte).forEach((v) => {
+          arreter(v);
+          if (enPause) v.pause();
+        });
+        if (!enPause && carte.querySelector('input')!.checked) geste(carte);
+      }
+    });
+    // On arrival, the checked team waves once, then keeps moving on its own.
+    if (!choix.hidden) {
+      const io = new IntersectionObserver(
+        ([e]) => {
+          if (!e.isIntersecting) return;
+          io.disconnect();
+          cartes.forEach((carte) => carte.querySelector('input')!.checked && geste(carte));
+        },
+        { threshold: 0.4 },
+      );
+      io.observe(choix);
+    }
+  }
   Cal('ui', {
     theme: 'light',
     hideEventTypeDetails: false,
