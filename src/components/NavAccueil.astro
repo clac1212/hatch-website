@@ -22,7 +22,7 @@ const { locale, paths, tone = 'day', espace = false, seul = false } = Astro.prop
 const nuit = tone === 'night';
 const t = useTranslations(locale);
 const other = otherLocale(locale);
-/** The resources pages themselves: their link reads as the current place. */
+/** The resources pages themselves: « Accueil » takes the place of their own link. */
 const enRessources = Astro.url.pathname.startsWith(routes.ressources[locale]);
 ---
 
@@ -44,7 +44,7 @@ const enRessources = Astro.url.pathname.startsWith(routes.ressources[locale]);
          page, so the logo, the resources, the language and the sign-in fit on one 360 px line. -->
     <div class="flex items-center gap-0.5 sm:gap-1">
       {
-        (espace || seul) && (
+        (espace || seul || enRessources) && (
           <a
             href={routes.home[locale]}
             class:list={[
@@ -73,17 +73,17 @@ const enRessources = Astro.url.pathname.startsWith(routes.ressources[locale]);
       {
         !seul && (
           <>
-            <a
-              href={routes.ressources[locale]}
-              aria-current={enRessources ? 'page' : undefined}
-              class:list={[
-                'rounded-full px-1.5 py-2.5 text-[0.8125rem] font-semibold sm:px-3 sm:text-[0.875rem] transition-colors',
-                nuit ? 'text-cream/70 hover:text-orange' : 'text-soft hover:text-orange-hover',
-                enRessources && (nuit ? 'text-cream' : 'text-ink'),
-              ]}
-            >
-              {t('nav.resources')}
-            </a>
+            {!enRessources && (
+              <a
+                href={routes.ressources[locale]}
+                class:list={[
+                  'rounded-full px-1.5 py-2.5 text-[0.8125rem] font-semibold sm:px-3 sm:text-[0.875rem] transition-colors',
+                  nuit ? 'text-cream/70 hover:text-orange' : 'text-soft hover:text-orange-hover',
+                ]}
+              >
+                {t('nav.resources')}
+              </a>
+            )}
             <a
               href={paths[other]}
               hreflang={other}

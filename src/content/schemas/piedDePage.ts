@@ -50,5 +50,10 @@ export const schema = z.strictObject({
   mention: z.string(),
   immeubleAlt: z.string(),
   /** A page's own footer scene (network: the open space; Robin: the Rungis market), in place of the building. */
-  scenes: z.strictObject({ reseaux: scene, robin: scene }),
+  scenes: z.strictObject({
+    reseaux: scene,
+    robin: scene,
+    /** The resources pages: the image alone (pared-down footer, no list beside it). */
+    ressources: z.strictObject({ alt: z.string().min(1) }),
+  }),
 });

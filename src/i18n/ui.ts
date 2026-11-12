@@ -12,12 +12,6 @@ export const appUrls = {
   login: 'https://app.gethatch.io/auth',
 };
 
-/**
- * Peep's demo WhatsApp number (digits only, country code first, e.g. `33612345678`), for the
- * « Écrire à Peep » card of /ressources. Empty until validated: the card is then not rendered.
- */
-export const demoWhatsapp = '';
-
 export const routes = {
   home: { fr: '/', en: '/en' },
   /** The franchise-network space (the former one-page home, its sections and pricing). */

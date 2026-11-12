@@ -12,28 +12,6 @@ hero:
     independant: 'Je tiens un restaurant'
     reseau: 'Je pilote un réseau'
 
-action:
-  kicker: 'En action'
-  titre: 'Deux agents, sur WhatsApp.'
-  robin:
-    titre: 'Robin, pour les indépendants'
-    texte: "Il rapproche le bon de livraison de la facture, trouve l'écart et prépare l'avoir. Vous dites oui."
-    statut: 'en ligne'
-    cta: "Rejoindre la liste d'attente"
-  peep:
-    titre: 'Peep, pour les réseaux'
-    texte: "Il répond à vos équipiers à partir de vos procédures, et cite le document d'où vient la réponse."
-    statut: 'en ligne'
-    mention: 'Exemple sur BunBun, enseigne fictive'
-    messages:
-      - qui: equipier
-        txt: "Le fond de caisse c'est combien à l'ouverture ?"
-      - qui: peep
-        txt: '150 € : 100 € en billets de 5 et 10, 50 € en pièces. Compte-le avec ton manager avant le premier client.'
-        source: 'Source : Manuel opératoire BunBun, ouverture du restaurant'
-    cta: 'Écrire à Peep sur WhatsApp'
-    preRempli: "Bonjour Peep, le fond de caisse c'est combien à l'ouverture ?"
-
 modeles:
   kicker: 'Modèles'
   titre: 'Des modèles prêts à remplir.'
@@ -76,18 +54,17 @@ guides:
   kicker: 'Guides'
   titre: 'Les guides, métier par métier.'
   texte: 'Une méthode concrète par sujet, et une source pour chaque chiffre.'
+  une: 'À la une'
+  tous: 'Tous les guides'
+  themes: 'Filtrer par thème'
+  toutTheme: 'Tous les thèmes'
+  lire: 'Lire le guide'
 
 glossaire:
   kicker: 'Glossaire'
   titre: 'Les mots du métier.'
   texte: 'Les termes qui reviennent en cuisine, chez le fournisseur et dans un contrat de franchise.'
   lien: 'Voir tout le glossaire'
-
-sansFiltre:
-  kicker: 'Sans filtre'
-  titre: 'Ce que nous livrons, chaque mois.'
-  texte: "Le journal mensuel de Hatch OS : ce que l'équipe a réellement livré, sans teasing ni roadmap fantôme."
-  lien: 'Toutes les éditions'
 
 sorties:
   independant:
@@ -109,3 +86,6 @@ guide:
   luLe: 'lu le'
   agents: "Les agents qui s'en chargent"
   agentLien: 'Voir la page de {name}'
+  essentiel: "L'essentiel"
+  sommaire: 'Sur cette page'
+  lies: 'À lire aussi'

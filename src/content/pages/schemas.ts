@@ -206,13 +206,6 @@ const modele = z.strictObject({
     .min(1),
 });
 
-/** A line of the WhatsApp exchanges of « En action »: who writes, what, and the source quoted. */
-const echange = z.strictObject({
-  qui: z.enum(['equipier', 'peep']),
-  txt: texte,
-  source: texte.optional(),
-});
-
 /** The two ways out, at the bottom of /ressources and of each guide (by its audience). */
 const sortie = z.strictObject({ kicker: texte, titre: texte, texte });
 
@@ -227,24 +220,6 @@ export const ressourcesPage = z.strictObject({
     filtre: texte,
     filtres: z.strictObject({ tout: texte, independant: texte, reseau: texte }),
   }),
-  action: z.strictObject({
-    kicker: texte,
-    titre: texte,
-    /** Robin's card: the Metro invoice exchange comes from src/content/sections/robinSituations. */
-    robin: z.strictObject({ titre: texte, texte, statut: texte, cta: texte }),
-    /** Peep's card, only rendered once `demoWhatsapp` (src/i18n/ui.ts) holds a number. */
-    peep: z.strictObject({
-      titre: texte,
-      texte,
-      statut: texte,
-      /** Says the network is fictional. */
-      mention: texte,
-      messages: z.array(echange).min(2).max(4),
-      cta: texte,
-      /** Message pre-filled in WhatsApp when the visitor opens the chat. */
-      preRempli: texte,
-    }),
-  }),
   modeles: z.strictObject({
     kicker: texte,
     titre: texte,
@@ -252,9 +227,19 @@ export const ressourcesPage = z.strictObject({
     telecharger: texte,
     liste: z.array(modele).min(1),
   }),
-  guides: z.strictObject({ kicker: texte, titre: texte, texte }),
+  guides: z.strictObject({
+    kicker: texte,
+    titre: texte,
+    texte,
+    /** Heading of the featured guide (`une: true`, else the latest). */
+    une: texte,
+    /** Heading of the grid of every guide, and its theme filter. */
+    tous: texte,
+    themes: texte,
+    toutTheme: texte,
+    lire: texte,
+  }),
   glossaire: z.strictObject({ kicker: texte, titre: texte, texte, lien: texte }),
-  sansFiltre: z.strictObject({ kicker: texte, titre: texte, texte, lien: texte }),
   sorties: z.strictObject({
     independant: sortie.extend({ cta: texte }),
     reseau: sortie,
@@ -272,6 +257,10 @@ export const ressourcesPage = z.strictObject({
     luLe: texte,
     agents: texte,
     agentLien: texte,
+    essentiel: texte,
+    sommaire: texte,
+    /** The related guides at the end (same audience first). */
+    lies: texte,
   }),
 });
 
@@ -281,6 +270,8 @@ export const glossairePage = z.strictObject({
   kicker: texte,
   titre: texte,
   chapeau: texte,
+  /** Accessible name of the A to Z letter bar. */
+  lettres: texte,
   termes: z
     .array(
       z.strictObject({

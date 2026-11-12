@@ -12,28 +12,6 @@ hero:
     independant: 'I run a restaurant'
     reseau: 'I run a network'
 
-action:
-  kicker: 'In action'
-  titre: 'Two agents, on WhatsApp.'
-  robin:
-    titre: 'Robin, for independents'
-    texte: 'He matches the delivery note with the invoice, finds the gap and prepares the credit note request. You say yes.'
-    statut: 'online'
-    cta: 'Join the waitlist'
-  peep:
-    titre: 'Peep, for networks'
-    texte: 'He answers your crew from your own procedures, and quotes the document the answer comes from.'
-    statut: 'online'
-    mention: 'Example on BunBun, a fictional brand'
-    messages:
-      - qui: equipier
-        txt: 'How much goes in the cash float at opening?'
-      - qui: peep
-        txt: '€150: €100 in 5 and 10 notes, €50 in coins. Count it with your manager before the first customer.'
-        source: 'Source: BunBun operations manual, opening the restaurant'
-    cta: 'Message Peep on WhatsApp'
-    preRempli: 'Hi Peep, how much goes in the cash float at opening?'
-
 modeles:
   kicker: 'Templates'
   titre: 'Templates ready to fill in.'
@@ -76,18 +54,17 @@ guides:
   kicker: 'Guides'
   titre: 'Guides, one trade at a time.'
   texte: 'One practical method per topic, and a source for every number.'
+  une: 'Featured'
+  tous: 'All guides'
+  themes: 'Filter by topic'
+  toutTheme: 'All topics'
+  lire: 'Read the guide'
 
 glossaire:
   kicker: 'Glossary'
   titre: 'The words of the trade.'
   texte: 'The terms that come up in the kitchen, with suppliers and in a franchise agreement.'
   lien: 'See the full glossary'
-
-sansFiltre:
-  kicker: 'Unfiltered'
-  titre: 'What we ship, every month.'
-  texte: 'The Hatch OS monthly journal: what the team actually shipped, no teasing and no phantom roadmap.'
-  lien: 'All editions'
 
 sorties:
   independant:
@@ -109,3 +86,6 @@ guide:
   luLe: 'read on'
   agents: 'The agents who handle it'
   agentLien: "See {name}'s page"
+  essentiel: 'Key points'
+  sommaire: 'On this page'
+  lies: 'Read next'

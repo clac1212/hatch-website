@@ -4,47 +4,37 @@ import { join } from 'node:path';
 import { getEntry } from 'astro:content';
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
-import Button from '../components/ui/Button.astro';
 import Badge from '../components/ressources/Badge.astro';
 import Sorties from '../components/ressources/Sorties.astro';
-import { sortedEditions } from '../content/pages/editions';
+import { piedRessources } from '../components/ressources/pied';
 import { guideSlug, publishedGuides } from '../content/pages/guides';
 import { fill } from '../components/pages/format';
 import { BRAND, breadcrumbList } from '../seo/jsonld';
-import { demoWhatsapp, entryRoutes, routes, type Locale } from '../i18n/ui';
-import portraitRobin from '../assets/portraits/robin.jpg';
-import portraitPeep from '../assets/portraits/peep.jpg';
+import { entryRoutes, routes, type Locale } from '../i18n/ui';
 
 /**
- * /ressources (/en/resources): what both audiences can take away, independents (Robin) and
- * networks (the agents). In order: header and audience filter, the two agents in action on
- * WhatsApp, the templates, the guides, a glossary preview, the latest Sans Filtre editions, the two
- * ways out. Copy in src/content/pages/ressources/<locale>.yaml.
+ * /ressources (/en/resources): the guides first, for both audiences, independents (Robin) and
+ * networks (the agents). In order: header and audience filter, the featured guide, every guide with
+ * a theme filter, the templates (once a file exists), a glossary preview, the two ways out. Copy in src/content/pages/ressources/<locale>.yaml, guides in
+ * src/content/ressources/<locale>/.
  *
- * The filter is progressive enhancement: without JS every card shows and the buttons stay hidden.
- * Each card carries `data-public` (independant | reseau | tous); `tous` cards show under every
- * filter, and a group left without a visible card hides with its section. The choice lives in the
- * hash (#restaurant, #reseau), so a filtered view can be shared.
+ * The filters are progressive enhancement: without JS every card shows and the buttons stay
+ * hidden. Each card carries `data-public` (independant | reseau | tous; `tous` shows under every
+ * audience) and guides `data-metier`; a group left without a visible card hides with its section.
+ * The audience lives in the hash (#restaurant, #reseau), so a filtered view can be shared.
  */
 interface Props {
   locale: Locale;
 }
 
 const { locale } = Astro.props;
+const pied = await piedRessources(locale);
 const ui = (await getEntry('ressourcesPage', locale))?.data;
 if (!ui) throw new Error(`Missing src/content/pages/ressources/${locale}.yaml`);
-const situations = (await getEntry('robinSituations', locale))?.data;
-if (!situations) throw new Error(`Missing src/content/sections/robinSituations/${locale}.yaml`);
 const glossaire = (await getEntry('glossairePage', locale))?.data;
 if (!glossaire) throw new Error(`Missing src/content/pages/glossaire/${locale}.yaml`);
 
-const { hero, action, modeles, sansFiltre } = ui;
-const facture = situations.facture;
-
-/** Peep's card waits for a validated demo number (src/i18n/ui.ts). */
-const waPeep = demoWhatsapp
-  ? `https://wa.me/${demoWhatsapp}?text=${encodeURIComponent(action.peep.preRempli)}`
-  : undefined;
+const { hero, modeles } = ui;
 
 /** Templates with at least one file in public/ressources/; the others are not shown yet. */
 const dossier = join(process.cwd(), 'public', 'ressources');
@@ -63,15 +53,16 @@ const guides = (await publishedGuides(locale)).map((g) => ({
   ...g.data,
   href: entryRoutes.guides(guideSlug(g.id))[locale],
 }));
+/** The featured guide: the one marked `une`, else the latest. The grid lists the others. */
+const une = guides.find((g) => g.une) ?? guides[0];
+const autres = guides.filter((g) => g !== une);
+/** Themes of the grid's filter, in alphabetical order. */
+const metiers = [...new Set(autres.map((g) => g.metier))].sort((a, b) =>
+  a.localeCompare(b, locale),
+);
 
 /** The glossary preview: its first eight terms, alphabetically. */
 const termes = [...glossaire.termes].sort((a, b) => a.mot.localeCompare(b.mot, locale)).slice(0, 8);
-
-const editions = (await sortedEditions()).slice(0, 3).map((e) => ({
-  numero: e.data.edition,
-  ...e.data[locale],
-  href: `${routes.sansFiltre[locale]}/${e.data.edition}`,
-}));
 
 const site = Astro.site!;
 const jsonLd = [
@@ -93,10 +84,11 @@ const h2 = 'font-display text-section font-bold text-balance text-ink';
   description={ui.seo.description}
   nav="accueil"
   piedEpure
+  pied={pied}
   jsonLd={jsonLd}
 >
   <!-- 1 · Header and audience filter -->
-  <section class="px-4 pt-32 pb-14 sm:px-6 lg:pt-40 lg:pb-20">
+  <section class="px-4 pt-32 pb-12 sm:px-6 lg:pt-40 lg:pb-16">
     <div class="mx-auto flex max-w-site flex-col gap-6">
       <span class={kicker}>{hero.kicker}</span>
       <h1
@@ -117,88 +109,114 @@ const h2 = 'font-display text-section font-bold text-balance text-ink';
     </div>
   </section>
 
-  <!-- 2 · In action: Robin (independents) and Peep (networks) on WhatsApp -->
-  <section class="bg-night px-4 py-20 text-cream sm:px-6 lg:py-28" data-filtre-section>
-    <div class="mx-auto flex max-w-site flex-col gap-10">
-      <div class="flex flex-col gap-4">
-        <span class="font-mono text-kicker text-cream/60 uppercase">{action.kicker}</span>
-        <h2 class="font-display text-section font-bold text-balance">{action.titre}</h2>
-      </div>
-      <div
-        class:list={['grid gap-5', waPeep ? 'lg:grid-cols-2' : 'max-w-[640px]']}
-        data-filtre-groupe
-      >
-        <article class="carte-action" data-public="independant">
-          <header class="flex items-center gap-4">
-            <Image src={portraitRobin} alt="" width={56} densities={[1, 2]} class="avatar" />
-            <div class="flex flex-col gap-1">
-              <h3 class="font-display text-card font-semibold">{action.robin.titre}</h3>
-              <span class="text-caption text-cream/60">{action.robin.statut}</span>
-            </div>
-          </header>
-          <p class="text-cream/75">{action.robin.texte}</p>
-          <div class="fil" aria-label={situations.conversation.ariaLabel} role="group">
-            <div class="msg moi">
-              <span class="piece">
-                <b class="font-mono text-source uppercase">{facture.photo.titre}</b>
-              </span>
-              {facture.photo.legende}
-            </div>
-            <div class="msg agent">{facture.ecart}</div>
-            <div class="msg moi">{facture.reponse}</div>
-            <div class="msg agent">
-              <span class="piece doc">
-                <span class="font-mono text-source">{facture.avoir.type}</span>
-                <b>{facture.avoir.nom}</b>
-                <span class="text-[0.75rem] text-soft">{facture.avoir.statut}</span>
-              </span>
-            </div>
-          </div>
-          <div class="mt-auto pt-2">
-            <Button href={`${routes.robin[locale]}#beta`} variant="cream">
-              {action.robin.cta}
-            </Button>
-          </div>
-        </article>
-
-        {
-          waPeep && (
-            <article class="carte-action" data-public="reseau">
-              <header class="flex items-center gap-4">
-                <Image src={portraitPeep} alt="" width={56} densities={[1, 2]} class="avatar" />
-                <div class="flex flex-col gap-1">
-                  <h3 class="font-display text-card font-semibold">{action.peep.titre}</h3>
-                  <span class="text-caption text-cream/60">{action.peep.statut}</span>
-                </div>
-              </header>
-              <p class="text-cream/75">{action.peep.texte}</p>
-              <div class="fil" role="group" aria-label={action.peep.mention}>
-                {action.peep.messages.map((m) => (
-                  <div class:list={['msg', m.qui === 'peep' ? 'agent' : 'moi']}>
-                    {m.txt}
-                    {m.source && (
-                      <span class="mt-2 block font-mono text-source text-soft">{m.source}</span>
-                    )}
-                  </div>
-                ))}
+  <!-- 2 · The featured guide -->
+  {
+    une && (
+      <section class="px-4 pb-16 sm:px-6 lg:pb-20" data-filtre-section aria-labelledby="une">
+        <div class="mx-auto flex max-w-site flex-col gap-5" data-filtre-groupe>
+          <h2 id="une" class={kicker}>
+            {ui.guides.une}
+          </h2>
+          <a
+            href={une.href}
+            class="une carte-lien grid overflow-hidden rounded-card border border-line bg-surface lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]"
+            data-public={une.public}
+          >
+            <Image
+              src={une.image}
+              alt={une.imageAlt}
+              widths={[640, 960, 1280]}
+              sizes="(min-width: 1024px) 760px, 100vw"
+              loading="eager"
+              class="aspect-[3/2] h-full w-full bg-cream object-cover"
+            />
+            <div class="flex flex-col gap-4 p-7 sm:p-10">
+              <div class="flex flex-wrap items-center gap-2">
+                <Badge locale={locale} public={une.public} />
+                <span class="font-mono text-source text-soft uppercase">{une.metier}</span>
               </div>
-              <p class="font-mono text-source text-cream/60 uppercase">{action.peep.mention}</p>
-              <div class="mt-auto pt-2">
-                <Button href={waPeep} variant="cream" target="_blank" rel="noopener">
-                  {action.peep.cta}
-                </Button>
-              </div>
-            </article>
-          )
-        }
-      </div>
-    </div>
-  </section>
+              <h3 class="font-display text-[clamp(1.625rem,1.3rem+1.2vw,2.25rem)] leading-[1.15] font-bold text-balance text-ink">
+                {une.title}
+              </h3>
+              <p class="text-soft">{une.chapeau}</p>
+              <span class="mt-auto flex flex-wrap items-center justify-between gap-3 pt-2">
+                <span class="font-mono text-source text-soft uppercase">
+                  {fill(ui.guide.lecture, { n: String(une.readingMinutes) })}
+                </span>
+                <span class="lien">{ui.guides.lire}</span>
+              </span>
+            </div>
+          </a>
+        </div>
+      </section>
+    )
+  }
 
-  <!-- 3 · Templates to download, no form nor email (hidden until a file exists) -->
+  <!-- 3 · Every guide, with a theme filter -->
+  {
+    autres.length > 0 && (
+      <section class="px-4 pb-20 sm:px-6 lg:pb-28" data-filtre-section aria-labelledby="tous">
+        <div class="mx-auto flex max-w-site flex-col gap-8">
+          <div class="flex flex-col gap-4">
+            <span class={kicker}>{ui.guides.kicker}</span>
+            <h2 id="tous" class={h2}>
+              {ui.guides.titre}
+            </h2>
+            <p class="max-w-[60ch] text-soft">{ui.guides.texte}</p>
+          </div>
+          {metiers.length > 1 && (
+            <div
+              class="themes flex flex-wrap gap-2"
+              role="group"
+              aria-label={ui.guides.themes}
+              hidden
+            >
+              <button type="button" data-theme="" aria-pressed="true">
+                {ui.guides.toutTheme}
+              </button>
+              {metiers.map((m) => (
+                <button type="button" data-theme={m} aria-pressed="false">
+                  {m}
+                </button>
+              ))}
+            </div>
+          )}
+          <ul class="grid gap-5 md:grid-cols-2 lg:grid-cols-3" data-filtre-groupe>
+            {autres.map((g) => (
+              <li class="contents" data-public={g.public} data-metier={g.metier}>
+                <a href={g.href} class="carte carte-lien overflow-hidden p-0">
+                  <Image
+                    src={g.image}
+                    alt={g.imageAlt}
+                    widths={[400, 640, 800]}
+                    sizes="(min-width: 1024px) 420px, (min-width: 768px) 50vw, 100vw"
+                    class="aspect-[3/2] w-full bg-cream object-cover"
+                  />
+                  <span class="flex flex-1 flex-col gap-3 p-6">
+                    <span class="flex flex-wrap items-center gap-2">
+                      <Badge locale={locale} public={g.public} />
+                      <span class="font-mono text-source text-soft uppercase">{g.metier}</span>
+                    </span>
+                    <h3 class="font-display text-card font-semibold text-balance text-ink">
+                      {g.title}
+                    </h3>
+                    <span class="mt-auto font-mono text-source text-soft uppercase">
+                      {fill(ui.guide.lecture, { n: String(g.readingMinutes) })}
+                    </span>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- 4 · Templates to download, no form nor email (hidden until a file exists) -->
   {
     disponibles.length > 0 && (
-      <section class="px-4 py-20 sm:px-6 lg:py-28" data-filtre-section>
+      <section class="border-t border-line px-4 py-20 sm:px-6 lg:py-28" data-filtre-section>
         <div class="mx-auto flex max-w-site flex-col gap-10">
           <div class="flex flex-col gap-4">
             <span class={kicker}>{modeles.kicker}</span>
@@ -224,39 +242,6 @@ const h2 = 'font-display text-section font-bold text-balance text-ink';
                     </a>
                   ))}
                 </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-    )
-  }
-
-  <!-- 4 · Guides (published ones only) -->
-  {
-    guides.length > 0 && (
-      <section class="px-4 py-20 sm:px-6 lg:py-28" data-filtre-section>
-        <div class="mx-auto flex max-w-site flex-col gap-10">
-          <div class="flex flex-col gap-4">
-            <span class={kicker}>{ui.guides.kicker}</span>
-            <h2 class={h2}>{ui.guides.titre}</h2>
-            <p class="max-w-[60ch] text-soft">{ui.guides.texte}</p>
-          </div>
-          <ul class="grid gap-5 md:grid-cols-2 lg:grid-cols-3" data-filtre-groupe>
-            {guides.map((g) => (
-              <li class="contents" data-public={g.public}>
-                <a href={g.href} class="carte carte-lien">
-                  <div class="flex flex-wrap items-center gap-2">
-                    <Badge locale={locale} public={g.public} />
-                    <span class="font-mono text-source text-soft uppercase">{g.metier}</span>
-                  </div>
-                  <h3 class="font-display text-card font-semibold text-balance text-ink">
-                    {g.title}
-                  </h3>
-                  <span class="mt-auto font-mono text-source text-soft uppercase">
-                    {fill(ui.guide.lecture, { n: String(g.readingMinutes) })}
-                  </span>
-                </a>
               </li>
             ))}
           </ul>
@@ -292,37 +277,7 @@ const h2 = 'font-display text-section font-bold text-balance text-ink';
     </div>
   </section>
 
-  <!-- 6 · Sans Filtre: the latest editions, straight from the editions collection -->
-  <section class="px-4 pb-20 sm:px-6 lg:pb-28">
-    <div
-      class="mx-auto grid max-w-site gap-10 rounded-card bg-sand p-7 sm:p-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:p-14"
-    >
-      <div class="flex flex-col gap-4">
-        <span class="font-mono text-kicker text-ink/70 uppercase">{sansFiltre.kicker}</span>
-        <h2 class={h2}>{sansFiltre.titre}</h2>
-        <p class="max-w-[46ch] text-soft">{sansFiltre.texte}</p>
-        <a href={routes.sansFiltre[locale]} class="lien mt-2 w-max">{sansFiltre.lien}</a>
-      </div>
-      <ol class="flex flex-col">
-        {
-          editions.map((e) => (
-            <li class="border-t border-ink/15 first:border-t-0">
-              <a href={e.href} class="edition">
-                <span class="font-mono text-source text-ink/70 uppercase">
-                  {e.numero} · {e.month}
-                </span>
-                <span class="font-display text-[1.25rem] leading-snug font-semibold text-ink">
-                  {e.issueTitle}
-                </span>
-              </a>
-            </li>
-          ))
-        }
-      </ol>
-    </div>
-  </section>
-
-  <!-- 7 · The two ways out -->
+  <!-- 6 · The two ways out -->
   <section class="px-4 pb-24 sm:px-6 lg:pb-32" data-filtre-section>
     <div class="mx-auto max-w-site">
       <Sorties locale={locale} public="tous" filtrable />
@@ -331,7 +286,8 @@ const h2 = 'font-display text-section font-bold text-balance text-ink';
 </Base>
 
 <style>
-  .filtre button {
+  .filtre button,
+  .themes button {
     border-radius: 999px;
     padding: 0.625rem 1.125rem;
     font-size: 0.9375rem;
@@ -343,88 +299,30 @@ const h2 = 'font-display text-section font-bold text-balance text-ink';
       background-color 0.2s var(--ease-hatch),
       color 0.2s var(--ease-hatch);
   }
-  .filtre button:hover {
+  .themes button {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.8125rem;
+  }
+  .filtre button:hover,
+  .themes button:hover {
     background: var(--color-orange-tint);
   }
-  .filtre button[aria-pressed='true'] {
+  .filtre button[aria-pressed='true'],
+  .themes button[aria-pressed='true'] {
     background: var(--color-ink);
     color: var(--color-cream);
     box-shadow: none;
   }
   .filtre button:focus-visible,
+  .themes button:focus-visible,
   .lien:focus-visible,
   .carte-lien:focus-visible,
-  .terme:focus-visible,
-  .edition:focus-visible {
+  .terme:focus-visible {
     outline: 2px solid var(--color-orange-txt);
     outline-offset: 3px;
   }
 
-  /* « En action »: one card per agent on the night band, its exchange on the WhatsApp wall. */
-  .carte-action {
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-    padding: 1.75rem;
-    border-radius: var(--radius-card);
-    background: var(--color-night-2);
-    box-shadow: inset 0 0 0 1px var(--color-line-night);
-  }
-  @media (width >= 40rem) {
-    .carte-action {
-      padding: 2.25rem;
-    }
-  }
-  .carte-action :global(.avatar) {
-    width: 56px;
-    height: 56px;
-    border-radius: 999px;
-    object-fit: cover;
-    background: var(--color-cream);
-  }
-  .fil {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    padding: 1rem;
-    border-radius: 14px;
-    background: var(--color-whatsapp-wall);
-    color: var(--color-ink);
-    font-size: 0.9375rem;
-    line-height: 1.4;
-  }
-  .msg {
-    max-width: 86%;
-    padding: 0.5rem 0.75rem;
-    border-radius: 10px;
-    box-shadow: 0 1px 0.5px color-mix(in srgb, var(--color-black) 13%, transparent);
-  }
-  .msg.agent {
-    align-self: flex-start;
-    background: var(--color-surface);
-    border-top-left-radius: 0;
-  }
-  .msg.moi {
-    align-self: flex-end;
-    background: var(--color-whatsapp);
-    border-top-right-radius: 0;
-  }
-  .piece {
-    display: flex;
-    flex-direction: column;
-    gap: 0.125rem;
-    margin-bottom: 0.375rem;
-    padding: 0.625rem 0.75rem;
-    border-radius: 8px;
-    background: color-mix(in srgb, var(--color-white) 55%, transparent);
-  }
-  .piece.doc {
-    margin-bottom: 0;
-    background: var(--color-gray-50);
-    border-left: 4px solid var(--color-statut-rouge);
-  }
-
-  /* Templates, guides. */
+  /* Guides, templates. */
   .carte {
     display: flex;
     flex-direction: column;
@@ -434,8 +332,11 @@ const h2 = 'font-display text-section font-bold text-balance text-ink';
     border: 1px solid var(--color-line);
     background: var(--color-surface);
   }
+  .carte.p-0 {
+    gap: 0;
+    padding: 0;
+  }
   .carte-lien {
-    min-height: 13rem;
     transition:
       box-shadow 0.3s var(--ease-hatch),
       transform 0.3s var(--ease-hatch);
@@ -443,6 +344,9 @@ const h2 = 'font-display text-section font-bold text-balance text-ink';
   .carte-lien:hover {
     box-shadow: var(--shadow-2);
     transform: translateY(-2px);
+  }
+  .carte-lien:hover h3 {
+    color: var(--color-orange-txt);
   }
   .lien {
     font-weight: 600;
@@ -455,9 +359,8 @@ const h2 = 'font-display text-section font-bold text-balance text-ink';
     color: var(--color-orange-hover);
   }
 
-  /* Glossary preview and Sans Filtre editions. */
-  .terme,
-  .edition {
+  /* Glossary preview. */
+  .terme {
     display: flex;
     flex-direction: column;
     gap: 0.375rem;
@@ -466,14 +369,14 @@ const h2 = 'font-display text-section font-bold text-balance text-ink';
   .terme {
     border-bottom: 1px solid var(--color-line);
   }
-  .terme:hover b,
-  .edition:hover span:last-child {
+  .terme:hover b {
     color: var(--color-orange-txt);
   }
 
   @media (prefers-reduced-motion: reduce) {
     .carte-lien,
-    .filtre button {
+    .filtre button,
+    .themes button {
       transition: none;
     }
     .carte-lien:hover {
@@ -484,14 +387,18 @@ const h2 = 'font-display text-section font-bold text-balance text-ink';
 
 <script>
   type Filtre = '' | 'independant' | 'reseau';
-  /** Hash of each filter, so a filtered view can be shared. */
+  /** Hash of each audience, so a filtered view can be shared. */
   const HASH: Record<Filtre, string> = { '': '', independant: '#restaurant', reseau: '#reseau' };
 
   const groupe = document.querySelector<HTMLElement>('.filtre');
+  const themes = document.querySelector<HTMLElement>('.themes');
   if (groupe) {
     const boutons = [...groupe.querySelectorAll<HTMLButtonElement>('[data-filtre]')];
+    const boutonsTheme = [...(themes?.querySelectorAll<HTMLButtonElement>('[data-theme]') ?? [])];
     const cartes = [...document.querySelectorAll<HTMLElement>('[data-public]')];
     const sections = [...document.querySelectorAll<HTMLElement>('[data-filtre-section]')];
+    let filtre: Filtre = '';
+    let theme = '';
 
     const depuisHash = (): Filtre =>
       location.hash === HASH.independant
@@ -500,11 +407,16 @@ const h2 = 'font-display text-section font-bold text-balance text-ink';
           ? 'reseau'
           : '';
 
-    const appliquer = (filtre: Filtre) => {
+    const appliquer = () => {
       for (const b of boutons) b.setAttribute('aria-pressed', String(b.dataset.filtre === filtre));
+      for (const b of boutonsTheme)
+        b.setAttribute('aria-pressed', String(b.dataset.theme === theme));
       for (const c of cartes) {
         const p = c.dataset.public;
-        c.hidden = filtre !== '' && p !== 'tous' && p !== filtre;
+        const horsPublic = filtre !== '' && p !== 'tous' && p !== filtre;
+        const horsTheme =
+          theme !== '' && c.dataset.metier !== undefined && c.dataset.metier !== theme;
+        c.hidden = horsPublic || horsTheme;
       }
       // A section whose groups are all left empty hides too.
       for (const s of sections) {
@@ -517,14 +429,25 @@ const h2 = 'font-display text-section font-bold text-balance text-ink';
 
     for (const b of boutons) {
       b.addEventListener('click', () => {
-        const filtre = (b.dataset.filtre ?? '') as Filtre;
+        filtre = (b.dataset.filtre ?? '') as Filtre;
         // replaceState: the hash changes without jumping to an anchor nor piling up history.
         history.replaceState(null, '', HASH[filtre] || location.pathname + location.search);
-        appliquer(filtre);
+        appliquer();
       });
     }
-    addEventListener('hashchange', () => appliquer(depuisHash()));
+    for (const b of boutonsTheme) {
+      b.addEventListener('click', () => {
+        theme = b.dataset.theme ?? '';
+        appliquer();
+      });
+    }
+    addEventListener('hashchange', () => {
+      filtre = depuisHash();
+      appliquer();
+    });
     groupe.hidden = false;
-    appliquer(depuisHash());
+    if (themes) themes.hidden = false;
+    filtre = depuisHash();
+    appliquer();
   }
 </script>

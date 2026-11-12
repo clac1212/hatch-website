@@ -4,16 +4,20 @@ import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Badge from '../components/ressources/Badge.astro';
 import Sorties from '../components/ressources/Sorties.astro';
+import { piedRessources } from '../components/ressources/pied';
 import { avatars } from '../components/pages/agent-visuels';
 import { centres } from '../components/agents/visuels';
 import { fill, longDate } from '../components/pages/format';
 import { BRAND, breadcrumbList, languageTag, organizationId } from '../seo/jsonld';
 import { entryRoutes, routes, type Locale } from '../i18n/ui';
+import { guideSlug, publishedGuides } from '../content/pages/guides';
 
 /**
  * A guide of /ressources (/ressources/<slug>, /en/resources/<slug>): kicker, H1 in Departure Mono
- * (the general rule, no exception here), chapeau, the Markdown body, its FAQ as <details>, its
- * sources, a card per agent it names, then the way out matching its audience (the demo for
+ * (the general rule, no exception here), chapeau, the cover, « L'essentiel » and the table of
+ * contents (its ## headings), the Markdown body (a blockquote opening on a bold line is the agent's
+ * box), its FAQ as <details>, its
+ * sources, a card per agent it names, three related guides, then the way out matching its audience (the demo for
  * networks, the Robin waitlist for independents, both for everyone).
  * Content: src/content/ressources/<locale>/<slug>.md; shared labels: `guide` of
  * src/content/pages/ressources/<locale>.yaml.
@@ -24,11 +28,14 @@ interface Props {
 }
 
 const { locale, slug } = Astro.props;
+const pied = await piedRessources(locale);
 const entry = await getEntry('ressources', `${locale}/${slug}`);
 if (!entry) throw new Error(`Missing src/content/ressources/${locale}/${slug}.md`);
 const ui = (await getEntry('ressourcesPage', locale))?.data;
 if (!ui) throw new Error(`Missing src/content/pages/ressources/${locale}.yaml`);
-const { Content } = await render(entry);
+const { Content, headings } = await render(entry);
+/** Table of contents: the body's ## headings. */
+const sommaire = headings.filter((h) => h.depth === 2);
 const g = entry.data;
 const l = ui.guide;
 const paths = entryRoutes.guides(slug);
@@ -49,6 +56,17 @@ const agents = await Promise.all(
   }),
 );
 
+/** Three guides to read next: same audience (or everyone) first, then the most recent. */
+const lies = (await publishedGuides(locale))
+  .filter((x) => guideSlug(x.id) !== slug)
+  .sort((a, b) => {
+    const proche = (x: typeof a) =>
+      x.data.public === g.public || x.data.public === 'tous' ? 0 : 1;
+    return proche(a) - proche(b);
+  })
+  .slice(0, 3)
+  .map((x) => ({ ...x.data, href: entryRoutes.guides(guideSlug(x.id))[locale] }));
+
 const site = Astro.site!;
 const url = new URL(paths[locale], site).href;
 const jsonLd = [
@@ -65,6 +83,7 @@ const jsonLd = [
     description: g.description,
     inLanguage: languageTag[locale],
     dateModified: g.updatedAt,
+    image: new URL(g.image.src, site).href,
     author: { '@id': organizationId(site) },
     publisher: { '@id': organizationId(site) },
   },
@@ -87,11 +106,13 @@ const jsonLd = [
 <Base
   locale={locale}
   paths={paths}
-  title={`${g.title} | ${BRAND}`}
+  title={`${g.seoTitle} | ${BRAND}`}
+  image={{ src: g.image, alt: g.imageAlt }}
   description={g.description}
   ogType="article"
   nav="accueil"
   piedEpure
+  pied={pied}
   jsonLd={jsonLd}
   noindex={g.brouillon}
 >
@@ -120,7 +141,43 @@ const jsonLd = [
       </div>
     </header>
 
-    <div class="corps mx-auto mt-10 max-w-prose">
+    <Image
+      src={g.image}
+      alt={g.imageAlt}
+      widths={[640, 960, 1280, 1600]}
+      sizes="(min-width: 1040px) 1000px, 100vw"
+      loading="eager"
+      class="mx-auto mt-10 aspect-[3/2] w-full max-w-[1000px] rounded-card bg-cream object-cover"
+    />
+
+    <div class="mx-auto mt-10 flex max-w-prose flex-col gap-6">
+      <aside class="essentiel" aria-labelledby="guide-essentiel">
+        <h2 id="guide-essentiel" class="font-mono text-kicker text-orange-txt uppercase">
+          {l.essentiel}
+        </h2>
+        <ul>
+          {g.essentiel.map((e) => <li>{e}</li>)}
+        </ul>
+      </aside>
+      {
+        sommaire.length > 2 && (
+          <nav class="sommaire" aria-labelledby="guide-sommaire">
+            <h2 id="guide-sommaire" class="font-mono text-kicker text-soft uppercase">
+              {l.sommaire}
+            </h2>
+            <ol>
+              {sommaire.map((h) => (
+                <li>
+                  <a href={`#${h.slug}`}>{h.text}</a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )
+      }
+    </div>
+
+    <div class="corps mx-auto mt-12 max-w-prose">
       <Content />
     </div>
 
@@ -205,6 +262,37 @@ const jsonLd = [
     }
   </article>
 
+  {
+    lies.length > 0 && (
+      <section class="px-4 pb-20 sm:px-6" aria-labelledby="guide-lies">
+        <div class="mx-auto flex max-w-site flex-col gap-6">
+          <h2 id="guide-lies" class="font-display text-[1.75rem] font-bold text-ink">
+            {l.lies}
+          </h2>
+          <ul class="grid gap-5 md:grid-cols-3">
+            {lies.map((x) => (
+              <li>
+                <a href={x.href} class="lie">
+                  <Image
+                    src={x.image}
+                    alt={x.imageAlt}
+                    widths={[400, 640]}
+                    sizes="(min-width: 768px) 33vw, 100vw"
+                    class="aspect-[3/2] w-full bg-cream object-cover"
+                  />
+                  <span class="flex flex-col gap-2 p-5">
+                    <span class="font-mono text-source text-soft uppercase">{x.metier}</span>
+                    <b class="font-display text-[1.125rem] leading-snug text-ink">{x.title}</b>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
   <section class="px-4 pb-24 sm:px-6 lg:pb-32">
     <div class="mx-auto max-w-site">
       <Sorties locale={locale} public={g.public} />
@@ -280,10 +368,91 @@ const jsonLd = [
   .corps :global(a:hover) {
     color: var(--color-orange-hover);
   }
+  /* The agent's box: a blockquote whose first paragraph is its bold title (« Avec Robin »). */
   .corps :global(blockquote) {
-    padding: 0.25rem 0 0.25rem 1.25rem;
-    border-left: 2px solid var(--color-line);
+    margin: 2rem 0;
+    padding: 1.5rem 1.75rem;
+    border-radius: var(--radius-card);
+    border: 1px solid var(--color-line);
+    background: var(--color-surface-2);
     color: var(--color-ink);
+  }
+  .corps :global(blockquote > p:first-child strong) {
+    font-family: var(--font-mono);
+    font-size: var(--text-kicker);
+    font-weight: 400;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--color-orange-txt);
+  }
+  .corps :global(blockquote > :last-child) {
+    margin-bottom: 0;
+  }
+  .corps :global(h2) {
+    scroll-margin-top: 6rem;
+  }
+
+  /* « L'essentiel » and the table of contents. */
+  .essentiel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1.5rem 1.75rem;
+    border-radius: var(--radius-card);
+    background: var(--color-sand);
+  }
+  .essentiel ul {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-left: 1.25rem;
+    list-style: disc;
+    color: var(--color-ink);
+  }
+  .essentiel li::marker {
+    color: var(--color-orange-txt);
+  }
+  .sommaire {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-left: 1.25rem;
+    border-left: 2px solid var(--color-line);
+  }
+  .sommaire ol {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    padding-left: 1.25rem;
+    list-style: decimal;
+    font-size: 0.9375rem;
+    color: var(--color-soft);
+  }
+  .sommaire a:hover {
+    color: var(--color-orange-txt);
+  }
+  .sommaire a:focus-visible,
+  .lie:focus-visible {
+    outline: 2px solid var(--color-orange-txt);
+    outline-offset: 3px;
+  }
+
+  /* Related guides. */
+  .lie {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    border-radius: var(--radius-card);
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
+    transition: box-shadow 0.3s var(--ease-hatch);
+  }
+  .lie:hover {
+    box-shadow: var(--shadow-2);
+  }
+  .lie:hover b {
+    color: var(--color-orange-txt);
   }
   /* Tables: readable on desktop, scrolling sideways in their own frame on phones (never the page). */
   .corps :global(table) {
@@ -389,7 +558,8 @@ const jsonLd = [
   @media (prefers-reduced-motion: reduce) {
     .plus::before,
     .plus::after,
-    .agent {
+    .agent,
+    .lie {
       transition: none;
     }
   }
