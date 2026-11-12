@@ -1,0 +1,27 @@
+---
+import { useTranslations, type Locale } from '../../i18n/ui';
+import type { PublicCible } from '../../content/pages/schemas';
+
+/**
+ * Audience badge of a resource: independents in Robin's blue, networks in orange, both in neutral.
+ * The colour repeats the word, it never replaces it.
+ */
+interface Props {
+  locale: Locale;
+  public: PublicCible;
+}
+
+const { locale, public: cible } = Astro.props;
+const t = useTranslations(locale);
+---
+
+<span
+  class:list={[
+    'inline-flex w-max items-center rounded-full px-2.5 py-1 font-mono text-source uppercase',
+    cible === 'independant' && 'bg-robin-tint text-robin',
+    cible === 'reseau' && 'bg-orange-tint text-orange-txt',
+    cible === 'tous' && 'bg-surface-2 text-soft ring-1 ring-line ring-inset',
+  ]}
+>
+  {t(`public.${cible}`)}
+</span>

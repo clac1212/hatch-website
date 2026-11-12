@@ -41,26 +41,27 @@ pnpm format:check
 
 ## Where things live
 
-| What                                | Where                                                                                                              |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Home page (`/`, the crossroads)     | `src/views/AccueilPage.astro`, copy in `src/content/sections/accueil/`, SEO in `src/content/home/{fr,en}.yaml`     |
-| Networks page (`/reseaux`)          | `src/views/ReseauxPage.astro` (the former one-page home), sections copy in `src/content/sections/*`                |
-| Robin page (`/robin`)               | `src/views/RobinPage.astro`, `src/components/robin/Situations.astro`, copy in `sections/robin*`                    |
-| Robin waitlist endpoint             | `src/pages/api/liste-attente.ts` (on demand): Notion row + Slack alert, secrets in Vercel env only                 |
-| Agents (7, + future agent pages)    | `src/content/agents/{fr,en}/<slug>.md`                                                                             |
-| Agent pages: feature wall copy      | `src/content/agents-bento/{fr,en}/<slug>.yaml`, one schema per agent in `src/content/schemas/bento/`               |
-| Agent pages: components             | `src/views/AgentPage.astro`, `src/components/agents/` (Mur, Tuile, Exemple, `bento/<Agent>.astro`)                 |
-| Agent pages: problem objects        | `src/content/agents-probleme/{fr,en}/<slug>.yaml`, `src/content/schemas/agent-probleme/`, `probleme/<Agent>.astro` |
-| Agent pages: usage-example scenes   | `src/content/agents-scenes/{fr,en}/<slug>.yaml`, `src/content/schemas/scenes/`, `scenes/<Agent>.astro`             |
-| Content schemas (Zod, strict)       | `src/content.config.ts`: exact filename, Astro discovers it                                                        |
-| Short UI strings, routes per locale | `src/i18n/ui.ts`                                                                                                   |
-| Design tokens                       | `src/styles/global.css` under `@theme`                                                                             |
-| Layout, nav, footer                 | `src/layouts/Base.astro`, `src/components/{Nav,Footer}.astro`                                                      |
-| DS primitives                       | `src/components/ui/` (Button, Logo…), mirroring the Pencil components                                              |
-| Home sections                       | `src/components/sections/*.astro`, one component per section                                                       |
-| Page bodies shared by FR and EN     | `src/views/*.astro`; `src/pages/**` files only pick the locale                                                     |
-| Images                              | `src/assets/` (optimised by Astro), never `public/` unless it must stay raw                                        |
-| Fonts                               | Astro Fonts API in `astro.config.mjs`; Departure Mono in `src/assets/fonts/`                                       |
+| What                                | Where                                                                                                                                                                                                                          |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Home page (`/`, the crossroads)     | `src/views/AccueilPage.astro`, copy in `src/content/sections/accueil/`, SEO in `src/content/home/{fr,en}.yaml`                                                                                                                 |
+| Networks page (`/reseaux`)          | `src/views/ReseauxPage.astro` (the former one-page home), sections copy in `src/content/sections/*`                                                                                                                            |
+| Robin page (`/robin`)               | `src/views/RobinPage.astro`, `src/components/robin/Situations.astro`, copy in `sections/robin*`                                                                                                                                |
+| Robin waitlist endpoint             | `src/pages/api/liste-attente.ts` (on demand): Notion row + Slack alert, secrets in Vercel env only                                                                                                                             |
+| Resources (`/ressources`)           | `src/views/{Ressources,Guide,Glossaire}Page.astro`, `src/components/ressources/`; copy in `src/content/pages/{ressources,glossaire}/`, guides in `src/content/ressources/{fr,en}/<slug>.md`, templates in `public/ressources/` |
+| Agents (7, + future agent pages)    | `src/content/agents/{fr,en}/<slug>.md`                                                                                                                                                                                         |
+| Agent pages: feature wall copy      | `src/content/agents-bento/{fr,en}/<slug>.yaml`, one schema per agent in `src/content/schemas/bento/`                                                                                                                           |
+| Agent pages: components             | `src/views/AgentPage.astro`, `src/components/agents/` (Mur, Tuile, Exemple, `bento/<Agent>.astro`)                                                                                                                             |
+| Agent pages: problem objects        | `src/content/agents-probleme/{fr,en}/<slug>.yaml`, `src/content/schemas/agent-probleme/`, `probleme/<Agent>.astro`                                                                                                             |
+| Agent pages: usage-example scenes   | `src/content/agents-scenes/{fr,en}/<slug>.yaml`, `src/content/schemas/scenes/`, `scenes/<Agent>.astro`                                                                                                                         |
+| Content schemas (Zod, strict)       | `src/content.config.ts`: exact filename, Astro discovers it                                                                                                                                                                    |
+| Short UI strings, routes per locale | `src/i18n/ui.ts`                                                                                                                                                                                                               |
+| Design tokens                       | `src/styles/global.css` under `@theme`                                                                                                                                                                                         |
+| Layout, nav, footer                 | `src/layouts/Base.astro`, `src/components/{Nav,Footer}.astro`                                                                                                                                                                  |
+| DS primitives                       | `src/components/ui/` (Button, Logo…), mirroring the Pencil components                                                                                                                                                          |
+| Home sections                       | `src/components/sections/*.astro`, one component per section                                                                                                                                                                   |
+| Page bodies shared by FR and EN     | `src/views/*.astro`; `src/pages/**` files only pick the locale                                                                                                                                                                 |
+| Images                              | `src/assets/` (optimised by Astro), never `public/` unless it must stay raw                                                                                                                                                    |
+| Fonts                               | Astro Fonts API in `astro.config.mjs`; Departure Mono in `src/assets/fonts/`                                                                                                                                                   |
 
 ## Content rules
 
@@ -73,7 +74,7 @@ pnpm format:check
   - agents presented by job first, speaking in the first person; exception: the agent pages (`/agents/<slug>`) are Patrick's copy (Notion « 08 · Pages agents »), in the third person and taken word for word (César 09/10), only the agent's `pitch` stays in the first person; except the problem block, rewritten landing-page style: a short title naming the pain, one or two concrete sentences, no « a network told us » (César 12/10);
   - every number carries a source;
   - no em dash inside a sentence, no « opérationnel en quelques minutes ».
-- Two calls to action, the classic SaaS pair (César 06/10): the demo, primary (`Button variant="orange"`, « Réserver une démo » / « Book a demo » → `/demo`, Cal.com), and access to the platform, secondary: « Se connecter » / « Log in » as a button in the home and Robin nav (`NavAccueil`, `appUrls.login`; the app's /auth page also lets a newcomer sign up); the networks hero carries the demo alone (Patrick 10/11). Every other CTA (pricing, footer, inner pages) is the demo alone. App URLs live in `appUrls` (src/i18n/ui.ts).
+- Two calls to action, the classic SaaS pair (César 06/10): the demo, primary (`Button variant="orange"`, « Réserver une démo » / « Book a demo » → `/demo`, Cal.com), and access to the platform, secondary: « Se connecter » / « Log in » as a button in the home and Robin nav (`NavAccueil`, `appUrls.login`; the app's /auth page also lets a newcomer sign up); the networks hero carries the demo alone (Patrick 10/11). Every other CTA (pricing, footer, inner pages) is the demo alone. Exception pending César's validation: the resources (`/ressources`, its guides, the glossary) end on the two ways out, the Robin waitlist for independents and the demo for networks, picked by the guide's `public`. App URLs live in `appUrls` (src/i18n/ui.ts).
 
 ## Styling (DS Hatch OS v4)
 

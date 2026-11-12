@@ -4,7 +4,7 @@ import { appUrls, routes, otherLocale, useTranslations, type Locale, type Paths 
 
 /**
  * MAQUETTE — nav de la page d'accueil (le carrefour) et de l'espace indépendant.
- * Volontairement minimale, façon muse.ai : le logo, la langue, la connexion. Les liens de l'espace
+ * Volontairement minimale, façon muse.ai : le logo, les ressources, la langue, la connexion. Les liens de l'espace
  * réseau (agents, cas clients, tarifs, sécurité) et la démo restent dans Nav.astro.
  */
 interface Props {
@@ -22,6 +22,8 @@ const { locale, paths, tone = 'day', espace = false, seul = false } = Astro.prop
 const nuit = tone === 'night';
 const t = useTranslations(locale);
 const other = otherLocale(locale);
+/** The resources pages themselves: « Accueil » takes the place of their own link. */
+const enRessources = Astro.url.pathname.startsWith(routes.ressources[locale]);
 ---
 
 <header
@@ -33,15 +35,20 @@ const other = otherLocale(locale);
     class="mx-auto flex max-w-[1360px] items-center justify-between gap-2 px-4 py-4 sm:px-6 lg:py-5"
   >
     <a href={espace ? '#' : routes.home[locale]} aria-label={t('a11y.home')} class="shrink-0">
-      <Logo tone={nuit ? 'night' : 'day'} class="w-[76px] sm:w-[84px] md:w-[96px]" />
+      <Logo
+        tone={nuit ? 'night' : 'day'}
+        class="w-[68px] min-[400px]:w-[76px] sm:w-[84px] md:w-[96px]"
+      />
     </a>
-    <div class="flex items-center gap-1">
+    <!-- Phones: tighter type and gaps, and « Accueil » down to its arrow on Robin and the network
+         page, so the logo, the resources, the language and the sign-in fit on one 360 px line. -->
+    <div class="flex items-center gap-0.5 sm:gap-1">
       {
-        (espace || seul) && (
+        (espace || seul || enRessources) && (
           <a
             href={routes.home[locale]}
             class:list={[
-              'inline-flex items-center gap-1 rounded-full px-2 py-2.5 text-[0.875rem] sm:px-3 font-semibold transition-colors',
+              'inline-flex items-center gap-1 rounded-full px-1.5 py-2.5 text-[0.8125rem] sm:px-3 sm:text-[0.875rem] font-semibold transition-colors',
               nuit ? 'text-cream/70 hover:text-orange' : 'text-soft hover:text-orange-hover',
             ]}
           >
@@ -57,19 +64,32 @@ const other = otherLocale(locale);
             >
               <path d="M15 6l-6 6 6 6" />
             </svg>
-            <span class="max-[359px]:sr-only">{t('nav.back')}</span>
+            <span class:list={[espace ? 'max-sm:sr-only' : 'max-[359px]:sr-only']}>
+              {t('nav.back')}
+            </span>
           </a>
         )
       }
       {
         !seul && (
           <>
+            {!enRessources && (
+              <a
+                href={routes.ressources[locale]}
+                class:list={[
+                  'rounded-full px-1.5 py-2.5 text-[0.8125rem] font-semibold sm:px-3 sm:text-[0.875rem] transition-colors',
+                  nuit ? 'text-cream/70 hover:text-orange' : 'text-soft hover:text-orange-hover',
+                ]}
+              >
+                {t('nav.resources')}
+              </a>
+            )}
             <a
               href={paths[other]}
               hreflang={other}
               lang={other}
               class:list={[
-                'rounded-full px-2 py-2.5 text-[0.875rem] font-semibold uppercase sm:px-3 transition-colors',
+                'rounded-full px-1.5 py-2.5 text-[0.8125rem] font-semibold uppercase sm:px-3 sm:text-[0.875rem] transition-colors',
                 nuit ? 'text-cream/70 hover:text-orange' : 'text-soft hover:text-orange-hover',
               ]}
             >
@@ -79,7 +99,7 @@ const other = otherLocale(locale);
             <a
               href={appUrls.login}
               class:list={[
-                'rounded-full px-4 py-2.5 text-[0.875rem] font-semibold whitespace-nowrap sm:px-5 transition-colors hover:bg-orange hover:text-ink',
+                'ml-1 rounded-full px-3.5 py-2.5 text-[0.8125rem] font-semibold whitespace-nowrap sm:ml-0 sm:px-5 sm:text-[0.875rem] transition-colors hover:bg-orange hover:text-ink',
                 nuit ? 'bg-cream text-ink' : 'bg-ink text-cream',
               ]}
             >

@@ -1,0 +1,370 @@
+seo:
+  title: 'Restaurant and franchise glossary | Hatch OS'
+  description: 'Plate cost, food cost ratio, HACCP, disclosure document, royalty, forward flow: the terms of the restaurant and franchise trades, from A to Z.'
+kicker: 'Glossary'
+titre: 'The words of the trade, simply defined.'
+chapeau: 'The terms that come up in the kitchen, with suppliers, in a franchise agreement and in the life of a network, from A to Z.'
+lettres: 'Jump to letter'
+# Anchors are stable: never change one once published (links point at them).
+# The order below is free: the page sorts the terms alphabetically.
+termes:
+  - mot: 'Allergens'
+    definition: 'The 14 substances or products whose presence must be disclosed to customers, listed in Annex II of Regulation (EU) No 1169/2011 (the INCO regulation): cereals containing gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, celery, mustard, sesame, sulphites above 10 mg/kg, lupin and molluscs. In France, for food that is not prepacked, a restaurant gives this information in writing, on the menu or in a document customers can consult freely without having to ask (decree No 2015-447).'
+    public: tous
+    ancre: allergens
+  - mot: 'Alim’confiance'
+    definition: 'The French Ministry of Agriculture’s public scheme that publishes the results of official hygiene inspections carried out since 1 March 2017 in restaurants, food shops and canteens. Each result is shown on a four-level hygiene scale, from “very satisfactory” to “to be corrected urgently” (agriculture.gouv.fr).'
+    public: tous
+    ancre: alim-confiance
+  - mot: 'Field manager'
+    definition: 'A franchisor employee who visits the sites, supports franchisees and checks that the concept is applied. Also called area manager or franchise business consultant.'
+    public: reseau
+    ancre: field-manager
+  - mot: 'Audit'
+    definition: 'A check of a site against a grid of criteria (hygiene, quality, welcome, brand standards), run by the network or by an outside body, followed by an action plan to fix the gaps.'
+    public: tous
+    ancre: audit
+  - mot: 'Self-checks'
+    definition: 'The checks operators run and record themselves, without waiting for an inspection: temperatures, cleaning, goods received, lab tests. Regulation (EC) No 852/2004 makes them an obligation, and official inspections review these records.'
+    public: tous
+    ancre: self-checks
+  - mot: 'Credit note'
+    definition: 'The supplier’s document that cancels or reduces all or part of an invoice, for example for missing or damaged goods, or for a discount granted afterwards. It usually quotes the number of the invoice it corrects.'
+    public: independant
+    ancre: credit-note
+  - mot: 'Commercial lease'
+    definition: 'In France, the rental contract for premises where a business is run. It cannot last less than nine years, and the tenant can in principle give notice at the end of each three-year period (Commercial Code, article L145-4). A landlord who refuses renewal must in principle pay the tenant an eviction indemnity (article L145-14).'
+    public: tous
+    ancre: commercial-lease
+  - mot: 'Short-term lease (bail dérogatoire)'
+    definition: 'A short lease that falls outside the French commercial lease rules, often used to test a location. Its total length, renewals included, cannot exceed three years (Commercial Code, article L145-5).'
+    public: tous
+    ancre: short-term-lease
+  - mot: 'Delivery note'
+    definition: 'The document handed over on delivery. It is checked against the order and the goods received, and any reservations (missing items, breakage, temperature) are written on it before signing.'
+    public: tous
+    ancre: delivery-note
+  - mot: 'Kitchen brigade'
+    definition: 'The kitchen team organised by station: head chef, sous-chef, chefs de partie, commis.'
+    public: tous
+    ancre: kitchen-brigade
+  - mot: 'Blast chiller'
+    definition: 'The appliance that brings the core temperature of cooked food down fast before cold storage, to limit bacterial growth. In French institutional catering, that temperature must not stay between +63 °C and +10 °C for more than two hours, unless a validated hazard analysis allows otherwise (order of 21 December 2009, Annex IV).'
+    public: tous
+    ancre: blast-chiller
+  - mot: 'Purchasing centre'
+    definition: 'A body that buys products from suppliers and resells them to the sites of a network. A listing centre, by contrast, only negotiates terms: the sites buy directly from the approved suppliers.'
+    public: reseau
+    ancre: purchasing-centre
+  - mot: 'Cold chain'
+    definition: 'Keeping chilled or frozen products at low temperature, without a break, from delivery to service. In France, the storage temperatures for each type of food are set by the order of 21 December 2009.'
+    public: tous
+    ancre: cold-chain
+  - mot: 'Net revenue (excl. VAT)'
+    definition: 'Sales excluding VAT. It is the basis for management ratios (food cost, labour cost) and usually for the franchise royalty; the amount taken at the till includes VAT owed to the State.'
+    public: tous
+    ancre: net-revenue
+  - mot: 'Non-compete clause'
+    definition: 'The clause that forbids the franchisee from running a competing business during the agreement or after it ends. It must stay proportionate to what it protects. After the agreement ends, Regulation (EU) 2022/720 (article 5) and article L341-2 of the French Commercial Code in principle only accept it if it is limited to one year, to the premises operated and to what is indispensable to protect the know-how.'
+    public: reseau
+    ancre: non-compete-clause
+  - mot: 'Mystery shopper'
+    definition: 'A person sent to visit as an ordinary customer who scores the welcome, the service and the brand standards.'
+    public: tous
+    ancre: mystery-shopper
+  - mot: 'European Code of Ethics for Franchising'
+    definition: 'The code of good practice of the European Franchise Federation, which networks belonging to the French Franchise Federation commit to follow. It is not law, but judges may refer to it to assess franchise practice.'
+    public: reseau
+    ancre: code-of-ethics
+  - mot: 'Markup multiplier'
+    definition: 'The number you multiply a portion’s ingredient cost by to get its selling price. State whether it gives a price before or after VAT, since VAT changes the result.'
+    public: independant
+    ancre: markup-multiplier
+  - mot: 'Income statement (P&L)'
+    definition: 'The accounting statement that sums up a financial year’s income and expenses and shows the resulting profit or loss.'
+    public: tous
+    ancre: income-statement
+  - mot: 'Franchise agreement'
+    definition: 'The contract by which the franchisor lets the franchisee use its brand and distinctive signs, passes on its know-how and supports it throughout the term, in return for payment, usually an initial fee and royalties. French law does not define it: these elements come from case law and the European Code of Ethics for Franchising.'
+    public: reseau
+    ancre: franchise-agreement
+  - mot: 'Official inspection'
+    definition: 'A hygiene inspection of a site by State officers, in French restaurants those of the DDPP or DDETSPP depending on the département. It covers the premises, practices and food safety plan records, and its result is published on Alim’confiance.'
+    public: tous
+    ancre: official-inspection
+  - mot: 'HCR collective agreement'
+    definition: 'The French national collective agreement for hotels, cafés and restaurants of 30 April 1997 (IDCC 1979). It sets minimum wages, working hours and the meal benefit in kind, among other things. Quick service restaurants fall under a different agreement (IDCC 1501).'
+    public: tous
+    ancre: hcr-collective-agreement
+  - mot: 'Quick service collective agreement'
+    definition: 'The French national collective agreement for quick service restaurants of 18 March 1988 (IDCC 1501). The main activity actually carried out, not the NAF code alone, decides whether a site falls under it or under the HCR agreement.'
+    public: tous
+    ancre: quick-service-collective-agreement
+  - mot: 'Rush'
+    definition: 'The part of service when orders pour in and the kitchen runs flat out.'
+    public: tous
+    ancre: rush
+  - mot: 'Plate cost'
+    definition: 'What the ingredients of one portion cost, worked out from the recipe card and purchase prices. It is the basis for pricing a dish. In accounting, full cost also includes labour and overheads; in the kitchen the term usually means ingredient cost only.'
+    public: independant
+    ancre: plate-cost
+  - mot: 'Cover'
+    definition: 'One guest served a meal. Covers per service are counted to track footfall and work out the average spend per guest.'
+    public: tous
+    ancre: cover
+  - mot: 'Dark kitchen'
+    definition: 'A kitchen with no dining room that only sells for delivery or pickup, usually through platforms.'
+    public: tous
+    ancre: dark-kitchen
+  - mot: 'Best-before date (DDM)'
+    definition: 'The date marked “best before” or “best before end” (Regulation (EU) No 1169/2011, Annex X). After that date the product may lose some quality but is still fit to eat.'
+    public: tous
+    ancre: best-before-date
+  - mot: 'Shrinkage'
+    definition: 'Products bought but never sold: expired, thrown away, damaged, eaten by staff or given away. Known shrinkage is recorded as it happens; unknown shrinkage shows in the gap between theoretical and counted stock.'
+    public: tous
+    ancre: shrinkage
+  - mot: 'Disclosure document (DIP)'
+    definition: 'The French pre-contractual information document. Anyone who lets another party use a brand or trade name while requiring exclusive or quasi-exclusive dealing must hand it over, with the draft contract, at least 20 days before signing or before any payment required before signing (Commercial Code, article L330-3). Its content is set by article R330-1: the company and network, accounts, state of the market, main contract terms.'
+    public: reseau
+    ancre: disclosure-document
+  - mot: 'Use-by date (DLC)'
+    definition: 'The date marked “use by” on highly perishable food (Regulation (EU) No 1169/2011, Annex X). After that date the food is deemed unsafe and must no longer be served or sold (article 24 of the same regulation).'
+    public: tous
+    ancre: use-by-date
+  - mot: 'Leasehold right (droit au bail)'
+    definition: 'The value of the right to occupy commercial premises and have the lease renewed. An incoming tenant pays it to the outgoing tenant when taking over a running lease.'
+    public: tous
+    ancre: leasehold-right
+  - mot: 'Initial franchise fee'
+    definition: 'The sum the franchisee pays on signing to join the network. It usually pays for access to the brand, the initial transfer of know-how and start-up support.'
+    public: reseau
+    ancre: initial-franchise-fee
+  - mot: 'Risk assessment document (DUERP)'
+    definition: 'The single occupational risk assessment document every French employer must draw up from the first employee, listing the risks of each job (burns, cuts, falls) and the prevention measures (Labour Code, articles R4121-1 and following). Businesses with 11 or more employees must update it at least once a year.'
+    public: tous
+    ancre: risk-assessment-document
+  - mot: 'Gross operating surplus (EBE)'
+    definition: 'Value added, plus operating subsidies, minus taxes and staff costs (Insee definition). It measures what operations generate before depreciation, interest, exceptional items and corporate tax, and is close to EBITDA without being identical.'
+    public: tous
+    ancre: ebe
+  - mot: 'Food cost variance'
+    definition: 'The gap between theoretical food cost, worked out from sales and recipe cards, and actual food cost, measured from purchases and stock counts. A widening gap points to waste, portions not respected, invoicing errors or theft.'
+    public: tous
+    ancre: food-cost-variance
+  - mot: 'Prime location'
+    definition: 'The spot with the highest footfall of potential customers in a town or district, such as a pedestrian shopping street. It costs more in rent and in leasehold right. In French it is called “emplacement n° 1”.'
+    public: tous
+    ancre: prime-location
+  - mot: 'Trade name (enseigne)'
+    definition: 'The name or sign that identifies the site to the public, on the shopfront and in communication. In a network, the word also means the brand shared by all sites.'
+    public: tous
+    ancre: trade-name
+  - mot: 'Multi-skilled crew member'
+    definition: 'An employee trained on several stations, for example till, prep and service. The term is common in quick service restaurants.'
+    public: tous
+    ancre: multi-skilled-crew-member
+  - mot: 'Local market report'
+    definition: 'The description of the market in the area where the candidate will open, which the franchisor must include in the DIP alongside the general state of the market (French Commercial Code, article R330-1). The law does not define it, and it does not replace the market study candidates must carry out themselves.'
+    public: reseau
+    ancre: local-market-report
+  - mot: 'Territorial exclusivity'
+    definition: 'The area in which the franchisor commits not to open, or let anyone open, another site of the brand. It is not mandatory, and the agreement says what it covers, for example delivery, online sales or sites such as railway stations.'
+    public: reseau
+    ancre: territorial-exclusivity
+  - mot: 'Homemade (fait maison)'
+    definition: 'The French label or logo that marks on the menu a dish prepared on site from raw products, some processed products listed in the rules being allowed. A restaurant must flag in this way each dish that meets the definition (Consumer Code, article L122-19, decree No 2015-505).'
+    public: tous
+    ancre: homemade
+  - mot: 'Administrative closure'
+    definition: 'The closure of all or part of a site ordered by the French prefect. For hygiene, it follows when the operator has not fixed the failings within the deadline of a formal notice, or comes at once in case of serious and imminent danger (Rural and Fishing Code, article L233-1). A bar or restaurant can also be closed for breaches of public order (Public Health Code, article L3332-15).'
+    public: tous
+    ancre: administrative-closure
+  - mot: 'Recipe card'
+    definition: 'The sheet for one recipe: ingredients, quantities per portion, steps, plating and cost. It keeps the dish the same from one service to the next.'
+    public: tous
+    ancre: recipe-card
+  - mot: 'Business (fonds de commerce)'
+    definition: 'All the elements used to run a business: customers, trade name, sign, leasehold right, equipment and, where relevant, licences (French Commercial Code, article L142-2). It is what gets sold or leased out under a management lease, separately from the building.'
+    public: tous
+    ancre: fonds-de-commerce
+  - mot: 'Marketing fund'
+    definition: 'The franchisees’ contribution that pays for the brand’s advertising and communication, national or local. It usually comes on top of the royalty, and the agreement sets its amount and use.'
+    public: reseau
+    ancre: marketing-fund
+  - mot: 'Food hygiene training'
+    definition: 'The 14-hour food hygiene course that at least one staff member must have taken in every French traditional restaurant, cafeteria or self-service and quick service restaurant (Rural and Fishing Code, article L233-4, decree No 2011-731, order of 5 October 2011). Holders of certain catering qualifications are exempt.'
+    public: tous
+    ancre: food-hygiene-training
+  - mot: 'Franchisee'
+    definition: 'The legally and financially independent business owner who runs a site under the franchisor’s brand, with their own capital and their own staff.'
+    public: reseau
+    ancre: franchisee
+  - mot: 'Franchisor'
+    definition: 'The company that created the concept and the brand, and lets franchisees use them while passing on its know-how, for a fee.'
+    public: reseau
+    ancre: franchisor
+  - mot: 'Good hygiene practice guide (GBPH)'
+    definition: 'A guide to good hygiene practice and HACCP principles, written by a trade and validated by the French authorities, that turns the rules into concrete practice (Regulation (EC) No 852/2004, article 8). Following it is not mandatory, but it helps operators show they meet their obligations.'
+    public: tous
+    ancre: good-hygiene-practice-guide
+  - mot: 'HACCP'
+    definition: 'Hazard Analysis and Critical Control Points: the method that identifies food safety hazards and sets the steps where they must be controlled (critical control points), with their limits, monitoring and corrective actions. Regulation (EC) No 852/2004 (article 5) requires every food business operator to apply procedures based on its principles.'
+    public: tous
+    ancre: haccp
+  - mot: 'Menu engineering'
+    definition: 'Analysing the menu by crossing each dish’s popularity with its margin, to decide which to keep, push or drop.'
+    public: independant
+    ancre: menu-engineering
+  - mot: 'Stock count'
+    definition: 'Counting and valuing the stock on a given date. Opening stock, plus purchases, minus closing stock gives the real consumption of ingredients over the period.'
+    public: tous
+    ancre: stock-count
+  - mot: 'Trademark licence'
+    definition: 'The contract by which a trademark owner lets another party use it, usually for a royalty, with no duty to pass on know-how (French Intellectual Property Code, article L714-1). If it requires exclusivity, the DIP is still due (Commercial Code, article L330-3).'
+    public: reseau
+    ancre: trademark-licence
+  - mot: 'Licence IV'
+    definition: 'The French category 4 licence, or full licence, that lets a bar serve on site every drink whose consumption is allowed, with no meal required (Public Health Code, article L3331-1). With few exceptions, creating new Licence IVs is forbidden: an existing one has to be bought (article L3332-2).'
+    public: tous
+    ancre: licence-iv
+  - mot: 'Restaurant licence'
+    definition: 'The French authorisation to serve alcoholic drinks during meals, alongside food (Public Health Code, article L3331-2). The small restaurant licence covers group 3 drinks such as wine, beer or cider; the restaurant licence covers every drink whose consumption is allowed.'
+    public: tous
+    ancre: restaurant-licence
+  - mot: 'Management lease (location-gérance)'
+    definition: 'The contract by which the owner of a business hands its operation to a manager-tenant, who runs it at their own risk and pays the owner a fee (French Commercial Code, article L144-1).'
+    public: tous
+    ancre: management-lease
+  - mot: 'Operations manual'
+    definition: 'The confidential document that sets out the network’s know-how: recipes, procedures, service and hygiene standards. The franchisor hands it to the franchisee and keeps it up to date. Also called the “bible”.'
+    public: reseau
+    ancre: operations-manual
+  - mot: 'Forward flow'
+    definition: 'The kitchen layout principle where food moves from dirty to clean areas, from receiving to service, without clean and dirty paths crossing. The separation can be in space or in time, with cleaning between two tasks.'
+    public: tous
+    ancre: forward-flow
+  - mot: 'Gross margin'
+    definition: 'Revenue excluding VAT minus the cost of ingredients consumed, that is purchases adjusted for the change in stock. It is expressed in euros or as a percentage of revenue.'
+    public: tous
+    ancre: gross-margin
+  - mot: 'Master franchise'
+    definition: 'The agreement by which a franchisor gives a partner, the master franchisee, the exclusive right to develop the brand in a country or region. The master franchisee recruits and supports the franchisees in its territory, and may also open its own sites.'
+    public: reseau
+    ancre: master-franchise
+  - mot: 'Supplier price list'
+    definition: 'A supplier’s prices for a period. Comparing it with the invoices shows price rises nobody announced.'
+    public: tous
+    ancre: supplier-price-list
+  - mot: 'Mise en place'
+    definition: 'Everything prepared before service (vegetables cut, sauces made, stations set) so dishes go out fast during the rush.'
+    public: tous
+    ancre: mise-en-place
+  - mot: 'Multi-unit franchisee'
+    definition: 'A franchisee who runs several sites, of one brand or of several.'
+    public: reseau
+    ancre: multi-unit-franchisee
+  - mot: 'Non-conformity'
+    definition: 'A gap against a rule or a standard, found in an audit, an official inspection or a self-check. It gets fixed and recorded.'
+    public: tous
+    ancre: non-conformity
+  - mot: 'Meat origin labelling'
+    definition: 'The duty for French restaurants to tell customers in writing the country of origin or provenance of the beef, pork, sheep meat and poultry they serve (decree No 2002-1465, extended by decree No 2025-141).'
+    public: tous
+    ancre: meat-origin-labelling
+  - mot: 'Key money (pas-de-porte)'
+    definition: 'A sum paid to the landlord on signing a commercial lease, on top of rent. Depending on how the lease words it, it is treated as extra rent or as an indemnity, which changes its tax treatment and its effect on the renewal rent.'
+    public: tous
+    ancre: key-money
+  - mot: 'Operating permit'
+    definition: 'The permit, valid for ten years, issued after compulsory training on the rights and duties of selling alcohol. In France it is required of anyone declaring the opening, change of owner, move or transfer of a category 3 or 4 on-premises drinks licence, or a site with a small restaurant licence or a restaurant licence (Public Health Code, article L3332-1-1).'
+    public: tous
+    ancre: operating-permit
+  - mot: 'Corrective action plan'
+    definition: 'The list of gaps found in an audit, each with an action, an owner and a due date.'
+    public: tous
+    ancre: corrective-action-plan
+  - mot: 'Cleaning schedule'
+    definition: 'The document that sets, for each area and piece of equipment, what to clean and disinfect, with which product, how often and by whom. It belongs to the good hygiene practices of the food safety plan, along with a record of the tasks done.'
+    public: tous
+    ancre: cleaning-schedule
+  - mot: 'Food safety plan (PMS)'
+    definition: 'The file that sets out the measures a site takes to ensure the hygiene and safety of its food: good hygiene practices, HACCP plan, traceability and handling of non-conformities, including withdrawals and recalls. It meets Regulations (EC) No 852/2004 and No 178/2002; in France its content is described by the order of 8 June 2006.'
+    public: tous
+    ancre: food-safety-plan
+  - mot: 'Business plan forecast'
+    definition: 'The projected income statement and cash flow plan for the first years. The bank asks for it before granting a loan; a franchisor who gives one to a candidate must base it on sound data or risk liability.'
+    public: tous
+    ancre: business-plan-forecast
+  - mot: 'Prime cost'
+    definition: 'The cost of ingredients consumed plus total labour cost, payroll taxes included. These are the two costs operators manage day to day, tracked as a percentage of revenue excluding VAT.'
+    public: tous
+    ancre: prime-cost
+  - mot: 'Food cost ratio'
+    definition: 'The cost of ingredients consumed divided by the matching revenue excluding VAT, as a percentage. Consumption comes from stock counts (opening stock, plus purchases, minus closing stock), not from purchases alone. Also called food cost.'
+    public: independant
+    ancre: food-cost-ratio
+  - mot: 'Royalty'
+    definition: 'A sum the franchisee pays the franchisor at regular intervals during the agreement, in return for use of the brand and ongoing support. It is most often a percentage of revenue excluding VAT, sometimes a fixed amount.'
+    public: reseau
+    ancre: royalty
+  - mot: 'Approved suppliers'
+    definition: 'The suppliers and products selected by the head office on negotiated terms, which franchisees must or may use depending on the agreement. An exclusive purchasing obligation must be justified by the identity and quality of the concept.'
+    public: reseau
+    ancre: approved-suppliers
+  - mot: 'Temperature log'
+    definition: 'The written record of fridge, cold room and food temperatures. It is one of the self-checks of the food safety plan and serves as proof during an inspection.'
+    public: tous
+    ancre: temperature-log
+  - mot: 'Year-end rebate'
+    definition: 'A conditional rebate a supplier grants once a yearly purchase volume is reached, usually paid as a credit note. In a network, the agreement or the supplier listing deal says who receives it, the head office or the franchisees.'
+    public: reseau
+    ancre: year-end-rebate
+  - mot: 'Opening countdown'
+    definition: 'The schedule of tasks before an opening, built backwards from the opening date: works, hiring, training, orders.'
+    public: reseau
+    ancre: opening-countdown
+  - mot: 'Table turnover'
+    definition: 'The number of times a seat is used during a service, that is covers divided by seats. It measures how well the dining room is used at peak times.'
+    public: tous
+    ancre: table-turnover
+  - mot: 'Know-how'
+    definition: 'A package of non-patented practical information, resulting from the franchisor’s experience and testing, that must be secret, substantial and identified (Regulation (EU) 2022/720, article 1). Passing it on is what sets a franchise apart from a mere trademark licence.'
+    public: reseau
+    ancre: know-how
+  - mot: 'Break-even point'
+    definition: 'The revenue at which the site covers all its fixed and variable costs, with neither loss nor profit. It equals fixed costs divided by the contribution margin rate.'
+    public: tous
+    ancre: break-even-point
+  - mot: 'Company-owned site'
+    definition: 'A site owned and run directly by the head office or one of its subsidiaries, with its own staff, and no franchisee.'
+    public: reseau
+    ancre: company-owned-site
+  - mot: 'Average ticket'
+    definition: 'Revenue over a period divided by the number of till receipts. Divided by covers instead of receipts, it gives the average spend per guest.'
+    public: tous
+    ancre: average-ticket
+  - mot: 'Foodborne outbreak (TIAC)'
+    definition: 'A collective foodborne illness: at least two cases with similar symptoms, usually digestive, that can be traced to the same food source (Santé publique France definition). In France it is a notifiable disease that triggers an investigation by the regional health agency and the veterinary services.'
+    public: tous
+    ancre: foodborne-outbreak
+  - mot: 'Traceability'
+    definition: 'Being able to identify the supplier and batch of every food received, from the labels and delivery notes kept, and, when supplying another business, who it was sold to (Regulation (EC) No 178/2002, article 18). It allows a product to be withdrawn or recalled during an alert.'
+    public: tous
+    ancre: traceability
+  - mot: 'Staff turnover'
+    definition: 'The share of employees who leave the business over a period.'
+    public: tous
+    ancre: staff-turnover
+  - mot: 'VAT in restaurants'
+    definition: 'In France, meals served on site and dishes prepared for immediate consumption, taken away or delivered, are taxed at 10 % (General Tax Code, article 279 m). Alcoholic drinks are always taxed at 20 %, and food sold in packaging that allows it to be kept, such as a soft drink in a sealed bottle, at 5.5 % (article 278-0 bis A).'
+    public: tous
+    ancre: vat-in-restaurants
+  - mot: 'Pilot unit'
+    definition: 'The site where the franchisor tested and fine-tuned its concept before offering it as a franchise. The European Code of Ethics for Franchising asks franchisors to have run the concept successfully in at least one pilot unit before launching the network.'
+    public: reseau
+    ancre: pilot-unit
+  - mot: 'Catchment area'
+    definition: 'The area most of a site’s customers come from, measured in travel time or distance. Studying it (population, footfall, competition) comes before choosing a location.'
+    public: tous
+    ancre: catchment-area

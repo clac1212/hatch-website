@@ -25,6 +25,10 @@ export interface ScenePied {
   alt: string;
   titre: string;
   liste: { repere: string; texte: string; href: string }[];
+  /** A wide strip (the resources' agents in a row): full width above the brand, not beside it. */
+  bande?: boolean;
+  /** The strip's phone version (two rows), shown below 768 px instead of the wide one. */
+  imageEtroite?: ImageMetadata;
 }
 
 interface Props {
@@ -41,6 +45,7 @@ interface Props {
 }
 
 const { locale, paths, scene, accueil = false, epure = false } = Astro.props;
+const bande = epure && !!scene?.bande;
 const t = useTranslations(locale);
 const data = await section('piedDePage', locale);
 const home = routes.home[locale];
@@ -80,23 +85,52 @@ const lien = 'lien-pied block w-fit text-[14.5px] leading-[normal] text-paper';
 <footer data-rv-groupe class="bg-black text-paper">
   <div
     class:list={[
-      'mx-auto flex max-w-[1920px] flex-col lg:flex-row',
-      epure ? 'max-w-[1440px] lg:items-center lg:gap-10 lg:px-12' : 'xl:h-[900px]',
+      'mx-auto flex max-w-[1920px] flex-col',
+      bande
+        ? 'max-w-[1440px] lg:px-12'
+        : epure
+          ? 'max-w-[1440px] lg:flex-row lg:items-center lg:gap-10 lg:px-12'
+          : 'lg:flex-row xl:h-[900px]',
     ]}
   >
     <div
       data-rv
       class:list={[
-        'order-1 flex justify-center lg:order-2 lg:shrink-0',
-        epure ? 'lg:w-[46%] lg:py-14' : 'lg:w-[40%] xl:w-[min(720px,42%)]',
+        'order-1 flex justify-center lg:shrink-0',
+        bande
+          ? 'px-6 pt-14 md:px-12 lg:px-0 lg:pt-16'
+          : epure
+            ? 'lg:order-2 lg:w-[46%] lg:py-14'
+            : 'lg:order-2 lg:w-[40%] xl:w-[min(720px,42%)]',
       ]}
     >
+      {
+        bande && scene?.imageEtroite && (
+          <Picture
+            pictureAttributes={{ class: 'block w-full max-w-[460px] md:hidden' }}
+            src={scene.imageEtroite}
+            alt={scene.alt}
+            widths={[400, 800, 1200]}
+            sizes="100vw"
+            formats={['avif', 'webp']}
+            class="block h-auto w-full"
+          />
+        )
+      }
       <Picture
-        pictureAttributes={{ class: 'block w-full max-w-[460px] lg:h-full lg:max-w-none' }}
+        pictureAttributes={{
+          class: bande
+            ? ['block w-full max-w-[1200px]', scene?.imageEtroite && 'max-md:hidden']
+                .filter(Boolean)
+                .join(' ')
+            : 'block w-full max-w-[460px] lg:h-full lg:max-w-none',
+        }}
         src={scene?.image ?? immeuble}
         alt={scene?.alt ?? data.immeubleAlt}
         widths={[480, 720, 1080, 1440]}
-        sizes="(min-width: 1280px) 720px, (min-width: 1024px) 40vw, (min-width: 768px) 460px, 100vw"
+        sizes={bande
+          ? '(min-width: 1280px) 1200px, 100vw'
+          : '(min-width: 1280px) 720px, (min-width: 1024px) 40vw, (min-width: 768px) 460px, 100vw'}
         formats={['avif', 'webp']}
         class:list={[
           'block h-auto w-full',
@@ -107,10 +141,13 @@ const lien = 'lien-pied block w-fit text-[14.5px] leading-[normal] text-paper';
 
     <div
       class:list={[
-        'order-2 flex min-w-0 flex-1 flex-col gap-14 px-6 pt-4 pb-10 md:px-12 lg:order-1',
-        epure
-          ? 'lg:justify-center lg:gap-16 lg:py-14 lg:pr-0 lg:pl-0 xl:pl-12'
-          : 'justify-between lg:gap-10 lg:pt-20 lg:pr-8 xl:pt-[88px] xl:pr-12 xl:pl-24',
+        'order-2 flex min-w-0 flex-1 flex-col gap-14 px-6 pt-4 pb-10 md:px-12',
+        !bande && 'lg:order-1',
+        bande
+          ? 'lg:flex-row lg:items-end lg:justify-between lg:px-0 lg:pt-12'
+          : epure
+            ? 'lg:justify-center lg:gap-16 lg:py-14 lg:pr-0 lg:pl-0 xl:pl-12'
+            : 'justify-between lg:gap-10 lg:pt-20 lg:pr-8 xl:pt-[88px] xl:pr-12 xl:pl-24',
       ]}
     >
       <div data-rv class="flex max-w-[420px] flex-col items-start gap-[18px]">

@@ -1,0 +1,77 @@
+---
+import { getEntry } from 'astro:content';
+import Button from '../ui/Button.astro';
+import { routes, useTranslations, type Locale } from '../../i18n/ui';
+import type { PublicCible } from '../../content/pages/schemas';
+
+/**
+ * The two ways out of the resources: the Robin waitlist for independents, the demo for networks.
+ * `public` picks them: `tous` shows both side by side (/ressources, a guide for everyone), a guide
+ * for one audience shows only its own.
+ */
+interface Props {
+  locale: Locale;
+  public: PublicCible;
+  /** Filter hook of /ressources: each card carries its audience. */
+  filtrable?: boolean;
+}
+
+const { locale, public: cible, filtrable = false } = Astro.props;
+const t = useTranslations(locale);
+const ui = (await getEntry('ressourcesPage', locale))?.data;
+if (!ui) throw new Error(`Missing src/content/pages/ressources/${locale}.yaml`);
+const { independant, reseau } = ui.sorties;
+const cartes = [
+  cible !== 'reseau' && {
+    public: 'independant',
+    ...independant,
+    href: `${routes.robin[locale]}#beta`,
+    cta: independant.cta,
+  },
+  cible !== 'independant' && {
+    public: 'reseau',
+    ...reseau,
+    href: routes.demo[locale],
+    cta: t('cta.demo'),
+  },
+].filter((c) => !!c);
+---
+
+<div
+  class:list={['grid gap-5', cartes.length > 1 && 'md:grid-cols-2']}
+  data-filtre-groupe={filtrable ? '' : undefined}
+>
+  {
+    cartes.map((c) => (
+      <div
+        class:list={[
+          'flex flex-col gap-3 rounded-card p-7 sm:p-9',
+          c.public === 'independant' ? 'bg-night text-cream' : 'border border-line bg-surface',
+        ]}
+        data-public={filtrable ? c.public : undefined}
+      >
+        <span
+          class:list={[
+            'font-mono text-kicker uppercase',
+            c.public === 'independant' ? 'text-cream/60' : 'text-orange-txt',
+          ]}
+        >
+          {c.kicker}
+        </span>
+        <h2 class="font-display text-card font-semibold text-balance sm:text-[1.75rem]">
+          {c.titre}
+        </h2>
+        <p
+          class:list={['max-w-[46ch]', c.public === 'independant' ? 'text-cream/75' : 'text-soft']}
+        >
+          {c.texte}
+        </p>
+        <div class="mt-auto pt-4">
+          <Button href={c.href} variant={c.public === 'independant' ? 'cream' : 'orange'}>
+            {c.cta}
+          </Button>
+        </div>
+      </div>
+    ))
+  }
+</div>

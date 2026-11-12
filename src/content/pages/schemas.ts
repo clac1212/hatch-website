@@ -190,3 +190,114 @@ export const agentPage = z.strictObject({
   faq: z.string(),
   related: z.strictObject({ title: z.string(), demo: z.string() }),
 });
+
+/** Who a resource is for: independents (Robin), networks (the agents), or both. */
+export const publicCible = z.enum(['independant', 'reseau', 'tous']);
+export type PublicCible = z.infer<typeof publicCible>;
+
+const texte = z.string().min(1);
+
+/**
+ * A downloadable template of /ressources. Each format points to a file of `public/ressources/`
+ * (raw, never optimised); a format whose file is not there yet is not shown, nor is a template left
+ * with none, nor the whole section when no template has a file.
+ */
+const modele = z.strictObject({
+  public: publicCible,
+  titre: texte,
+  texte,
+  formats: z
+    .array(
+      z.strictObject({
+        format: z.enum(['PDF', 'Sheets', 'Docs']),
+        /** File name in public/ressources/ (e.g. `fiche-technique.xlsx`); absent until it exists. */
+        fichier: z
+          .string()
+          .regex(/^[a-z0-9-]+\.(pdf|xlsx|docx)$/)
+          .optional(),
+      }),
+    )
+    .min(1),
+});
+
+/** The two ways out, at the bottom of /ressources and of each guide (by its audience). */
+const sortie = z.strictObject({ kicker: texte, titre: texte, texte });
+
+/** /ressources — the index (templates, guides, glossary preview), and the guides' shared labels. */
+export const ressourcesPage = z.strictObject({
+  seo,
+  hero: z.strictObject({
+    kicker: texte,
+    titre: texte,
+    chapeau: texte,
+    /** aria-label of the filter's button group. */
+    filtre: texte,
+    filtres: z.strictObject({ tout: texte, independant: texte, reseau: texte }),
+  }),
+  modeles: z.strictObject({
+    kicker: texte,
+    titre: texte,
+    texte,
+    telecharger: texte,
+    liste: z.array(modele).min(1),
+  }),
+  guides: z.strictObject({
+    kicker: texte,
+    titre: texte,
+    texte,
+    /** Heading of the featured guide (`une: true`, else the latest). */
+    une: texte,
+    /** Heading of the grid of every guide, and its theme filter. */
+    tous: texte,
+    themes: texte,
+    toutTheme: texte,
+    lire: texte,
+  }),
+  glossaire: z.strictObject({ kicker: texte, titre: texte, texte, lien: texte }),
+  sorties: z.strictObject({
+    independant: sortie.extend({ cta: texte }),
+    reseau: sortie,
+  }),
+  /** Labels shared by every guide page (/ressources/<slug>). */
+  guide: z.strictObject({
+    /** Breadcrumb's name of /ressources (structured data and the link above the kicker). */
+    retour: texte,
+    /** `{n}`: the reading time in minutes. */
+    lecture: texte,
+    majLe: texte,
+    faq: texte,
+    sources: texte,
+    /** Before a source's reading date: « lu le 2 octobre 2026 ». */
+    luLe: texte,
+    agents: texte,
+    agentLien: texte,
+    essentiel: texte,
+    sommaire: texte,
+    /** The related guides at the end (same audience first). */
+    lies: texte,
+  }),
+});
+
+/** /ressources/glossaire — the terms, one YAML per locale (`src/content/pages/glossaire`). */
+export const glossairePage = z.strictObject({
+  seo,
+  kicker: texte,
+  titre: texte,
+  chapeau: texte,
+  /** Accessible name of the A to Z letter bar. */
+  lettres: texte,
+  termes: z
+    .array(
+      z.strictObject({
+        mot: texte,
+        definition: texte,
+        public: publicCible,
+        /** Stable anchor of the term on the glossary page: never change it once published. */
+        ancre: z.string().regex(/^[a-z0-9-]+$/),
+      }),
+    )
+    .min(1)
+    .refine((t) => new Set(t.map((x) => x.ancre)).size === t.length, {
+      message: 'Two glossary terms share an anchor',
+    }),
+});

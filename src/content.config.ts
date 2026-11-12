@@ -19,12 +19,15 @@ import { schema as agent } from './content/schemas/agents';
 import { schema as bento } from './content/schemas/bento';
 import { schema as scene } from './content/schemas/scenes';
 import { schema as agentProbleme } from './content/schemas/agent-probleme';
+import { schema as ressource } from './content/schemas/ressource';
 import {
   demoPage,
   securityPage,
   sansFiltrePage,
   sansFiltreEdition,
   agentPage,
+  ressourcesPage,
+  glossairePage,
 } from './content/pages/schemas';
 
 /**
@@ -105,8 +108,17 @@ const sansFiltre = defineCollection({
   schema: sansFiltreEdition,
 });
 
+/** The guides of /ressources, one Markdown file per guide and per locale (`fr/<slug>.md`). */
+const ressources = defineCollection({
+  loader: glob({ pattern: '*/*.md', base: './src/content/ressources' }),
+  schema: ressource,
+});
+
 export const collections = {
   legal,
+  ressources,
+  ressourcesPage: pageCollection('ressources', ressourcesPage),
+  glossairePage: pageCollection('glossaire', glossairePage),
   sansFiltre,
   demoPage: pageCollection('demo', demoPage),
   securityPage: pageCollection('security', securityPage),
