@@ -1,9 +1,22 @@
 ---
 import { getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
+import peep from '../assets/portraits/peep.jpg';
+import owl from '../assets/portraits/owl.jpg';
+import jay from '../assets/portraits/jay.jpg';
+import lark from '../assets/portraits/lark.jpg';
+import finch from '../assets/portraits/finch.jpg';
+import pecker from '../assets/portraits/pecker.jpg';
+import sparrow from '../assets/portraits/sparrow.jpg';
+import { section } from '../content/section';
 import { routes, type Locale } from '../i18n/ui';
 
-/** Demo booking page with the inline Cal.com agenda, shared by /demo and /en/demo. */
+/**
+ * Demo booking page with the inline Cal.com agenda, shared by /demo and /en/demo. Above the
+ * agenda, the visitor ticks the offers they are interested in, as in the pricing form (the Core, plus
+ * Finch, Pecker, Sparrow): the choice is handed to the booking (Cal.com field `agents`, and a line
+ * in the notes) so the demo is prepared on them.
+ */
 interface Props {
   locale: Locale;
 }
@@ -13,6 +26,14 @@ const entry = await getEntry('demoPage', locale);
 if (!entry) throw new Error(`Missing src/content/pages/demo/${locale}.yaml`);
 const d = entry.data;
 const calLink = 'patrick-rakotondrajao-bjremk/presentation-hatch';
+
+/** The four offers of the pricing form (the Core, then Finch, Pecker, Sparrow), with its copy. */
+const c = await section('tarifsFormulaire', locale);
+/** What the booking receives for each offer: the Core spelled out with its four agents. */
+const valeur = (o: (typeof c.offres)[number]) =>
+  o.id === 'socle' ? `${c.notes.socle} (${o.agents.map((ag) => ag.nom).join(', ')})` : o.nom;
+/** As in the pricing form, each agent faces us in a circle and waves when its offer is checked. */
+const portraits = { peep, owl, jay, lark, finch, pecker, sparrow };
 ---
 
 <Base locale={locale} paths={routes.demo} title={d.seo.title} description={d.seo.description}>
@@ -31,9 +52,95 @@ const calLink = 'patrick-rakotondrajao-bjremk/presentation-hatch';
       </p>
     </header>
 
+    <fieldset
+      id="choix-agents"
+      class="mt-12 rounded-glass bg-surface p-5 shadow-1 outline outline-1 -outline-offset-1 outline-line md:mt-14 md:p-8"
+      data-note={d.agents.note}
+    >
+      <legend class="sr-only">{d.agents.titre}</legend>
+      <div class="flex items-start justify-between gap-4 px-1">
+        <div class="flex flex-col gap-1" aria-hidden="true">
+          <p class="font-display text-[24px] leading-tight font-bold text-ink md:text-[28px]">
+            {d.agents.titre}
+          </p>
+          <p class="text-caption text-soft">{d.agents.aide}</p>
+        </div>
+        <button
+          type="button"
+          class="anim-pause"
+          data-anim-pause
+          data-label-pause={c.pause.pause}
+          data-label-reprendre={c.pause.reprendre}
+          aria-pressed="false"
+          hidden
+        >
+          <span class="ap-ico" aria-hidden="true"></span>
+          <span class="sr-only" data-anim-label>{c.pause.pause}</span>
+        </button>
+      </div>
+      <div class="mt-5 grid gap-3 sm:grid-cols-3" data-equipe>
+        {
+          c.offres.map((o) => (
+            <label class:list={['choix', o.id === 'socle' && 'socle sm:col-span-3']}>
+              <input
+                type="checkbox"
+                id={`d-${o.id}`}
+                name="agents"
+                value={valeur(o)}
+                class="sr-only"
+              />
+              <span class="troupe" aria-hidden="true">
+                {o.agents.map((ag, k) => (
+                  <span class="membre" style={`--k:${k}`}>
+                    <span class="rond">
+                      <video
+                        src={`/anim/${ag.id}-geste.mp4`}
+                        poster={portraits[ag.id].src}
+                        muted
+                        playsinline
+                        preload="none"
+                      />
+                    </span>
+                    {o.id === 'socle' && (
+                      <span class="membre-nom">
+                        <b>{ag.nom}</b> {ag.role}
+                      </span>
+                    )}
+                  </span>
+                ))}
+              </span>
+              <span class="flex min-w-0 flex-col gap-1">
+                {(o.id === 'finch' || o.id === 'pecker') && (
+                  <span class="avec-socle">
+                    <span aria-hidden="true">+</span> {c.avecSocle}
+                  </span>
+                )}
+                <span class="flex flex-wrap items-baseline gap-x-3 pr-8">
+                  <b class="font-display text-[20px] text-ink">{o.nom}</b>
+                  <span class="font-mono text-[11px] tracking-[0.14em] text-orange-txt uppercase">
+                    {o.tag}
+                  </span>
+                </span>
+                <span class="text-[14px] leading-5 text-soft">{o.texte}</span>
+                {o.id === 'socle' && <span class="requis">{c.requis}</span>}
+              </span>
+              <span class="coche" aria-hidden="true">
+                ✓
+              </span>
+            </label>
+          ))
+        }
+        <label class="choix sm:col-span-3">
+          <input type="checkbox" name="agents-inconnu" value={d.agents.inconnu} class="sr-only" />
+          <b class="pr-8 font-display text-[17px] leading-tight text-ink">{d.agents.inconnu}</b>
+          <span class="coche" aria-hidden="true"> ✓ </span>
+        </label>
+      </div>
+    </fieldset>
+
     <section
       aria-labelledby="agenda-titre"
-      class="mt-12 rounded-glass bg-surface p-4 shadow-1 outline outline-1 -outline-offset-1 outline-line md:mt-14 md:p-8"
+      class="mt-6 rounded-glass bg-surface p-4 shadow-1 outline outline-1 -outline-offset-1 outline-line md:p-8"
     >
       <div class="flex flex-col gap-1 px-2 pt-2 md:flex-row md:items-baseline md:justify-between">
         <h2
@@ -44,13 +151,21 @@ const calLink = 'patrick-rakotondrajao-bjremk/presentation-hatch';
         </h2>
         <p class="text-caption text-muted">{d.agendaHint}</p>
       </div>
-      <div class="relative mt-4 min-h-[650px]">
+      <div id="cal-zone" class="relative mt-4 min-h-[650px]">
         <p
           id="cal-attente"
           class="absolute inset-x-0 top-24 text-center font-mono text-caption text-muted uppercase"
           aria-live="polite"
         >
           {d.agendaFallback}
+        </p>
+        <!-- Until something is ticked above, no slot can be booked. -->
+        <p
+          id="cal-verrou"
+          class="mx-auto max-w-[420px] px-4 py-14 text-center text-body text-soft"
+          hidden
+        >
+          {d.agents.verrou}
         </p>
         <div
           id="cal-inline"
@@ -59,7 +174,7 @@ const calLink = 'patrick-rakotondrajao-bjremk/presentation-hatch';
         >
         </div>
       </div>
-      <p class="px-2 pt-3 text-caption">
+      <p id="cal-lien" class="px-2 pt-3 text-caption">
         <a
           href={`https://cal.com/${calLink}`}
           target="_blank"
@@ -72,6 +187,206 @@ const calLink = 'patrick-rakotondrajao-bjremk/presentation-hatch';
     </section>
   </div>
 </Base>
+
+<style>
+  /* An offer to tick, as in the pricing form: the whole card is the label of a real checkbox. */
+  .choix {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+    padding: 18px;
+    border-radius: var(--radius-card);
+    background: var(--color-surface-2);
+    box-shadow: inset 0 0 0 1px var(--color-line);
+    cursor: pointer;
+    transition:
+      box-shadow 0.2s var(--ease-hatch),
+      background-color 0.2s var(--ease-hatch);
+  }
+  .choix:hover {
+    box-shadow: inset 0 0 0 1px var(--color-orange-txt);
+  }
+  .choix:has(input:checked) {
+    background: var(--color-orange-tint);
+    box-shadow: inset 0 0 0 2px var(--color-orange-txt);
+  }
+  .choix:has(input:focus-visible) {
+    outline: 2px solid var(--color-orange-txt);
+    outline-offset: 3px;
+  }
+  /* Agents face us, each in a circle; when their offer is checked, they rise a little and wave. */
+  .troupe {
+    display: flex;
+    gap: 18px;
+    margin-right: 30px; /* room for the check mark, top right */
+  }
+  .membre {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .rond {
+    display: block;
+    width: 84px;
+    height: 84px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--color-cream-2);
+    box-shadow: 0 0 0 3px var(--color-surface);
+    transition: translate 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--k) * 60ms);
+  }
+  .rond video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .choix:has(input:checked) .rond {
+    translate: 0 -4px;
+  }
+  .membre-nom {
+    font-size: 12.5px;
+    line-height: 1.25;
+    text-align: center;
+    color: var(--color-soft);
+  }
+  .membre-nom b {
+    display: block;
+    font-size: 14px;
+    color: var(--color-ink);
+  }
+  /* The Core: the four in a row, text beside them on wide screens, below otherwise. */
+  @media (min-width: 64rem) {
+    .socle {
+      flex-direction: row;
+      align-items: center;
+      gap: 32px;
+      padding-right: 56px;
+    }
+    .socle .troupe {
+      flex: none;
+      margin-right: 0;
+    }
+  }
+  @media (max-width: 30rem) {
+    /* Phone: the four of the Core share the card width, names wrap under their circle. */
+    .socle .troupe {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 4px;
+      margin-right: 26px;
+    }
+    .socle .rond {
+      width: 100%;
+      max-width: 64px;
+      height: auto;
+      aspect-ratio: 1;
+    }
+    .socle .membre-nom {
+      font-size: 11px;
+    }
+    .socle .membre-nom b {
+      font-size: 12.5px;
+    }
+  }
+  /* Discreet pause for the waves, icon only (its label is for screen readers), like the
+     pricing form's. */
+  .anim-pause {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1px var(--color-line);
+    color: var(--color-soft);
+    cursor: pointer;
+  }
+  .anim-pause[hidden] {
+    display: none;
+  }
+  .anim-pause:hover,
+  .anim-pause:focus-visible {
+    color: var(--color-ink);
+  }
+  .anim-pause:focus-visible {
+    outline: 2px solid var(--color-orange-txt);
+    outline-offset: 2px;
+  }
+  .ap-ico {
+    width: 8px;
+    height: 9px;
+    border-left: 3px solid currentColor;
+    border-right: 3px solid currentColor;
+  }
+  .anim-pause[aria-pressed='true'] .ap-ico {
+    width: 0;
+    height: 0;
+    border-left: 8px solid currentColor;
+    border-right: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+  }
+  /* Finch and Pecker add to the Core; the locked Core says so. */
+  .avec-socle {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    align-self: flex-start;
+    margin-bottom: 4px;
+    padding: 5px 9px;
+    border-radius: 999px;
+    background: var(--color-orange-tint);
+    box-shadow: inset 0 0 0 1px var(--color-orange);
+    font: 700 12px/1 var(--font-sans);
+    color: var(--color-orange-txt);
+    white-space: nowrap;
+  }
+  .requis {
+    display: none;
+    margin-top: 4px;
+    font: 400 11px/1.3 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-orange-txt);
+  }
+  .choix.verrou .requis {
+    display: block;
+  }
+  .choix.verrou {
+    cursor: default;
+  }
+  .coche {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: flex;
+    width: 24px;
+    height: 24px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 7px;
+    box-shadow: inset 0 0 0 1.5px var(--color-stone);
+    color: transparent;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .choix:has(input:checked) .coche {
+    background: var(--color-orange);
+    box-shadow: none;
+    color: var(--color-ink);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .choix,
+    .rond {
+      transition: none;
+    }
+  }
+</style>
 
 <script>
   import { suivre } from '../scripts/suivi';
@@ -129,16 +444,150 @@ const calLink = 'patrick-rakotondrajao-bjremk/presentation-hatch';
   } catch {
     prefill = {};
   }
-  const config: Record<string, string> = { layout: 'month_view', theme: 'light' };
+  const base: Record<string, string> = { layout: 'month_view', theme: 'light' };
   for (const key of ['name', 'email', 'notes'] as const) {
     const value = prefill[key];
-    if (typeof value === 'string' && value.trim()) config[key] = value.trim();
+    if (typeof value === 'string' && value.trim()) base[key] = value.trim();
   }
-  Cal('inline', {
-    elementOrSelector: '#cal-inline',
-    calLink: el.dataset.calLink,
-    config,
+
+  // The agents step. The pricing form already sent its agents in the notes: the step is skipped.
+  const choix = document.getElementById('choix-agents') as HTMLFieldSetElement;
+  if (base.notes) choix.hidden = true;
+  const cases = [...choix.querySelectorAll<HTMLInputElement>('input[name="agents"]')];
+  const inconnu = choix.querySelector<HTMLInputElement>('input[name="agents-inconnu"]')!;
+  // A hidden step adds nothing: the pricing form already sent its choice in the notes.
+  const choisis = () =>
+    choix.hidden
+      ? []
+      : inconnu.checked
+        ? [inconnu.value]
+        : cases.filter((c) => c.checked).map((c) => c.value);
+
+  /** (Re)draws the agenda with the current answers: Cal.com reads its prefill only on load. */
+  const attente = document.getElementById('cal-attente')!;
+  const verrouAgenda = document.getElementById('cal-verrou')!;
+  const lienAgenda = document.getElementById('cal-lien')!;
+  const zone = document.getElementById('cal-zone')!;
+  let charge = false; // the agenda loaded once: no more « loading » line over it
+  const monter = () => {
+    const config = { ...base };
+    const liste = choisis().join(', ');
+    // No choice yet (and the step is shown): the agenda stays closed, so nobody books blind.
+    const ferme = !choix.hidden && !liste;
+    verrouAgenda.hidden = !ferme;
+    zone.classList.toggle('min-h-[650px]', !ferme);
+    lienAgenda.hidden = ferme;
+    attente.hidden = ferme || charge;
+    if (ferme) {
+      el.replaceChildren();
+      return;
+    }
+    if (liste) {
+      config.agents = liste;
+      const ligne = `${choix.dataset.note} ${liste}`;
+      config.notes = base.notes ? `${base.notes}\n${ligne}` : ligne;
+    }
+    el.replaceChildren();
+    Cal('inline', { elementOrSelector: '#cal-inline', calLink: el.dataset.calLink, config });
+  };
+  // Same rule as the pricing form: Finch or Pecker need the Core, which then gets checked and
+  // locked (it can't be unchecked); it unlocks when neither is checked.
+  const socle = choix.querySelector<HTMLInputElement>('#d-socle')!;
+  const carteSocle = socle.closest('.choix')!;
+  const lies = ['#d-finch', '#d-pecker'].map((s) => choix.querySelector<HTMLInputElement>(s)!);
+  const verrouiller = () => {
+    const verrou = lies.some((i) => i.checked);
+    if (verrou) socle.checked = true;
+    carteSocle.classList.toggle('verrou', verrou);
+    socle.setAttribute('aria-disabled', verrou ? 'true' : 'false');
+  };
+  socle.addEventListener('click', (ev) => {
+    if (carteSocle.classList.contains('verrou')) ev.preventDefault();
   });
+  let delai: number | undefined;
+  choix.addEventListener('change', (ev) => {
+    const cible = ev.target as HTMLInputElement;
+    // « Not sure yet » and the offers exclude each other (the Core included).
+    if (cible === inconnu && inconnu.checked) cases.forEach((c) => (c.checked = false));
+    if (cible !== inconnu && cible.checked) inconnu.checked = false;
+    verrouiller();
+    clearTimeout(delai);
+    delai = window.setTimeout(monter, 500);
+  });
+  verrouiller();
+  monter();
+
+  // The team feels alive, as in the pricing form: checking (or hovering) an offer plays its agents'
+  // wave, then each checked agent waves again now and then (6 to 10 s). Since it repeats, a button
+  // pauses everything (WCAG 2.2.2). Reduced motion: no wave, no button.
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const bouton = choix.querySelector<HTMLButtonElement>('[data-anim-pause]')!;
+    const label = choix.querySelector<HTMLElement>('[data-anim-label]')!;
+    const cartes = [...choix.querySelectorAll<HTMLLabelElement>('[data-equipe] .choix')].filter(
+      (carte) => carte.querySelector('video'),
+    );
+    const minuteurs = new Map<HTMLVideoElement, number>();
+    let enPause = false;
+    const arreter = (v: HTMLVideoElement) => clearTimeout(minuteurs.get(v));
+    const jouer = (v: HTMLVideoElement) => {
+      if (enPause) return;
+      arreter(v);
+      v.currentTime = 0;
+      v.play().catch(() => {});
+    };
+    const videos = (carte: Element) => [...carte.querySelectorAll('video')];
+    const geste = (carte: Element) =>
+      videos(carte).forEach((v, k) => {
+        arreter(v);
+        minuteurs.set(
+          v,
+          window.setTimeout(() => jouer(v), k * 220),
+        );
+      });
+    let n = 0;
+    for (const carte of cartes) {
+      const input = carte.querySelector('input')!;
+      for (const v of videos(carte)) {
+        const rythme = 6000 + (n++ % 5) * 900;
+        // Wave over: if still checked, the agent does it again a bit later.
+        v.addEventListener('ended', () => {
+          arreter(v);
+          if (!input.checked || enPause) return;
+          minuteurs.set(
+            v,
+            window.setTimeout(() => input.checked && jouer(v), rythme + Math.random() * 1500),
+          );
+        });
+      }
+      input.addEventListener('change', () => input.checked && geste(carte));
+      carte.addEventListener('mouseenter', () => geste(carte));
+    }
+    bouton.hidden = false;
+    bouton.addEventListener('click', () => {
+      enPause = !enPause;
+      bouton.setAttribute('aria-pressed', String(enPause));
+      label.textContent = bouton.dataset[enPause ? 'labelReprendre' : 'labelPause'] ?? '';
+      for (const carte of cartes) {
+        videos(carte).forEach((v) => {
+          arreter(v);
+          if (enPause) v.pause();
+        });
+        if (!enPause && carte.querySelector('input')!.checked) geste(carte);
+      }
+    });
+    // On arrival, the checked team waves once, then keeps moving on its own.
+    if (!choix.hidden) {
+      const io = new IntersectionObserver(
+        ([e]) => {
+          if (!e.isIntersecting) return;
+          io.disconnect();
+          cartes.forEach((carte) => carte.querySelector('input')!.checked && geste(carte));
+        },
+        { threshold: 0.4 },
+      );
+      io.observe(choix);
+    }
+  }
   Cal('ui', {
     theme: 'light',
     hideEventTypeDetails: false,
@@ -163,7 +612,10 @@ const calLink = 'patrick-rakotondrajao-bjremk/presentation-hatch';
   });
   Cal('on', {
     action: 'linkReady',
-    callback: () => document.getElementById('cal-attente')?.remove(),
+    callback: () => {
+      charge = true;
+      attente.hidden = true;
+    },
   });
   // The site's conversion: Cal.com confirmed the booking.
   Cal('on', {
