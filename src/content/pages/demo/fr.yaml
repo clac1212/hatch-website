@@ -10,6 +10,6 @@ agendaFallback: "L'agenda se charge…"
 agendaFallbackLink: "Ouvrir l'agenda dans un nouvel onglet"
 agents:
   titre: 'Quels agents vous intéressent ?'
-  aide: 'Cochez-en un ou plusieurs : Patrick préparera la démo sur ces agents.'
+  aide: 'Le socle est la base de chaque équipe, les autres agents s’y ajoutent. Patrick préparera la démo sur votre choix.'
   inconnu: 'Je ne sais pas encore'
   note: 'Agents qui m’intéressent :'
