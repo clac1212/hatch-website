@@ -18,6 +18,18 @@ export const demoPage = z.strictObject({
   /** Shown inside the agenda frame until Cal.com has loaded (and when JS is off). */
   agendaFallback: z.string(),
   agendaFallbackLink: z.string(),
+  /**
+   * The agents the visitor is interested in, picked before the agenda: the choice is handed to the
+   * Cal.com booking (field `agents`, and the notes). Hidden when the pricing form already sent it.
+   */
+  agents: z.strictObject({
+    titre: z.string(),
+    aide: z.string(),
+    /** « Not sure yet »: exclusive with the agents. */
+    inconnu: z.string(),
+    /** Line written in the booking notes, followed by the picked agents. */
+    note: z.string(),
+  }),
 });
 
 /**

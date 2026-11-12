@@ -1,9 +1,16 @@
 ---
 import { getEntry } from 'astro:content';
+import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
+import { avatars } from '../components/pages/agent-visuels';
+import { agentSlugs } from '../content/schemas/agents';
 import { routes, type Locale } from '../i18n/ui';
 
-/** Demo booking page with the inline Cal.com agenda, shared by /demo and /en/demo. */
+/**
+ * Demo booking page with the inline Cal.com agenda, shared by /demo and /en/demo. Above the
+ * agenda, the visitor ticks the agents they are interested in: the choice is handed to the booking
+ * (Cal.com field `agents`, and a line in the notes) so the demo is prepared on them.
+ */
 interface Props {
   locale: Locale;
 }
@@ -13,6 +20,17 @@ const entry = await getEntry('demoPage', locale);
 if (!entry) throw new Error(`Missing src/content/pages/demo/${locale}.yaml`);
 const d = entry.data;
 const calLink = 'patrick-rakotondrajao-bjremk/presentation-hatch';
+
+/** The seven agents in the site's order, with their name and job. */
+const agents = (
+  await Promise.all(
+    agentSlugs.map(async (slug) => {
+      const e = await getEntry('agents', `${locale}/${slug}`);
+      if (!e) throw new Error(`Missing src/content/agents/${locale}/${slug}.md`);
+      return { slug, name: e.data.name, job: e.data.job, order: e.data.order };
+    }),
+  )
+).sort((a, b) => a.order - b.order);
 ---
 
 <Base locale={locale} paths={routes.demo} title={d.seo.title} description={d.seo.description}>
@@ -31,9 +49,49 @@ const calLink = 'patrick-rakotondrajao-bjremk/presentation-hatch';
       </p>
     </header>
 
+    <fieldset
+      id="choix-agents"
+      class="mt-12 rounded-glass bg-surface p-5 shadow-1 outline outline-1 -outline-offset-1 outline-line md:mt-14 md:p-8"
+      data-note={d.agents.note}
+    >
+      <legend class="sr-only">{d.agents.titre}</legend>
+      <div class="flex flex-col gap-1 px-1" aria-hidden="true">
+        <p class="font-display text-[24px] leading-tight font-bold text-ink md:text-[28px]">
+          {d.agents.titre}
+        </p>
+        <p class="text-caption text-soft">{d.agents.aide}</p>
+      </div>
+      <div class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        {
+          agents.map((a) => (
+            <label class="choix">
+              <input type="checkbox" name="agents" value={a.name} class="sr-only" />
+              <Image
+                src={avatars[a.slug]}
+                alt=""
+                width={48}
+                densities={[1, 2]}
+                class="size-12 shrink-0 object-contain"
+              />
+              <span class="flex min-w-0 flex-col">
+                <b class="font-display text-[17px] leading-tight text-ink">{a.name}</b>
+                <span class="text-[13px] leading-snug text-soft">{a.job}</span>
+              </span>
+            </label>
+          ))
+        }
+        <label class="choix">
+          <input type="checkbox" name="agents-inconnu" value={d.agents.inconnu} class="sr-only" />
+          <span class="flex min-w-0 flex-col">
+            <b class="font-display text-[17px] leading-tight text-ink">{d.agents.inconnu}</b>
+          </span>
+        </label>
+      </div>
+    </fieldset>
+
     <section
       aria-labelledby="agenda-titre"
-      class="mt-12 rounded-glass bg-surface p-4 shadow-1 outline outline-1 -outline-offset-1 outline-line md:mt-14 md:p-8"
+      class="mt-6 rounded-glass bg-surface p-4 shadow-1 outline outline-1 -outline-offset-1 outline-line md:p-8"
     >
       <div class="flex flex-col gap-1 px-2 pt-2 md:flex-row md:items-baseline md:justify-between">
         <h2
@@ -72,6 +130,40 @@ const calLink = 'patrick-rakotondrajao-bjremk/presentation-hatch';
     </section>
   </div>
 </Base>
+
+<style>
+  /* An agent to tick: the whole card is the label of a real checkbox. */
+  .choix {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 72px;
+    padding: 12px 14px;
+    border-radius: var(--radius-card);
+    background: var(--color-surface-2);
+    box-shadow: inset 0 0 0 1px var(--color-line);
+    cursor: pointer;
+    transition:
+      box-shadow 0.2s var(--ease-hatch),
+      background-color 0.2s var(--ease-hatch);
+  }
+  .choix:hover {
+    box-shadow: inset 0 0 0 1px var(--color-orange-txt);
+  }
+  .choix:has(input:checked) {
+    background: var(--color-orange-tint);
+    box-shadow: inset 0 0 0 2px var(--color-orange-txt);
+  }
+  .choix:has(input:focus-visible) {
+    outline: 2px solid var(--color-orange-txt);
+    outline-offset: 3px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .choix {
+      transition: none;
+    }
+  }
+</style>
 
 <script>
   import { suivre } from '../scripts/suivi';
@@ -129,16 +221,42 @@ const calLink = 'patrick-rakotondrajao-bjremk/presentation-hatch';
   } catch {
     prefill = {};
   }
-  const config: Record<string, string> = { layout: 'month_view', theme: 'light' };
+  const base: Record<string, string> = { layout: 'month_view', theme: 'light' };
   for (const key of ['name', 'email', 'notes'] as const) {
     const value = prefill[key];
-    if (typeof value === 'string' && value.trim()) config[key] = value.trim();
+    if (typeof value === 'string' && value.trim()) base[key] = value.trim();
   }
-  Cal('inline', {
-    elementOrSelector: '#cal-inline',
-    calLink: el.dataset.calLink,
-    config,
+
+  // The agents step. The pricing form already sent its agents in the notes: the step is skipped.
+  const choix = document.getElementById('choix-agents') as HTMLFieldSetElement;
+  if (base.notes) choix.hidden = true;
+  const cases = [...choix.querySelectorAll<HTMLInputElement>('input[name="agents"]')];
+  const inconnu = choix.querySelector<HTMLInputElement>('input[name="agents-inconnu"]')!;
+  const choisis = () =>
+    inconnu.checked ? [inconnu.value] : cases.filter((c) => c.checked).map((c) => c.value);
+
+  /** (Re)draws the agenda with the current answers: Cal.com reads its prefill only on load. */
+  const monter = () => {
+    const config = { ...base };
+    const liste = choisis().join(', ');
+    if (liste) {
+      config.agents = liste;
+      const ligne = `${choix.dataset.note} ${liste}`;
+      config.notes = base.notes ? `${base.notes}\n${ligne}` : ligne;
+    }
+    el.replaceChildren();
+    Cal('inline', { elementOrSelector: '#cal-inline', calLink: el.dataset.calLink, config });
+  };
+  let attente: number | undefined;
+  choix.addEventListener('change', (ev) => {
+    const cible = ev.target as HTMLInputElement;
+    // « Not sure yet » and the agents exclude each other.
+    if (cible === inconnu && inconnu.checked) cases.forEach((c) => (c.checked = false));
+    if (cible !== inconnu && cible.checked) inconnu.checked = false;
+    clearTimeout(attente);
+    attente = window.setTimeout(monter, 500);
   });
+  monter();
   Cal('ui', {
     theme: 'light',
     hideEventTypeDetails: false,
