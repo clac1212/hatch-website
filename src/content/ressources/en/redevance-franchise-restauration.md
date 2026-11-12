@@ -52,7 +52,7 @@ sources:
   - affirmation: 'Hatch OS does not calculate or bill royalties (Lark replaces neither the point of sale nor accounting)'
     url: 'https://www.gethatch.io/agents/lark'
     luLe: '2026-11-10'
-brouillon: true
+brouillon: false
 ---
 
 ## The three sums, and what each pays for

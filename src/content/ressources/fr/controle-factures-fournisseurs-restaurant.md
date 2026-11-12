@@ -49,7 +49,7 @@ sources:
   - affirmation: "Robin : associé IA des restaurateurs indépendants, en bêta sur WhatsApp avec liste d'attente ; photo du bon de livraison, rapprochement avec commande et facture, écart montré, avoir préparé, validation par le patron ; rien ne part chez un fournisseur sans accord"
     url: 'https://www.gethatch.io/robin'
     luLe: '2026-11-10'
-brouillon: true
+brouillon: false
 ---
 
 ## Les trois documents à rapprocher

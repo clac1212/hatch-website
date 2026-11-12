@@ -70,7 +70,7 @@ sources:
   - affirmation: 'Security sentence'
     url: 'https://www.gethatch.io/agents/sparrow'
     luLe: '2026-11-10'
-brouillon: true
+brouillon: false
 ---
 
 ## Where the obligation comes from

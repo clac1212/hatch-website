@@ -78,7 +78,7 @@ sources:
   - affirmation: 'Hatch OS : tarif présenté en démo selon les agents et la taille du réseau'
     url: 'https://www.gethatch.io/reseaux'
     luLe: '2026-11-10'
-brouillon: true
+brouillon: false
 ---
 
 ## La question à se poser avant de comparer

@@ -49,7 +49,7 @@ sources:
   - affirmation: 'Robin: AI partner for independent restaurant owners, in beta on WhatsApp with a waitlist; photo of the delivery note, matching with order and invoice, gap shown, credit note prepared, approval by the owner; nothing goes to a supplier without approval'
     url: 'https://www.gethatch.io/robin'
     luLe: '2026-11-10'
-brouillon: true
+brouillon: false
 ---
 
 ## The three documents to match

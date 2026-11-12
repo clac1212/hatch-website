@@ -65,7 +65,7 @@ sources:
   - affirmation: 'Finch: quality audits on mobile, weighted checklists (example: Hygiene ×3), score out of 100, action plan, proof uploaded by the franchisee'
     url: 'https://www.gethatch.io/agents/finch'
     luLe: '2026-11-10'
-brouillon: true
+brouillon: false
 ---
 
 ## What the rules say
