@@ -47,7 +47,7 @@ sources:
   - affirmation: "Robin : associé IA des restaurateurs indépendants, en bêta sur WhatsApp avec liste d'attente ; quand un prix d'achat bouge, il recalcule le coût des plats et prévient si une marge passe sous le seuil ; il propose, vous décidez"
     url: 'https://www.gethatch.io/robin'
     luLe: '2026-11-10'
-brouillon: true
+brouillon: false
 ---
 
 ## Coût matière, coût de revient : de quoi parle-t-on ?

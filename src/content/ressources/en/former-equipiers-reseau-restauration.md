@@ -51,7 +51,7 @@ sources:
   - affirmation: "Hatch OS: Pecker (WhatsApp magic link with no app or account, triggers, reminders, quizzes with results, automatic translation, skills assessments, dashboard), Peep (answers on WhatsApp in the crew member's language); security sentence"
     url: 'https://www.gethatch.io/agents/pecker'
     luLe: '2026-11-10'
-brouillon: true
+brouillon: false
 ---
 
 ## What turnover changes for training

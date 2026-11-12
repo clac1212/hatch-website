@@ -51,7 +51,7 @@ sources:
   - affirmation: "Hatch OS : Pecker (lien magique WhatsApp sans appli ni compte, déclencheurs, relances, quiz avec résultats, traduction automatique, évaluations de compétences, tableau de bord), Peep (réponses sur WhatsApp dans la langue de l'équipier) ; phrase sécurité"
     url: 'https://www.gethatch.io/agents/pecker'
     luLe: '2026-11-10'
-brouillon: true
+brouillon: false
 ---
 
 ## Ce que le turnover change à la formation

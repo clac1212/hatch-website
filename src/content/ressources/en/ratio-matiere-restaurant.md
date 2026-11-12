@@ -38,7 +38,7 @@ sources:
   - affirmation: 'Traditional restaurants (NAF 56.10A), 2025 financial year, 28,784 businesses: gross margin 69.29% of sales (French Order of Chartered Accountants, Baromètre Image PME, Statexpert database; document published by UMIH). The "around 31%" of purchases consumed is derived: 100 − 69.3'
     url: 'https://www.umih.fr/assets/files/site/ressources/observatoires-et-etudes/260823_Observatoire_2025_5610A_Restauration_traditionnelle.pdf'
     luLe: '2026-11-10'
-brouillon: true
+brouillon: false
 ---
 
 ## The formula, line by line

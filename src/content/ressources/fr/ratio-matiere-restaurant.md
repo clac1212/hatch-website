@@ -38,7 +38,7 @@ sources:
   - affirmation: "Restauration traditionnelle (NAF 56.10A), exercice 2025, 28 784 entreprises : marge brute 69,29 % du CA (Ordre des experts-comptables, Baromètre Image PME, base Statexpert ; document publié par l'UMIH). Les « autour de 31 % » d'achats consommés sont déduits : 100 − 69,3"
     url: 'https://www.umih.fr/assets/files/site/ressources/observatoires-et-etudes/260823_Observatoire_2025_5610A_Restauration_traditionnelle.pdf'
     luLe: '2026-11-10'
-brouillon: true
+brouillon: false
 ---
 
 ## La formule, ligne par ligne

@@ -65,7 +65,7 @@ sources:
   - affirmation: "Finch : audits qualité sur mobile, grilles pondérées (exemple Hygiène ×3), score sur 100, plan d'action, preuve déposée par le franchisé"
     url: 'https://www.gethatch.io/agents/finch'
     luLe: '2026-11-10'
-brouillon: true
+brouillon: false
 ---
 
 ## Ce que dit la règle

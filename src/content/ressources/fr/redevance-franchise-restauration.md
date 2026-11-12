@@ -52,7 +52,7 @@ sources:
   - affirmation: 'Hatch OS ne calcule ni ne facture les redevances (Lark ne remplace ni la caisse ni la comptabilité)'
     url: 'https://www.gethatch.io/agents/lark'
     luLe: '2026-11-10'
-brouillon: true
+brouillon: false
 ---
 
 ## Les trois sommes, et ce que chacune rémunère

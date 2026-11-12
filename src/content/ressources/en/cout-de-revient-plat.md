@@ -47,7 +47,7 @@ sources:
   - affirmation: 'Robin: AI partner for independent restaurant owners, in beta on WhatsApp with a waitlist; when a purchase price moves, he recalculates the cost of dishes and warns if a margin drops below the threshold; he suggests, you decide'
     url: 'https://www.gethatch.io/robin'
     luLe: '2026-11-10'
-brouillon: true
+brouillon: false
 ---
 
 ## Plate cost, food cost: what are we talking about?

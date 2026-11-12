@@ -48,7 +48,7 @@ sources:
   - affirmation: "Hatch OS : fonctions de Finch (grilles pondérées, audit mobile avec photos et historique, score sur 100, rapport PDF sur WhatsApp, plan d'action avec criticité validé par l'auditeur, preuves, auto-évaluation, tableau de bord) ; phrase sécurité"
     url: 'https://www.gethatch.io/agents/finch'
     luLe: '2026-11-10'
-brouillon: true
+brouillon: false
 ---
 
 ## Partir de ce que contrôle l'administration

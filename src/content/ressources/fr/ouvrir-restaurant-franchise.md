@@ -69,7 +69,7 @@ sources:
   - affirmation: 'Sécurité des données : hébergement en Europe, chiffrement en transit et au repos, cloisonnement par client, aucun modèle entraîné sur vos données (pages agents, FAQ)'
     url: 'http://gethatch.io'
     luLe: '2026-11-10'
-brouillon: true
+brouillon: false
 ---
 
 ## Partir de la date d'ouverture

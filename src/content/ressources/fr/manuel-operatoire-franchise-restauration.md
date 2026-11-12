@@ -59,7 +59,7 @@ sources:
   - affirmation: "Hatch OS : Jay (sources connectées, synchro chaque nuit, « Éditer avec Jay », exclusion d'un document, sources citées), Peep (WhatsApp, langue de l'équipier, questions transmises au siège), Owl (tablette, voix) ; phrase sécurité"
     url: 'https://www.gethatch.io/agents/jay'
     luLe: '2026-11-10'
-brouillon: true
+brouillon: false
 ---
 
 ## Ce que le manuel doit couvrir

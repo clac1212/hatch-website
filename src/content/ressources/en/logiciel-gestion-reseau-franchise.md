@@ -78,7 +78,7 @@ sources:
   - affirmation: 'Hatch OS: pricing presented in the demo, based on the agents and the size of the network'
     url: 'https://www.gethatch.io/reseaux'
     luLe: '2026-11-10'
-brouillon: true
+brouillon: false
 ---
 
 ## The question to ask before comparing

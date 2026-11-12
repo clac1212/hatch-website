@@ -69,7 +69,7 @@ sources:
   - affirmation: 'Data security: hosting in Europe, encryption in transit and at rest, isolation per customer, no model trained on your data (agent pages, FAQ)'
     url: 'http://gethatch.io'
     luLe: '2026-11-10'
-brouillon: true
+brouillon: false
 ---
 
 ## Start from the opening date

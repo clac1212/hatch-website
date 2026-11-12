@@ -48,7 +48,7 @@ sources:
   - affirmation: 'Hatch OS: Finch features (weighted checklists, mobile audit with photos and history, score out of 100, PDF report on WhatsApp, action plan with criticality validated by the auditor, proof, self-assessment, dashboard); security sentence'
     url: 'https://www.gethatch.io/agents/finch'
     luLe: '2026-11-10'
-brouillon: true
+brouillon: false
 ---
 
 ## Start from what inspectors check
