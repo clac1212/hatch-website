@@ -43,7 +43,7 @@ sections:
         text: "L'assistant ne s'appuie que sur vos documents, isolés de ceux des autres clients."
   - kicker: "Contrôle d'accès"
     visual: ecran
-    title: "Un contrôle d'accès granulaire, à chaque niveau"
+    title: 'Un accès réglé à chaque niveau'
     subtitle: "Chaque membre de votre réseau n'accède qu'à ce qui le concerne."
     items:
       - title: 'SSO entreprise'

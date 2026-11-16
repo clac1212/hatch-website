@@ -15,7 +15,7 @@ import { appUrls, routes, otherLocale, useTranslations, type Locale, type Paths 
  * `surPlace`: the page carries the sections itself (anchors stay on the page).
  * Real glass, like Apple's Liquid Glass: nearly transparent, blurred and refracting, so the page's own
  * colors show through it; nothing is painted in. Only the content adapts: a script reads the background
- * under the pill as the page scrolls and switches text and logo to cream over a dark one (`data-ton`),
+ * under the logo as the page scrolls and switches text and logo to cream over a dark one (`data-ton`),
  * the logo to ink over a vivid one (`data-vif`). A section whose look is an image rather than its
  * background color declares it with `data-nav-fond="clair" | "sombre"`. `tone` sets the first paint.
  */
@@ -279,12 +279,16 @@ const survol = 'hover:bg-current/10';
     const [r, g, b, a] = pinceau.getImageData(0, 0, 1, 1).data;
     return [r, g, b, a / 255];
   }
+  const logo = nav.querySelector<HTMLElement>('a[href]')!;
   const NUIT = 'rgb(11, 11, 13)';
   const BLANC = 'rgb(255, 255, 255)';
   function fondSous(): string {
-    const b = nav.getBoundingClientRect();
+    // Read under the logo: it is what must stay legible (the pill's middle may sit over a card).
+    const b = logo.getBoundingClientRect();
     const pile = document.elementsFromPoint(b.left + b.width / 2, b.top + b.height / 2);
-    let el = pile.find((e) => !e.closest('header')) ?? null;
+    // Skip the nav's own fixed bar only: a page's hero may itself be a <header> (/securite).
+    const barre = nav.parentElement!;
+    let el = pile.find((e) => !barre.contains(e)) ?? null;
     for (; el; el = el.parentElement) {
       // A section whose look is an image, not its background color (the networks map), says it.
       const declare = (el as HTMLElement).dataset?.navFond;
