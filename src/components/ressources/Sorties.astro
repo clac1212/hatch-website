@@ -1,6 +1,7 @@
 ---
 import { getEntry } from 'astro:content';
 import Button from '../ui/Button.astro';
+import Carte from '../ui/Carte.astro';
 import { routes, useTranslations, type Locale } from '../../i18n/ui';
 import type { PublicCible } from '../../content/pages/schemas';
 
@@ -43,35 +44,20 @@ const cartes = [
 >
   {
     cartes.map((c) => (
-      <div
-        class:list={[
-          'flex flex-col gap-3 rounded-card p-7 sm:p-9',
-          c.public === 'independant' ? 'bg-night text-cream' : 'border border-line bg-surface',
-        ]}
+      <Carte
+        variante={c.public === 'independant' ? 'nuit' : 'surface'}
+        class="flex flex-col gap-3 p-8 sm:p-10"
         data-public={filtrable ? c.public : undefined}
       >
-        <span
-          class:list={[
-            'font-mono text-kicker uppercase',
-            c.public === 'independant' ? 'text-cream/60' : 'text-orange-txt',
-          ]}
-        >
-          {c.kicker}
-        </span>
-        <h2 class="font-display text-card font-semibold text-balance sm:text-[1.75rem]">
-          {c.titre}
-        </h2>
-        <p
-          class:list={['max-w-[46ch]', c.public === 'independant' ? 'text-cream/75' : 'text-soft']}
-        >
-          {c.texte}
-        </p>
-        <div class="mt-auto pt-4">
+        <span class="font-mono text-kicker text-(--doux) uppercase">{c.kicker}</span>
+        <h2 class="font-display text-section font-semibold text-balance">{c.titre}</h2>
+        <p class="max-w-lead text-(--doux)">{c.texte}</p>
+        <div class="mt-auto pt-6">
           <Button href={c.href} variant={c.public === 'independant' ? 'cream' : 'orange'}>
             {c.cta}
           </Button>
         </div>
-      </div>
+      </Carte>
     ))
   }
 </div>
