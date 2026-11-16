@@ -1,0 +1,420 @@
+---
+/**
+ * WhatsApp for iOS, the chats list (DS mock-up component, the companion of ui/WhatsApp): status bar,
+ * the "•••" / camera / new chat row, the large title, search, the filter chips, the chats, the tab
+ * bar. Sized in `em` from 4.33cqw inside `Iphone`, like ui/WhatsApp. Each chat is a real button
+ * (`data-ouvre` = its id) for the app around to open it; its unread badge is `[data-badge]`.
+ */
+import type { ImageMetadata } from 'astro';
+import Statut from './WhatsAppStatut.astro';
+import Avatar from './WhatsAppAvatar.astro';
+
+interface Discussion {
+  id: string;
+  nom: string;
+  avatar?: ImageMetadata;
+  genre?: 'personne' | 'groupe' | 'entreprise';
+  /** The last message, its author in a group, and whether the owner sent it (read ticks). */
+  apercu: string;
+  auteur?: string;
+  sortant: boolean;
+  /** The time of the last message, or its day. */
+  quand: string;
+  nonLus: number;
+  epingle?: boolean;
+}
+interface Props {
+  titre: string;
+  recherche: string;
+  /** All, unread, favourites, groups: the first one is selected. */
+  filtres: string[];
+  /** Updates, calls, communities, chats, settings: the fourth one is selected. */
+  onglets: string[];
+  discussions: Discussion[];
+  heure?: string;
+  /** Between a group message's author and its text: « : » in French, ": " in English. */
+  separateur?: string;
+}
+const { titre, recherche, filtres, onglets, discussions, heure, separateur = ': ' } = Astro.props;
+const nonLues = discussions.filter((d) => d.nonLus > 0).length;
+---
+
+<div class="wad">
+  <Statut heure={heure} />
+  <div class="wad-haut" aria-hidden="true">
+    <span class="wad-rond">
+      <svg viewBox="0 0 20 4"
+        ><circle cx="2" cy="2" r="2"></circle><circle cx="10" cy="2" r="2"></circle><circle
+          cx="18"
+          cy="2"
+          r="2"></circle></svg
+      >
+    </span>
+    <span class="wad-actions">
+      <svg viewBox="0 0 22 20" class="wad-photo">
+        <path
+          d="M2 6.5c0-1.1.9-2 2-2h2.6l1.6-2.3c.2-.3.5-.4.8-.4h4c.3 0 .6.1.8.4l1.6 2.3H18c1.1 0 2 .9 2 2V16c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2Z"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.7"
+          stroke-linejoin="round"></path>
+        <circle cx="11" cy="11" r="3.6" fill="none" stroke="currentColor" stroke-width="1.7"
+        ></circle>
+      </svg>
+      <span class="wad-nouveau">
+        <svg viewBox="0 0 20 20"
+          ><path
+            d="M10 4v12M4 10h12"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.4"
+            stroke-linecap="round"></path></svg
+        >
+      </span>
+    </span>
+  </div>
+  <p class="wad-titre">{titre}</p>
+  <div class="wad-recherche" aria-hidden="true">
+    <svg viewBox="0 0 20 20"
+      ><circle cx="8.5" cy="8.5" r="6" fill="none" stroke="currentColor" stroke-width="2"
+      ></circle><path d="m13 13 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      ></path></svg
+    >
+    {recherche}
+  </div>
+  <div class="wad-filtres" aria-hidden="true">
+    {
+      filtres.map((f, i) => (
+        <span class:list={['wad-filtre', i === 0 && 'actif']}>
+          {f}
+          {i === 1 && ` ${nonLues}`}
+        </span>
+      ))
+    }
+  </div>
+
+  <ul class="wad-liste">
+    {
+      discussions.map((d) => (
+        <li>
+          <button type="button" class="wad-ligne" data-ouvre={d.id}>
+            <Avatar image={d.avatar} genre={d.genre} nom={d.nom} class="wad-av" />
+            <span class="wad-corps">
+              <span class="wad-l1">
+                <b>{d.nom}</b>
+                <span class:list={['wad-quand', d.nonLus > 0 && 'non-lu']} data-quand>
+                  {d.quand}
+                </span>
+              </span>
+              <span class="wad-l2">
+                <span class="wad-apercu">
+                  {d.sortant && (
+                    <svg class="wad-lu" viewBox="0 0 16 11" aria-hidden="true">
+                      <path
+                        d="M1.2 6.1 4.3 9.2 10.6 1.9M7.4 8.4l.8.8 6.3-7.3"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  )}
+                  {d.auteur && <>{d.auteur + separateur}</>}
+                  {d.apercu}
+                </span>
+                {d.nonLus > 0 ? (
+                  <span class="wad-badge" data-badge>
+                    {d.nonLus}
+                  </span>
+                ) : (
+                  d.epingle && (
+                    <svg class="wad-epingle" viewBox="0 0 16 16" aria-hidden="true">
+                      <path d="M9.8 1.5 14.5 6.2l-1.4 1.4-1-.4-2.6 2.6.3 3-1.4 1.4-2.4-2.4L2.6 15.2l-.8-.8L5.2 11 2.8 8.6l1.4-1.4 3 .3 2.6-2.6-.4-1Z" />
+                    </svg>
+                  )
+                )}
+              </span>
+            </span>
+          </button>
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="wad-onglets" aria-hidden="true">
+    {
+      onglets.map((o, i) => (
+        <span class:list={['wad-onglet', i === 3 && 'actif']}>
+          <svg viewBox="0 0 24 24">
+            {i === 0 && (
+              <>
+                <circle cx="12" cy="12" r="5" />
+                <path d="M12 2.5a9.5 9.5 0 1 1-6.7 2.8" stroke-dasharray="3 2.2" />
+              </>
+            )}
+            {i === 1 && (
+              <path d="M7 3.2 9.2 7.6c.3.6.1 1.3-.4 1.7L7.6 10.3a11 11 0 0 0 5.6 5.6l1-1.2c.4-.5 1.1-.7 1.7-.4l4.4 2.2c.6.3.9 1 .7 1.6-.6 2-2.4 3.2-4.4 3C9.7 20.5 3.5 14.3 2.9 7.4c-.2-2 1-3.8 3-4.4.4-.1.8 0 1.1.2Z" />
+            )}
+            {i === 2 && (
+              <>
+                <circle cx="12" cy="8" r="3.3" />
+                <circle cx="5" cy="10" r="2.4" />
+                <circle cx="19" cy="10" r="2.4" />
+                <path d="M6.5 19.5c.6-3.4 2.8-5.5 5.5-5.5s4.9 2.1 5.5 5.5M1.5 18.5c.3-2.4 1.6-3.8 3.5-3.8M22.5 18.5c-.3-2.4-1.6-3.8-3.5-3.8" />
+              </>
+            )}
+            {i === 3 && (
+              <path d="M12 3c5 0 9 3.6 9 8s-4 8-9 8c-1.3 0-2.5-.2-3.6-.6L4 20l1.2-3.6A7.6 7.6 0 0 1 3 11c0-4.4 4-8 9-8Z" />
+            )}
+            {i === 4 && (
+              <>
+                <circle cx="12" cy="12" r="3" />
+                <path d="M12 2.5v2.7M12 18.8v2.7M21.5 12h-2.7M5.2 12H2.5M18.7 5.3l-1.9 1.9M7.2 16.8l-1.9 1.9M18.7 18.7l-1.9-1.9M7.2 7.2 5.3 5.3" />
+              </>
+            )}
+          </svg>
+          {i === 3 && nonLues > 0 && (
+            <span class="wad-badge onglet" data-badge-onglet>
+              {nonLues}
+            </span>
+          )}
+          <span class="wad-onglet-nom">{o}</span>
+        </span>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .wad {
+    --wad-ligne: color-mix(in srgb, var(--color-black) 10%, transparent);
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--color-white);
+    color: var(--color-whatsapp-ink);
+    font-family: var(--font-ios);
+    font-size: 4.33cqw;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    text-align: left;
+  }
+  .wad-haut {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.2em 1em 0;
+  }
+  .wad-rond,
+  .wad-nouveau {
+    display: grid;
+    place-items: center;
+    width: 1.75em;
+    height: 1.75em;
+    border-radius: 999px;
+    background: var(--color-whatsapp-boite);
+  }
+  .wad-rond svg {
+    width: 0.9em;
+    fill: currentColor;
+  }
+  .wad-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.1em;
+  }
+  .wad-photo {
+    width: 1.3em;
+  }
+  .wad-nouveau {
+    background: var(--color-whatsapp-brand);
+    color: var(--color-white);
+  }
+  .wad-nouveau svg {
+    width: 0.95em;
+  }
+  .wad-titre {
+    flex: none;
+    margin: 0.35em 1em 0.3em;
+    font-size: 1.95em;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .wad-recherche {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 0.4em;
+    margin: 0 1em;
+    padding: 0.42em 0.7em;
+    border-radius: 0.65em;
+    background: var(--color-whatsapp-boite);
+    color: var(--color-whatsapp-meta);
+  }
+  .wad-recherche svg {
+    width: 0.95em;
+  }
+  .wad-filtres {
+    display: flex;
+    flex: none;
+    gap: 0.45em;
+    padding: 0.7em 1em 0.45em;
+  }
+  .wad-filtre {
+    padding: 0.28em 0.75em;
+    border-radius: 999px;
+    background: var(--color-whatsapp-boite);
+    color: var(--color-whatsapp-meta);
+    font-size: 0.86em;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .wad-filtre.actif {
+    background: var(--color-whatsapp);
+    color: var(--color-whatsapp-teal);
+  }
+
+  /* The chats: the list scrolls, the page takes over at its ends (no overscroll containment). */
+  .wad-liste {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .wad-ligne {
+    display: flex;
+    align-items: center;
+    gap: 0.75em;
+    width: 100%;
+    padding: 0.55em 1em 0 1em;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .wad-ligne:hover,
+  .wad-ligne:active {
+    background: var(--color-whatsapp-bar);
+  }
+  .wad-ligne:focus-visible {
+    outline: 2px solid var(--color-orange);
+    outline-offset: -2px;
+  }
+  .wad-ligne :global(.wad-av) {
+    align-self: flex-start;
+    font-size: 3.1em;
+  }
+  /* The rule under a chat starts after its avatar, as on iOS. */
+  .wad-corps {
+    display: grid;
+    flex: 1;
+    min-width: 0;
+    gap: 0.1em;
+    padding-bottom: 0.6em;
+    box-shadow: 0 0.5px 0 var(--wad-ligne);
+  }
+  .wad-l1,
+  .wad-l2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    min-width: 0;
+  }
+  .wad-l1 b {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .wad-quand {
+    flex: none;
+    color: var(--color-whatsapp-meta);
+    font-size: 0.8em;
+  }
+  .wad-quand.non-lu {
+    color: var(--color-whatsapp-unread);
+  }
+  .wad-apercu {
+    display: -webkit-box;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    color: var(--color-whatsapp-meta);
+    font-size: 0.9em;
+    line-height: 1.25;
+  }
+  .wad-lu {
+    display: inline;
+    width: 1.05em;
+    margin-right: 0.15em;
+    color: var(--color-whatsapp-tick);
+    vertical-align: -0.05em;
+  }
+  .wad-badge {
+    display: grid;
+    flex: none;
+    place-items: center;
+    min-width: 1.35em;
+    height: 1.35em;
+    padding: 0 0.35em;
+    border-radius: 999px;
+    background: var(--color-whatsapp-unread);
+    color: var(--color-white);
+    font-size: 0.78em;
+    font-weight: 600;
+  }
+  .wad-epingle {
+    flex: none;
+    width: 0.95em;
+    fill: var(--color-whatsapp-meta);
+  }
+
+  /* The tab bar and the home indicator's room. */
+  .wad-onglets {
+    display: flex;
+    flex: none;
+    justify-content: space-around;
+    padding: 0.45em 0.4em 1.9em;
+    background: var(--color-whatsapp-bar);
+    box-shadow: 0 -0.5px 0 var(--wad-ligne);
+  }
+  .wad-onglet {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 0.15em;
+    color: var(--color-whatsapp-ink);
+  }
+  .wad-onglet svg {
+    width: 1.5em;
+    height: 1.5em;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .wad-onglet.actif svg {
+    fill: currentColor;
+  }
+  .wad-onglet-nom {
+    font-size: 0.6em;
+    font-weight: 500;
+  }
+  .wad-onglet.actif .wad-onglet-nom {
+    font-weight: 700;
+  }
+  .wad-badge.onglet {
+    position: absolute;
+    top: -0.2em;
+    left: 55%;
+    font-size: 0.66em;
+  }
+</style>

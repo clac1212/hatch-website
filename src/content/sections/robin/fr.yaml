@@ -8,36 +8,22 @@ hero:
   intro: "Vous faites tout, tout seul. Robin est le bras droit que vous n'avez pas : il connaît la maison, revient vers vous et prépare le travail."
   cta: "Rejoindre la liste d'attente"
   video: 'Robin, un rouge-gorge en voxel, arrive en volant, fait coucou, prend des notes, vérifie un ticket, lève le pouce et repart.'
-  pause:
-    pause: "Mettre l'animation de Robin en pause"
-    lecture: "Relancer l'animation de Robin"
 
+pied:
+  signature: 'Robin, votre associé IA, sur WhatsApp.'
 soiree:
   video: "Le soir, à la fermeture d'un petit bistrot en voxels : Robin, perché sur le comptoir, fait le point avec le patron, qui regarde son téléphone."
   label: 'Les messages de Robin ce soir'
-  pause:
-    pause: "Mettre l'animation en pause"
-    lecture: "Relancer l'animation"
   messages:
     - txt: "Le service est fini ! 🎉 Je te fais le point de la soirée. Tu trouveras le détail dans le tableau de bord qu'on a construit ensemble."
       lien: 'Tableau de bord'
     - txt: "Le tartare de bœuf est parti très vite ce soir 🔥. J'ai croisé les ventes avec ton stock et ajusté la commande Metro de demain : plus de bœuf 🥩, moins de saumon 🐟."
     - txt: "Lina t'a répondu par mail pour l'extra de demain : elle confirme sa présence 👍. Je prépare son contrat d'extra et sa fiche de paie en avance."
 
-pilule:
-  label: 'Sur cette page'
-  statut: 'en ligne'
-  fait: "Ce qu'il fait"
-  semaine: 'Une semaine'
-  canaux: 'Où le trouver'
-  cta: "Rejoindre la liste d'attente"
-
 fait:
-  kicker: 'Ce que fait Robin'
   titre: 'Pas un logiciel de plus. Un associé qui connaît la maison.'
 
 semaine:
-  kicker: 'Une semaine avec Robin'
   titre: 'Du lundi matin au dimanche soir.'
   frise: 'Jours de la semaine'
   jours:
@@ -73,32 +59,151 @@ semaine:
       bulle: 'Tu me demandais si on reste ouvert de 14 h à 18 h : en semaine, le créneau ne couvre pas les salaires. On en parle demain ?'
 
 canaux:
-  kicker: 'Où le trouver'
   titre: 'Là où vous êtes déjà.'
-  texte: 'Pendant la bêta, Robin vit dans WhatsApp. Ensuite, il aura sa propre application, pensée pour lui, toujours à portée de main.'
+  texte: 'Robin vit dans WhatsApp, à côté de votre équipe et de vos fournisseurs. Vous lui écrivez ou lui laissez un vocal entre deux services, il vous répond comme un collègue. Rien à installer, rien à apprendre.'
   telephone:
-    statut: 'en ligne'
-    jour: 'Lundi'
-    messages:
-      - qui: robin
-        txt: 'Bonjour Karim, voici le point de la semaine. J’ai rapproché les livraisons et les factures : il manque 2 kg de bœuf chez Metro, la demande d’avoir est prête.'
-      - qui: patron
-        txt: 'Envoie-la. Et fais le contrat de Lina pour samedi'
-      - qui: robin
-        txt: "C'est fait, à partir de ton modèle. Relis-le avant que je l'envoie."
-        doc: "Contrat d'extra · Lina.pdf"
-        meta: 'Ton modèle · prêt à signer'
+    ariaLabel: 'WhatsApp sur le téléphone de Karim, sa discussion avec Robin ouverte'
+    app:
+      titre: 'Discussions'
+      recherche: 'Rechercher'
+      filtres: ['Toutes', 'Non lues', 'Favoris', 'Groupes']
+      onglets: ['Actus', 'Appels', 'Communautés', 'Discussions', 'Réglages']
+      retour: 'Retour aux discussions'
+      ecrit: 'écrit…'
+      saisie: 'Message'
+      aujourdhui: "Aujourd'hui"
+    discussions:
+      - nom: 'Robin'
+        avatar: robin
+        statut: 'en ligne'
+        epingle: true
+        nonLus: 0
+        messages:
+          - jour: 'Jeudi'
+            qui: in
+            txt: 'Le bœuf a pris 8 % chez Metro. Ton tartare passe sous ta marge cible : 64 % au lieu de 70 %.'
+            heure: '15:05'
+          - qui: out
+            txt: 'Propose-moi quelque chose'
+            heure: '15:20'
+          - qui: in
+            txt: 'Deux pistes : le passer à 17,50 €, ou le servir en 160 g au lieu de 180 g. Les deux te remettent à 70 %.'
+            heure: '15:21'
+          - qui: out
+            txt: '17,50 €, je change la carte'
+            heure: '15:34'
+          - jour: 'Hier'
+            qui: in
+            txt: 'Tu me demandais si on reste ouvert de 14 h à 18 h : en semaine, le créneau ne couvre pas les salaires. On en parle demain ?'
+            heure: '21:00'
+          - qui: out
+            txt: 'Oui, demain 👍'
+            heure: '21:42'
+          - jour: "Aujourd'hui"
+            qui: in
+            txt: 'Bonjour Karim, voici le point de la semaine. J’ai rapproché les livraisons et les factures : il manque 2 kg de bœuf chez Metro, la demande d’avoir est prête.'
+            heure: '08:30'
+          - qui: out
+            txt: 'Envoie-la. Et fais le contrat de Lina pour samedi'
+            heure: '08:31'
+          - qui: in
+            txt: "C'est fait, à partir de ton modèle. Relis-le avant que je l'envoie."
+            heure: '08:33'
+            doc:
+              nom: "Contrat d'extra · Lina.pdf"
+              meta: '2 pages · PDF · prêt à signer'
+      - nom: 'Équipe · Le Petit Comptoir'
+        avatar: groupe
+        statut: 'Inès, Lina, Thomas, vous'
+        nonLus: 2
+        messages:
+          - jour: "Aujourd'hui"
+            qui: in
+            auteur: 'Inès'
+            txt: 'Livraison Metro arrivée, je range 📦'
+            heure: '07:52'
+          - qui: in
+            auteur: 'Thomas'
+            txt: 'Karim, je peux poser samedi ?'
+            heure: '08:12'
+      - nom: 'Lina (extra)'
+        avatar: personne
+        statut: 'en ligne'
+        nonLus: 1
+        messages:
+          - jour: "Aujourd'hui"
+            qui: in
+            txt: 'Contrat signé ✍️ À samedi !'
+            heure: '09:12'
+      - nom: 'Sylvain · Expert-comptable'
+        avatar: personne
+        statut: 'vu aujourd’hui à 08:05'
+        nonLus: 1
+        messages:
+          - jour: "Aujourd'hui"
+            qui: out
+            txt: 'Voilà la compta d’octobre, préparée par Robin.'
+            heure: '07:58'
+          - qui: in
+            txt: 'Bien reçu le fichier de Robin. Rien à redire, pour une fois 👌'
+            heure: '08:05'
+      - nom: 'Metro'
+        avatar: entreprise
+        statut: 'Compte professionnel'
+        nonLus: 0
+        messages:
+          - jour: "Aujourd'hui"
+            qui: in
+            txt: 'Votre demande d’avoir (bœuf, 2 kg) a été acceptée. Il apparaîtra sur votre prochaine facture.'
+            heure: '09:05'
+      - nom: 'Peep'
+        avatar: peep
+        statut: 'Agent Hatch OS'
+        nonLus: 1
+        messages:
+          - jour: 'Hier'
+            qui: in
+            txt: 'Psst. Le jour où tu ouvres un deuxième resto, je m’occupe de tes équipes 😉'
+            heure: '22:47'
+            lien:
+              titre: 'Hatch OS · pour les réseaux'
+              sousTitre: 'Les agents IA des réseaux de restauration'
+              domaine: 'gethatch.io'
+              url: '/reseaux'
+      - nom: 'Owl'
+        avatar: owl
+        statut: 'Agent Hatch OS'
+        nonLus: 0
+        messages:
+          - jour: 'Hier'
+            qui: out
+            txt: 'Owl, t’es là ?'
+            heure: '20:14'
+          - qui: in
+            txt: 'Chut, je suis en plein service. 🦉'
+            heure: '20:14'
+      - nom: 'Maman'
+        avatar: personne
+        statut: 'vu hier à 23:02'
+        nonLus: 1
+        messages:
+          - jour: 'Hier'
+            qui: in
+            txt: 'Tu manges quand ? Pas que des sandwichs debout hein ❤️'
+            heure: '23:02'
 
 confiance:
   titre: 'À vos côtés, sous votre contrôle.'
   cartes:
     - titre: 'Vos données restent les vôtres'
-      texte: 'Hébergées en Europe, jamais utilisées pour entraîner une IA. Vous choisissez ce que Robin voit.'
+      texte: 'Hébergées en Europe, conformes au RGPD, jamais utilisées pour entraîner une IA. Vous choisissez ce que Robin voit.'
+      alt: 'Robin, l’oiseau voxel, tient la clé d’un coffre-fort fermé par un cadenas, un drapeau européen dessus'
     - titre: 'Il propose, vous décidez'
       texte: 'Robin prépare, vous validez. Il ne promet rien à votre place, et rien ne part chez un fournisseur ou un salarié sans votre accord.'
-    - titre: 'Dans une appli que vous connaissez'
-      texte: "Pas de logiciel à installer pendant la bêta : Robin vous écrit sur WhatsApp, à l'écrit ou en vocal."
-
+      alt: 'Robin tend une feuille sur un plateau, le tampon posé à côté attend votre accord'
+    - titre: 'Il apprend tout seul'
+      texte: 'Rien à paramétrer : il retient vos fournisseurs, vos prix et vos habitudes au fil des échanges. Plus vous lui parlez, mieux il connaît la maison.'
+      alt: 'Robin lit un carnet ouvert, une pile de livres à côté de lui'
 beta:
   kicker: 'Bêta'
   titre: "Vous souhaitez utiliser Robin ? Inscrivez-vous sur la liste d'attente."
@@ -106,10 +211,10 @@ beta:
   champs:
     prenom: { label: 'Prénom', placeholder: 'Karim' }
     nom: { label: 'Nom', placeholder: 'Benali' }
-    restaurant: { label: 'Nom du restaurant', placeholder: 'Le Petit Comptoir' }
-    site: { label: 'Site web', placeholder: 'lepetitcomptoir.fr' }
+    restaurant: { label: 'Nom du restaurant', placeholder: 'Chez Karim' }
+    site: { label: 'Site web', placeholder: 'exemple.fr' }
     whatsapp: { label: 'Numéro WhatsApp', placeholder: '06 12 34 56 78' }
-    email: { label: 'Email', placeholder: 'karim@lepetitcomptoir.fr' }
+    email: { label: 'Email', placeholder: 'karim@exemple.fr' }
   bouton: "Rejoindre la liste d'attente"
   mention: 'Gratuit pendant la bêta. Aucun engagement.'
   messages:

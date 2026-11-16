@@ -1,81 +1,91 @@
 ---
 import Logo from './ui/Logo.astro';
 import Button from './ui/Button.astro';
-import { routes, otherLocale, useTranslations, type Locale, type Paths } from '../i18n/ui';
+import { appUrls, routes, otherLocale, useTranslations, type Locale, type Paths } from '../i18n/ui';
 
 /**
- * v4 nav: liquid-glass pill, centred and fixed at the top; a drop shadow appears once the page scrolls.
- * From lg it folds while the visitor scrolls down (César 05/10): only the logo, « Se connecter » and
- * the demo stay, the links and the language slide shut; scrolling back up unfolds it.
- * Dead zones (FOLD_DELTA down, a longer UNFOLD_DELTA up) keep it from flickering or reopening on a
- * small scroll back, and it unfolds a touch slower than it folds.
+ * The site's only nav (DS decision 3, César 09/11): a floating glass pill, the same on every page;
+ * only its content changes with the space it serves.
+ *   logo (always back to the home page, César 10/11: no « ← Home » link) · the space's sections ·
+ *   language · the space's one call to action
+ * - `accueil` (/): the two spaces (independents → Robin, networks), and « Se connecter ».
+ * - `robin`: Robin's sections, and the beta waitlist (no sign-in: independents have no account yet).
+ * - `reseau` (/reseaux and its inner pages: agents, demo, security…): agents, customers, pricing, demo.
+ * - `legal`: the language only.
+ * `surPlace`: the page carries the sections itself (anchors stay on the page).
+ * Real glass, like Apple's Liquid Glass: nearly transparent, blurred and refracting, so the page's own
+ * colors show through it; nothing is painted in. Only the content adapts: a script reads the background
+ * under the logo as the page scrolls and switches text and logo to cream over a dark one (`data-ton`),
+ * the logo to ink over a vivid one (`data-vif`). A section whose look is an image rather than its
+ * background color declares it with `data-nav-fond="clair" | "sombre"`. `tone` sets the first paint.
  */
 interface Props {
   locale: Locale;
   paths: Paths;
-  /**
-   * A space of the site (the network page): the logo brings back to the top of this page, the
-   * links point at its own sections, and a « Accueil » link leads back to the home page.
-   */
-  espace?: boolean;
+  espace?: 'accueil' | 'robin' | 'reseau' | 'legal';
+  surPlace?: boolean;
+  tone?: 'day' | 'night';
 }
 
-const { locale, paths, espace = false } = Astro.props;
+const { locale, paths, espace = 'reseau', surPlace = false, tone = 'day' } = Astro.props;
 const t = useTranslations(locale);
 const home = routes.home[locale];
-const base = espace ? '' : routes.reseaux[locale];
-const links = [
-  { href: `${base}#agents`, label: t('nav.agents') },
-  { href: `${base}#cas-clients`, label: t('nav.cases') },
-  { href: `${base}#tarifs`, label: t('nav.pricing') },
-  { href: routes.ressources[locale], label: t('nav.resources') },
-];
+const sombre = tone === 'night';
 const other = otherLocale(locale);
+
+const base = surPlace ? '' : routes.reseaux[locale];
+const liens = {
+  accueil: [
+    { href: routes.robin[locale], label: t('nav.independants') },
+    { href: routes.reseaux[locale], label: t('nav.reseaux') },
+    { href: routes.ressources[locale], label: t('nav.resources') },
+  ],
+  robin: [
+    { href: '#fait', label: t('nav.robin.features') },
+    { href: '#semaine', label: t('nav.robin.daily') },
+    { href: '#canaux', label: t('nav.robin.whatsapp') },
+    { href: routes.ressources[locale], label: t('nav.resources') },
+  ],
+  reseau: [
+    { href: `${base}#agents`, label: t('nav.agents') },
+    { href: `${base}#cas-clients`, label: t('nav.cases') },
+    { href: `${base}#tarifs`, label: t('nav.pricing') },
+    { href: routes.ressources[locale], label: t('nav.resources') },
+  ],
+  legal: [],
+}[espace];
+const cta = {
+  accueil: { href: appUrls.login, label: t('nav.login'), variant: 'ink' },
+  robin: { href: '#beta', label: t('cta.waitlist'), variant: 'orange' },
+  reseau: { href: routes.demo[locale], label: t('cta.demo'), variant: 'orange' },
+  legal: null,
+}[espace] as { href: string; label: string; variant: 'orange' | 'ink' | 'cream' } | null;
+
+const lien =
+  'rounded-full px-3.5 py-2.5 text-caption font-semibold whitespace-nowrap transition-colors duration-300';
+const survol = 'hover:bg-current/10';
 ---
 
 <header class="pointer-events-none fixed inset-x-0 top-3 z-60 flex justify-center px-3 md:top-5">
   <nav
     id="nav"
     aria-label={t('a11y.mainNav')}
-    class="vitre pointer-events-auto flex w-full max-w-max items-center gap-1.5 rounded-full py-2 pr-2 pl-5 transition-[filter] duration-500 max-sm:justify-between md:pl-6 [&.defile]:drop-shadow-[0_10px_24px_rgb(20_10_0/0.18)]"
+    class:list={[
+      'vitre pointer-events-auto flex w-full max-w-max items-center gap-1.5 rounded-full py-2 pr-2 pl-5 transition-[filter] duration-500 max-sm:justify-between md:pl-6 [&.defile]:drop-shadow-[0_10px_24px_rgb(20_10_0/0.18)]',
+    ]}
+    data-ton={sombre ? 'sombre' : 'clair'}
   >
-    <a href={espace ? '#' : home} aria-label={t('a11y.home')} class="shrink-0">
-      <Logo class="w-[80px] md:w-[92px]" />
+    <a href={home} aria-label={t('a11y.home')} class="shrink-0">
+      <Logo class="n-logo-jour w-[80px] md:w-[92px]" />
+      <Logo tone="night" class="n-logo-nuit w-[80px] md:w-[92px]" />
     </a>
-    {
-      espace && (
-        <a
-          href={home}
-          class="ml-2 hidden items-center gap-1 rounded-full px-3 py-2.5 text-[0.875rem] font-semibold whitespace-nowrap transition-colors duration-300 hover:bg-orange/14 hover:text-orange-hover lg:inline-flex"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            class="size-3.5"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.4"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M15 6l-6 6 6 6" />
-          </svg>
-          {t('nav.back')}
-        </a>
-      )
-    }
-    <div class="n-pli n-liens hidden items-center lg:flex" data-pli>
-      <span class="mx-2 h-[22px] w-px shrink-0 bg-ink/15" aria-hidden="true"></span>
-
+    <div class="n-pli n-liens ml-4 hidden items-center lg:flex" data-pli>
       <ul class="flex items-center gap-0.5">
         {
-          links.map((link) => (
+          liens.map((l) => (
             <li>
-              <a
-                href={link.href}
-                class="block rounded-full px-3.5 py-2.5 text-[0.875rem] font-semibold whitespace-nowrap transition-colors duration-300 hover:bg-orange/14 hover:text-orange-hover"
-              >
-                {link.label}
+              <a href={l.href} class:list={['block', lien, survol]}>
+                {l.label}
               </a>
             </li>
           ))
@@ -85,7 +95,7 @@ const other = otherLocale(locale);
             href={paths[other]}
             hreflang={other}
             lang={other}
-            class="block rounded-full px-3 py-2.5 text-[0.875rem] font-semibold text-soft uppercase transition-colors duration-300 hover:bg-orange/14 hover:text-orange-hover"
+            class:list={['block uppercase', lien, survol, 'n-attenue']}
           >
             {other}<span class="sr-only"> · {t('lang.switch')}</span>
           </a>
@@ -93,14 +103,29 @@ const other = otherLocale(locale);
       </ul>
     </div>
 
-    <!-- The demo alone: sign-in now lives on the home page's nav (NavAccueil). -->
-    <Button href={routes.demo[locale]} class="max-sm:px-4 max-sm:text-[0.8125rem]">
-      {t('cta.demo')}
-    </Button>
+    {/* exception: a smaller button below 640 px so the pill fits a 360 px screen */}
+    {
+      cta && (
+        <Button
+          href={cta.href}
+          variant={cta.variant}
+          class:list={[
+            'max-sm:px-4 max-sm:text-[0.8125rem]',
+            cta.variant === 'ink' && 'n-cta-inverse',
+            cta.variant === 'orange' && 'n-cta-orange',
+          ]}
+        >
+          {cta.label}
+        </Button>
+      )
+    }
 
     <details class="group relative lg:hidden">
       <summary
-        class="flex size-10 cursor-pointer list-none items-center justify-center rounded-full text-ink hover:bg-orange/14 [&::-webkit-details-marker]:hidden"
+        class:list={[
+          'flex size-10 cursor-pointer list-none items-center justify-center rounded-full [&::-webkit-details-marker]:hidden',
+          survol,
+        ]}
       >
         <span class="sr-only">{t('a11y.menu')}</span>
         <svg
@@ -117,29 +142,17 @@ const other = otherLocale(locale);
         </svg>
       </summary>
       <div
-        class="absolute top-full right-0 mt-3 w-64 rounded-card border border-line bg-surface p-2 shadow-3"
+        class="absolute top-full right-0 mt-3 w-64 rounded-card-sm border border-line bg-surface p-2 text-ink shadow-3"
       >
         <ul class="flex flex-col">
           {
-            espace && (
+            liens.map((l) => (
               <li>
                 <a
-                  href={home}
-                  class="block rounded-btn px-3 py-2.5 font-semibold hover:bg-orange-tint"
+                  href={l.href}
+                  class="block rounded-sm px-3 py-2.5 font-semibold hover:bg-orange-tint"
                 >
-                  ← {t('nav.back')}
-                </a>
-              </li>
-            )
-          }
-          {
-            links.map((link) => (
-              <li>
-                <a
-                  href={link.href}
-                  class="block rounded-btn px-3 py-2.5 font-semibold hover:bg-orange-tint"
-                >
-                  {link.label}
+                  {l.label}
                 </a>
               </li>
             ))
@@ -149,7 +162,7 @@ const other = otherLocale(locale);
               href={paths[other]}
               hreflang={other}
               lang={other}
-              class="block rounded-btn px-3 py-2.5 font-semibold hover:bg-orange-tint"
+              class="block rounded-sm px-3 py-2.5 font-semibold hover:bg-orange-tint"
             >
               {t('lang.switch')}
             </a>
@@ -161,8 +174,50 @@ const other = otherLocale(locale);
 </header>
 
 <style>
-  /* Folding part: its width slides to 0 (the pill follows), it fades, and the gap it leaves is taken
-     back by a negative margin. Only from lg; below, the menu carries the links. */
+  /* The glass lets the background through: a faint white veil only, the blur and refraction come
+     from .vitre (global.css, src/scripts/vitre.ts). No hard rim: just a hairline catching the light. */
+  #nav {
+    background-color: color-mix(in srgb, var(--color-white) 12%, transparent);
+    color: var(--color-ink);
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, var(--color-white) 22%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--color-white) 10%, transparent),
+      0 10px 30px color-mix(in srgb, var(--color-shadow) 14%, transparent);
+    transition:
+      color 0.45s var(--ease-hatch),
+      filter 0.5s;
+  }
+  #nav::before {
+    display: none;
+  }
+  #nav[data-ton='sombre'] {
+    color: var(--color-cream);
+  }
+  .n-attenue {
+    color: color-mix(in srgb, currentColor 68%, transparent);
+  }
+  /* The logos are rendered by Logo.astro, out of this component's scope. */
+  #nav :global(.n-logo-nuit),
+  #nav[data-ton='sombre'] :global(.n-logo-jour) {
+    display: none;
+  }
+  #nav[data-ton='sombre'] :global(.n-logo-nuit) {
+    display: block;
+  }
+  #nav[data-vif] :global(.n-logo-jour) {
+    filter: brightness(0);
+  }
+  /* The orange button would vanish over an orange background: it turns ink, without its glow. */
+  #nav[data-vif] :global(.n-cta-orange) {
+    background: var(--color-ink);
+    color: var(--color-cream);
+    box-shadow: none;
+  }
+  /* The ink button (home's « Se connecter ») turns cream over a dark background. */
+  #nav[data-ton='sombre'] :global(.n-cta-inverse) {
+    background: var(--color-cream);
+    color: var(--color-ink);
+  }
   @media (width >= 64rem) {
     .n-pli {
       overflow: clip;
@@ -174,7 +229,6 @@ const other = otherLocale(locale);
         opacity 0.35s var(--ease-hatch),
         margin 0.55s var(--ease-hatch);
     }
-    /* Unfolding: slower and slightly delayed, so the bar eases back open. */
     :global(#nav:not(.replie)) .n-pli {
       transition-duration: 0.7s, 0.45s, 0.7s;
       transition-delay: 0.08s;
@@ -193,14 +247,9 @@ const other = otherLocale(locale);
 </style>
 
 <script>
-  // Rendered by this component, so it always exists.
   const nav = document.getElementById('nav')!;
   const plis = [...nav.querySelectorAll<HTMLElement>('.n-pli')];
   const large = matchMedia('(min-width: 64rem)');
-  /**
-   * Scroll needed in one direction before the bar folds (down) or unfolds (up), and the top zone kept
-   * open. Unfolding asks for a longer, deliberate move up (César 05/10: it reopened too soon).
-   */
   const FOLD_DELTA = 28;
   const UNFOLD_DELTA = 160;
   const HAUT = 120;
@@ -209,7 +258,6 @@ const other = otherLocale(locale);
 
   function plier(replie: boolean) {
     nav.classList.toggle('replie', replie && large.matches);
-    // Folded links leave the tab order.
     const plie = nav.classList.contains('replie');
     for (const el of plis) el.inert = plie;
   }
@@ -223,17 +271,70 @@ const other = otherLocale(locale);
       cumul = 0;
       return plier(false);
     }
-    // Accumulate in the current direction only: a reversal starts the count again.
     cumul = Math.sign(dy) === Math.sign(cumul) ? cumul + dy : dy;
     if (cumul > FOLD_DELTA) plier(true);
     else if (cumul < -UNFOLD_DELTA) plier(false);
   };
   addEventListener('scroll', maj, { passive: true });
+
+  // Liquid-glass tint: the background color right under the pill, found by walking up from the element
+  // there to the first one with an opaque enough background (images and videos are skipped: their box
+  // carries the color). A 1×1 canvas turns any CSS color (rgb, oklab, color-mix…) into RGBA.
+  const pinceau = document.createElement('canvas').getContext('2d', { willReadFrequently: true })!;
+  function rgba(css: string): [number, number, number, number] {
+    pinceau.clearRect(0, 0, 1, 1);
+    pinceau.fillStyle = '#0000';
+    pinceau.fillStyle = css;
+    pinceau.fillRect(0, 0, 1, 1);
+    const [r, g, b, a] = pinceau.getImageData(0, 0, 1, 1).data;
+    return [r, g, b, a / 255];
+  }
+  const logo = nav.querySelector<HTMLElement>('a[href]')!;
+  const NUIT = 'rgb(11, 11, 13)';
+  const BLANC = 'rgb(255, 255, 255)';
+  function fondSous(): string {
+    // Read under the logo: it is what must stay legible (the pill's middle may sit over a card).
+    const b = logo.getBoundingClientRect();
+    const pile = document.elementsFromPoint(b.left + b.width / 2, b.top + b.height / 2);
+    // Skip the nav's own fixed bar only: a page's hero may itself be a <header> (/securite).
+    const barre = nav.parentElement!;
+    let el = pile.find((e) => !barre.contains(e)) ?? null;
+    for (; el; el = el.parentElement) {
+      // A section whose look is an image, not its background color (the networks map), says it.
+      const declare = (el as HTMLElement).dataset?.navFond;
+      if (declare) return declare === 'sombre' ? NUIT : BLANC;
+      const fond = getComputedStyle(el).backgroundColor;
+      if (rgba(fond)[3] > 0.5) return fond;
+    }
+    return getComputedStyle(document.body).backgroundColor;
+  }
+  let dernierFond = '';
+  let prevu = false;
+  function accorder() {
+    prevu = false;
+    const fond = fondSous();
+    if (fond === dernierFond) return;
+    dernierFond = fond;
+    const [r, g, b] = rgba(fond).map((v) => v / 255);
+    const lin = (c: number) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+    const luminance = 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+    nav.dataset.ton = luminance < 0.2 ? 'sombre' : 'clair';
+    // A vivid background (the orange Security band): the orange logo would vanish, it turns ink.
+    const max = Math.max(r, g, b);
+    nav.toggleAttribute('data-vif', max > 0 && (max - Math.min(r, g, b)) / max > 0.6);
+  }
+  const planifier = () => {
+    if (!prevu) {
+      prevu = true;
+      requestAnimationFrame(accorder);
+    }
+  };
+  addEventListener('scroll', planifier, { passive: true });
+  addEventListener('resize', planifier);
+  accorder();
   large.addEventListener('change', () => plier(nav.classList.contains('replie')));
-  // Keyboard: tabbing into the bar opens it.
   nav.addEventListener('focusin', () => plier(false));
   maj();
-  // Close the mobile menu once a link is followed (same-page anchors don't reload the page).
   document
     .querySelectorAll<HTMLAnchorElement>('#nav details a')
     .forEach((a) =>

@@ -2,9 +2,6 @@ import { z } from 'astro/zod';
 
 const texte = z.string().min(1);
 
-/** Screen-reader labels of a looping animation's pause button, swapped by the inline script. */
-const pause = z.strictObject({ pause: texte, lecture: texte });
-
 /** A waitlist form field: its label and example value (type and autocomplete live in the view). */
 const champ = z.strictObject({ label: texte, placeholder: texte });
 
@@ -22,29 +19,19 @@ export const schema = z.strictObject({
     cta: texte,
     /** aria-label of Robin's flying loop above the title. */
     video: texte,
-    pause,
   }),
+  /** The footer under the page: the line under the logo (the call to action is the hero's). */
+  pied: z.strictObject({ signature: texte }),
   /** The evening scene under the hero: the bistro video and Robin's messages popping one by one. */
   soiree: z.strictObject({
     video: texte,
     /** aria-label of the list of messages. */
     label: texte,
-    pause,
     /** Exactly three: the CSS loop (19.5 s, one bubble every 6.5 s) is timed for three bubbles. */
     messages: z.array(z.strictObject({ txt: texte, lien: texte.optional() })).length(3),
   }),
-  /** The sticky in-page nav pill. */
-  pilule: z.strictObject({
-    label: texte,
-    statut: texte,
-    fait: texte,
-    semaine: texte,
-    canaux: texte,
-    cta: texte,
-  }),
-  fait: z.strictObject({ kicker: texte, titre: texte }),
+  fait: z.strictObject({ titre: texte }),
   semaine: z.strictObject({
-    kicker: texte,
     titre: texte,
     /** aria-label of the tablist. */
     frise: texte,
@@ -53,30 +40,64 @@ export const schema = z.strictObject({
       .array(z.strictObject({ jour: texte, heure: texte, titre: texte, texte, bulle: texte }))
       .length(6),
   }),
-  /** Where to find him: the WhatsApp thread in the phone. */
+  /** Where to find him: a WhatsApp you can browse, Robin's chat first, a few others (easter eggs). */
   canaux: z.strictObject({
-    kicker: texte,
     titre: texte,
     texte,
     telephone: z.strictObject({
-      statut: texte,
-      jour: texte,
-      messages: z
+      ariaLabel: texte,
+      /** WhatsApp's own words: the chats list, its filters, the tab bar. */
+      app: z.strictObject({
+        titre: texte,
+        recherche: texte,
+        filtres: z.array(texte).length(4),
+        onglets: z.array(texte).length(5),
+        /** aria-label of the back chevron. */
+        retour: texte,
+        ecrit: texte,
+        saisie: texte,
+        /** The date chip of today's messages: the list shows their time instead. */
+        aujourdhui: texte,
+      }),
+      discussions: z
         .array(
           z.strictObject({
-            qui: z.enum(['robin', 'patron']),
-            txt: texte,
-            /** An attached file: its name and the line under it. */
-            doc: texte.optional(),
-            meta: texte.optional(),
+            nom: texte,
+            /** Robin, a Hatch agent (its portrait), or WhatsApp's default avatar. */
+            avatar: z.enum(['robin', 'peep', 'owl', 'personne', 'groupe', 'entreprise']),
+            /** Under the name, in the chat's header. */
+            statut: texte,
+            epingle: z.boolean().optional(),
+            nonLus: z.number().int().min(0),
+            /** Each day opens with its date chip (`jour`), the first message included. */
+            messages: z
+              .array(
+                z.strictObject({
+                  jour: texte.optional(),
+                  qui: z.enum(['in', 'out']),
+                  /** In a group: who wrote it. */
+                  auteur: texte.optional(),
+                  txt: texte,
+                  heure: texte,
+                  /** An attached file: its name and the line under it. */
+                  doc: z.strictObject({ nom: texte, meta: texte }).optional(),
+                  /** A link with its preview (a Hatch page). */
+                  lien: z
+                    .strictObject({ titre: texte, sousTitre: texte, domaine: texte, url: texte })
+                    .optional(),
+                }),
+              )
+              .min(1)
+              .refine((m) => m[0].jour, 'the first message opens its day (jour)'),
           }),
         )
-        .min(1),
+        .min(2),
     }),
   }),
   confiance: z.strictObject({
     titre: texte,
-    cartes: z.array(z.strictObject({ titre: texte, texte })).length(3),
+    /** Data, decisions, learning: each card has its voxel Robin (alt = what he does). */
+    cartes: z.array(z.strictObject({ titre: texte, texte, alt: texte })).length(3),
   }),
   beta: z.strictObject({
     kicker: texte,

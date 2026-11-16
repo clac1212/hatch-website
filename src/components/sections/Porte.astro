@@ -1,0 +1,101 @@
+---
+/**
+ * One of the home page's two doors (signature section, César 09/11): the whole voxel illustration on
+ * top (2:1), then the audience, the title, one or two lines and the button on the card's tone.
+ * The whole card is the link; the button is drawn as a <span>.
+ * - `ton`: `clair` (cream card, ink text) or `sombre` (night card, cream text).
+ */
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Button from '../ui/Button.astro';
+import Carte from '../ui/Carte.astro';
+
+interface Props {
+  href: string;
+  image: ImageMetadata;
+  alt: string;
+  kicker: string;
+  titre: string;
+  texte: string;
+  cta: string;
+  ton: 'clair' | 'sombre';
+}
+const { href, image, alt, kicker, titre, texte, cta, ton } = Astro.props;
+const sombre = ton === 'sombre';
+---
+
+<Carte
+  href={href}
+  variante="image"
+  taille="panneau"
+  class:list={['porte flex flex-col', sombre ? 'porte-sombre' : 'porte-claire']}
+  data-rv-groupe
+>
+  <!-- The illustration -->
+  <div class="porte-image relative overflow-clip">
+    <Picture
+      src={image}
+      alt={alt}
+      widths={[640, 960, 1280]}
+      sizes="(min-width: 768px) 50vw, 100vw"
+      formats={['avif', 'webp']}
+      class="carte-zoom size-full object-cover object-[50%_40%]"
+    />
+  </div>
+
+  <div
+    class:list={[
+      'plaque flex flex-col items-start gap-2',
+      sombre ? 'plaque-sombre text-cream' : 'plaque-claire text-ink',
+    ]}
+  >
+    <span
+      class:list={[
+        'kicker font-mono text-kicker uppercase',
+        sombre ? 'text-peach' : 'text-orange-txt',
+      ]}
+    >
+      {kicker}
+    </span>
+    <h2 class="font-display text-section font-semibold text-balance">{titre}</h2>
+    <p class="texte max-w-lead text-body">{texte}</p>
+    <span class="mt-3">
+      <Button variant={sombre ? 'cream' : 'orange'}>{cta}</Button>
+    </span>
+  </div>
+</Carte>
+
+<style>
+  /* The whole illustration on top, the text below on the card's tone, nothing laid over the picture
+     (César 09/11: a glass plate over it hid the scene and took too much height). */
+  .porte-claire {
+    background-color: var(--color-surface);
+    box-shadow: var(--shadow-carte);
+  }
+  .porte-sombre {
+    background-color: var(--color-night);
+  }
+  .porte-image {
+    aspect-ratio: 2 / 1;
+  }
+  /* The picture fills the frame without sizing it (else its own 16:10 would win over the 2:1). */
+  .porte-image > :global(picture),
+  .porte-image > :global(img) {
+    position: absolute;
+    inset: 0;
+  }
+  .plaque {
+    padding: 24px 28px 28px;
+  }
+  @media (width >= 64rem) {
+    .plaque {
+      padding: 28px 36px 32px;
+    }
+  }
+  .plaque-claire .texte {
+    color: var(--color-soft);
+  }
+  .plaque-sombre .texte {
+    color: color-mix(in srgb, var(--color-cream) 75%, transparent);
+  }
+</style>

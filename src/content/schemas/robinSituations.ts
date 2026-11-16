@@ -1,10 +1,24 @@
 import { z } from 'astro/zod';
 
-/** A document sent in the chat (Excel, PDF): its type badge, file name and status line. */
-const fichier = z.strictObject({ type: z.string(), nom: z.string(), statut: z.string() });
+/**
+ * A document sent in the chat (Excel, PDF), as WhatsApp shows it: the type (its icon), the file
+ * name, the detail line (« 1 page · PDF · 84 Ko ») and the caption sent with it.
+ */
+const fichier = z.strictObject({
+  type: z.enum(['PDF', 'XLS']),
+  nom: z.string(),
+  meta: z.string(),
+  statut: z.string(),
+});
 
 /** Two quick reply buttons under Robin's message: the one the owner's thumb taps, then the other. */
 const boutons = z.strictObject({ oui: z.string(), non: z.string() });
+
+const situation = z.strictObject({
+  titre: z.string(),
+  texte: z.string(),
+  moment: z.strictObject({ jour: z.string(), heure: z.string() }),
+});
 
 /**
  * Copy of the Robin page's "What Robin does" block (src/content/sections/robinSituations/{fr,en}.yaml):
@@ -23,20 +37,22 @@ export const schema = z.strictObject({
     ecrit: z.string(),
     /** Placeholder of the input bar. */
     saisie: z.string(),
-    rejouer: z.string(),
   }),
-  /** Title and text next to each chat, in display order. */
-  situations: z.tuple([
-    z.strictObject({ titre: z.string(), texte: z.string() }),
-    z.strictObject({ titre: z.string(), texte: z.string() }),
-    z.strictObject({ titre: z.string(), texte: z.string() }),
-    z.strictObject({ titre: z.string(), texte: z.string() }),
-  ]),
-  /** 1 · Plugs into your tools: the link card, the system notice, what he found, the month's books. */
+  /**
+   * Title and text next to each chat, in display order, and when the chat happens: `jour` is the
+   * WhatsApp date chip at the top of the chat, `heure` the time on its bubbles.
+   */
+  situations: z.tuple([situation, situation, situation, situation]),
+  /** 1 · Plugs into your tools: the link (shown as a WhatsApp link preview), what he found, the books. */
   connexion: z.strictObject({
     demande: z.string(),
-    lien: z.strictObject({ icone: z.string(), titre: z.string(), sousTitre: z.string() }),
-    systeme: z.string(),
+    lien: z.strictObject({
+      titre: z.string(),
+      sousTitre: z.string(),
+      domaine: z.string(),
+      /** Illustrative only: shown as text in the bubble, never a real link. */
+      url: z.string(),
+    }),
     trouve: z.string(),
     trouvailles: z.array(z.string()).min(1),
     compta: z.string(),
@@ -84,6 +100,9 @@ export const schema = z.strictObject({
     vocal: z.strictObject({ duree: z.string(), transcription: z.string() }),
     contrat: z.strictObject({
       titre: z.string(),
+      /** The PDF as WhatsApp lists it under its first-page preview. */
+      nom: z.string(),
+      meta: z.string(),
       tampon: z.string(),
       champs: z.array(z.strictObject({ cle: z.string(), valeur: z.string() })).min(1),
     }),

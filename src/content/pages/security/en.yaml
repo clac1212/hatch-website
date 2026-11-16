@@ -43,7 +43,7 @@ sections:
         text: "The assistant draws only on your documents, isolated from other customers'."
   - kicker: 'Access control'
     visual: ecran
-    title: 'Granular access control, at every level'
+    title: 'Access set at every level'
     subtitle: 'Everyone in your network only accesses what concerns them.'
     items:
       - title: 'Enterprise SSO'

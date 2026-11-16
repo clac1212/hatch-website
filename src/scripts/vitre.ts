@@ -60,7 +60,11 @@ function installer(surfaces: HTMLElement[]) {
       // One material for every surface (César 05/10): same bevel and same strength on the nav pill and
       // the hero's title card, only clamped to a third of very short surfaces.
       const bevel = Math.min(BISEAU, h / 3);
-      image.setAttribute('href', carte(w, h, r, bevel));
+      // A squircle corner (corner-shape, the DS card shape) bends along its own curve, not a circle's.
+      const squircle = /superellipse|squircle/.test(
+        getComputedStyle(el).getPropertyValue('corner-shape'),
+      );
+      image.setAttribute('href', carte(w, h, r, bevel, squircle));
       image.setAttribute('width', String(w));
       image.setAttribute('height', String(h));
       deplacement.setAttribute('scale', String(FORCE));
@@ -81,7 +85,7 @@ function installer(surfaces: HTMLElement[]) {
  * x / y offset (128 = none). Inside the bevel the offset points inwards along the edge's normal, with
  * a convex profile: steep at the rim, flat towards the centre.
  */
-function carte(w: number, h: number, r: number, bevel: number): string {
+function carte(w: number, h: number, r: number, bevel: number, squircle = false): string {
   const canvas = document.createElement('canvas');
   canvas.width = w;
   canvas.height = h;
@@ -100,7 +104,13 @@ function carte(w: number, h: number, r: number, bevel: number): string {
       let nx: number;
       let ny: number;
       let dist: number;
-      if (qx > 0 && qy > 0) {
+      if (qx > 0 && qy > 0 && squircle) {
+        // Superellipse of exponent 4 (CSS `squircle`): |x|⁴ + |y|⁴ = r⁴, normal ∝ (x³, y³).
+        dist = Math.pow(qx ** 4 + qy ** 4, 0.25) - r;
+        const len = Math.hypot(qx ** 3, qy ** 3) || 1;
+        nx = qx ** 3 / len;
+        ny = qy ** 3 / len;
+      } else if (qx > 0 && qy > 0) {
         const len = Math.hypot(qx, qy) || 1;
         dist = len - r;
         nx = qx / len;

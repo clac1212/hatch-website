@@ -1,0 +1,44 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+/**
+ * The site's card (DS component, César 09/11): one shape, one skin per variant, one hover, one focus.
+ * - `variante`: `surface` (light, the object shadow), `nuit` (dark, a hairline), `image` (a picture
+ *   fills it, content laid over), `verre` (the site's glass).
+ * - `taille`: `sm` (24 px, narrow cards), `md` (40 px, cards), `panneau` (64 px, large objects).
+ * - `href`: the whole card is a link; it lifts on hover and a child marked `.carte-zoom` leans in.
+ * - `as`: the element when it isn't a link (`div` by default; `li`, `article`…).
+ * What touches the card's edge is clipped by it; what sits inset takes `rounded-interieur`.
+ */
+type Variante = 'surface' | 'nuit' | 'image' | 'verre';
+interface Props extends HTMLAttributes<'div'> {
+  variante?: Variante;
+  taille?: 'sm' | 'md' | 'panneau';
+  href?: string;
+  as?: 'div' | 'li' | 'article';
+}
+const {
+  variante = 'surface',
+  taille = 'md',
+  href,
+  as = 'div',
+  class: className,
+  ...rest
+} = Astro.props;
+const Tag = href ? 'a' : as;
+const RAYONS = { sm: 'rounded-card-sm', md: 'rounded-card', panneau: 'rounded-panneau' };
+const PEAUX: Record<Variante, string> = {
+  surface: 'carte-surface',
+  nuit: 'carte-nuit',
+  image: 'carte-image',
+  verre: 'vitre',
+};
+---
+
+<Tag
+  href={href}
+  class:list={['carte', RAYONS[taille], PEAUX[variante], href && 'carte-lien group', className]}
+  {...rest}
+>
+  <slot />
+</Tag>

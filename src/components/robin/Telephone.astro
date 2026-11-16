@@ -1,0 +1,294 @@
+---
+/**
+ * Karim's phone (Robin page, « Sur WhatsApp », César 10/11): a WhatsApp you can browse. It opens on
+ * the chat with Robin: the days before are there (scroll up), today's messages play once when the
+ * phone comes into view (he types, they come in). The back chevron leads to the chats list (ui/WhatsAppDiscussions): the people around a
+ * restaurant (the team, the extra, the accountant, Metro, his mum) and two Hatch agents as easter
+ * eggs, Peep pointing to Hatch for networks, Owl busy during service. Tapping a chat slides it in
+ * from the right as on iOS; opening it clears its unread badge.
+ * Without JS: Robin's chat, all its messages. With reduced motion: no slide, no playback.
+ * Copy in src/content/sections/robin/{fr,en}.yaml (canaux.telephone).
+ */
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Iphone from '../ui/Iphone.astro';
+import WhatsApp from '../ui/WhatsApp.astro';
+import Discussions from '../ui/WhatsAppDiscussions.astro';
+import Heure from '../ui/WhatsAppHeure.astro';
+import robin from '../../assets/portraits/robin.jpg';
+import peep from '../../assets/equipe/peep.jpg';
+import owl from '../../assets/equipe/owl.jpg';
+import hatch from '../../assets/brand/hatch-os.png';
+import { section } from '../../content/section';
+import type { Locale } from '../../i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const { telephone } = (await section('robin', locale)).canaux;
+const { app } = telephone;
+
+const PORTRAITS: Record<string, ImageMetadata> = { robin, peep, owl };
+const discussions = telephone.discussions.map((d, i) => {
+  const dernier = d.messages.at(-1)!;
+  /** The day of the last messages: the last date chip. */
+  const jour = d.messages.findLast((m) => m.jour)!.jour!;
+  return {
+    ...d,
+    id: `wa-${i}`,
+    image: PORTRAITS[d.avatar],
+    genre: d.avatar === 'groupe' || d.avatar === 'entreprise' ? d.avatar : ('personne' as const),
+    apercu: dernier.txt,
+    auteur: dernier.auteur,
+    sortant: dernier.qui === 'out',
+    quand: jour === app.aujourdhui ? dernier.heure : jour,
+  };
+});
+/** Unread chats, as the back chevron of an open chat counts them (the open one excluded). */
+const nonLuesSauf = (id: string) => discussions.filter((d) => d.id !== id && d.nonLus > 0).length;
+---
+
+<div class="telephone" role="group" aria-label={telephone.ariaLabel} data-telephone>
+  <Iphone>
+    <div class="app">
+      <div class="vue liste recule" data-vue="liste" inert>
+        <Discussions
+          titre={app.titre}
+          recherche={app.recherche}
+          filtres={app.filtres}
+          onglets={app.onglets}
+          separateur={locale === 'fr' ? '\u202f: ' : ': '}
+          discussions={discussions.map((d) => ({ ...d, avatar: d.image }))}
+        />
+      </div>
+      {
+        discussions.map((d, i) => (
+          <div
+            class:list={['vue', 'conv', i === 0 && 'ouverte']}
+            data-vue={d.id}
+            inert={i === 0 ? undefined : true}
+          >
+            <WhatsApp
+              contact={d.nom}
+              statut={d.statut}
+              ecrit={app.ecrit}
+              avatar={d.image}
+              genre={d.genre}
+              saisie={app.saisie}
+              nonLus={nonLuesSauf(d.id)}
+              retour={app.retour}
+            >
+              <div class="wa-fil" data-fil={i === 0 ? 'joue' : undefined}>
+                {d.messages.map((m, k) => (
+                  <>
+                    {m.jour && <span class="wa-jour">{m.jour}</span>}
+                    <div
+                      class:list={[
+                        'b',
+                        m.qui,
+                        (m.qui !== d.messages[k + 1]?.qui || d.messages[k + 1]?.jour) && 'fin',
+                        m.auteur && 'avec-auteur',
+                      ]}
+                    >
+                      {m.auteur && <b class="wa-auteur">{m.auteur}</b>}
+                      {m.lien && (
+                        <a class="wa-apercu" href={m.lien.url}>
+                          <Image src={hatch} alt="" width={64} densities={[1, 2]} />
+                          <span>
+                            <b>{m.lien.titre}</b>
+                            <span>{m.lien.sousTitre}</span>
+                            <span class="dom">{m.lien.domaine}</span>
+                          </span>
+                        </a>
+                      )}
+                      {m.doc && (
+                        <span class="wa-doc">
+                          <span class="wa-doc-ico pdf">
+                            <span>PDF</span>
+                          </span>
+                          <span>
+                            <span>{m.doc.nom}</span>
+                            <span class="meta">{m.doc.meta}</span>
+                          </span>
+                        </span>
+                      )}
+                      {m.txt}
+                      <Heure heure={m.heure} lu={m.qui === 'out'} />
+                    </div>
+                  </>
+                ))}
+              </div>
+            </WhatsApp>
+          </div>
+        ))
+      }
+    </div>
+  </Iphone>
+</div>
+
+<script>
+  const racine = document.querySelector<HTMLElement>('[data-telephone]');
+  if (racine) {
+    const reduit = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const vues = new Map(
+      [...racine.querySelectorAll<HTMLElement>('[data-vue]')].map((v) => [v.dataset.vue!, v]),
+    );
+    const liste = vues.get('liste')!;
+    let ouverte = racine.querySelector<HTMLElement>('.conv.ouverte')!;
+
+    /** The unread chats left, on every back chevron and on the tab bar. */
+    const recompter = () => {
+      const badges = [...liste.querySelectorAll<HTMLElement>('[data-badge]')];
+      for (const v of vues.values()) {
+        const n =
+          v === liste
+            ? 0
+            : badges.filter((b) => !b.closest(`[data-ouvre="${v.dataset.vue}"]`)).length;
+        const span = v.querySelector<HTMLElement>('[data-nonlus]');
+        if (span) {
+          span.textContent = String(n);
+          span.hidden = n === 0;
+        }
+      }
+      const onglet = liste.querySelector<HTMLElement>('[data-badge-onglet]');
+      if (onglet) {
+        onglet.textContent = String(badges.length);
+        onglet.hidden = badges.length === 0;
+      }
+    };
+
+    const ouvrir = (id: string) => {
+      const conv = vues.get(id)!;
+      // Opening a chat reads it: its badge goes, its time turns grey.
+      const ligne = liste.querySelector(`[data-ouvre="${id}"]`)!;
+      ligne.querySelector('[data-badge]')?.remove();
+      ligne.querySelector('[data-quand]')?.classList.remove('non-lu');
+      recompter();
+      conv.querySelector<HTMLElement>('.wa-fil')!.scrollTop = 1e6;
+      conv.inert = false;
+      liste.inert = true;
+      conv.classList.add('ouverte');
+      ouverte = conv;
+      conv.querySelector<HTMLElement>('[data-retour]')!.focus({ preventScroll: true });
+    };
+    const fermer = () => {
+      const conv = ouverte;
+      conv.inert = true;
+      liste.inert = false;
+      conv.classList.remove('ouverte');
+      liste.classList.remove('recule');
+      liste.querySelector<HTMLElement>(`[data-ouvre="${conv.dataset.vue}"]`)!.focus({
+        preventScroll: true,
+      });
+    };
+
+    liste
+      .querySelectorAll<HTMLElement>('[data-ouvre]')
+      .forEach((l) => l.addEventListener('click', () => ouvrir(l.dataset.ouvre!)));
+    racine.querySelectorAll('[data-retour]').forEach((b) => b.addEventListener('click', fermer));
+
+    // Robin's chat plays once, the first time the phone is in view: he types, each message comes in.
+    const fil = racine.querySelector<HTMLElement>('[data-fil="joue"]')!;
+    const tete = fil.closest('.wai')!.querySelector('[data-tete]')!;
+    // Only today's messages play (after the last date chip); the days before are already there.
+    const bulles = [...fil.querySelectorAll<HTMLElement>('.wa-jour:last-of-type ~ .b')];
+    fil.scrollTop = fil.scrollHeight;
+    if (!reduit) {
+      bulles.forEach((b) => b.classList.add('attend'));
+      const vue = new IntersectionObserver(
+        async ([e]) => {
+          if (!e.isIntersecting) return;
+          vue.disconnect();
+          const pause = (ms: number) => new Promise((r) => setTimeout(r, ms));
+          await pause(500);
+          for (const b of bulles) {
+            if (b.classList.contains('in')) {
+              tete.classList.add('ecrit');
+              await pause(1300);
+              tete.classList.remove('ecrit');
+            } else await pause(900);
+            b.classList.remove('attend');
+            fil.scrollTop = fil.scrollHeight;
+            await pause(500);
+          }
+        },
+        { threshold: 0.5 },
+      );
+      vue.observe(racine);
+    }
+  }
+</script>
+
+<style>
+  /* A fixed width, so a content-sized grid column around it gets its size. */
+  .telephone {
+    /* exception: the phone's width, the mock-up read at a glance */
+    width: 340px;
+    max-width: 100%;
+  }
+  .app {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: var(--color-black);
+  }
+  /* Each screen fills the phone; a chat slides in from the right over the list, which steps back
+     a little and dims, as iOS pushes a view. */
+  .vue {
+    position: absolute;
+    inset: 0;
+    transition:
+      translate 0.42s cubic-bezier(0.2, 0.8, 0.2, 1),
+      filter 0.42s cubic-bezier(0.2, 0.8, 0.2, 1),
+      visibility 0s 0.42s;
+  }
+  .conv {
+    translate: 100% 0;
+    visibility: hidden;
+    box-shadow: -0.5em 0 1.5em color-mix(in srgb, var(--color-black) 12%, transparent);
+  }
+  .conv.ouverte {
+    translate: none;
+    visibility: visible;
+    transition-delay: 0s;
+  }
+  .liste.recule {
+    translate: -28% 0;
+    filter: brightness(0.9);
+    visibility: hidden;
+  }
+  .liste:not(.recule) {
+    visibility: visible;
+    transition-delay: 0s;
+  }
+
+  /* Robin's chat, before it plays. */
+  .vue :global(.b.attend) {
+    display: none;
+  }
+  .vue :global(.wa-auteur) {
+    display: block;
+    color: var(--color-whatsapp-teal);
+    font-size: 0.82em;
+    font-weight: 600;
+  }
+  .vue :global(a.wa-apercu) {
+    color: inherit;
+  }
+  /* The Hatch logo in the link preview, whole. */
+  .vue :global(a.wa-apercu img) {
+    padding: 0.3em;
+    background: var(--color-cream);
+    object-fit: contain;
+  }
+  .vue :global(a.wa-apercu:hover b) {
+    text-decoration: underline;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .vue {
+      transition: none;
+    }
+  }
+</style>

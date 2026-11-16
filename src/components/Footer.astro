@@ -42,9 +42,11 @@ interface Props {
    * stay reachable, small, on the fine-print line.
    */
   epure?: boolean;
+  /** The page's own call to action and line under the logo (Robin: the waitlist); the demo by default. */
+  appel?: { href: string; label: string; signature: string };
 }
 
-const { locale, paths, scene, accueil = false, epure = false } = Astro.props;
+const { locale, paths, scene, accueil = false, epure = false, appel } = Astro.props;
 const bande = epure && !!scene?.bande;
 const t = useTranslations(locale);
 const data = await section('piedDePage', locale);
@@ -154,8 +156,10 @@ const lien = 'lien-pied block w-fit text-[14.5px] leading-[normal] text-paper';
         <a href={home} aria-label={t('a11y.home')}>
           <Image src={logo} alt="" width={130} densities={[1, 2]} class="h-auto w-[130px]" />
         </a>
-        <p class="text-[15px] leading-[23px] text-white/70">{data.signature}</p>
-        <Button href={routes.demo[locale]} variant="cream">{data.cta}</Button>
+        <p class="text-[15px] leading-[23px] text-white/70">{appel?.signature ?? data.signature}</p>
+        <Button href={appel?.href ?? routes.demo[locale]} variant="cream">
+          {appel?.label ?? data.cta}
+        </Button>
       </div>
 
       {

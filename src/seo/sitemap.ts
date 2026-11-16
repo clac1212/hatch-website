@@ -29,7 +29,7 @@ const SOURCES: Partial<Record<RouteKey, (l: Locale) => string[]>> = {
     'src/views/AccueilPage.astro',
     `src/content/home/${l}.yaml`,
     `src/content/sections/accueil/${l}.yaml`,
-    'src/components/sections/SecuriteLivre.astro',
+    'src/components/sections/SecuriteBandeau.astro',
   ],
   reseaux: (l) => [
     'src/views/ReseauxPage.astro',

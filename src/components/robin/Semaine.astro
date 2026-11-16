@@ -1,0 +1,393 @@
+---
+/**
+ * "From Monday morning to Sunday night" (signature section, César 09/11, reworked 10/11). Under the
+ * section title, what the day is about in one line; then Robin in the day's outfit, in a round frame
+ * as in the hero, his message beside him in a cream card; then the week's timeline, square pixel
+ * dots. The week runs on its own, one line filling from Monday to Sunday, then again; as the line
+ * reaches a day, Robin's outfit, his message and the line change. A click jumps to a day and the
+ * week runs on from there. With reduced motion: no run, clicks switch days. Without JS: Monday.
+ */
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  /** aria-label of the timeline. */
+  frise: string;
+  jours: { jour: string; heure: string; titre: string; texte: string; bulle: string }[];
+  /** Robin's outfit per day, in the order of `jours`. */
+  poses: ImageMetadata[];
+}
+const { frise, jours, poses } = Astro.props;
+
+/** The time as a clock prints it: « 8 h 30 » → « 08:30 », « 8:30 am » → « 8:30 AM ». */
+const horloge = (h: string) => {
+  const fr = h.match(/^(\d{1,2}) h(?: (\d{2}))?$/);
+  return fr ? `${fr[1].padStart(2, '0')}:${fr[2] ?? '00'}` : h.toUpperCase();
+};
+---
+
+<div class="semaine" data-semaine>
+  <!-- What the day is about, right under the section title: one heading, its line changes. -->
+  <div class="details">
+    {
+      jours.map((j, i) => (
+        <p
+          class:list={['detail', i === 0 && 'on']}
+          id={`semaine-jour-${i}`}
+          role="tabpanel"
+          aria-labelledby={`semaine-onglet-${i}`}
+        >
+          <strong class="font-semibold text-cream">{j.titre}.</strong> {j.texte}
+        </p>
+      ))
+    }
+  </div>
+
+  <!-- Robin and, beside him, his message of the day: every bubble and outfit share one cell, so the
+       stage never changes size from one day to the next. -->
+  <div class="scene">
+    <div class="robin" aria-hidden="true">
+      <div class="rond">
+        {
+          poses.map((src, i) => (
+            <Image
+              src={src}
+              alt=""
+              widths={[200, 400]}
+              sizes="184px"
+              class:list={['pose', i === 0 && 'on']}
+            />
+          ))
+        }
+      </div>
+    </div>
+    <div class="bulles">
+      {
+        jours.map((j, i) => (
+          <div class:list={['bulle', i === 0 && 'on']} aria-hidden={i === 0 ? undefined : 'true'}>
+            <p class="bulle-tete font-mono text-source uppercase">Robin · {horloge(j.heure)}</p>
+            <p class="mt-1.5 text-body">{j.bulle}</p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+
+  <!-- The timeline: one line from Monday's dot to Sunday's, filled as the week runs. -->
+  <div class="frise" role="tablist" aria-label={frise}>
+    <span class="ligne" aria-hidden="true"><i></i></span>
+    {
+      jours.map((j, i) => (
+        <button
+          type="button"
+          role="tab"
+          id={`semaine-onglet-${i}`}
+          class="jour"
+          aria-selected={i === 0 ? 'true' : 'false'}
+          aria-controls={`semaine-jour-${i}`}
+          tabindex={i === 0 ? 0 : -1}
+        >
+          <span class="point" aria-hidden="true" />
+          <span class="jour-nom font-mono text-body uppercase">{j.jour}</span>
+          <span class="jour-heure font-mono text-caption">{horloge(j.heure)}</span>
+        </button>
+      ))
+    }
+  </div>
+</div>
+
+<script>
+  const JOUR = 4000; // ms per day
+
+  const racine = document.querySelector<HTMLElement>('[data-semaine]');
+  if (racine) {
+    const onglets = [...racine.querySelectorAll<HTMLElement>('[role="tab"]')];
+    const bulles = [...racine.querySelectorAll<HTMLElement>('.bulle')];
+    const changent = [...bulles, ...racine.querySelectorAll<HTMLElement>('.pose, .detail')];
+    const ligne = racine.querySelector<HTMLElement>('.ligne > i')!;
+    const n = onglets.length;
+    const reduit = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let actif = -1;
+    /** Where the week is, in days: 2.5 is Wednesday, halfway through. */
+    let t = 0;
+
+    const montrer = (i: number) => {
+      if (i === actif) return;
+      actif = i;
+      onglets.forEach((o, k) => {
+        o.setAttribute('aria-selected', String(k === i));
+        o.tabIndex = k === i ? 0 : -1;
+        o.classList.toggle('passe', k < i);
+      });
+      // Bubbles, outfits and lines come in the same order as the days.
+      changent.forEach((e) => e.classList.toggle('on', Number(e.dataset.jour) === i));
+      bulles.forEach((b, k) => b.toggleAttribute('aria-hidden', k !== i));
+    };
+    /** The line reaches each day's dot as that day starts; Sunday's turn keeps it full. */
+    const peindre = () => {
+      const i = Math.floor(t);
+      montrer(i);
+      ligne.style.transform = `scaleX(${Math.min(t, n - 1) / (n - 1)})`;
+    };
+    for (const sel of ['.bulle', '.pose', '.detail'])
+      racine.querySelectorAll<HTMLElement>(sel).forEach((e, k) => (e.dataset.jour = String(k)));
+
+    // A click jumps to the day; the week runs on from there.
+    onglets.forEach((o, k) =>
+      o.addEventListener('click', () => {
+        t = k;
+        peindre();
+      }),
+    );
+    // Arrow keys move between days, as in any tab list.
+    racine.querySelector('.frise')!.addEventListener('keydown', (e) => {
+      const { key } = e as KeyboardEvent;
+      const k = onglets.indexOf(document.activeElement as HTMLElement);
+      if (k < 0 || (key !== 'ArrowRight' && key !== 'ArrowLeft')) return;
+      const suivant = onglets[(k + (key === 'ArrowRight' ? 1 : -1) + n) % n];
+      suivant.focus();
+      suivant.click();
+    });
+
+    peindre();
+    if (!reduit) {
+      // It runs once the section is first seen, then never stops.
+      let avant = 0;
+      const tour = (now: number) => {
+        t = (t + (now - avant) / JOUR) % n;
+        avant = now;
+        peindre();
+        requestAnimationFrame(tour);
+      };
+      const vue = new IntersectionObserver(([e]) => {
+        if (!e.isIntersecting) return;
+        vue.disconnect();
+        requestAnimationFrame((now) => {
+          avant = now;
+          requestAnimationFrame(tour);
+        });
+      });
+      vue.observe(racine);
+    }
+  }
+</script>
+
+<style>
+  .semaine {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  /* --- What the day is about, under the section title --- */
+  .details {
+    display: grid;
+    width: min(100%, 40rem);
+    margin-top: 16px;
+  }
+  .detail {
+    grid-area: 1 / 1;
+    color: var(--doux);
+    font-size: var(--text-punch);
+    line-height: 1.5;
+    text-wrap: balance;
+    opacity: 0;
+    translate: 0 6px;
+    visibility: hidden;
+    transition:
+      opacity 0.3s var(--ease-hatch),
+      translate 0.3s var(--ease-hatch),
+      visibility 0s 0.3s;
+  }
+  .detail.on {
+    opacity: 1;
+    translate: none;
+    visibility: visible;
+    transition-duration: 0.5s;
+    transition-delay: 0.1s;
+  }
+
+  /* --- Robin and his bubble --- */
+  .scene {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+    margin-top: 40px;
+  }
+  .bulles {
+    display: grid;
+    align-items: center;
+    flex: 0 1 24rem;
+  }
+  /* Robin's message, in the site's vocabulary: a cream card, its sender and time in mono, its point
+     aimed at Robin. It comes in once the new outfit is there. */
+  .bulle {
+    position: relative;
+    grid-area: 1 / 1;
+    padding: 16px 20px 18px;
+    border-radius: var(--radius-card-sm);
+    corner-shape: squircle;
+    background: var(--color-cream);
+    box-shadow: var(--shadow-3);
+    color: var(--color-ink);
+    text-align: left;
+    opacity: 0;
+    translate: 0 6px;
+    transition:
+      opacity 0.3s var(--ease-hatch),
+      translate 0.3s var(--ease-hatch);
+  }
+  .bulle.on {
+    opacity: 1;
+    translate: none;
+    transition-duration: 0.5s;
+    transition-delay: 0.25s;
+  }
+  /* Its point, on the left, aimed at Robin. */
+  .bulle::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: calc(100% - 1px);
+    width: 12px;
+    height: 22px;
+    background: inherit;
+    translate: 0 -50%;
+    /* exception: the point of a speech bubble, a curved notch */
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 18'%3E%3Cpath d='M10 0v18c-.8-4.2-3.8-7-10-9C6.2 7 9.2 4.2 10 0z'/%3E%3C/svg%3E")
+      no-repeat center / 100% 100%;
+  }
+  .bulle-tete {
+    color: var(--color-orange-txt);
+    letter-spacing: 0.06em;
+  }
+  /* Robin in a round frame, as in the hero. */
+  .robin {
+    flex: none;
+    /* exception: the stage's size, the scene's one figure */
+    width: 88px;
+  }
+  .rond {
+    display: grid;
+    width: 100%;
+    aspect-ratio: 1;
+    overflow: clip;
+    border-radius: 999px;
+    background: var(--color-robin-studio);
+  }
+  /* The next outfit comes in softly over the last one. */
+  .rond :global(.pose) {
+    grid-area: 1 / 1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* exception: the outfit is framed tight; set lower and smaller so the whole Robin fits the disc,
+       his props included, as in the hero */
+    transform-origin: 50% 100%;
+    translate: 0 4%;
+    opacity: 0;
+    scale: 0.94;
+    transition:
+      opacity 0.6s var(--ease-hatch),
+      scale 0.9s var(--ease-hatch);
+  }
+  .rond :global(.pose.on) {
+    opacity: 1;
+    scale: 0.86;
+  }
+
+  /* --- The timeline --- */
+  .frise {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    width: min(100%, 60rem);
+    margin-top: 56px;
+  }
+  /* One line from the first dot to the last (each dot sits mid-column). */
+  .ligne {
+    position: absolute;
+    top: 5px;
+    left: calc(100% / 12);
+    right: calc(100% / 12);
+    height: 2px;
+    overflow: clip;
+    background: color-mix(in srgb, var(--color-cream) 18%, transparent);
+  }
+  .ligne > i {
+    position: absolute;
+    inset: 0;
+    background: var(--color-orange);
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  .jour {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding-bottom: 4px;
+    color: var(--doux);
+    cursor: pointer;
+    transition: color 0.25s var(--ease-hatch);
+  }
+  .jour:hover,
+  .jour[aria-selected='true'] {
+    color: var(--color-cream);
+  }
+  .jour:focus-visible {
+    outline: 2px solid var(--color-orange);
+    outline-offset: 4px;
+    border-radius: var(--radius-sm);
+  }
+  /* exception: a square dot, the pixel of the voxel */
+  .point {
+    position: relative;
+    width: 12px;
+    height: 12px;
+    background: var(--fond);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-cream) 35%, transparent);
+    transition:
+      background-color 0.25s,
+      box-shadow 0.25s;
+  }
+  .passe .point {
+    background: var(--color-peach);
+    box-shadow: none;
+  }
+  .jour[aria-selected='true'] .point {
+    background: var(--color-orange);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-orange) 25%, transparent);
+  }
+  .jour-nom {
+    margin-top: 8px;
+    line-height: 1;
+  }
+  .jour-heure {
+    letter-spacing: 0.04em;
+    color: var(--doux);
+  }
+
+  @media (width >= 48rem) {
+    .scene {
+      gap: 36px;
+    }
+    .robin {
+      width: 184px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bulle,
+    .rond :global(.pose),
+    .detail {
+      transition: none;
+      translate: none;
+    }
+  }
+</style>

@@ -4,25 +4,36 @@ conversation:
   enLigne: online
   ecrit: typing…
   saisie: Message
-  rejouer: Replay
 
 situations:
   - titre: He plugs into your tools
     texte: It all happens in WhatsApp. Robin sends you a link, you give him access to your inbox or your Drive, and he finds your invoices and documents on his own.
+    moment:
+      jour: Monday
+      heure: '9:12 AM'
   - titre: He checks every invoice
     texte: Snap a photo of the delivery note. Robin matches it against the order and the invoice, and shows you the gap. He drafts the credit request, you say yes.
+    moment:
+      jour: Tuesday
+      heure: '7:48 AM'
   - titre: He helps you decide
     texte: Ask him a real owner’s question. He cross-checks your sales, your purchases and your staff costs, and answers with the numbers to back it up.
+    moment:
+      jour: Thursday
+      heure: '3:05 PM'
   - titre: He does the prep work
     texte: A voice note is enough. He starts from your templates and your data, sends you the document ready to review, and nothing goes out without your OK.
+    moment:
+      jour: Friday
+      heure: '6:30 PM'
 
 connexion:
   demande: 'To find your invoices, I need access to your inbox. You can connect it here:'
   lien:
-    icone: G
-    titre: Connect your inbox
-    sousTitre: Secure Hatch OS link
-  systeme: Inbox connected
+    titre: Connect your inbox · Hatch OS
+    sousTitre: Secure link, valid for 24 h
+    domaine: gethatch.io
+    url: https://gethatch.io/c/7Kq2
   trouve: "All set ✅ Here's what I found so far:"
   trouvailles:
     - 3 Metro invoices
@@ -33,6 +44,7 @@ connexion:
   fichier:
     type: XLS
     nom: October books · Le Petit Comptoir.xlsx
+    meta: XLSX · 18 kB
     statut: Draft, for you to review
 
 facture:
@@ -63,6 +75,7 @@ facture:
   avoir:
     type: PDF
     nom: Credit request · Metro.pdf
+    meta: 1 page · PDF · 84 kB
     statut: Draft, needs your OK
 
 decision:
@@ -85,6 +98,8 @@ preparation:
     transcription: “Do Lina's contract for Saturday night.”
   contrat:
     titre: Temp contract · your template
+    nom: Temp contract · Lina Moreau.pdf
+    meta: 2 pages · PDF · 112 kB
     tampon: Ready to sign
     champs:
       - { cle: Employee, valeur: Lina Moreau }

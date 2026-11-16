@@ -38,7 +38,8 @@ export const POST: APIRoute = async ({ request, redirect }) => {
     return formulaire ? retour(false) : json(400, { ok: false, error: 'invalid' });
   }
   // Honeypot: a bot filled the hidden field. Pretend it worked, record nothing.
-  if (texte(body.website)) return formulaire ? retour(true) : json(200, { ok: true });
+  // Honeypot (`hatch_hp`, a name no browser autofills): a bot that fills it is told « ok » and dropped.
+  if (texte(body.hatch_hp)) return formulaire ? retour(true) : json(200, { ok: true });
 
   const f = {
     prenom: texte(body.prenom, 80),
@@ -83,11 +84,14 @@ export const POST: APIRoute = async ({ request, redirect }) => {
 
   const slack = async () => {
     if (!SLACK_WEBHOOK_LISTE_ATTENTE) return false;
+    // Slack reads `<…>` as a mention or a link: escaped, a typed `<!channel>` or
+    // `<https://…|label>` stays plain text instead of pinging the channel or hiding a link.
+    const s = (v: string) => v.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const lignes = [
       `*Nouvelle inscription Robin* (${f.locale.toUpperCase()})`,
-      `${f.prenom} ${f.nom} · ${f.restaurant}`,
-      `WhatsApp : ${f.whatsapp} · ${f.email}`,
-      site ? `Site : ${site}` : '',
+      `${s(f.prenom)} ${s(f.nom)} · ${s(f.restaurant)}`,
+      `WhatsApp : ${s(f.whatsapp)} · ${s(f.email)}`,
+      site ? `Site : ${s(site)}` : '',
     ].filter(Boolean);
     const res = await fetch(SLACK_WEBHOOK_LISTE_ATTENTE, {
       method: 'POST',

@@ -1,0 +1,116 @@
+---
+/**
+ * Security on the home page (the crossroads), under the two spaces: a compact band, not the Security
+ * page itself (César 09/11). The orange grain of the Security page, its title and lead, its four themes
+ * as a band (César 09/11: compact): the head and the link on the left, the four promises on the right,
+ * each a slim card with its voxel character on a small tinted stage, its title and one line. For
+ * access control, the three roles of the page's access screen, the crew member's highlighted.
+ * Content: the Security page's (src/content/pages/security/{fr,en}.yaml); the link's label lives in
+ * src/content/sections/accueil/{fr,en}.yaml under `securite`.
+ */
+import { getEntry } from 'astro:content';
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Section from '../layout/Section.astro';
+import EnTete from '../ui/EnTete.astro';
+import Carte from '../ui/Carte.astro';
+import jay from '../../assets/securite/jay.png';
+import owl from '../../assets/securite/owl.png';
+import finch from '../../assets/securite/finch.png';
+import { section } from '../../content/section';
+import { routes, type Locale } from '../../i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const entry = await getEntry('securityPage', locale);
+if (!entry) throw new Error(`Missing src/content/pages/security/${locale}.yaml`);
+const { hero, sections, screen } = entry.data;
+const ui = (await section('accueil', locale)).securite;
+const AGENTS: Record<'jay' | 'owl' | 'finch', ImageMetadata> = { jay, owl, finch };
+---
+
+<Section id="securite" ton="orange" aria-labelledby="securite-titre">
+  <div class="grid items-center gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
+    <div class="flex flex-col items-start gap-8">
+      <EnTete id="securite-titre" titre={hero.title} intro={hero.lead} />
+      <!-- exception: the underlined text link (also on the 404) is not a DS component yet -->
+      <a
+        href={routes.security[locale]}
+        class="border-b-[1.5px] border-ink pb-[3px] text-caption font-semibold transition-colors hover:border-transparent"
+      >
+        {ui.lien}
+        <span aria-hidden="true">→</span>
+      </a>
+    </div>
+
+    <ul class="grid gap-4 sm:grid-cols-2">
+      {
+        sections.map((s) => (
+          <Carte as="li" class="flex flex-col gap-5 p-6">
+            {/* The illustration sits on the card itself, no frame of its own. */}
+            <div class="illus" aria-hidden={s.visual === 'ecran' ? 'true' : undefined}>
+              {s.visual === 'ecran' ? (
+                <ul class="roles">
+                  {screen.roles.map((r, k) => (
+                    <li class:list={{ on: k === screen.roles.length - 1 }}>{r}</li>
+                  ))}
+                </ul>
+              ) : (
+                <Picture
+                  src={AGENTS[s.visual]}
+                  alt={hero.alts[s.visual]}
+                  height={224}
+                  densities={[1, 2]}
+                  formats={['avif', 'webp']}
+                  loading="lazy"
+                  class="illus-img"
+                />
+              )}
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <h3 class="font-display text-card font-semibold text-balance">{s.title}</h3>
+              <p class="text-caption text-soft">{s.subtitle}</p>
+            </div>
+          </Carte>
+        ))
+      }
+    </ul>
+  </div>
+</Section>
+
+<style>
+  /* exception: the illustrations' height, one line of figures across the four cards */
+  .illus {
+    display: flex;
+    align-items: flex-end;
+    height: 7rem;
+  }
+  .illus > :global(picture) {
+    height: 100%;
+  }
+  .illus :global(.illus-img) {
+    width: auto;
+    height: 100%;
+    object-fit: contain;
+  }
+  /* The access levels, drawn as the app's role pills. */
+  .roles {
+    display: grid;
+    gap: 5px;
+    font: 600 11px/1 var(--font-sans);
+  }
+  .roles li {
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: var(--color-cream-2);
+    color: var(--color-soft);
+    text-align: center;
+    white-space: nowrap;
+  }
+  .roles li.on {
+    background: var(--color-ink);
+    color: var(--color-cream);
+  }
+</style>
