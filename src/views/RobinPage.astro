@@ -242,6 +242,8 @@ const champs = [
             <input type="text" name="hatch_hp" tabindex="-1" autocomplete="off" />
           </div>
           <input type="hidden" name="locale" value={locale} />
+          <!-- Filled by the script with the utm_source of the link the visitor came from (ads, Instagram, referral). -->
+          <input type="hidden" name="source" value="" />
 
           <Button
             type="submit"
@@ -279,6 +281,14 @@ const champs = [
       var requis = [].slice.call(form.querySelectorAll('input[required]'));
       var courriel = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       var enCours = false;
+      // Where the visitor came from: the utm_source of the landing URL, kept for the session so it
+      // survives a reload or a detour through another page. Storage can be missing: then the URL only.
+      var source = new URLSearchParams(location.search).get('utm_source') || '';
+      try {
+        if (source) sessionStorage.setItem('hatch_source', source);
+        else source = sessionStorage.getItem('hatch_source') || '';
+      } catch (e) {}
+      form.elements.namedItem('source').value = source;
       function valeur(nom) {
         return form.elements.namedItem(nom).value.trim();
       }
@@ -324,6 +334,7 @@ const champs = [
             whatsapp: valeur('whatsapp'),
             email: valeur('email'),
             locale: form.getAttribute('data-locale'),
+            source: source,
             hatch_hp: form.elements.namedItem('hatch_hp').value,
           }),
         })
