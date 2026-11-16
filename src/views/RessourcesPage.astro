@@ -88,50 +88,42 @@ const jsonLd = [
   pied={pied}
   jsonLd={jsonLd}
 >
-  <!-- 1 · Header and audience filter -->
-  <Section rythme="aucun" class="pt-32 pb-12 lg:pt-40 lg:pb-16">
-    <EnTete niveau="h1" titre={hero.titre} intro={hero.chapeau} />
-    <div class="filtre mt-8 flex flex-wrap gap-2" role="group" aria-label={hero.filtre} hidden>
-      <button type="button" data-filtre="" aria-pressed="true">{hero.filtres.tout}</button>
-      <button type="button" data-filtre="independant" aria-pressed="false">
-        {hero.filtres.independant}
-      </button>
-      <button type="button" data-filtre="reseau" aria-pressed="false">
-        {hero.filtres.reseau}
-      </button>
-    </div>
-  </Section>
-
-  <!-- 2 · The featured guide -->
-  {
-    une && (
-      <Section rythme="bas" data-filtre-section aria-label={ui.guides.une}>
-        <div data-filtre-groupe>
-          <Carte
-            href={une.href}
-            taille="panneau"
-            class="grid lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]"
-            data-public={une.public}
-          >
-            <span class="block aspect-3/2 overflow-clip bg-scene lg:aspect-auto">
+  <!-- 1 · Header, audience filter and, beside them, the featured guide: content from the first
+       screen. The featured guide stays whatever the filter. -->
+  <Section rythme="bas" class="pt-32 lg:pt-40">
+    <div class="grid items-center gap-12 lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)] lg:gap-16">
+      <div class="flex flex-col items-start gap-8">
+        <EnTete niveau="h1" titre={hero.titre} intro={hero.chapeau} />
+        <div class="filtre flex flex-wrap gap-2" role="group" aria-label={hero.filtre} hidden>
+          <button type="button" data-filtre="" aria-pressed="true">{hero.filtres.tout}</button>
+          <button type="button" data-filtre="independant" aria-pressed="false">
+            {hero.filtres.independant}
+          </button>
+          <button type="button" data-filtre="reseau" aria-pressed="false">
+            {hero.filtres.reseau}
+          </button>
+        </div>
+      </div>
+      {
+        une && (
+          <Carte href={une.href} class="flex flex-col">
+            <span class="block aspect-16/10 overflow-clip bg-scene">
               <Image
                 src={une.image}
                 alt={une.imageAlt}
-                widths={[640, 960, 1280]}
-                sizes="(min-width: 1024px) 760px, 100vw"
+                widths={[480, 720, 1080]}
+                sizes="(min-width: 1024px) 540px, 100vw"
                 loading="eager"
                 class="carte-zoom size-full object-cover"
               />
             </span>
-            <span class="flex flex-col gap-4 p-8 sm:p-12">
+            <span class="flex flex-col gap-3 p-7">
               <span class="flex flex-wrap items-center gap-x-3 gap-y-2">
                 <span class="font-mono text-kicker text-orange-txt uppercase">{ui.guides.une}</span>
                 <Badge locale={locale} public={une.public} />
-                <span class="font-mono text-source text-soft uppercase">{une.metier}</span>
               </span>
-              <b class="font-display text-section font-semibold text-balance">{une.title}</b>
-              <span class="text-soft">{une.chapeau}</span>
-              <span class="mt-auto flex flex-wrap items-center justify-between gap-3 pt-4">
+              <b class="font-display text-card font-semibold text-balance">{une.title}</b>
+              <span class="flex flex-wrap items-center justify-between gap-3 pt-1">
                 <span class="font-mono text-source text-soft uppercase">
                   {fill(ui.guide.lecture, { n: String(une.readingMinutes) })}
                 </span>
@@ -141,10 +133,10 @@ const jsonLd = [
               </span>
             </span>
           </Carte>
-        </div>
-      </Section>
-    )
-  }
+        )
+      }
+    </div>
+  </Section>
 
   <!-- 3 · Every guide, with a theme filter -->
   {
