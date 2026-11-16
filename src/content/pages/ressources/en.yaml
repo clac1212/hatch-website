@@ -4,13 +4,15 @@ seo:
 
 hero:
   kicker: 'Resources'
-  titre: 'What restaurant owners actually use, free to access.'
-  chapeau: 'Templates, guides and a glossary, whether you run a bistro or a network of 50 restaurants. Read and download everything with no form and no email.'
-  filtre: 'Filter the resources'
+  titre: 'Resources for those who'
+  chapeau: 'Templates, guides and a glossary, free to access: read and download everything with no form and no email.'
+  filtre: 'Choose what applies to you'
   filtres:
-    tout: 'All'
-    independant: 'I run a restaurant'
-    reseau: 'I run a network'
+    tout: 'run a restaurant or a network'
+    independant: 'run a restaurant'
+    reseau: 'run a network'
+  compteGuides: '{n} guides'
+  compteModeles: '{n} templates'
 
 modeles:
   kicker: 'Templates'

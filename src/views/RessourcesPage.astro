@@ -13,6 +13,8 @@ import { piedRessources } from '../components/ressources/pied';
 import { guideSlug, publishedGuides } from '../content/pages/guides';
 import { fill } from '../components/pages/format';
 import { BRAND, breadcrumbList } from '../seo/jsonld';
+import robin from '../assets/portraits/robin.jpg';
+import lark from '../assets/portraits/lark.jpg';
 import { entryRoutes, routes, type Locale } from '../i18n/ui';
 
 /**
@@ -67,6 +69,38 @@ const metiers = [...new Set(autres.map((g) => g.metier))].sort((a, b) =>
 /** The glossary preview: its first eight terms, alphabetically. */
 const termes = [...glossaire.termes].sort((a, b) => a.mot.localeCompare(b.mot, locale)).slice(0, 8);
 
+/** What a choice holds, e.g. « 4 guides · 2 modèles ». */
+const pour = (p: Filtre) => (x: { public: string }) =>
+  p === '' || x.public === p || x.public === 'tous';
+const compte = (p: Filtre) =>
+  [
+    fill(hero.compteGuides, { n: String(guides.filter(pour(p)).length) }),
+    disponibles.some(pour(p)) &&
+      fill(hero.compteModeles, { n: String(disponibles.filter(pour(p)).length) }),
+  ]
+    .filter(Boolean)
+    .join(' · ');
+type Filtre = '' | 'independant' | 'reseau';
+/** The H1 is a sentence whose ending is the audience choice, like the home's rebus: each audience
+ * has its agent (Robin for the independent, Lark for the head office) and its ending. Nothing chosen:
+ * the ending names both, both agents in the circle; it is also the picker's first option. */
+const fins: { filtre: Filtre; texte: string; agents: { nom: string; img: typeof robin }[] }[] = [
+  {
+    filtre: '',
+    texte: hero.filtres.tout,
+    agents: [
+      { nom: 'Robin', img: robin },
+      { nom: 'Lark', img: lark },
+    ],
+  },
+  {
+    filtre: 'independant',
+    texte: hero.filtres.independant,
+    agents: [{ nom: 'Robin', img: robin }],
+  },
+  { filtre: 'reseau', texte: hero.filtres.reseau, agents: [{ nom: 'Lark', img: lark }] },
+];
+
 const site = Astro.site!;
 const jsonLd = [
   breadcrumbList(site, [
@@ -74,8 +108,6 @@ const jsonLd = [
     { name: hero.kicker, path: routes.ressources[locale] },
   ]),
 ];
-
-/** Shared look of the section headings. */
 ---
 
 <Base
@@ -88,105 +120,165 @@ const jsonLd = [
   pied={pied}
   jsonLd={jsonLd}
 >
-  <!-- 1 · Header, audience filter and, beside them, the featured guide: content from the first
-       screen. The featured guide stays whatever the filter. -->
-  <Section rythme="bas" class="pt-32 lg:pt-40">
-    <div class="grid items-center gap-12 lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)] lg:gap-16">
-      <div class="flex flex-col items-start gap-8">
-        <EnTete niveau="h1" titre={hero.titre} intro={hero.chapeau} />
-        <div class="filtre flex flex-wrap gap-2" role="group" aria-label={hero.filtre} hidden>
-          <button type="button" data-filtre="" aria-pressed="true">{hero.filtres.tout}</button>
-          <button type="button" data-filtre="independant" aria-pressed="false">
-            {hero.filtres.independant}
-          </button>
-          <button type="button" data-filtre="reseau" aria-pressed="false">
-            {hero.filtres.reseau}
-          </button>
-        </div>
-      </div>
-      {
-        une && (
-          <Carte href={une.href} class="flex flex-col">
-            <span class="block aspect-16/10 overflow-clip bg-scene">
-              <Image
-                src={une.image}
-                alt={une.imageAlt}
-                widths={[480, 720, 1080]}
-                sizes="(min-width: 1024px) 540px, 100vw"
-                loading="eager"
-                class="carte-zoom size-full object-cover"
-              />
-            </span>
-            <span class="flex flex-col gap-3 p-7">
-              <span class="flex flex-wrap items-center gap-x-3 gap-y-2">
-                <span class="font-mono text-kicker text-orange-txt uppercase">{ui.guides.une}</span>
-                <Badge locale={locale} public={une.public} />
-              </span>
-              <b class="font-display text-card font-semibold text-balance">{une.title}</b>
-              <span class="flex flex-wrap items-center justify-between gap-3 pt-1">
-                <span class="font-mono text-source text-soft uppercase">
-                  {fill(ui.guide.lecture, { n: String(une.readingMinutes) })}
+  <!-- 1 · Header on night: one sentence, the home's rebus. Its ending is the audience choice: greyed
+       while nothing is chosen; hovering it (or a tap, or the keyboard) opens a picker that grows out
+       of it, one audience above, one below. -->
+  <Section ton="night" rythme="aucun" class="pt-32 pb-14 lg:pt-40 lg:pb-16" data-nav-fond="sombre">
+    <div class="flex flex-col items-center gap-6 text-center">
+      <h1 class="rebus font-display text-h1 font-semibold text-balance">
+        <span class="block">{hero.titre}</span>
+        <span class="choix" data-choix>
+          <button
+            type="button"
+            class="fin-bouton"
+            aria-haspopup="true"
+            aria-expanded="false"
+            aria-controls="choix-menu"
+            data-choix-bouton
+          >
+            {
+              fins.map((f) => (
+                <span class:list={['fin', f.filtre === '' && 'on']} data-fin={f.filtre}>
+                  <span class="avatars" aria-hidden="true">
+                    {f.agents.map((a) => (
+                      <Image src={a.img} alt="" widths={[96, 192]} sizes="1.3em" class="av" />
+                    ))}
+                  </span>
+                  {f.texte.split(' ').map((w, j) => (
+                    <>
+                      <span class="w" style={`--i:${j}`}>
+                        {w}
+                      </span>{' '}
+                    </>
+                  ))}
                 </span>
-                <span class="lien">
-                  {ui.guides.lire} <span aria-hidden="true">→</span>
-                </span>
-              </span>
-            </span>
-          </Carte>
-        )
-      }
+              ))
+            }
+          </button>
+          <span id="choix-menu" class="menu" role="group" aria-label={hero.filtre} data-choix-menu>
+            {
+              fins.map((f) => (
+                <button type="button" class="option" data-filtre={f.filtre} aria-pressed="false">
+                  <span class="option-avs">
+                    {f.agents.map((ag) => (
+                      <Image
+                        src={ag.img}
+                        alt=""
+                        widths={[96, 192]}
+                        sizes="2.5rem"
+                        class="option-av"
+                      />
+                    ))}
+                  </span>
+                  <span class="flex flex-col items-start">
+                    <span class="option-texte">{f.texte}</span>
+                    <span class="option-compte mt-1 font-mono text-source not-italic uppercase">
+                      {f.agents.map((ag) => ag.nom).join(' & ')} · {compte(f.filtre)}
+                    </span>
+                  </span>
+                </button>
+              ))
+            }
+          </span>
+        </span>
+      </h1>
+      <p class="max-w-lead text-punch text-(--doux)">{hero.chapeau}</p>
     </div>
   </Section>
 
-  <!-- 3 · Every guide, with a theme filter -->
+  <!-- 2 · The featured guide, out of the header: picture on the left, text on the right, no card.
+       It stays whatever the filter. -->
+  {
+    une && (
+      <Section rythme="aucun" class="pt-16 lg:pt-20">
+        <a href={une.href} class="une grid items-center gap-8 lg:grid-cols-2 lg:gap-14">
+          <Carte variante="image" class="aspect-3/2">
+            <Image
+              src={une.image}
+              alt={une.imageAlt}
+              widths={[640, 960, 1280]}
+              sizes="(min-width: 1024px) 640px, 100vw"
+              loading="eager"
+              class="carte-zoom size-full object-cover"
+            />
+          </Carte>
+          <span class="flex flex-col items-start gap-4">
+            <span class="flex flex-wrap items-center gap-x-3 gap-y-2">
+              <span class="font-mono text-kicker text-orange-txt uppercase">{ui.guides.une}</span>
+              <Badge locale={locale} public={une.public} />
+            </span>
+            <b class="font-display text-section font-semibold text-balance">{une.title}</b>
+            <span class="line-clamp-3 text-body text-soft">{une.chapeau}</span>
+            <span class="flex items-center gap-5 pt-1">
+              <span class="lien">
+                {ui.guides.lire}{' '}
+                <span class="fleche" aria-hidden="true">
+                  →
+                </span>
+              </span>
+              <span class="font-mono text-source text-soft uppercase">
+                {fill(ui.guide.lecture, { n: String(une.readingMinutes) })}
+              </span>
+            </span>
+          </span>
+        </a>
+      </Section>
+    )
+  }
+
+  <!-- 3 · Every guide: the themes on the left, two guides per row on the right. -->
   {
     autres.length > 0 && (
-      <Section rythme="bas" data-filtre-section aria-labelledby="tous">
-        <EnTete id="tous" titre={ui.guides.titre} intro={ui.guides.texte} />
-        {metiers.length > 1 && (
-          <div
-            class="themes mt-8 flex flex-wrap gap-2"
-            role="group"
-            aria-label={ui.guides.themes}
-            hidden
-          >
-            <button type="button" data-theme="" aria-pressed="true">
-              {ui.guides.toutTheme}
-            </button>
-            {metiers.map((m) => (
-              <button type="button" data-theme={m} aria-pressed="false">
-                {m}
+      <Section data-filtre-section aria-labelledby="tous">
+        <div class="grid gap-10 lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-16">
+          <nav class="themes-col" aria-label={ui.guides.themes}>
+            <div
+              class="themes flex flex-wrap gap-2 lg:sticky lg:top-28 lg:flex-col lg:items-start lg:gap-1"
+              role="group"
+              aria-label={ui.guides.themes}
+              hidden
+            >
+              <p class="mb-3 hidden font-display text-card font-semibold lg:block">
+                {ui.guides.themes}
+              </p>
+              <button type="button" data-theme="" aria-pressed="true">
+                {ui.guides.toutTheme}
               </button>
-            ))}
+              {metiers.map((m) => (
+                <button type="button" data-theme={m} aria-pressed="false">
+                  {m}
+                </button>
+              ))}
+            </div>
+          </nav>
+          <div class="flex flex-col gap-8">
+            <EnTete id="tous" titre={ui.guides.titre} intro={ui.guides.texte} />
+            <ul class="grid gap-5 md:grid-cols-2" data-filtre-groupe>
+              {autres.map((g) => (
+                <li class="contents" data-public={g.public} data-metier={g.metier}>
+                  <Carte href={g.href} class="flex flex-col">
+                    <span class="block aspect-3/2 overflow-clip bg-scene">
+                      <Image
+                        src={g.image}
+                        alt={g.imageAlt}
+                        widths={[400, 640, 800]}
+                        sizes="(min-width: 768px) 480px, 100vw"
+                        class="carte-zoom size-full object-cover"
+                      />
+                    </span>
+                    <span class="flex flex-1 flex-col items-start gap-3 p-6">
+                      <Badge locale={locale} public={g.public} />
+                      <b class="font-display text-card font-semibold text-balance">{g.title}</b>
+                      <span class="mt-auto pt-1 text-caption text-soft">
+                        {g.metier} · {fill(ui.guide.lecture, { n: String(g.readingMinutes) })}
+                      </span>
+                    </span>
+                  </Carte>
+                </li>
+              ))}
+            </ul>
           </div>
-        )}
-        <ul class="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3" data-filtre-groupe>
-          {autres.map((g) => (
-            <li class="contents" data-public={g.public} data-metier={g.metier}>
-              <Carte href={g.href} class="flex flex-col">
-                <span class="block aspect-3/2 overflow-clip bg-scene">
-                  <Image
-                    src={g.image}
-                    alt={g.imageAlt}
-                    widths={[400, 640, 800]}
-                    sizes="(min-width: 1024px) 420px, (min-width: 768px) 50vw, 100vw"
-                    class="carte-zoom size-full object-cover"
-                  />
-                </span>
-                <span class="flex flex-1 flex-col gap-3 p-6">
-                  <span class="flex flex-wrap items-center gap-x-3 gap-y-2">
-                    <Badge locale={locale} public={g.public} />
-                    <span class="font-mono text-source text-soft uppercase">{g.metier}</span>
-                  </span>
-                  <b class="font-display text-card font-semibold text-balance">{g.title}</b>
-                  <span class="mt-auto pt-2 font-mono text-source text-soft uppercase">
-                    {fill(ui.guide.lecture, { n: String(g.readingMinutes) })}
-                  </span>
-                </span>
-              </Carte>
-            </li>
-          ))}
-        </ul>
+        </div>
       </Section>
     )
   }
@@ -254,11 +346,166 @@ const jsonLd = [
 </Base>
 
 <style>
-  /* The audience filter and the theme filter: pills, the chosen one in ink. */
-  .filtre button,
+  /* The sentence's ending, as on the home: bold italic Fraunces, brand orange on night (6.6:1).
+     Greyed while nothing is chosen. All endings stacked in one cell, word by word (45 ms apart). */
+  .choix {
+    position: relative;
+    display: inline-block;
+  }
+  .fin-bouton {
+    display: inline-grid;
+    font: inherit;
+    font-weight: 700;
+    font-style: italic;
+    color: var(--color-orange);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+  }
+  .fin {
+    grid-area: 1 / 1;
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0 0.25em;
+    visibility: hidden;
+  }
+  .fin.on {
+    visibility: visible;
+  }
+  .fin > * {
+    flex-shrink: 0;
+  }
+  /* From 1280 px the longest ending holds on one line; below, it may wrap. */
+  @media (min-width: 80rem) {
+    .fin {
+      flex-wrap: nowrap;
+      white-space: nowrap;
+    }
+  }
+  .w {
+    display: inline-block;
+    opacity: 0;
+    translate: 0 0.3em;
+    transition:
+      opacity 0.35s ease,
+      translate 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .fin.on .w {
+    opacity: 1;
+    translate: 0 0;
+    transition-delay: calc(120ms + var(--i) * 45ms);
+  }
+  /* exception: the home's avatar circle (1.3em, cream, thin rim), here with one or two agents */
+  .avatars {
+    display: inline-flex;
+    margin-right: 0.3em;
+  }
+  .avatars :global(.av) {
+    width: 1.1em;
+    height: 1.1em;
+    border-radius: 999px;
+    object-fit: cover;
+    background: var(--color-cream-2);
+    box-shadow: 0 0 0 2px var(--color-night);
+  }
+  .avatars :global(.av + .av) {
+    margin-left: -0.35em;
+  }
+
+  /* The picker: under the sentence, as wide as its choices, in the nav's glass (nearly transparent,
+     blurred), one audience under the other. It slides in from just above with a soft spring. */
+  .menu {
+    position: absolute;
+    left: 50%;
+    top: calc(100% + 0.75rem);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    width: max-content;
+    min-width: 36rem;
+    padding: 0.375rem;
+    border-radius: var(--radius-card-sm);
+    /* tinted with night: the picker can overlap the cream section below, its cream text stays legible */
+    background: color-mix(in srgb, var(--color-night) 60%, transparent);
+    backdrop-filter: blur(18px) saturate(1.4);
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--color-cream) 16%, transparent),
+      var(--shadow-3);
+    color: var(--color-cream);
+    font-size: var(--text-card);
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, -0.5rem) scale(0.97);
+    transition:
+      opacity 0.25s ease,
+      transform 0.4s cubic-bezier(0.34, 1.4, 0.64, 1),
+      visibility 0s 0.4s;
+  }
+  /* The gap between the sentence and the picker still counts as hovering it. */
+  .menu::before {
+    content: '';
+    position: absolute;
+    inset: -0.75rem 0 100%;
+  }
+  .choix.ouvert .menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0) scale(1);
+    transition:
+      opacity 0.25s ease,
+      transform 0.4s cubic-bezier(0.34, 1.4, 0.64, 1);
+  }
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.5rem 0.75rem 0.75rem;
+    border-radius: calc(var(--radius-card-sm) - 0.375rem);
+    text-align: left;
+    font-style: italic;
+    font-weight: 700;
+    transition: background-color 0.2s var(--ease-hatch);
+  }
+  .option:hover,
+  .option:focus-visible {
+    background: color-mix(in srgb, var(--color-cream) 10%, transparent);
+  }
+  .option[aria-pressed='true'] {
+    background: color-mix(in srgb, var(--color-cream) 14%, transparent);
+  }
+  .option[aria-pressed='true'] .option-texte {
+    color: var(--color-orange);
+  }
+  .option :global(.option-av) {
+    width: 2.5rem;
+    height: 2.5rem;
+    flex: none;
+    border-radius: 999px;
+    object-fit: cover;
+    background: var(--color-cream-2);
+  }
+  /* two agents (both audiences): overlapped, like in the sentence */
+  .option-avs {
+    display: flex;
+    flex: none;
+  }
+  .option-avs :global(.option-av + .option-av) {
+    margin-left: -1rem;
+    box-shadow: 0 0 0 2px var(--color-night);
+  }
+  .option-texte {
+    line-height: 1.2;
+  }
+  .option-compte {
+    color: color-mix(in srgb, var(--color-cream) 60%, transparent);
+  }
+
+  /* The themes: pills on small screens, a plain list in the left column on large ones. */
   .themes button {
     border-radius: 999px;
-    padding: 0.625rem 1.125rem;
+    padding: 0.5rem 0.875rem;
     font-size: var(--text-caption);
     font-weight: 600;
     color: var(--color-ink);
@@ -268,20 +515,64 @@ const jsonLd = [
       background-color 0.2s var(--ease-hatch),
       color 0.2s var(--ease-hatch);
   }
-  .themes button {
-    padding: 0.5rem 0.875rem;
-  }
-  .filtre button:hover,
   .themes button:hover {
     background: var(--color-orange-tint);
   }
-  .filtre button[aria-pressed='true'],
   .themes button[aria-pressed='true'] {
     background: var(--color-ink);
     color: var(--color-cream);
     box-shadow: none;
   }
-  .filtre button:focus-visible,
+  @media (min-width: 64rem) {
+    .themes button,
+    .themes button:hover,
+    .themes button[aria-pressed='true'] {
+      background: none;
+      box-shadow: none;
+      padding: 0.375rem 0;
+      border-radius: var(--radius-sm);
+      font-size: var(--text-body);
+      font-weight: 400;
+      color: var(--color-soft);
+      text-align: left;
+    }
+    .themes button:hover {
+      color: var(--color-ink);
+    }
+    .themes button[aria-pressed='true'] {
+      color: var(--color-ink);
+      font-weight: 600;
+    }
+  }
+
+  /* The guides' title clears the floating nav when the theme filter brings it back into view. */
+  :global(#tous) {
+    scroll-margin-top: 7rem;
+  }
+
+  /* The featured guide is one link without a card: on hover the picture leans in, like a card's, and
+     the arrow slides. */
+  .une :global(.carte-zoom) {
+    transition: transform 0.6s var(--ease-hatch);
+  }
+  .une:hover :global(.carte-zoom) {
+    transform: scale(1.04);
+  }
+  .fleche {
+    display: inline-block;
+    transition: transform 0.2s var(--ease-hatch);
+  }
+  .une:hover .fleche {
+    transform: translateX(4px);
+  }
+  .une:focus-visible {
+    outline: 2px solid var(--color-orange);
+    outline-offset: 6px;
+    border-radius: var(--radius-card);
+  }
+
+  .fin-bouton:focus-visible,
+  .option:focus-visible,
   .themes button:focus-visible,
   .lien:focus-visible,
   .terme:focus-visible {
@@ -310,7 +601,11 @@ const jsonLd = [
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .filtre button,
+    .w,
+    .menu,
+    .option,
+    .une :global(.carte-zoom),
+    .fleche,
     .themes button {
       transition: none;
     }
@@ -322,10 +617,41 @@ const jsonLd = [
   /** Hash of each audience, so a filtered view can be shared. */
   const HASH: Record<Filtre, string> = { '': '', independant: '#restaurant', reseau: '#reseau' };
 
-  const groupe = document.querySelector<HTMLElement>('.filtre');
+  const groupe = document.querySelector<HTMLElement>('[data-choix]');
   const themes = document.querySelector<HTMLElement>('.themes');
   if (groupe) {
-    const boutons = [...groupe.querySelectorAll<HTMLButtonElement>('[data-filtre]')];
+    const bouton = groupe.querySelector<HTMLButtonElement>('[data-choix-bouton]')!;
+    const fins = [...groupe.querySelectorAll<HTMLElement>('[data-fin]')];
+    /* The picker opens on hover (mouse), on a tap or from the keyboard (the ending is a button).
+       After a pick under the mouse it stays shut until the pointer leaves, so it does not reopen
+       at once. */
+    let fermeture = 0;
+    let bloque = false;
+    const ouvrir = (oui: boolean) => {
+      clearTimeout(fermeture);
+      groupe.classList.toggle('ouvert', oui);
+      bouton.setAttribute('aria-expanded', String(oui));
+    };
+    groupe.addEventListener('pointerenter', (e) => {
+      if (e.pointerType === 'mouse' && !bloque) ouvrir(true);
+    });
+    groupe.addEventListener('pointerleave', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      bloque = false;
+      fermeture = window.setTimeout(() => ouvrir(false), 160);
+    });
+    bouton.addEventListener('click', () => ouvrir(!groupe.classList.contains('ouvert')));
+    addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && groupe.classList.contains('ouvert')) {
+        ouvrir(false);
+        bouton.focus();
+      }
+    });
+    addEventListener('pointerdown', (e) => {
+      if (!groupe.contains(e.target as Node)) ouvrir(false);
+    });
+
+    const boutons = [...document.querySelectorAll<HTMLButtonElement>('[data-filtre]')];
     const boutonsTheme = [...(themes?.querySelectorAll<HTMLButtonElement>('[data-theme]') ?? [])];
     const cartes = [...document.querySelectorAll<HTMLElement>('[data-public]')];
     const sections = [...document.querySelectorAll<HTMLElement>('[data-filtre-section]')];
@@ -341,6 +667,8 @@ const jsonLd = [
 
     const appliquer = () => {
       for (const b of boutons) b.setAttribute('aria-pressed', String(b.dataset.filtre === filtre));
+      // The sentence takes the chosen ending; its words come in one after another.
+      for (const f of fins) f.classList.toggle('on', f.dataset.fin === filtre);
       for (const b of boutonsTheme)
         b.setAttribute('aria-pressed', String(b.dataset.theme === theme));
       for (const c of cartes) {
@@ -362,6 +690,8 @@ const jsonLd = [
     for (const b of boutons) {
       b.addEventListener('click', () => {
         filtre = (b.dataset.filtre ?? '') as Filtre;
+        bloque = groupe.matches(':hover');
+        ouvrir(false);
         // replaceState: the hash changes without jumping to an anchor nor piling up history.
         history.replaceState(null, '', HASH[filtre] || location.pathname + location.search);
         appliquer();
@@ -371,13 +701,19 @@ const jsonLd = [
       b.addEventListener('click', () => {
         theme = b.dataset.theme ?? '';
         appliquer();
+        // The list shrinks under the reader: scroll anchoring would keep a later section in view and
+        // drop them far below. Bring the top of the guides back instead, if it went above the screen.
+        const tete = document.getElementById('tous')!;
+        if (tete.getBoundingClientRect().top < 0) {
+          const doux = matchMedia('(prefers-reduced-motion: reduce)').matches;
+          tete.scrollIntoView({ block: 'start', behavior: doux ? 'auto' : 'smooth' });
+        }
       });
     }
     addEventListener('hashchange', () => {
       filtre = depuisHash();
       appliquer();
     });
-    groupe.hidden = false;
     if (themes) themes.hidden = false;
     filtre = depuisHash();
     appliquer();

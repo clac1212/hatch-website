@@ -230,9 +230,13 @@ export const ressourcesPage = z.strictObject({
     kicker: texte,
     titre: texte,
     chapeau: texte,
-    /** aria-label of the filter's button group. */
+    /** The H1 is a sentence whose ending is the audience choice: `titre` is its start, each of
+     * `filtres` an ending (`tout`: nothing chosen, everything shown). `filtre`: the picker's label. */
     filtre: texte,
     filtres: z.strictObject({ tout: texte, independant: texte, reseau: texte }),
+    /** What each choice holds: `{n}` guides, `{n}` templates. */
+    compteGuides: texte,
+    compteModeles: texte,
   }),
   modeles: z.strictObject({
     kicker: texte,

@@ -1,11 +1,10 @@
 ---
+import { Image } from 'astro:assets';
 import { useTranslations, type Locale } from '../../i18n/ui';
 import type { PublicCible } from '../../content/pages/schemas';
+import robin from '../../assets/portraits/robin.jpg';
+import lark from '../../assets/portraits/lark.jpg';
 
-/**
- * Audience badge of a resource: independents in Robin's blue, networks in orange, both in neutral.
- * The colour repeats the word, it never replaces it.
- */
 interface Props {
   locale: Locale;
   public: PublicCible;
@@ -13,17 +12,43 @@ interface Props {
 
 const { locale, public: cible } = Astro.props;
 const t = useTranslations(locale);
+
+/** The audience's agent, as in the resources header: Robin for the independent, Lark for the head
+ * office, both for everyone. */
+const AGENTS = { independant: [robin], reseau: [lark], tous: [robin, lark] };
 ---
 
-<!-- The audience, in the site's palette: independents on night as their Robin card, networks on
-     the orange tint, everyone as a plain outline. -->
+<!-- The audience, coloured and with its agent's head: independents on night like Robin's page,
+     networks on the brand orange (ink text, never white), everyone on sand. -->
 <span
   class:list={[
-    'inline-flex w-max items-center rounded-full px-2.5 py-1 font-mono text-source uppercase',
-    cible === 'independant' && 'bg-night text-cream',
-    cible === 'reseau' && 'bg-orange-tint text-orange-txt',
-    cible === 'tous' && 'text-soft ring-1 ring-line ring-inset',
+    'badge inline-flex w-max items-center gap-1.5 rounded-full py-0.5 pr-2.5 pl-0.5 font-mono text-source uppercase',
+    cible === 'independant' && 'bg-night text-cream [--bord:var(--color-night)]',
+    cible === 'reseau' && 'bg-orange text-ink [--bord:var(--color-orange)]',
+    cible === 'tous' && 'bg-sand text-ink [--bord:var(--color-sand)]',
   ]}
 >
+  <span class="flex">
+    {
+      AGENTS[cible].map((img) => (
+        <Image src={img} alt="" widths={[48, 96]} sizes="1.625rem" class="tete" />
+      ))
+    }
+  </span>
   {t(`public.${cible}`)}
 </span>
+
+<style>
+  .badge :global(.tete) {
+    width: 1.625rem;
+    height: 1.625rem;
+    border-radius: 999px;
+    object-fit: cover;
+    background: var(--color-cream-2);
+  }
+  /* two heads overlap, the second one ringed in the pill's colour to stay distinct */
+  .badge :global(.tete + .tete) {
+    margin-left: -0.625rem;
+    box-shadow: 0 0 0 1.5px var(--bord);
+  }
+</style>

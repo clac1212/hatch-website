@@ -4,13 +4,15 @@ seo:
 
 hero:
   kicker: 'Ressources'
-  titre: 'Ce que les restaurateurs utilisent vraiment, en libre accès.'
-  chapeau: 'Modèles, guides et glossaire, que vous teniez un bistrot ou que vous pilotiez un réseau de 50 restaurants. Tout se lit et se télécharge sans formulaire ni email.'
-  filtre: 'Filtrer les ressources'
+  titre: 'Des ressources pour vous qui'
+  chapeau: 'Modèles, guides et glossaire en libre accès : tout se lit et se télécharge sans formulaire ni email.'
+  filtre: 'Choisir ce qui vous concerne'
   filtres:
-    tout: 'Tout'
-    independant: 'Je tiens un restaurant'
-    reseau: 'Je pilote un réseau'
+    tout: 'tenez un restaurant ou un réseau'
+    independant: 'tenez un restaurant'
+    reseau: 'pilotez un réseau'
+  compteGuides: '{n} guides'
+  compteModeles: '{n} modèles'
 
 modeles:
   kicker: 'Modèles'
