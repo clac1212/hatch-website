@@ -60,7 +60,7 @@ semaine:
 
 canaux:
   titre: 'Right where you already are.'
-  texte: 'Robin lives in WhatsApp, between your team and your suppliers. Nothing to install, nothing to learn: text him or leave a voice note, between services.'
+  texte: 'Robin lives in WhatsApp, next to your team and your suppliers. Text him or leave a voice note between services, and he answers like a colleague. Nothing to install, nothing to learn.'
   telephone:
     ariaLabel: 'WhatsApp on Karim’s phone, his chat with Robin open'
     app:

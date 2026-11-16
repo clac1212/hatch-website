@@ -60,7 +60,7 @@ semaine:
 
 canaux:
   titre: 'Là où vous êtes déjà.'
-  texte: 'Robin vit dans WhatsApp, entre votre équipe et vos fournisseurs. Rien à installer, rien à apprendre : vous lui écrivez ou lui laissez un vocal, entre deux services.'
+  texte: 'Robin vit dans WhatsApp, à côté de votre équipe et de vos fournisseurs. Vous lui écrivez ou lui laissez un vocal entre deux services, il vous répond comme un collègue. Rien à installer, rien à apprendre.'
   telephone:
     ariaLabel: 'WhatsApp sur le téléphone de Karim, sa discussion avec Robin ouverte'
     app:
