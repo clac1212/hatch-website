@@ -11,7 +11,8 @@ import {
  * worked. Rendered on demand (a Vercel function), the rest of the site stays static.
  *
  * Notion database properties (exact names): « Nom » (title), « Prénom » (text), « Restaurant »
- * (text), « Site web » (URL), « WhatsApp » (phone), « Email » (email), « Langue » (select: fr, en).
+ * (text), « Site web » (URL), « WhatsApp » (phone), « Email » (email), « Langue » (select: fr, en),
+ * « Source » (text: the utm_source of the link the visitor came from, empty for a direct visit).
  * Responses: 200 {ok:true} · 400 {ok:false,error:'invalid'} · 500 {ok:false}.
  */
 export const prerender = false;
@@ -49,6 +50,10 @@ export const POST: APIRoute = async ({ request, redirect }) => {
     whatsapp: texte(body.whatsapp, 30),
     email: texte(body.email, 200).toLowerCase(),
     locale: body.locale === 'en' ? 'en' : 'fr',
+    // Where the visitor came from (utm_source, kept by the page): letters, digits, - and _ only.
+    source: texte(body.source, 40)
+      .toLowerCase()
+      .replace(/[^a-z0-9_-]/g, ''),
   };
   if (!f.prenom || !f.nom || !f.restaurant || !EMAIL.test(f.email) || !TEL.test(f.whatsapp)) {
     return formulaire ? retour(false) : json(400, { ok: false, error: 'invalid' });
@@ -75,6 +80,7 @@ export const POST: APIRoute = async ({ request, redirect }) => {
           WhatsApp: { phone_number: f.whatsapp },
           Email: { email: f.email },
           Langue: { select: { name: f.locale } },
+          ...(f.source ? { Source: { rich_text: rt(f.source) } } : {}),
         },
       }),
     });
@@ -92,6 +98,7 @@ export const POST: APIRoute = async ({ request, redirect }) => {
       `${s(f.prenom)} ${s(f.nom)} · ${s(f.restaurant)}`,
       `WhatsApp : ${s(f.whatsapp)} · ${s(f.email)}`,
       site ? `Site : ${s(site)}` : '',
+      `Source : ${f.source ? s(f.source) : 'accès direct'}`,
     ].filter(Boolean);
     const res = await fetch(SLACK_WEBHOOK_LISTE_ATTENTE, {
       method: 'POST',
