@@ -112,6 +112,7 @@ const survol = 'hover:bg-current/10';
           class:list={[
             'max-sm:px-4 max-sm:text-[0.8125rem]',
             cta.variant === 'ink' && 'n-cta-inverse',
+            cta.variant === 'orange' && 'n-cta-orange',
           ]}
         >
           {cta.label}
@@ -205,6 +206,12 @@ const survol = 'hover:bg-current/10';
   }
   #nav[data-vif] :global(.n-logo-jour) {
     filter: brightness(0);
+  }
+  /* The orange button would vanish over an orange background: it turns ink, without its glow. */
+  #nav[data-vif] :global(.n-cta-orange) {
+    background: var(--color-ink);
+    color: var(--color-cream);
+    box-shadow: none;
   }
   /* The ink button (home's « Se connecter ») turns cream over a dark background. */
   #nav[data-ton='sombre'] :global(.n-cta-inverse) {
