@@ -60,3 +60,5 @@ scenes:
       - { repere: 'VIANDE', texte: 'Il vérifie les pesées · Factures', href: '#fait' }
       - { repere: 'CRÈMERIE', texte: 'Il suit les avoirs · Fournisseurs', href: '#fait' }
       - { repere: 'BUREAU', texte: 'Il prépare les contrats · Équipe', href: '#semaine' }
+  ressources:
+    alt: "Robin et les sept agents Hatch OS en voxels, alignés, rédigent chacun un article à leur façon : Robin debout sur une caisse avec son carnet, Peep assis par terre sur son téléphone, Owl perché sur une tablette, Lark allongée sur une feuille, Jay sur un tabouret avec son ordinateur portable, Finch qui réfléchit avec son bloc-notes, Pecker à son bureau devant l'ordinateur fixe et Sparrow sur une pile de livres."

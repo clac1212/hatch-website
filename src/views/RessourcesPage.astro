@@ -1,0 +1,453 @@
+---
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
+import { getEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Badge from '../components/ressources/Badge.astro';
+import Sorties from '../components/ressources/Sorties.astro';
+import { piedRessources } from '../components/ressources/pied';
+import { guideSlug, publishedGuides } from '../content/pages/guides';
+import { fill } from '../components/pages/format';
+import { BRAND, breadcrumbList } from '../seo/jsonld';
+import { entryRoutes, routes, type Locale } from '../i18n/ui';
+
+/**
+ * /ressources (/en/resources): the guides first, for both audiences, independents (Robin) and
+ * networks (the agents). In order: header and audience filter, the featured guide, every guide with
+ * a theme filter, the templates (once a file exists), a glossary preview, the two ways out. Copy in src/content/pages/ressources/<locale>.yaml, guides in
+ * src/content/ressources/<locale>/.
+ *
+ * The filters are progressive enhancement: without JS every card shows and the buttons stay
+ * hidden. Each card carries `data-public` (independant | reseau | tous; `tous` shows under every
+ * audience) and guides `data-metier`; a group left without a visible card hides with its section.
+ * The audience lives in the hash (#restaurant, #reseau), so a filtered view can be shared.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const pied = await piedRessources(locale);
+const ui = (await getEntry('ressourcesPage', locale))?.data;
+if (!ui) throw new Error(`Missing src/content/pages/ressources/${locale}.yaml`);
+const glossaire = (await getEntry('glossairePage', locale))?.data;
+if (!glossaire) throw new Error(`Missing src/content/pages/glossaire/${locale}.yaml`);
+
+const { hero, modeles } = ui;
+
+/** Templates with at least one file in public/ressources/; the others are not shown yet. */
+const dossier = join(process.cwd(), 'public', 'ressources');
+const disponibles = modeles.liste
+  .map((m) => ({
+    ...m,
+    formats: m.formats.flatMap((f) =>
+      f.fichier && existsSync(join(dossier, f.fichier))
+        ? [{ format: f.format, href: `/ressources/${f.fichier}` }]
+        : [],
+    ),
+  }))
+  .filter((m) => m.formats.length > 0);
+
+const guides = (await publishedGuides(locale)).map((g) => ({
+  ...g.data,
+  href: entryRoutes.guides(guideSlug(g.id))[locale],
+}));
+/** The featured guide: the one marked `une`, else the latest. The grid lists the others. */
+const une = guides.find((g) => g.une) ?? guides[0];
+const autres = guides.filter((g) => g !== une);
+/** Themes of the grid's filter, in alphabetical order. */
+const metiers = [...new Set(autres.map((g) => g.metier))].sort((a, b) =>
+  a.localeCompare(b, locale),
+);
+
+/** The glossary preview: its first eight terms, alphabetically. */
+const termes = [...glossaire.termes].sort((a, b) => a.mot.localeCompare(b.mot, locale)).slice(0, 8);
+
+const site = Astro.site!;
+const jsonLd = [
+  breadcrumbList(site, [
+    { name: BRAND, path: routes.home[locale] },
+    { name: hero.kicker, path: routes.ressources[locale] },
+  ]),
+];
+
+/** Shared look of the section headings. */
+const kicker = 'font-mono text-kicker text-orange-txt uppercase';
+const h2 = 'font-display text-section font-bold text-balance text-ink';
+---
+
+<Base
+  locale={locale}
+  paths={routes.ressources}
+  title={ui.seo.title}
+  description={ui.seo.description}
+  nav="accueil"
+  piedEpure
+  pied={pied}
+  jsonLd={jsonLd}
+>
+  <!-- 1 · Header and audience filter -->
+  <section class="px-4 pt-32 pb-12 sm:px-6 lg:pt-40 lg:pb-16">
+    <div class="mx-auto flex max-w-site flex-col gap-6">
+      <span class={kicker}>{hero.kicker}</span>
+      <h1
+        class="max-w-[22ch] font-mono text-[clamp(2rem,1.3rem+2.8vw,3.5rem)] leading-[1.1] text-balance text-ink"
+      >
+        {hero.titre}
+      </h1>
+      <p class="max-w-[60ch] text-punch text-soft">{hero.chapeau}</p>
+      <div class="filtre mt-4 flex flex-wrap gap-2" role="group" aria-label={hero.filtre} hidden>
+        <button type="button" data-filtre="" aria-pressed="true">{hero.filtres.tout}</button>
+        <button type="button" data-filtre="independant" aria-pressed="false">
+          {hero.filtres.independant}
+        </button>
+        <button type="button" data-filtre="reseau" aria-pressed="false">
+          {hero.filtres.reseau}
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 · The featured guide -->
+  {
+    une && (
+      <section class="px-4 pb-16 sm:px-6 lg:pb-20" data-filtre-section aria-labelledby="une">
+        <div class="mx-auto flex max-w-site flex-col gap-5" data-filtre-groupe>
+          <h2 id="une" class={kicker}>
+            {ui.guides.une}
+          </h2>
+          <a
+            href={une.href}
+            class="une carte-lien grid overflow-hidden rounded-card border border-line bg-surface lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]"
+            data-public={une.public}
+          >
+            <Image
+              src={une.image}
+              alt={une.imageAlt}
+              widths={[640, 960, 1280]}
+              sizes="(min-width: 1024px) 760px, 100vw"
+              loading="eager"
+              class="aspect-[3/2] h-full w-full bg-cream object-cover"
+            />
+            <div class="flex flex-col gap-4 p-7 sm:p-10">
+              <div class="flex flex-wrap items-center gap-2">
+                <Badge locale={locale} public={une.public} />
+                <span class="font-mono text-source text-soft uppercase">{une.metier}</span>
+              </div>
+              <h3 class="font-display text-[clamp(1.625rem,1.3rem+1.2vw,2.25rem)] leading-[1.15] font-bold text-balance text-ink">
+                {une.title}
+              </h3>
+              <p class="text-soft">{une.chapeau}</p>
+              <span class="mt-auto flex flex-wrap items-center justify-between gap-3 pt-2">
+                <span class="font-mono text-source text-soft uppercase">
+                  {fill(ui.guide.lecture, { n: String(une.readingMinutes) })}
+                </span>
+                <span class="lien">{ui.guides.lire}</span>
+              </span>
+            </div>
+          </a>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- 3 · Every guide, with a theme filter -->
+  {
+    autres.length > 0 && (
+      <section class="px-4 pb-20 sm:px-6 lg:pb-28" data-filtre-section aria-labelledby="tous">
+        <div class="mx-auto flex max-w-site flex-col gap-8">
+          <div class="flex flex-col gap-4">
+            <span class={kicker}>{ui.guides.kicker}</span>
+            <h2 id="tous" class={h2}>
+              {ui.guides.titre}
+            </h2>
+            <p class="max-w-[60ch] text-soft">{ui.guides.texte}</p>
+          </div>
+          {metiers.length > 1 && (
+            <div
+              class="themes flex flex-wrap gap-2"
+              role="group"
+              aria-label={ui.guides.themes}
+              hidden
+            >
+              <button type="button" data-theme="" aria-pressed="true">
+                {ui.guides.toutTheme}
+              </button>
+              {metiers.map((m) => (
+                <button type="button" data-theme={m} aria-pressed="false">
+                  {m}
+                </button>
+              ))}
+            </div>
+          )}
+          <ul class="grid gap-5 md:grid-cols-2 lg:grid-cols-3" data-filtre-groupe>
+            {autres.map((g) => (
+              <li class="contents" data-public={g.public} data-metier={g.metier}>
+                <a href={g.href} class="carte carte-lien overflow-hidden p-0">
+                  <Image
+                    src={g.image}
+                    alt={g.imageAlt}
+                    widths={[400, 640, 800]}
+                    sizes="(min-width: 1024px) 420px, (min-width: 768px) 50vw, 100vw"
+                    class="aspect-[3/2] w-full bg-cream object-cover"
+                  />
+                  <span class="flex flex-1 flex-col gap-3 p-6">
+                    <span class="flex flex-wrap items-center gap-2">
+                      <Badge locale={locale} public={g.public} />
+                      <span class="font-mono text-source text-soft uppercase">{g.metier}</span>
+                    </span>
+                    <h3 class="font-display text-card font-semibold text-balance text-ink">
+                      {g.title}
+                    </h3>
+                    <span class="mt-auto font-mono text-source text-soft uppercase">
+                      {fill(ui.guide.lecture, { n: String(g.readingMinutes) })}
+                    </span>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- 4 · Templates to download, no form nor email (hidden until a file exists) -->
+  {
+    disponibles.length > 0 && (
+      <section class="border-t border-line px-4 py-20 sm:px-6 lg:py-28" data-filtre-section>
+        <div class="mx-auto flex max-w-site flex-col gap-10">
+          <div class="flex flex-col gap-4">
+            <span class={kicker}>{modeles.kicker}</span>
+            <h2 class={h2}>{modeles.titre}</h2>
+            <p class="max-w-[60ch] text-soft">{modeles.texte}</p>
+          </div>
+          <ul class="grid gap-5 md:grid-cols-2 lg:grid-cols-3" data-filtre-groupe>
+            {disponibles.map((m) => (
+              <li class="carte" data-public={m.public}>
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <Badge locale={locale} public={m.public} />
+                  <span class="font-mono text-source text-soft uppercase">
+                    {m.formats.map((f) => f.format).join(' · ')}
+                  </span>
+                </div>
+                <h3 class="font-display text-card font-semibold text-ink">{m.titre}</h3>
+                <p class="text-caption text-soft">{m.texte}</p>
+                <div class="mt-auto flex flex-wrap gap-x-5 gap-y-2 pt-2">
+                  {m.formats.map((f) => (
+                    <a href={f.href} download class="lien">
+                      {modeles.telecharger}
+                      {m.formats.length > 1 && <span> ({f.format})</span>}
+                    </a>
+                  ))}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- 5 · Glossary preview -->
+  <section class="border-t border-line px-4 py-20 sm:px-6 lg:py-28" data-filtre-section>
+    <div class="mx-auto flex max-w-site flex-col gap-10">
+      <div class="flex flex-col gap-4">
+        <span class={kicker}>{ui.glossaire.kicker}</span>
+        <h2 class={h2}>{ui.glossaire.titre}</h2>
+        <p class="max-w-[60ch] text-soft">{ui.glossaire.texte}</p>
+      </div>
+      <ul class="grid gap-x-10 gap-y-2 md:grid-cols-2" data-filtre-groupe>
+        {
+          termes.map((x) => (
+            <li data-public={x.public}>
+              <a href={`${routes.glossaire[locale]}#${x.ancre}`} class="terme">
+                <span class="flex flex-wrap items-center gap-3">
+                  <b class="font-display text-[1.25rem] font-semibold text-ink">{x.mot}</b>
+                  <Badge locale={locale} public={x.public} />
+                </span>
+                <span class="text-caption text-soft">{x.definition}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <a href={routes.glossaire[locale]} class="lien w-max">{ui.glossaire.lien}</a>
+    </div>
+  </section>
+
+  <!-- 6 · The two ways out -->
+  <section class="px-4 pb-24 sm:px-6 lg:pb-32" data-filtre-section>
+    <div class="mx-auto max-w-site">
+      <Sorties locale={locale} public="tous" filtrable />
+    </div>
+  </section>
+</Base>
+
+<style>
+  .filtre button,
+  .themes button {
+    border-radius: 999px;
+    padding: 0.625rem 1.125rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-ink);
+    box-shadow: inset 0 0 0 1px var(--color-line);
+    background: var(--color-surface);
+    transition:
+      background-color 0.2s var(--ease-hatch),
+      color 0.2s var(--ease-hatch);
+  }
+  .themes button {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.8125rem;
+  }
+  .filtre button:hover,
+  .themes button:hover {
+    background: var(--color-orange-tint);
+  }
+  .filtre button[aria-pressed='true'],
+  .themes button[aria-pressed='true'] {
+    background: var(--color-ink);
+    color: var(--color-cream);
+    box-shadow: none;
+  }
+  .filtre button:focus-visible,
+  .themes button:focus-visible,
+  .lien:focus-visible,
+  .carte-lien:focus-visible,
+  .terme:focus-visible {
+    outline: 2px solid var(--color-orange-txt);
+    outline-offset: 3px;
+  }
+
+  /* Guides, templates. */
+  .carte {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    padding: 1.5rem;
+    border-radius: var(--radius-card);
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
+  }
+  .carte.p-0 {
+    gap: 0;
+    padding: 0;
+  }
+  .carte-lien {
+    transition:
+      box-shadow 0.3s var(--ease-hatch),
+      transform 0.3s var(--ease-hatch);
+  }
+  .carte-lien:hover {
+    box-shadow: var(--shadow-2);
+    transform: translateY(-2px);
+  }
+  .carte-lien:hover h3 {
+    color: var(--color-orange-txt);
+  }
+  .lien {
+    font-weight: 600;
+    color: var(--color-orange-txt);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+  .lien:hover {
+    color: var(--color-orange-hover);
+  }
+
+  /* Glossary preview. */
+  .terme {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    padding: 1rem 0;
+  }
+  .terme {
+    border-bottom: 1px solid var(--color-line);
+  }
+  .terme:hover b {
+    color: var(--color-orange-txt);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .carte-lien,
+    .filtre button,
+    .themes button {
+      transition: none;
+    }
+    .carte-lien:hover {
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  type Filtre = '' | 'independant' | 'reseau';
+  /** Hash of each audience, so a filtered view can be shared. */
+  const HASH: Record<Filtre, string> = { '': '', independant: '#restaurant', reseau: '#reseau' };
+
+  const groupe = document.querySelector<HTMLElement>('.filtre');
+  const themes = document.querySelector<HTMLElement>('.themes');
+  if (groupe) {
+    const boutons = [...groupe.querySelectorAll<HTMLButtonElement>('[data-filtre]')];
+    const boutonsTheme = [...(themes?.querySelectorAll<HTMLButtonElement>('[data-theme]') ?? [])];
+    const cartes = [...document.querySelectorAll<HTMLElement>('[data-public]')];
+    const sections = [...document.querySelectorAll<HTMLElement>('[data-filtre-section]')];
+    let filtre: Filtre = '';
+    let theme = '';
+
+    const depuisHash = (): Filtre =>
+      location.hash === HASH.independant
+        ? 'independant'
+        : location.hash === HASH.reseau
+          ? 'reseau'
+          : '';
+
+    const appliquer = () => {
+      for (const b of boutons) b.setAttribute('aria-pressed', String(b.dataset.filtre === filtre));
+      for (const b of boutonsTheme)
+        b.setAttribute('aria-pressed', String(b.dataset.theme === theme));
+      for (const c of cartes) {
+        const p = c.dataset.public;
+        const horsPublic = filtre !== '' && p !== 'tous' && p !== filtre;
+        const horsTheme =
+          theme !== '' && c.dataset.metier !== undefined && c.dataset.metier !== theme;
+        c.hidden = horsPublic || horsTheme;
+      }
+      // A section whose groups are all left empty hides too.
+      for (const s of sections) {
+        const groupes = [...s.querySelectorAll<HTMLElement>('[data-filtre-groupe]')];
+        s.hidden =
+          groupes.length > 0 &&
+          groupes.every((g) => !g.querySelector('[data-public]:not([hidden])'));
+      }
+    };
+
+    for (const b of boutons) {
+      b.addEventListener('click', () => {
+        filtre = (b.dataset.filtre ?? '') as Filtre;
+        // replaceState: the hash changes without jumping to an anchor nor piling up history.
+        history.replaceState(null, '', HASH[filtre] || location.pathname + location.search);
+        appliquer();
+      });
+    }
+    for (const b of boutonsTheme) {
+      b.addEventListener('click', () => {
+        theme = b.dataset.theme ?? '';
+        appliquer();
+      });
+    }
+    addEventListener('hashchange', () => {
+      filtre = depuisHash();
+      appliquer();
+    });
+    groupe.hidden = false;
+    if (themes) themes.hidden = false;
+    filtre = depuisHash();
+    appliquer();
+  }
+</script>

@@ -55,10 +55,23 @@ const SOURCES: Partial<Record<RouteKey, (l: Locale) => string[]>> = {
     `src/content/pages/sansFiltre/${l}.yaml`,
     'src/content/sans-filtre',
   ],
+  ressources: (l) => [
+    'src/views/RessourcesPage.astro',
+    'src/components/ressources',
+    `src/content/pages/ressources/${l}.yaml`,
+    `src/content/pages/glossaire/${l}.yaml`,
+    `src/content/ressources/${l}`,
+  ],
+  glossaire: (l) => ['src/views/GlossairePage.astro', `src/content/pages/glossaire/${l}.yaml`],
 };
 
 /** Sources of a page below a route (`tail`: what follows the route's path, e.g. `002`). */
 const CHILD_SOURCES: Partial<Record<RouteKey, (tail: string) => string[]>> = {
+  ressources: (slug) => [
+    `src/content/ressources/fr/${slug}.md`,
+    `src/content/ressources/en/${slug}.md`,
+    'src/views/GuidePage.astro',
+  ],
   sansFiltre: (edition) => {
     const dir = 'src/content/sans-filtre';
     const file = readdirSync(dir).find((f) =>

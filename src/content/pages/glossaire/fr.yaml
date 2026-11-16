@@ -1,0 +1,370 @@
+seo:
+  title: 'Glossaire de la restauration et de la franchise | Hatch OS'
+  description: 'Coût de revient, ratio matière, HACCP, DIP, redevance, marche en avant : les termes de la restauration et de la franchise, classés de A à Z.'
+kicker: 'Glossaire'
+titre: 'Les mots du métier, définis simplement.'
+chapeau: 'Les termes qui reviennent en cuisine, chez le fournisseur, dans un contrat de franchise et dans la vie d’un réseau, classés de A à Z.'
+lettres: 'Aller à la lettre'
+# Les ancres sont stables : ne jamais les changer une fois publiées (des liens pointent dessus).
+# L'ordre ci-dessous est libre : la page trie les termes par ordre alphabétique.
+termes:
+  - mot: 'Allergènes'
+    definition: 'Les 14 substances ou produits dont la présence doit être signalée au client, listés à l’annexe II du règlement (UE) n° 1169/2011, dit INCO : céréales contenant du gluten, crustacés, œufs, poissons, arachides, soja, lait, fruits à coque, céleri, moutarde, sésame, sulfites au-delà de 10 mg/kg, lupin et mollusques. Pour les plats non préemballés, le restaurant donne cette information par écrit, sur la carte ou sur un document que le client peut consulter librement, sans avoir à la demander (décret n° 2015-447).'
+    public: tous
+    ancre: allergenes
+  - mot: 'Alim’confiance'
+    definition: 'Le dispositif public du ministère de l’Agriculture qui publie les résultats des contrôles sanitaires officiels réalisés depuis le 1er mars 2017 dans les restaurants, commerces alimentaires et cantines. Chaque résultat est affiché selon quatre niveaux d’hygiène, de « très satisfaisant » à « à corriger de manière urgente » (agriculture.gouv.fr).'
+    public: tous
+    ancre: alim-confiance
+  - mot: 'Animateur réseau'
+    definition: 'Salarié du franchiseur qui visite les établissements, accompagne les franchisés et vérifie que le concept est appliqué. On parle aussi de superviseur ou de responsable de secteur.'
+    public: reseau
+    ancre: animateur-reseau
+  - mot: 'Audit'
+    definition: 'Le contrôle d’un établissement sur une grille de critères (hygiène, qualité, accueil, respect du concept), mené par le réseau ou par un organisme extérieur, suivi d’un plan d’action pour corriger les écarts.'
+    public: tous
+    ancre: audit
+  - mot: 'Autocontrôle'
+    definition: 'Les vérifications que l’exploitant réalise lui-même et enregistre, sans attendre une inspection : températures, nettoyage, réception des marchandises, analyses. Le règlement (CE) n° 852/2004 en fait une obligation, et les contrôles officiels portent sur ces enregistrements.'
+    public: tous
+    ancre: autocontrole
+  - mot: 'Avoir'
+    definition: 'Le document du fournisseur qui annule ou réduit tout ou partie d’une facture, par exemple pour une marchandise manquante ou abîmée, ou pour une remise accordée après coup. Il reprend en général le numéro de la facture concernée.'
+    public: independant
+    ancre: avoir
+  - mot: 'Bail commercial'
+    definition: 'Le contrat de location d’un local où est exploité un fonds de commerce. Sa durée ne peut pas être inférieure à neuf ans, et le locataire peut en principe donner congé à la fin de chaque période de trois ans (article L145-4 du Code de commerce). Le bailleur qui refuse le renouvellement doit en principe verser au locataire une indemnité d’éviction (article L145-14).'
+    public: tous
+    ancre: bail-commercial
+  - mot: 'Bail dérogatoire'
+    definition: 'Un bail de courte durée qui échappe au statut des baux commerciaux, souvent utilisé pour tester un emplacement. Sa durée totale, renouvellements compris, ne peut pas dépasser trois ans (article L145-5 du Code de commerce).'
+    public: tous
+    ancre: bail-derogatoire
+  - mot: 'Bon de livraison'
+    definition: 'Le document remis à la livraison. On le vérifie contre la commande et la marchandise reçue, et on y inscrit les réserves (manquants, casse, température) avant de le signer.'
+    public: tous
+    ancre: bon-de-livraison
+  - mot: 'Brigade'
+    definition: 'L’équipe de cuisine organisée par postes : chef, second, chefs de partie, commis.'
+    public: tous
+    ancre: brigade
+  - mot: 'Cellule de refroidissement'
+    definition: 'L’appareil qui abaisse rapidement la température à cœur des préparations cuisinées avant leur stockage au froid, pour limiter le développement des bactéries. En restauration collective, cette température ne doit pas rester entre +63 °C et +10 °C plus de deux heures, sauf analyse des dangers validée (arrêté du 21 décembre 2009, annexe IV).'
+    public: tous
+    ancre: cellule-de-refroidissement
+  - mot: 'Centrale d’achat'
+    definition: 'Une structure qui achète des produits aux fournisseurs pour les revendre aux établissements d’un réseau. Une centrale de référencement, elle, négocie seulement les conditions : les établissements achètent directement aux fournisseurs retenus.'
+    public: reseau
+    ancre: centrale-d-achat
+  - mot: 'Chaîne du froid'
+    definition: 'Le maintien des produits réfrigérés ou surgelés à basse température, sans interruption, de la livraison jusqu’au service. Les températures de conservation par type de denrée sont fixées par l’arrêté du 21 décembre 2009.'
+    public: tous
+    ancre: chaine-du-froid
+  - mot: 'Chiffre d’affaires HT'
+    definition: 'Le montant des ventes hors TVA. C’est la base des ratios de gestion (ratio matière, ratio de personnel) et, le plus souvent, de la redevance de franchise ; le montant TTC encaissé comprend la TVA reversée à l’État.'
+    public: tous
+    ancre: chiffre-d-affaires-ht
+  - mot: 'Clause de non-concurrence'
+    definition: 'La clause qui interdit au franchisé d’exercer une activité concurrente pendant le contrat ou après sa fin. Elle doit rester proportionnée à ce qu’elle protège. Après la fin du contrat, le règlement (UE) 2022/720 (article 5) et l’article L341-2 du Code de commerce ne la valident en principe que si elle se limite à un an, aux locaux exploités et à ce qui est indispensable pour protéger le savoir-faire.'
+    public: reseau
+    ancre: clause-de-non-concurrence
+  - mot: 'Client mystère'
+    definition: 'Une personne mandatée qui se présente comme un client ordinaire et note l’accueil, le service et le respect des standards de l’enseigne.'
+    public: tous
+    ancre: client-mystere
+  - mot: 'Code de déontologie européen de la franchise'
+    definition: 'Le texte de bonnes pratiques de la Fédération européenne de la franchise, que les réseaux membres de la Fédération française de la franchise s’engagent à respecter. Il n’a pas force de loi, mais les juges peuvent s’y référer pour apprécier les usages de la franchise.'
+    public: reseau
+    ancre: code-de-deontologie
+  - mot: 'Coefficient multiplicateur'
+    definition: 'Le nombre par lequel on multiplie le coût matière d’une portion pour obtenir son prix de vente. Il faut préciser s’il donne un prix hors taxes ou toutes taxes comprises, car la TVA change le résultat.'
+    public: independant
+    ancre: coefficient-multiplicateur
+  - mot: 'Compte de résultat'
+    definition: 'Le document comptable qui récapitule les produits et les charges d’un exercice et en déduit le bénéfice ou la perte. On l’appelle aussi P&L (profit and loss).'
+    public: tous
+    ancre: compte-de-resultat
+  - mot: 'Contrat de franchise'
+    definition: 'Le contrat par lequel le franchiseur met sa marque et ses signes distinctifs à la disposition du franchisé, lui transmet son savoir-faire et l’assiste pendant toute sa durée, contre une rémunération, le plus souvent un droit d’entrée et des redevances. La loi française ne le définit pas : ces éléments viennent de la jurisprudence et du Code de déontologie européen de la franchise.'
+    public: reseau
+    ancre: contrat-de-franchise
+  - mot: 'Contrôle officiel'
+    definition: 'L’inspection sanitaire d’un établissement par les agents de l’État, en restauration ceux de la DDPP ou de la DDETSPP selon le département. Elle porte sur les locaux, les pratiques et les documents du plan de maîtrise sanitaire, et son résultat est publié sur Alim’confiance.'
+    public: tous
+    ancre: controle-officiel
+  - mot: 'Convention collective HCR'
+    definition: 'La convention collective nationale des hôtels, cafés, restaurants du 30 avril 1997 (IDCC 1979). Elle fixe notamment les salaires minimaux, la durée du travail et l’avantage en nature repas. La restauration rapide relève d’une autre convention (IDCC 1501).'
+    public: tous
+    ancre: convention-collective-hcr
+  - mot: 'Convention collective de la restauration rapide'
+    definition: 'La convention collective nationale de la restauration rapide du 18 mars 1988 (IDCC 1501). C’est l’activité principale réellement exercée, et non le seul code NAF, qui détermine si un établissement relève de celle-ci ou de la convention HCR.'
+    public: tous
+    ancre: convention-collective-restauration-rapide
+  - mot: 'Coup de feu'
+    definition: 'Le moment du service où les commandes arrivent en masse et où la cuisine tourne à plein.'
+    public: tous
+    ancre: coup-de-feu
+  - mot: 'Coût de revient'
+    definition: 'Ce que coûtent les ingrédients d’une portion, calculé à partir de la fiche technique et des prix d’achat. C’est la base pour fixer le prix d’un plat. Au sens comptable, le coût de revient complet inclut aussi la main-d’œuvre et les frais généraux ; en cuisine, le mot désigne le plus souvent le seul coût matière.'
+    public: independant
+    ancre: cout-de-revient
+  - mot: 'Couvert'
+    definition: 'Un client servi lors d’un repas. On compte les couverts par service pour suivre la fréquentation et calculer la dépense moyenne par client.'
+    public: tous
+    ancre: couvert
+  - mot: 'Dark kitchen'
+    definition: 'Une cuisine sans salle qui ne vend qu’en livraison ou en retrait, le plus souvent par des plateformes.'
+    public: tous
+    ancre: dark-kitchen
+  - mot: 'DDM'
+    definition: 'Date de durabilité minimale, signalée par la mention « à consommer de préférence avant le » ou « avant fin » (règlement (UE) n° 1169/2011, annexe X). Passé cette date, le produit peut perdre de ses qualités mais reste consommable.'
+    public: tous
+    ancre: ddm
+  - mot: 'Démarque'
+    definition: 'Les produits achetés mais jamais vendus : périmés, jetés, abîmés, consommés par le personnel ou offerts. La démarque connue est enregistrée au fil de l’eau ; la démarque inconnue apparaît dans l’écart entre le stock théorique et le stock compté.'
+    public: tous
+    ancre: demarque
+  - mot: 'DIP'
+    definition: 'Document d’information précontractuelle. Toute personne qui met une marque ou une enseigne à la disposition d’une autre en exigeant d’elle une exclusivité ou une quasi-exclusivité doit le lui remettre, avec le projet de contrat, au moins 20 jours avant la signature ou avant tout versement exigé avant la signature (article L330-3 du Code de commerce). Son contenu est fixé par l’article R330-1 : présentation de l’entreprise et du réseau, comptes, état du marché, principales conditions du contrat.'
+    public: reseau
+    ancre: dip
+  - mot: 'DLC'
+    definition: 'Date limite de consommation, signalée par la mention « à consommer jusqu’au » sur les denrées très périssables (règlement (UE) n° 1169/2011, annexe X). Passé cette date, la denrée est considérée comme dangereuse et ne doit plus être servie ni vendue (article 24 du même règlement).'
+    public: tous
+    ancre: dlc
+  - mot: 'Droit au bail'
+    definition: 'La valeur du droit d’occuper un local commercial et d’obtenir le renouvellement du bail. Le nouveau locataire la paie au locataire sortant quand il reprend le bail en cours.'
+    public: tous
+    ancre: droit-au-bail
+  - mot: 'Droit d’entrée'
+    definition: 'La somme que le franchisé verse à la signature pour rejoindre le réseau. Elle rémunère en général l’accès à la marque, la transmission initiale du savoir-faire et l’assistance au démarrage.'
+    public: reseau
+    ancre: droit-d-entree
+  - mot: 'DUERP'
+    definition: 'Document unique d’évaluation des risques professionnels : tout employeur doit l’établir dès le premier salarié, en recensant les risques de chaque poste (brûlures, coupures, chutes) et les mesures de prévention (articles R4121-1 et suivants du Code du travail). Il est mis à jour au moins une fois par an dans les entreprises d’au moins 11 salariés.'
+    public: tous
+    ancre: duerp
+  - mot: 'EBE'
+    definition: 'Excédent brut d’exploitation : la valeur ajoutée, plus les subventions d’exploitation, moins les impôts et taxes et les charges de personnel (définition de l’Insee). Il mesure ce que l’exploitation dégage avant amortissements, frais financiers, éléments exceptionnels et impôt sur les bénéfices, et se rapproche de l’EBITDA sans lui être identique.'
+    public: tous
+    ancre: ebe
+  - mot: 'Écart matière'
+    definition: 'La différence entre le coût matière théorique, calculé à partir des ventes et des fiches techniques, et le coût matière réel, mesuré par les achats et les inventaires. Un écart qui se creuse signale des pertes, des portions non respectées, des erreurs de facturation ou des vols.'
+    public: tous
+    ancre: ecart-matiere
+  - mot: 'Emplacement n° 1'
+    definition: 'L’emplacement où le passage de clients potentiels est le plus fort dans une ville ou un quartier, par exemple une rue piétonne commerçante. Il se paie plus cher en loyer et en droit au bail.'
+    public: tous
+    ancre: emplacement-numero-1
+  - mot: 'Enseigne'
+    definition: 'Le nom ou le signe qui désigne l’établissement auprès du public, sur la façade et dans la communication. Dans un réseau, le mot désigne aussi la marque commune à tous les établissements.'
+    public: tous
+    ancre: enseigne
+  - mot: 'Équipier polyvalent'
+    definition: 'Un employé formé à plusieurs postes, par exemple la caisse, la préparation et le service. Le terme est courant en restauration rapide.'
+    public: tous
+    ancre: equipier-polyvalent
+  - mot: 'État local du marché'
+    definition: 'La présentation du marché dans la zone où le candidat va s’implanter, que le franchiseur doit inclure dans le DIP avec l’état général du marché (article R330-1 du Code de commerce). Le texte ne la définit pas, et elle ne remplace pas l’étude de marché que le candidat doit mener lui-même.'
+    public: reseau
+    ancre: etat-local-du-marche
+  - mot: 'Exclusivité territoriale'
+    definition: 'La zone dans laquelle le franchiseur s’engage à ne pas implanter, ni laisser implanter, un autre établissement de l’enseigne. Elle n’est pas obligatoire, et le contrat précise ce qu’elle couvre, par exemple la livraison, la vente en ligne ou certains sites comme les gares.'
+    public: reseau
+    ancre: exclusivite-territoriale
+  - mot: 'Fait maison'
+    definition: 'La mention ou le logo qui signale sur la carte un plat élaboré sur place à partir de produits crus, certains produits transformés listés par la réglementation étant admis. Le restaurant doit identifier ainsi chaque plat qui répond à cette définition (article L122-19 du Code de la consommation, décret n° 2015-505).'
+    public: tous
+    ancre: fait-maison
+  - mot: 'Fermeture administrative'
+    definition: 'La fermeture de tout ou partie d’un établissement ordonnée par le préfet. En hygiène, elle intervient quand l’exploitant n’a pas corrigé les manquements dans le délai d’une mise en demeure, ou sans délai en cas de danger grave et imminent (article L233-1 du Code rural et de la pêche maritime). Un débit de boissons ou un restaurant peut aussi être fermé pour atteinte à l’ordre public (article L3332-15 du Code de la santé publique).'
+    public: tous
+    ancre: fermeture-administrative
+  - mot: 'Fiche technique'
+    definition: 'La fiche d’une recette : ingrédients, quantités par portion, étapes, dressage et coût. Elle permet de servir le même plat d’un service à l’autre.'
+    public: tous
+    ancre: fiche-technique
+  - mot: 'Fonds de commerce'
+    definition: 'L’ensemble des éléments qui permettent d’exploiter un commerce : clientèle, nom commercial, enseigne, droit au bail, matériel et, le cas échéant, licences (article L142-2 du Code de commerce). C’est lui qui se vend ou se met en location-gérance, indépendamment des murs.'
+    public: tous
+    ancre: fonds-de-commerce
+  - mot: 'Fonds de communication'
+    definition: 'La contribution des franchisés qui finance la publicité et la communication de l’enseigne, nationale ou locale. Elle s’ajoute le plus souvent à la redevance, et le contrat fixe son montant et son usage.'
+    public: reseau
+    ancre: fonds-de-communication
+  - mot: 'Formation hygiène'
+    definition: 'La formation de 14 heures en hygiène alimentaire qu’au moins une personne de l’effectif doit avoir suivie dans chaque établissement de restauration traditionnelle, de cafétéria ou libre-service et de restauration rapide (article L233-4 du Code rural et de la pêche maritime, décret n° 2011-731, arrêté du 5 octobre 2011). Les titulaires de certains diplômes du secteur en sont dispensés.'
+    public: tous
+    ancre: formation-hygiene
+  - mot: 'Franchisé'
+    definition: 'Le commerçant, juridiquement et financièrement indépendant, qui exploite un établissement sous l’enseigne du franchiseur, avec son propre capital et ses propres salariés.'
+    public: reseau
+    ancre: franchise
+  - mot: 'Franchiseur'
+    definition: 'L’entreprise qui a créé le concept et la marque, et qui les met à disposition de franchisés en leur transmettant son savoir-faire, contre rémunération.'
+    public: reseau
+    ancre: franchiseur
+  - mot: 'GBPH'
+    definition: 'Guide de bonnes pratiques d’hygiène et d’application des principes HACCP : un guide rédigé par une profession et validé par l’administration, qui traduit la réglementation en pratiques concrètes (règlement (CE) n° 852/2004, article 8). Le suivre n’est pas obligatoire, mais aide l’exploitant à montrer qu’il respecte ses obligations.'
+    public: tous
+    ancre: gbph
+  - mot: 'HACCP'
+    definition: 'Hazard Analysis Critical Control Point : la méthode qui identifie les dangers pour la sécurité des aliments, fixe les étapes où ils doivent être maîtrisés (points critiques) avec leurs limites, leur surveillance et les actions correctives. Le règlement (CE) n° 852/2004 (article 5) oblige tout exploitant du secteur alimentaire à appliquer des procédures fondées sur ses principes.'
+    public: tous
+    ancre: haccp
+  - mot: 'Ingénierie de menu'
+    definition: 'L’analyse de la carte qui croise la popularité et la marge de chaque plat, pour décider lesquels garder, mettre en avant ou retirer.'
+    public: independant
+    ancre: ingenierie-de-menu
+  - mot: 'Inventaire'
+    definition: 'Le comptage et la valorisation du stock à une date donnée. Le stock de début, plus les achats, moins le stock de fin, donne la consommation réelle de matières sur la période.'
+    public: tous
+    ancre: inventaire
+  - mot: 'Licence de marque'
+    definition: 'Le contrat par lequel le titulaire d’une marque autorise un tiers à l’utiliser, en général contre une redevance, sans obligation de lui transmettre un savoir-faire (article L714-1 du Code de la propriété intellectuelle). Si elle impose une exclusivité, le DIP reste dû (article L330-3 du Code de commerce).'
+    public: reseau
+    ancre: licence-de-marque
+  - mot: 'Licence IV'
+    definition: 'La licence de 4e catégorie, dite grande licence, qui autorise un débit de boissons à servir sur place toutes les boissons dont la consommation est autorisée, sans obligation de repas (article L3331-1 du Code de la santé publique). Sauf exceptions, la création de nouvelles licences IV est interdite : il faut en reprendre une existante (article L3332-2).'
+    public: tous
+    ancre: licence-iv
+  - mot: 'Licence restaurant'
+    definition: 'L’autorisation de servir des boissons alcooliques pendant les repas, comme accessoire de la nourriture (article L3331-2 du Code de la santé publique). La petite licence restaurant couvre les boissons du 3e groupe, comme le vin, la bière ou le cidre ; la licence restaurant couvre toutes les boissons dont la consommation est autorisée.'
+    public: tous
+    ancre: licence-restaurant
+  - mot: 'Location-gérance'
+    definition: 'Le contrat par lequel le propriétaire d’un fonds de commerce en confie l’exploitation à un locataire-gérant, qui l’exploite à ses risques et lui verse une redevance (article L144-1 du Code de commerce).'
+    public: tous
+    ancre: location-gerance
+  - mot: 'Manuel opératoire'
+    definition: 'Le document confidentiel qui décrit le savoir-faire du réseau : recettes, procédures, standards d’accueil et d’hygiène. Le franchiseur le remet au franchisé et le tient à jour. On l’appelle aussi « bible ».'
+    public: reseau
+    ancre: manuel-operatoire
+  - mot: 'Marche en avant'
+    definition: 'Le principe d’organisation de la cuisine où les denrées progressent des zones sales vers les zones propres, de la réception au service, sans que les circuits propres et sales se croisent. La séparation peut se faire dans l’espace ou dans le temps, avec un nettoyage entre deux opérations.'
+    public: tous
+    ancre: marche-en-avant
+  - mot: 'Marge brute'
+    definition: 'Le chiffre d’affaires hors taxes moins le coût des matières consommées, c’est-à-dire les achats corrigés de la variation de stock. On l’exprime en euros ou en pourcentage du chiffre d’affaires.'
+    public: tous
+    ancre: marge-brute
+  - mot: 'Master franchise'
+    definition: 'Le contrat par lequel un franchiseur confie à un partenaire, le master franchisé, le droit exclusif de développer l’enseigne dans un pays ou une région. Le master franchisé recrute et anime lui-même les franchisés de son territoire, et peut aussi ouvrir ses propres établissements.'
+    public: reseau
+    ancre: master-franchise
+  - mot: 'Mercuriale'
+    definition: 'La liste des prix d’un fournisseur pour une période. La comparer aux factures permet de repérer les hausses non annoncées.'
+    public: tous
+    ancre: mercuriale
+  - mot: 'Mise en place'
+    definition: 'Tout ce qui se prépare avant le service (légumes taillés, sauces, postes rangés) pour envoyer vite pendant le coup de feu.'
+    public: tous
+    ancre: mise-en-place
+  - mot: 'Multi-franchisé'
+    definition: 'Un franchisé qui exploite plusieurs établissements, d’une seule enseigne ou de plusieurs.'
+    public: reseau
+    ancre: multi-franchise
+  - mot: 'Non-conformité'
+    definition: 'Un écart à une règle ou à un standard, relevé en audit, en contrôle officiel ou en autocontrôle. Elle se corrige et se trace.'
+    public: tous
+    ancre: non-conformite
+  - mot: 'Origine des viandes'
+    definition: 'L’obligation, pour les restaurants, d’indiquer par écrit au client le pays d’origine ou de provenance des viandes bovines, porcines, ovines et de volaille qu’ils servent (décret n° 2002-1465, étendu par le décret n° 2025-141).'
+    public: tous
+    ancre: origine-des-viandes
+  - mot: 'Pas-de-porte'
+    definition: 'La somme versée au bailleur à la signature d’un bail commercial, en plus des loyers. Selon la rédaction du bail, elle est traitée comme un supplément de loyer ou comme une indemnité, ce qui change sa fiscalité et son effet sur le loyer de renouvellement.'
+    public: tous
+    ancre: pas-de-porte
+  - mot: 'Permis d’exploitation'
+    definition: 'Le permis délivré à l’issue d’une formation obligatoire sur les droits et obligations liés à la vente d’alcool, valable dix ans. Il est exigé de toute personne qui déclare l’ouverture, la mutation, la translation ou le transfert d’un débit de boissons à consommer sur place de 3e ou 4e catégorie, ou un établissement doté d’une petite licence restaurant ou d’une licence restaurant (article L3332-1-1 du Code de la santé publique).'
+    public: tous
+    ancre: permis-d-exploitation
+  - mot: 'Plan d’action correctif'
+    definition: 'La liste des écarts relevés lors d’un audit, avec pour chacun une action, un responsable et une date limite.'
+    public: tous
+    ancre: plan-d-action-correctif
+  - mot: 'Plan de nettoyage'
+    definition: 'Le document qui fixe, pour chaque zone et chaque équipement, quoi nettoyer et désinfecter, avec quel produit, à quelle fréquence et par qui. Il fait partie des bonnes pratiques d’hygiène du plan de maîtrise sanitaire, avec l’enregistrement des opérations réalisées.'
+    public: tous
+    ancre: plan-de-nettoyage
+  - mot: 'PMS'
+    definition: 'Plan de maîtrise sanitaire : le dossier qui décrit les mesures prises par l’établissement pour assurer l’hygiène et la sécurité de ses produits, avec ses bonnes pratiques d’hygiène, son plan HACCP, sa traçabilité et la gestion des non-conformités, dont les retraits et rappels. Il répond aux règlements (CE) n° 852/2004 et n° 178/2002 ; son contenu est décrit par l’arrêté du 8 juin 2006.'
+    public: tous
+    ancre: pms
+  - mot: 'Prévisionnel'
+    definition: 'Le compte de résultat et le plan de trésorerie estimés pour les premières années. La banque le demande avant d’accorder un prêt ; le franchiseur qui en remet un au candidat doit le fonder sur des données sérieuses, sous peine d’engager sa responsabilité.'
+    public: tous
+    ancre: previsionnel
+  - mot: 'Prime cost'
+    definition: 'Le coût des matières consommées plus le coût total du personnel, charges sociales comprises. Ce sont les deux postes que l’exploitant pilote au quotidien, suivis en pourcentage du chiffre d’affaires hors taxes.'
+    public: tous
+    ancre: prime-cost
+  - mot: 'Ratio matière'
+    definition: 'Le coût des matières consommées divisé par le chiffre d’affaires hors taxes correspondant, exprimé en pourcentage. La consommation se calcule avec les inventaires (stock initial, plus achats, moins stock final), pas avec les seuls achats. On dit aussi food cost.'
+    public: independant
+    ancre: ratio-matiere
+  - mot: 'Redevance'
+    definition: 'La somme versée régulièrement par le franchisé au franchiseur pendant le contrat, en contrepartie de l’usage de la marque et de l’assistance. C’est le plus souvent un pourcentage du chiffre d’affaires hors taxes, parfois un montant fixe.'
+    public: reseau
+    ancre: redevance
+  - mot: 'Référencement'
+    definition: 'La sélection par la tête de réseau de fournisseurs et de produits aux conditions négociées, que les franchisés doivent ou peuvent utiliser selon le contrat. Une obligation d’achat exclusive doit rester justifiée par l’identité et la qualité du concept.'
+    public: reseau
+    ancre: referencement
+  - mot: 'Relevé de températures'
+    definition: 'Le contrôle noté des températures des frigos, des chambres froides et des préparations. Il fait partie des autocontrôles du plan de maîtrise sanitaire et sert de preuve lors d’une inspection.'
+    public: tous
+    ancre: releve-de-temperatures
+  - mot: 'Remise de fin d’année'
+    definition: 'Une remise conditionnelle qu’un fournisseur accorde quand un volume d’achats est atteint sur l’année, versée le plus souvent sous forme d’avoir. Dans un réseau, le contrat ou l’accord de référencement dit qui la perçoit, la tête de réseau ou les franchisés.'
+    public: reseau
+    ancre: remise-de-fin-d-annee
+  - mot: 'Rétroplanning d’ouverture'
+    definition: 'Le calendrier des tâches avant une ouverture, construit à rebours depuis la date d’ouverture : travaux, recrutement, formation, commandes.'
+    public: reseau
+    ancre: retroplanning-d-ouverture
+  - mot: 'Rotation des tables'
+    definition: 'Le nombre de fois qu’une place assise est occupée pendant un service, soit le nombre de couverts divisé par le nombre de places. Il mesure l’usage de la salle aux heures de pointe.'
+    public: tous
+    ancre: rotation-des-tables
+  - mot: 'Savoir-faire'
+    definition: 'Un ensemble d’informations pratiques non brevetées, issues de l’expérience et testées par le franchiseur, qui doit être secret, substantiel et identifié (règlement (UE) 2022/720, article 1er). C’est sa transmission qui distingue une franchise d’une simple licence de marque.'
+    public: reseau
+    ancre: savoir-faire
+  - mot: 'Seuil de rentabilité'
+    definition: 'Le chiffre d’affaires à partir duquel l’établissement couvre toutes ses charges, fixes et variables, sans perte ni bénéfice. Il se calcule en divisant les charges fixes par le taux de marge sur coûts variables.'
+    public: tous
+    ancre: seuil-de-rentabilite
+  - mot: 'Succursale'
+    definition: 'Un établissement détenu et exploité directement par la tête de réseau ou l’une de ses filiales, avec ses propres salariés, sans franchisé.'
+    public: reseau
+    ancre: succursale
+  - mot: 'Ticket moyen'
+    definition: 'Le chiffre d’affaires d’une période divisé par le nombre de tickets de caisse. Rapporté au nombre de couverts plutôt qu’aux tickets, on parle de dépense moyenne par couvert.'
+    public: tous
+    ancre: ticket-moyen
+  - mot: 'TIAC'
+    definition: 'Toxi-infection alimentaire collective : au moins deux cas d’une même symptomatologie, en général digestive, dont on peut rapporter la cause à une même origine alimentaire (définition de Santé publique France). C’est une maladie à déclaration obligatoire, qui déclenche une enquête de l’agence régionale de santé et des services vétérinaires.'
+    public: tous
+    ancre: tiac
+  - mot: 'Traçabilité'
+    definition: 'Pouvoir identifier le fournisseur et le lot de chaque denrée reçue, grâce aux étiquettes et aux bons de livraison conservés, et, quand on livre un autre professionnel, à qui on l’a vendue (règlement (CE) n° 178/2002, article 18). Elle permet de retirer ou de rappeler un produit en cas d’alerte.'
+    public: tous
+    ancre: tracabilite
+  - mot: 'Turnover'
+    definition: 'Le taux de rotation du personnel : la part des salariés qui quittent l’entreprise sur une période.'
+    public: tous
+    ancre: turnover
+  - mot: 'TVA en restauration'
+    definition: 'En France, les repas servis sur place et les plats préparés pour une consommation immédiate, à emporter ou livrés, sont taxés à 10 % (article 279 m du CGI). Les boissons alcooliques sont toujours à 20 %, et les produits alimentaires vendus dans un emballage qui permet de les conserver, comme une boisson sans alcool en bouteille fermée, à 5,5 % (article 278-0 bis A du CGI).'
+    public: tous
+    ancre: tva-restauration
+  - mot: 'Unité pilote'
+    definition: 'L’établissement où le franchiseur a testé et mis au point son concept avant de le proposer en franchise. Le Code de déontologie européen de la franchise demande d’avoir exploité le concept avec succès dans au moins une unité pilote avant de lancer le réseau.'
+    public: reseau
+    ancre: unite-pilote
+  - mot: 'Zone de chalandise'
+    definition: 'La zone géographique d’où vient l’essentiel de la clientèle d’un établissement, mesurée en temps de trajet ou en distance. Son étude (population, flux, concurrence) précède le choix d’un emplacement.'
+    public: tous
+    ancre: zone-de-chalandise

@@ -60,3 +60,5 @@ scenes:
       - { repere: 'MEAT', texte: 'He checks the weights · Invoices', href: '#fait' }
       - { repere: 'DAIRY', texte: 'He tracks credits · Suppliers', href: '#fait' }
       - { repere: 'OFFICE', texte: 'He prepares contracts · Team', href: '#semaine' }
+  ressources:
+    alt: 'Robin and the seven Hatch OS voxel agents in a row, each writing an article their own way: Robin on a crate with his notebook, Peep sitting on the floor with a phone, Owl perched on a tablet, Lark lying on a sheet of paper, Jay on a stool with a laptop, Finch thinking with a clipboard, Pecker at a desk with a desktop computer and Sparrow on a stack of books.'

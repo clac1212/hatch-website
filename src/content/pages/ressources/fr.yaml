@@ -1,0 +1,91 @@
+seo:
+  title: 'Ressources pour restaurateurs et réseaux | Hatch OS'
+  description: 'Modèles à télécharger, guides et glossaire pour les restaurateurs indépendants et les réseaux de franchise. En libre accès, sans formulaire ni email.'
+
+hero:
+  kicker: 'Ressources'
+  titre: 'Ce que les restaurateurs utilisent vraiment, en libre accès.'
+  chapeau: 'Modèles, guides et glossaire, que vous teniez un bistrot ou que vous pilotiez un réseau de 50 restaurants. Tout se lit et se télécharge sans formulaire ni email.'
+  filtre: 'Filtrer les ressources'
+  filtres:
+    tout: 'Tout'
+    independant: 'Je tiens un restaurant'
+    reseau: 'Je pilote un réseau'
+
+modeles:
+  kicker: 'Modèles'
+  titre: 'Des modèles prêts à remplir.'
+  texte: "Téléchargez, remplissez, adaptez à votre maison. Pas de formulaire, pas d'email."
+  telecharger: 'Télécharger le modèle'
+  liste:
+    - public: independant
+      titre: "Fiche technique et coût de revient d'un plat"
+      texte: 'Les grammages, le prix de chaque ingrédient et le coût de la portion, calculé tout seul.'
+      formats:
+        - format: Sheets
+    - public: independant
+      titre: 'Checklist de réception des livraisons'
+      texte: 'Ce qu’on vérifie avant de signer le bon : quantités, températures, dates, état des colis.'
+      formats:
+        - format: PDF
+    - public: tous
+      titre: 'Trame de plan de maîtrise sanitaire'
+      texte: 'Les rubriques attendues lors d’un contrôle, à compléter avec vos propres procédures.'
+      formats:
+        - format: Docs
+    - public: reseau
+      titre: 'Trame de manuel opératoire'
+      texte: 'Le plan d’un manuel que les équipes lisent : ouverture, service, fermeture, hygiène.'
+      formats:
+        - format: Docs
+    - public: reseau
+      titre: "Grille d'audit hygiène et qualité, pondérée"
+      texte: 'Chaque point noté et pondéré, pour comparer les restaurants entre eux visite après visite.'
+      formats:
+        - format: Sheets
+    - public: reseau
+      titre: "Checklist d'ouverture d'un restaurant franchisé"
+      texte: 'De la signature au premier service, les étapes à cocher par le franchisé et par le siège.'
+      formats:
+        - format: PDF
+        - format: Sheets
+
+guides:
+  kicker: 'Guides'
+  titre: 'Les guides, métier par métier.'
+  texte: 'Une méthode concrète par sujet, et une source pour chaque chiffre.'
+  une: 'À la une'
+  tous: 'Tous les guides'
+  themes: 'Filtrer par thème'
+  toutTheme: 'Tous les thèmes'
+  lire: 'Lire le guide'
+
+glossaire:
+  kicker: 'Glossaire'
+  titre: 'Les mots du métier.'
+  texte: 'Les termes qui reviennent en cuisine, chez le fournisseur et dans un contrat de franchise.'
+  lien: 'Voir tout le glossaire'
+
+sorties:
+  independant:
+    kicker: 'Indépendant'
+    titre: 'Vous tenez un ou deux restaurants'
+    texte: 'Robin vérifie vos factures, calcule le coût de vos plats et vous fait le point de la semaine, sur WhatsApp.'
+    cta: "Rejoindre la liste d'attente"
+  reseau:
+    kicker: 'Réseau'
+    titre: 'Vous pilotez un réseau'
+    texte: 'Sept agents pour la vie de réseau, la formation, la documentation, la qualité et le développement de vos restaurants.'
+
+guide:
+  retour: 'Ressources'
+  lecture: '{n} min de lecture'
+  majLe: 'Mis à jour le'
+  faq: 'Questions fréquentes'
+  sources: 'Sources'
+  luLe: 'lu le'
+  agents: "Les agents qui s'en chargent"
+  agentLien: 'Voir la page de {name}'
+  essentiel: "L'essentiel"
+  sommaire: 'Sur cette page'
+  lies: 'À lire aussi'

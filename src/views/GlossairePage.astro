@@ -1,0 +1,207 @@
+---
+import { getEntry } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Badge from '../components/ressources/Badge.astro';
+import Sorties from '../components/ressources/Sorties.astro';
+import { piedRessources } from '../components/ressources/pied';
+import { BRAND, breadcrumbList, languageTag } from '../seo/jsonld';
+import { routes, type Locale } from '../i18n/ui';
+
+/**
+ * The glossary (/ressources/glossaire, /en/resources/glossary): every term in alphabetical order,
+ * each with its stable anchor (linked from the /ressources preview) and its audience badge.
+ * Content: src/content/pages/glossaire/<locale>.yaml.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const pied = await piedRessources(locale);
+const g = (await getEntry('glossairePage', locale))?.data;
+if (!g) throw new Error(`Missing src/content/pages/glossaire/${locale}.yaml`);
+const ui = (await getEntry('ressourcesPage', locale))?.data;
+if (!ui) throw new Error(`Missing src/content/pages/ressources/${locale}.yaml`);
+const termes = [...g.termes].sort((a, b) =>
+  a.mot.localeCompare(b.mot, locale, { sensitivity: 'base' }),
+);
+/** First letter without its accent (É goes under E), so the groups follow the sort. */
+const lettreDe = (mot: string) => mot.normalize('NFD').charAt(0).toUpperCase();
+const groupes = termes.reduce<{ lettre: string; termes: typeof termes }[]>((acc, x) => {
+  const l = lettreDe(x.mot);
+  const dernier = acc.at(-1);
+  if (dernier?.lettre === l) dernier.termes.push(x);
+  else acc.push({ lettre: l, termes: [x] });
+  return acc;
+}, []);
+/** The whole alphabet: letters with no term show, greyed out, so the bar keeps its shape. */
+const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+const presentes = new Set(groupes.map((x) => x.lettre));
+
+const site = Astro.site!;
+const url = new URL(routes.glossaire[locale], site).href;
+const jsonLd = [
+  breadcrumbList(site, [
+    { name: BRAND, path: routes.home[locale] },
+    { name: ui.guide.retour, path: routes.ressources[locale] },
+    { name: g.kicker, path: routes.glossaire[locale] },
+  ]),
+  {
+    '@type': 'DefinedTermSet',
+    '@id': `${url}#glossaire`,
+    name: g.titre,
+    inLanguage: languageTag[locale],
+    hasDefinedTerm: termes.map((x) => ({
+      '@type': 'DefinedTerm',
+      '@id': `${url}#${x.ancre}`,
+      name: x.mot,
+      description: x.definition,
+    })),
+  },
+];
+---
+
+<Base
+  locale={locale}
+  paths={routes.glossaire}
+  title={g.seo.title}
+  description={g.seo.description}
+  nav="accueil"
+  piedEpure
+  pied={pied}
+  jsonLd={jsonLd}
+>
+  <div class="px-4 pt-32 pb-20 sm:px-6 lg:pt-40">
+    <header class="mx-auto flex max-w-prose flex-col gap-5">
+      <a href={routes.ressources[locale]} class="retour w-max text-caption font-semibold text-soft">
+        ‹ {ui.guide.retour}
+      </a>
+      <span class="font-mono text-kicker text-orange-txt uppercase">{g.kicker}</span>
+      <h1
+        class="font-mono text-[clamp(1.875rem,1.3rem+2.2vw,3rem)] leading-[1.12] text-balance text-ink"
+      >
+        {g.titre}
+      </h1>
+      <p class="text-punch text-soft">{g.chapeau}</p>
+    </header>
+
+    <nav aria-label={g.lettres} class="lettres mx-auto mt-10 max-w-prose">
+      <ul class="flex flex-wrap gap-1">
+        {
+          alphabet.map((l) => (
+            <li>
+              {presentes.has(l) ? (
+                <a href={`#lettre-${l}`} class="lettre">
+                  {l}
+                </a>
+              ) : (
+                <span class="lettre vide" aria-hidden="true">
+                  {l}
+                </span>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="mx-auto mt-10 max-w-prose">
+      {
+        groupes.map((gr) => (
+          <section id={`lettre-${gr.lettre}`} class="groupe" aria-labelledby={`t-${gr.lettre}`}>
+            <h2 id={`t-${gr.lettre}`} class="font-mono text-[1.75rem] leading-none text-orange-txt">
+              {gr.lettre}
+            </h2>
+            <dl class="mt-3 border-t border-line">
+              {gr.termes.map((x) => (
+                <div id={x.ancre} class="terme">
+                  <dt class="flex flex-wrap items-center gap-3">
+                    <a
+                      href={`#${x.ancre}`}
+                      class="font-display text-[1.375rem] font-semibold text-ink"
+                    >
+                      {x.mot}
+                    </a>
+                    <Badge locale={locale} public={x.public} />
+                  </dt>
+                  <dd class="mt-2 text-soft">{x.definition}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+        ))
+      }
+    </div>
+  </div>
+
+  <section class="px-4 pb-24 sm:px-6 lg:pb-32">
+    <div class="mx-auto max-w-site">
+      <Sorties locale={locale} public="tous" />
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* The A to Z bar stays under the fixed nav while scrolling, from tablet width up (on a phone it
+     wraps to three rows, too tall to keep on screen). */
+  .lettres {
+    padding: 0.5rem 0;
+    background: var(--color-cream);
+  }
+  @media (min-width: 40rem) {
+    .lettres {
+      position: sticky;
+      top: 4.5rem;
+      z-index: 10;
+    }
+  }
+  .lettre {
+    display: inline-flex;
+    width: 2rem;
+    height: 2rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-btn);
+    font-family: var(--font-mono);
+    font-size: 0.9375rem;
+    color: var(--color-ink);
+    box-shadow: inset 0 0 0 1px var(--color-line);
+  }
+  a.lettre:hover {
+    color: var(--color-orange-txt);
+    box-shadow: inset 0 0 0 1px var(--color-orange-txt);
+  }
+  a.lettre:focus-visible {
+    outline: 2px solid var(--color-orange-txt);
+    outline-offset: 2px;
+  }
+  .lettre.vide {
+    color: var(--color-line);
+    box-shadow: none;
+  }
+  .groupe {
+    padding-top: 2rem;
+    scroll-margin-top: 8.5rem;
+  }
+  .terme {
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--color-line);
+    scroll-margin-top: 8.5rem;
+  }
+  /* The term reached through its anchor stands out. */
+  .terme:target {
+    background: var(--color-orange-tint);
+    box-shadow:
+      -1rem 0 0 var(--color-orange-tint),
+      1rem 0 0 var(--color-orange-tint);
+  }
+  .terme a:hover,
+  .retour:hover {
+    color: var(--color-orange-txt);
+  }
+  .terme a:focus-visible,
+  .retour:focus-visible {
+    outline: 2px solid var(--color-orange-txt);
+    outline-offset: 3px;
+  }
+</style>

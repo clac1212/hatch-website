@@ -38,16 +38,19 @@ const liens = {
   accueil: [
     { href: routes.robin[locale], label: t('nav.independants') },
     { href: routes.reseaux[locale], label: t('nav.reseaux') },
+    { href: routes.ressources[locale], label: t('nav.resources') },
   ],
   robin: [
     { href: '#fait', label: t('nav.robin.features') },
     { href: '#semaine', label: t('nav.robin.daily') },
     { href: '#canaux', label: t('nav.robin.whatsapp') },
+    { href: routes.ressources[locale], label: t('nav.resources') },
   ],
   reseau: [
     { href: `${base}#agents`, label: t('nav.agents') },
     { href: `${base}#cas-clients`, label: t('nav.cases') },
     { href: `${base}#tarifs`, label: t('nav.pricing') },
+    { href: routes.ressources[locale], label: t('nav.resources') },
   ],
   legal: [],
 }[espace];
