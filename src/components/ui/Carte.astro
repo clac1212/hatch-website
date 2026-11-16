@@ -7,7 +7,7 @@ import type { HTMLAttributes } from 'astro/types';
  *   fills it, content laid over), `verre` (the site's glass).
  * - `taille`: `sm` (24 px, narrow cards), `md` (40 px, cards), `panneau` (64 px, large objects).
  * - `href`: the whole card is a link; it lifts on hover and a child marked `.carte-zoom` leans in.
- * - `as`: the element when it isn't a link (`div` by default; `li`, `article`…).
+ * - `as`: the element when it isn't a link (`div` by default; `li`, `article`, `aside`).
  * What touches the card's edge is clipped by it; what sits inset takes `rounded-interieur`.
  */
 type Variante = 'surface' | 'nuit' | 'image' | 'verre';
@@ -15,7 +15,7 @@ interface Props extends HTMLAttributes<'div'> {
   variante?: Variante;
   taille?: 'sm' | 'md' | 'panneau';
   href?: string;
-  as?: 'div' | 'li' | 'article';
+  as?: 'div' | 'li' | 'article' | 'aside';
 }
 const {
   variante = 'surface',

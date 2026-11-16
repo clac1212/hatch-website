@@ -2,6 +2,8 @@
 import { getEntry, render } from 'astro:content';
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
+import Section from '../components/layout/Section.astro';
+import Carte from '../components/ui/Carte.astro';
 import Badge from '../components/ressources/Badge.astro';
 import Sorties from '../components/ressources/Sorties.astro';
 import { piedRessources } from '../components/ressources/pied';
@@ -116,202 +118,363 @@ const jsonLd = [
   jsonLd={jsonLd}
   noindex={g.brouillon}
 >
-  <article class="px-4 pt-32 pb-20 sm:px-6 lg:pt-40">
-    <header class="mx-auto flex max-w-prose flex-col gap-5">
-      <a href={routes.ressources[locale]} class="retour w-max text-caption font-semibold text-soft">
-        ‹ {l.retour}
-      </a>
-      <span class="font-mono text-kicker text-orange-txt uppercase">{g.kicker}</span>
-      <h1
-        class="font-mono text-[clamp(1.875rem,1.3rem+2.2vw,3rem)] leading-[1.12] text-balance text-ink"
-      >
-        {g.title}
-      </h1>
-      <p class="text-punch text-soft">{g.chapeau}</p>
-      <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line pb-6">
-        <Badge locale={locale} public={g.public} />
-        <span class="font-mono text-source text-soft uppercase">{g.metier}</span>
-        <span class="font-mono text-source text-soft uppercase">
-          {fill(l.lecture, { n: String(g.readingMinutes) })}
-        </span>
-        <span class="font-mono text-source text-soft uppercase">
-          {l.majLe}
-          <time datetime={g.updatedAt}>{longDate(g.updatedAt, locale)}</time>
-        </span>
-      </div>
-    </header>
+  <!-- A reading page: one column at the width of running text; on a wide screen the contents sit in
+       a column of their own on its left, and stay in view, marking the part being read. -->
+  <Section rythme="bas" class="pt-32 lg:pt-40">
+    <article class="lecture">
+      <header class="col-texte flex flex-col items-start gap-5">
+        <a href={routes.ressources[locale]} class="retour text-caption font-semibold text-soft">
+          <span aria-hidden="true">←</span>
+          {l.retour}
+        </a>
+        <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+          <Badge locale={locale} public={g.public} />
+          <span class="font-mono text-source text-soft uppercase">{g.metier}</span>
+        </div>
+        <h1 class="font-display text-h1 font-semibold text-balance">{g.title}</h1>
+        <p class="text-punch text-soft">{g.chapeau}</p>
+        <p class="flex flex-wrap gap-x-4 gap-y-1 font-mono text-source text-soft uppercase">
+          <span>{fill(l.lecture, { n: String(g.readingMinutes) })}</span>
+          <span>
+            {l.majLe}
+            <time datetime={g.updatedAt}>{longDate(g.updatedAt, locale)}</time>
+          </span>
+        </p>
+      </header>
 
-    <Image
-      src={g.image}
-      alt={g.imageAlt}
-      widths={[640, 960, 1280, 1600]}
-      sizes="(min-width: 1040px) 1000px, 100vw"
-      loading="eager"
-      class="mx-auto mt-10 aspect-[3/2] w-full max-w-[1000px] rounded-card bg-cream object-cover"
-    />
+      <Carte variante="image" class="col-texte mt-10 aspect-3/2">
+        <Image
+          src={g.image}
+          alt={g.imageAlt}
+          widths={[640, 960, 1280, 1600]}
+          sizes="(min-width: 800px) 760px, 100vw"
+          loading="eager"
+          class="size-full object-cover"
+        />
+      </Carte>
 
-    <div class="mx-auto mt-10 flex max-w-prose flex-col gap-6">
-      <aside class="essentiel" aria-labelledby="guide-essentiel">
-        <h2 id="guide-essentiel" class="font-mono text-kicker text-orange-txt uppercase">
-          {l.essentiel}
-        </h2>
-        <ul>
-          {g.essentiel.map((e) => <li>{e}</li>)}
-        </ul>
-      </aside>
       {
         sommaire.length > 2 && (
-          <nav class="sommaire" aria-labelledby="guide-sommaire">
-            <h2 id="guide-sommaire" class="font-mono text-kicker text-soft uppercase">
-              {l.sommaire}
-            </h2>
-            <ol>
-              {sommaire.map((h) => (
-                <li>
-                  <a href={`#${h.slug}`}>{h.text}</a>
-                </li>
-              ))}
-            </ol>
+          <nav class="sommaire" aria-labelledby="guide-sommaire" data-sommaire>
+            <details open>
+              <summary id="guide-sommaire" class="font-mono text-kicker text-soft uppercase">
+                {l.sommaire}
+              </summary>
+              <ol>
+                {sommaire.map((h) => (
+                  <li>
+                    <a href={`#${h.slug}`}>{h.text}</a>
+                  </li>
+                ))}
+              </ol>
+            </details>
           </nav>
         )
       }
-    </div>
 
-    <div class="corps mx-auto mt-12 max-w-prose">
-      <Content />
-    </div>
-
-    {
-      g.faq.length > 0 && (
-        <section class="mx-auto mt-16 max-w-prose" aria-labelledby="guide-faq">
-          <h2 id="guide-faq" class="font-display text-[1.75rem] font-bold text-ink">
-            {l.faq}
+      <div class="col-texte mt-10 flex flex-col gap-12">
+        <Carte as="aside" class="essentiel p-6 sm:p-8" aria-labelledby="guide-essentiel">
+          <h2 id="guide-essentiel" class="font-mono text-kicker text-orange-txt uppercase">
+            {l.essentiel}
           </h2>
-          <div class="mt-6 border-t border-line">
-            {g.faq.map((q) => (
-              <details class="question">
-                <summary>
-                  <span>{q.question}</span>
-                  <span class="plus" aria-hidden="true" />
-                </summary>
-                <p class="pb-5 text-soft">{q.reponse}</p>
-              </details>
-            ))}
-          </div>
-        </section>
-      )
-    }
-
-    {
-      g.sources.length > 0 && (
-        <section class="mx-auto mt-14 max-w-prose" aria-labelledby="guide-sources">
-          <h2 id="guide-sources" class="font-mono text-kicker text-soft uppercase">
-            {l.sources}
-          </h2>
-          <ol class="mt-4 flex list-decimal flex-col gap-2 pl-5 font-mono text-source text-soft">
-            {g.sources.map((s) => (
-              <li>
-                {s.affirmation} · {l.luLe} <time datetime={s.luLe}>{longDate(s.luLe, locale)}</time>{' '}
-                ·{' '}
-                <a href={s.url} rel="noopener" class="break-all underline underline-offset-2">
-                  {new URL(s.url).hostname.replace(/^www\./, '')}
-                </a>
-              </li>
-            ))}
-          </ol>
-        </section>
-      )
-    }
-
-    {
-      agents.length > 0 && (
-        <section class="mx-auto mt-16 max-w-prose" aria-labelledby="guide-agents">
-          <h2 id="guide-agents" class="font-display text-[1.75rem] font-bold text-ink">
-            {l.agents}
-          </h2>
-          <ul class="mt-6 flex flex-col gap-3">
-            {agents.map((a) => {
-              const Tag = a.href ? 'a' : 'div';
-              return (
-                <li>
-                  <Tag href={a.href} class="agent">
-                    <span class="agent-av" style={`background-color:${centres[a.slug].fond}`}>
-                      <Image
-                        src={avatars[a.slug]}
-                        alt=""
-                        width={56}
-                        densities={[1, 2]}
-                        class="size-14 object-contain"
-                      />
-                    </span>
-                    <span class="flex flex-1 flex-col gap-1">
-                      <span class="flex flex-wrap items-baseline gap-x-3">
-                        <b class="font-display text-[1.25rem] text-ink">{a.name}</b>
-                        <span class="font-mono text-source text-soft uppercase">{a.job}</span>
-                      </span>
-                      <span class="text-caption text-soft">{a.pitch}</span>
-                      {a.href && <span class="sr-only">{fill(l.agentLien, { name: a.name })}</span>}
-                    </span>
-                  </Tag>
-                </li>
-              );
-            })}
+          <ul>
+            {g.essentiel.map((e) => <li>{e}</li>)}
           </ul>
-        </section>
-      )
-    }
-  </article>
+        </Carte>
+
+        <div class="corps">
+          <Content />
+        </div>
+
+        {
+          g.faq.length > 0 && (
+            <section aria-labelledby="guide-faq">
+              <h2 id="guide-faq" class="font-display text-card font-semibold">
+                {l.faq}
+              </h2>
+              <div class="mt-4 border-t border-line">
+                {g.faq.map((q) => (
+                  <details class="question">
+                    <summary>
+                      <span>{q.question}</span>
+                      <span class="plus" aria-hidden="true" />
+                    </summary>
+                    <p class="pb-5 text-soft">{q.reponse}</p>
+                  </details>
+                ))}
+              </div>
+            </section>
+          )
+        }
+
+        {
+          agents.length > 0 && (
+            <section aria-labelledby="guide-agents">
+              <h2 id="guide-agents" class="font-display text-card font-semibold">
+                {l.agents}
+              </h2>
+              <ul class="mt-5 flex flex-col gap-3">
+                {agents.map((a) => (
+                  <li>
+                    <Carte
+                      href={a.href}
+                      taille="sm"
+                      class="flex items-center gap-4 p-3 pr-5 [--r:var(--radius-card-sm)]"
+                    >
+                      <span
+                        class="grid size-18 shrink-0 place-items-center rounded-interieur"
+                        style={`background-color:${centres[a.slug].fond}`}
+                      >
+                        <Image
+                          src={avatars[a.slug]}
+                          alt=""
+                          width={56}
+                          densities={[1, 2]}
+                          class="size-14 object-contain"
+                        />
+                      </span>
+                      <span class="flex flex-1 flex-col gap-1">
+                        <span class="flex flex-wrap items-baseline gap-x-3">
+                          <b class="font-display text-card font-semibold">{a.name}</b>
+                          <span class="font-mono text-source text-soft uppercase">{a.job}</span>
+                        </span>
+                        <span class="text-caption text-soft">{a.pitch}</span>
+                        {a.href && (
+                          <span class="sr-only">{fill(l.agentLien, { name: a.name })}</span>
+                        )}
+                      </span>
+                    </Carte>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
+
+        {
+          g.sources.length > 0 && (
+            <section aria-labelledby="guide-sources" class="border-t border-line pt-8">
+              <h2 id="guide-sources" class="font-mono text-kicker text-soft uppercase">
+                {l.sources}
+              </h2>
+              <ol class="mt-4 flex list-decimal flex-col gap-2 pl-5 font-mono text-source text-soft">
+                {g.sources.map((s) => (
+                  <li>
+                    {s.affirmation} · {l.luLe}{' '}
+                    <time datetime={s.luLe}>{longDate(s.luLe, locale)}</time> ·{' '}
+                    <a href={s.url} rel="noopener" class="break-all underline underline-offset-2">
+                      {new URL(s.url).hostname.replace(/^www\./, '')}
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          )
+        }
+      </div>
+    </article>
+  </Section>
 
   {
     lies.length > 0 && (
-      <section class="px-4 pb-20 sm:px-6" aria-labelledby="guide-lies">
-        <div class="mx-auto flex max-w-site flex-col gap-6">
-          <h2 id="guide-lies" class="font-display text-[1.75rem] font-bold text-ink">
-            {l.lies}
-          </h2>
-          <ul class="grid gap-5 md:grid-cols-3">
-            {lies.map((x) => (
-              <li>
-                <a href={x.href} class="lie">
+      <Section rythme="bas" aria-labelledby="guide-lies">
+        <h2 id="guide-lies" class="font-display text-section font-semibold text-balance">
+          {l.lies}
+        </h2>
+        <ul class="mt-8 grid gap-5 md:grid-cols-3">
+          {lies.map((x) => (
+            <li>
+              <Carte href={x.href} class="flex h-full flex-col">
+                <span class="block aspect-3/2 overflow-clip bg-scene">
                   <Image
                     src={x.image}
                     alt={x.imageAlt}
                     widths={[400, 640]}
                     sizes="(min-width: 768px) 33vw, 100vw"
-                    class="aspect-[3/2] w-full bg-cream object-cover"
+                    class="carte-zoom size-full object-cover"
                   />
-                  <span class="flex flex-col gap-2 p-5">
+                </span>
+                <span class="flex flex-col gap-3 p-6">
+                  <span class="flex flex-wrap items-center gap-x-3 gap-y-2">
+                    <Badge locale={locale} public={x.public} />
                     <span class="font-mono text-source text-soft uppercase">{x.metier}</span>
-                    <b class="font-display text-[1.125rem] leading-snug text-ink">{x.title}</b>
                   </span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
+                  <b class="font-display text-card font-semibold text-balance">{x.title}</b>
+                </span>
+              </Carte>
+            </li>
+          ))}
+        </ul>
+      </Section>
     )
   }
 
-  <section class="px-4 pb-24 sm:px-6 lg:pb-32">
-    <div class="mx-auto max-w-site">
-      <Sorties locale={locale} public={g.public} />
-    </div>
-  </section>
+  <Section rythme="bas">
+    <Sorties locale={locale} public={g.public} />
+  </Section>
 </Base>
 
-<style>
-  .retour:hover {
-    color: var(--color-orange-txt);
+<script>
+  // The contents mark the part being read: the last heading that has passed under the nav.
+  const sommaire = document.querySelector<HTMLElement>('[data-sommaire]');
+  if (sommaire) {
+    const liens = [...sommaire.querySelectorAll<HTMLAnchorElement>('a[href^="#"]')];
+    const titres = liens
+      .map((a) => document.getElementById(decodeURIComponent(a.hash.slice(1))))
+      .filter((h): h is HTMLElement => !!h);
+    let actif = -1;
+    const marquer = () => {
+      const seuil = innerHeight * 0.3;
+      let i = -1;
+      titres.forEach((h, k) => {
+        if (h.getBoundingClientRect().top <= seuil) i = k;
+      });
+      if (i === actif) return;
+      actif = i;
+      liens.forEach((a, k) =>
+        k === i ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current'),
+      );
+    };
+    let prevu = false;
+    addEventListener(
+      'scroll',
+      () => {
+        if (prevu) return;
+        prevu = true;
+        requestAnimationFrame(() => {
+          prevu = false;
+          marquer();
+        });
+      },
+      { passive: true },
+    );
+    marquer();
+    // On a wide screen the contents are a column of their own, always open.
+    const large = matchMedia('(min-width: 64rem)');
+    const details = sommaire.querySelector('details')!;
+    const ouvrir = () => {
+      if (large.matches) details.open = true;
+    };
+    large.addEventListener('change', ouvrir);
+    if (!large.matches) details.open = false;
   }
-  .retour:focus-visible,
-  .agent:focus-visible,
-  .question summary:focus-visible {
-    outline: 2px solid var(--color-orange-txt);
-    outline-offset: 3px;
+</script>
+
+<style>
+  /* One column at the width of running text, centred; from 1024 px the contents take a column on
+     its left, the text column staying where it was. */
+  .lecture {
+    display: grid;
+    grid-template-columns: minmax(0, var(--container-prose));
+    justify-content: center;
+  }
+  .col-texte {
+    grid-column: 1;
+  }
+  .sommaire {
+    grid-column: 1;
+    margin-top: 2.5rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--color-line);
+  }
+  @media (width >= 64rem) {
+    .lecture {
+      /* exception: the contents column, the width of its longest lines */
+      grid-template-columns: 14rem minmax(0, var(--container-prose)) 14rem;
+      column-gap: 3rem;
+    }
+    .col-texte {
+      grid-column: 2;
+    }
+    .sommaire {
+      grid-column: 1;
+      grid-row: 3 / span 2;
+      align-self: start;
+      position: sticky;
+      top: 7rem;
+      margin-top: 2.5rem;
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+    .sommaire summary {
+      pointer-events: none;
+    }
+    .sommaire summary::after {
+      display: none;
+    }
+  }
+  .sommaire summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    list-style: none;
+  }
+  .sommaire summary::-webkit-details-marker {
+    display: none;
+  }
+  .sommaire summary::after {
+    content: '+';
+    font-size: 1rem;
+  }
+  .sommaire details[open] summary::after {
+    content: '−';
+  }
+  .sommaire ol {
+    display: flex;
+    flex-direction: column;
+    margin-top: 0.875rem;
+    border-left: 1px solid var(--color-line);
+  }
+  .sommaire a {
+    display: block;
+    margin-left: -1px;
+    padding: 0.375rem 0 0.375rem 1rem;
+    border-left: 2px solid transparent;
+    font-size: var(--text-caption);
+    line-height: 1.4;
+    color: var(--color-soft);
+    transition:
+      color 0.2s var(--ease-hatch),
+      border-color 0.2s var(--ease-hatch);
+  }
+  .sommaire a:hover {
+    color: var(--color-ink);
+  }
+  .sommaire a[aria-current] {
+    border-left-color: var(--color-orange);
+    color: var(--color-ink);
+    font-weight: 600;
   }
 
-  /* Markdown body: element selectors are unavoidable here, the HTML comes from the renderer. */
+  .retour:hover {
+    color: var(--color-ink);
+  }
+  .retour:focus-visible,
+  .sommaire a:focus-visible,
+  .question summary:focus-visible {
+    outline: 2px solid var(--color-orange);
+    outline-offset: 3px;
+    border-radius: var(--radius-sm);
+  }
+
+  .essentiel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+  }
+  .essentiel ul {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-left: 1.25rem;
+    list-style: disc;
+  }
+  .essentiel li::marker {
+    color: var(--color-orange-txt);
+  }
+
+  /* The guide's text, from Markdown. */
   .corps {
     font-size: var(--text-body);
     line-height: 1.7;
@@ -320,17 +483,17 @@ const jsonLd = [
   .corps :global(h2) {
     margin: 3rem 0 0.875rem;
     font-family: var(--font-display);
-    font-size: 1.625rem;
-    font-weight: 700;
-    line-height: 1.2;
-    letter-spacing: -0.01em;
+    font-size: var(--text-card);
+    font-weight: 600;
+    line-height: var(--text-card--line-height);
+    letter-spacing: var(--text-card--letter-spacing);
     color: var(--color-ink);
     text-wrap: balance;
+    scroll-margin-top: 7rem;
   }
   .corps :global(h3) {
-    margin: 2rem 0 0.625rem;
-    font-family: var(--font-display);
-    font-size: 1.25rem;
+    margin: 2rem 0 0.5rem;
+    font-size: var(--text-body);
     font-weight: 600;
     color: var(--color-ink);
   }
@@ -368,13 +531,13 @@ const jsonLd = [
   .corps :global(a:hover) {
     color: var(--color-orange-hover);
   }
-  /* The agent's box: a blockquote whose first paragraph is its bold title (« Avec Robin »). */
+  /* A callout in the text: a quiet card of its own. */
   .corps :global(blockquote) {
     margin: 2rem 0;
     padding: 1.5rem 1.75rem;
-    border-radius: var(--radius-card);
-    border: 1px solid var(--color-line);
-    background: var(--color-surface-2);
+    border-radius: var(--radius-card-sm);
+    corner-shape: squircle;
+    background: var(--color-cream-2);
     color: var(--color-ink);
   }
   .corps :global(blockquote > p:first-child strong) {
@@ -388,112 +551,37 @@ const jsonLd = [
   .corps :global(blockquote > :last-child) {
     margin-bottom: 0;
   }
-  .corps :global(h2) {
-    scroll-margin-top: 6rem;
-  }
-
-  /* « L'essentiel » and the table of contents. */
-  .essentiel {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    padding: 1.5rem 1.75rem;
-    border-radius: var(--radius-card);
-    background: var(--color-sand);
-  }
-  .essentiel ul {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    padding-left: 1.25rem;
-    list-style: disc;
-    color: var(--color-ink);
-  }
-  .essentiel li::marker {
-    color: var(--color-orange-txt);
-  }
-  .sommaire {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    padding-left: 1.25rem;
-    border-left: 2px solid var(--color-line);
-  }
-  .sommaire ol {
-    display: flex;
-    flex-direction: column;
-    gap: 0.375rem;
-    padding-left: 1.25rem;
-    list-style: decimal;
-    font-size: 0.9375rem;
-    color: var(--color-soft);
-  }
-  .sommaire a:hover {
-    color: var(--color-orange-txt);
-  }
-  .sommaire a:focus-visible,
-  .lie:focus-visible {
-    outline: 2px solid var(--color-orange-txt);
-    outline-offset: 3px;
-  }
-
-  /* Related guides. */
-  .lie {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    overflow: hidden;
-    border-radius: var(--radius-card);
-    border: 1px solid var(--color-line);
-    background: var(--color-surface);
-    transition: box-shadow 0.3s var(--ease-hatch);
-  }
-  .lie:hover {
-    box-shadow: var(--shadow-2);
-  }
-  .lie:hover b {
-    color: var(--color-orange-txt);
-  }
-  /* Tables: readable on desktop, scrolling sideways in their own frame on phones (never the page). */
+  /* Tables: rules between rows only, figures aligned, a scroll of their own on a phone. */
   .corps :global(table) {
     display: block;
     max-width: 100%;
-    margin: 1.5rem 0;
+    margin: 1.75rem 0;
     overflow-x: auto;
-    border: 1px solid var(--color-line);
-    border-radius: var(--radius-btn);
-    border-collapse: separate;
-    border-spacing: 0;
-    background: var(--color-surface);
-    font-size: 0.9375rem;
+    border-collapse: collapse;
+    font-size: var(--text-caption);
     line-height: 1.5;
     font-variant-numeric: tabular-nums;
   }
   .corps :global(th) {
-    border-bottom: 1px solid var(--color-line);
-    background: var(--color-surface-2);
-    padding: 0.7rem 1rem;
+    padding: 0 1.25rem 0.75rem 0;
+    border-bottom: 1px solid var(--color-ink);
     text-align: left;
     white-space: nowrap;
     font-family: var(--font-mono);
-    font-size: 0.75rem;
+    font-size: var(--text-source);
     font-weight: 400;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--color-soft);
   }
   .corps :global(td) {
-    min-width: 8rem;
+    min-width: 7rem;
+    padding: 0.75rem 1.25rem 0.75rem 0;
     border-bottom: 1px solid var(--color-line);
-    padding: 0.7rem 1rem;
     vertical-align: top;
     color: var(--color-ink);
   }
-  .corps :global(tr:last-child td) {
-    border-bottom: 0;
-  }
 
-  /* FAQ: native <details>, the « + » turns into « − » when open. */
   .question {
     border-bottom: 1px solid var(--color-line);
   }
@@ -533,33 +621,10 @@ const jsonLd = [
   .question[open] .plus::after {
     transform: rotate(0deg);
   }
-
-  /* The agents it names. */
-  .agent {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem 1.25rem 1rem 1rem;
-    border-radius: 20px;
-    background: var(--color-galet);
-    transition: box-shadow 0.3s var(--ease-hatch);
-  }
-  a.agent:hover {
-    box-shadow: inset 0 0 0 2px var(--color-orange);
-  }
-  .agent-av {
-    display: grid;
-    flex: none;
-    place-items: center;
-    width: 72px;
-    height: 72px;
-    border-radius: 16px;
-  }
   @media (prefers-reduced-motion: reduce) {
     .plus::before,
     .plus::after,
-    .agent,
-    .lie {
+    .sommaire a {
       transition: none;
     }
   }
