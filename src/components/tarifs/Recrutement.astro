@@ -1,0 +1,2128 @@
+---
+/**
+ * The pricing form as a hiring, in three acts (signature section). Act 1: one paper file per
+ * offer; hover one and a rubber stamp, seen from above, follows the pointer; click anywhere on it
+ * and it stamps « Embauché » there and ticks the file's hidden box (the real control, keyboards
+ * included). Act 2: the network, a town whose shops light up with the number of establishments,
+ * and Sparrow's pace of openings. Act 3: the team's badges and the contact details. Then the
+ * request leaves as a letter (Envoi) and the postcard leads to /demo, the answers handed over in
+ * sessionStorage to prefill the Cal.com booking (never in the URL, nothing is posted).
+ */
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import Button from '../ui/Button.astro';
+import Envoi from './Envoi.astro';
+import { section } from '../../content/section';
+import { insecable, routes, type Locale } from '../../i18n/ui';
+import peep from '../../assets/portraits/peep.jpg';
+import owl from '../../assets/portraits/owl.jpg';
+import jay from '../../assets/portraits/jay.jpg';
+import lark from '../../assets/portraits/lark.jpg';
+import finch from '../../assets/portraits/finch.jpg';
+import pecker from '../../assets/portraits/pecker.jpg';
+import sparrow from '../../assets/portraits/sparrow.jpg';
+import tamponImg from '../../assets/tarifs/tampon.png';
+import villeGris from '../../assets/tarifs/ville/gris.jpg';
+import ouv1 from '../../assets/tarifs/ouv-1.jpg';
+import ouv2 from '../../assets/tarifs/ouv-2.jpg';
+import ouv3 from '../../assets/tarifs/ouv-3.jpg';
+import ouv4 from '../../assets/tarifs/ouv-4.jpg';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const c = await section('tarifsFormulaire', locale);
+const t = c.recrutement;
+const demo = routes.demo[locale];
+const portraits = { peep, owl, jay, lark, finch, pecker, sparrow };
+type Id = keyof typeof portraits;
+const infos = Object.fromEntries(
+  (await getCollection('agents', (e) => e.id.startsWith(`${locale}/`))).map((e) => [
+    e.id.replace(`${locale}/`, ''),
+    e.data,
+  ]),
+) as Record<Id, { name: string; pitch: string }>;
+const agents = JSON.stringify(
+  (Object.keys(portraits) as Id[]).map((id) => ({
+    id,
+    nom: infos[id].name,
+    pitch: infos[id].pitch,
+    photo: portraits[id].src,
+  })),
+);
+/** Everything the script writes, in the page's language. */
+const textes = JSON.stringify({
+  locale: locale === 'fr' ? 'fr-FR' : 'en-GB',
+  demo,
+  titres: t.titres,
+  titreEnvoye: t.titreEnvoye,
+  tampons: t.tampons,
+  etablissements: t.etablissements,
+  barre: t.barre,
+  badges: t.badges,
+  envoi: c.envoi,
+  notes: c.notes,
+  socle: c.offres[0].agents.map((a) => a.id),
+});
+const liste = (n: string[]) =>
+  n.length > 1 ? `${n.slice(0, -1).join(', ')} ${t.et} ${n.at(-1)}` : n[0];
+// One file per offer, all built the same way. The core is the large one.
+const fiches = c.offres.map((o) => ({
+  id: o.id,
+  nom: o.nom,
+  tag: o.tag,
+  texte: o.id === 'socle' ? t.socleTexte : o.texte,
+  agents: o.agents.map((a) => ({ ...a, id: a.id as Id })),
+  case: t.embaucher.replace('{agents}', liste(o.agents.map((a) => a.nom))),
+}));
+// Two blocks: the core with its two add-ons, and Sparrow on its own.
+const blocs = [fiches.slice(0, 3), fiches.slice(3)];
+// The town of act 2: one render, greyed, and each shop cut out of the coloured render at its exact
+// place (box in % of the scene: left, top, width, height), nearest to the head office first.
+const boutiquesVille = Object.values(
+  import.meta.glob<{ default: ImageMetadata }>('../../assets/tarifs/ville/b*.png', { eager: true }),
+).map((m) => m.default);
+// prettier-ignore
+const placesVille = [[54.17, 23.35, 5.93, 16.51], [39.46, 23.58, 5.93, 16.51], [65.47, 6.84, 5.93, 16.51], [27.9, 7.45, 5.93, 16.51], [34.85, 30.57, 5.93, 16.13], [70.58, 13.75, 5.93, 16.51], [22.79, 14.44, 5.93, 16.51], [41.7, 40.86, 5.93, 16.51], [79.73, 0.84, 5.93, 16.51], [12.44, 1.08, 5.93, 16.51], [27.02, 41.01, 5.93, 16.51], [15.21, 25.27, 5.93, 16.51], [68.94, 43.63, 5.93, 16.51], [79.77, 26.5, 5.93, 16.51], [62.63, 55.07, 5.93, 16.51], [57.13, 61.29, 5.93, 16.51], [50.66, 71.97, 5.93, 16.51], [22.82, 66.82, 5.93, 16.51], [3.35, 42.32, 5.9, 16.44], [65.25, 72.27, 5.93, 16.51], [45.2, 79.65, 5.78, 16.51], [81.94, 61.67, 5.93, 16.51], [92.55, 44.09, 5.93, 16.51], [7.35, 68.82, 5.93, 16.51], [89.02, 71.51, 5.93, 16.51]];
+// Sparrow's question: one voxel picture per pace, from one opening to a whole town.
+const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, ouv4][k] }));
+---
+
+<div class="g" data-g data-agents={agents} data-textes={textes}>
+  <svg width="0" height="0" class="defs" aria-hidden="true">
+    <filter id="g-encre">
+      <feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" seed="7"></feTurbulence>
+      <feDisplacementMap in="SourceGraphic" scale="1.6"></feDisplacementMap>
+    </filter>
+  </svg>
+
+  <div class="tete">
+    <ol class="actes" aria-label={t.actesNom}>
+      {
+        t.actes.map((a, i) => (
+          <li data-acte={i + 1}>
+            <span>{String(i + 1).padStart(2, '0')}</span> {a}
+          </li>
+        ))
+      }
+    </ol>
+    <h3 class="font-display text-card font-semibold" data-titre>{t.titres[0]}</h3>
+  </div>
+
+  <!-- Act 1: four recruitment forms. Hover one: a rubber stamp follows the pointer. Click anywhere
+       on the form: it stamps « Embauché » there. A hidden box per form is the real control. -->
+  <div data-panneau="1" class="acte1">
+    <p class="texte consigne">{t.consigne}</p>
+    <div class="bureau">
+      {
+        blocs.map((bloc, i) => (
+          <div class:list={['bloc', i === 0 ? 'bloc-socle' : 'bloc-sparrow']}>
+            {bloc.map((f) => (
+              <div class:list={['pile', `pile-${f.id}`]}>
+                <article class="fiche" data-carte={f.id}>
+                  <span class="encres" data-encres aria-hidden="true" />
+                  <div class:list={['photos', f.agents.length > 1 && 'photos-equipe']}>
+                    {f.agents.map((a) => (
+                      <figure class="photo">
+                        <svg class="trombone trombone-dos" viewBox="0 0 20 56" aria-hidden="true">
+                          <path d="M14 9a5.5 5.5 0 0 0-11 0v38a7 7 0 0 0 14 0V26" />
+                        </svg>
+                        <span class="tirage">
+                          <video
+                            src={`/anim/${a.id}-geste.mp4`}
+                            poster={portraits[a.id].src}
+                            muted
+                            playsinline
+                            preload="none"
+                          />
+                        </span>
+                        <svg class="trombone trombone-face" viewBox="0 0 20 56" aria-hidden="true">
+                          <path d="M6 31v13a4 4 0 0 0 8 0V9a5.5 5.5 0 0 0-11 0" />
+                        </svg>
+                        {f.agents.length > 1 && (
+                          <figcaption>
+                            <b>{a.nom}</b>
+                            <span>{a.role}</span>
+                          </figcaption>
+                        )}
+                      </figure>
+                    ))}
+                  </div>
+                  <div class="titre">
+                    <h4 class="nom">{f.nom}</h4>
+                    <p class="metier">{f.tag}</p>
+                    {(f.id === 'finch' || f.id === 'pecker') && <p class="avec">{t.avecSocle}</p>}
+                  </div>
+                  <p class="texte">{f.texte}</p>
+                  <label class="sr-only">
+                    <input type="checkbox" data-case={f.id} />
+                    {f.case}
+                  </label>
+                </article>
+              </div>
+            ))}
+          </div>
+        ))
+      }
+    </div>
+  </div>
+
+  <!-- Act 2: the network on a sheet of paper. The name is painted on the head office's sign as
+       it is typed; each establishment drops a shop around it, tied to it by a line. Then, only if
+       Sparrow was hired, the pace of openings, picked by stamping one of four pictures. -->
+  <div data-panneau="2" hidden class="affectation">
+    <div class="plan">
+      <div class="plan-champs">
+        <label class="ligne ligne-nom"
+          ><span>{c.champs.enseigne.label}</span><input
+            data-champ="enseigne"
+            placeholder={`${t.exemple} ${c.champs.enseigne.placeholder}`}
+            autocomplete="organization"
+            required
+          /></label
+        >
+        <div class="ligne">
+          <span id="g-nb">{c.champs.etablissements.label}</span>
+          <div class="pas">
+            <button type="button" class="touche" data-pas="-1" aria-label={t.moins}>−</button>
+            <input
+              data-champ="etablissements"
+              type="number"
+              min="1"
+              max="999"
+              inputmode="numeric"
+              aria-labelledby="g-nb"
+            />
+            <button type="button" class="touche" data-pas="1" aria-label={t.plus}>+</button>
+          </div>
+        </div>
+      </div>
+      <!-- The town: every shop is already there, greyed. Each establishment lights one up, nearest
+           to the head office first, and an arc ties it to the head office. A shop can also be
+           clicked, on or off; the number follows. -->
+      <div class="scene" data-scene aria-hidden="true">
+        <Image src={villeGris} alt="" class="terrain" width={1440} densities={[1, 2]} />
+        <svg class="liens" data-liens viewBox="0 0 1440 592" preserveAspectRatio="none"></svg>
+        <span class="onde" data-onde></span>
+        {
+          placesVille.map(([x, y, l, h], k) => (
+            <button
+              type="button"
+              tabindex="-1"
+              class="lieu"
+              data-lieu={k}
+              style={`left:${x}%;top:${y}%;width:${l}%;height:${h}%`}
+            >
+              <Image src={boutiquesVille[k]} alt="" width={96} densities={[1, 2]} />
+            </button>
+          ))
+        }
+      </div>
+    </div>
+    <fieldset class="ouvertures" data-ouvertures hidden>
+      <legend class="question">{insecable(c.ouvertures.question)}</legend>
+      <div class="vignettes">
+        {
+          rythmes.map((r, k) => (
+            <div class="pile pile-ouv">
+              <label class="fiche vignette" data-carte={`vol-${k}`} data-vol>
+                <span class="encres" data-encres aria-hidden="true" />
+                <span class="photo">
+                  <svg class="trombone trombone-dos" viewBox="0 0 17 48" aria-hidden="true">
+                    <path d="M14 9a5.5 5.5 0 0 0-11 0v38a7 7 0 0 0 14 0V26" />
+                  </svg>
+                  <span class="tirage">
+                    <Image src={r.img} alt="" width={240} densities={[1, 2]} />
+                  </span>
+                  <svg class="trombone trombone-face" viewBox="0 0 17 48" aria-hidden="true">
+                    <path d="M6 31v13a4 4 0 0 0 8 0V9a5.5 5.5 0 0 0-11 0" />
+                  </svg>
+                </span>
+                <input type="radio" name="g-ouv" value={r.v} class="sr-only" />
+                <span class="valeur">{r.v}</span>
+              </label>
+            </div>
+          ))
+        }
+      </div>
+    </fieldset>
+  </div>
+
+  <!-- The stamp in the hand, seen from above, shared by steps 1 and 2 (outside the panels, so
+       hiding one never hides it). It trails the hand a little and sways; its shadow stays on the
+       paper under the pointer; on click it presses down onto the paper. -->
+  <div class="curseur" data-curseur aria-hidden="true">
+    <span class="c-ombre" data-ombre></span>
+    <span class="c-outil" data-outil>
+      <span class="c-levee" data-levee>
+        <Image src={tamponImg} alt="" width={84} densities={[1, 2]} loading="eager" />
+      </span>
+    </span>
+  </div>
+
+  <!-- Act 3 -->
+  <div data-panneau="3" hidden class="acte3">
+    <div class="champs champs-col">
+      {
+        (['nom', 'role', 'email', 'telephone'] as const).map((k) => (
+          <label class="ligne">
+            <span>{c.champs[k].label}</span>
+            <input
+              data-champ={k}
+              placeholder={`${t.exemple} ${c.champs[k].placeholder}`}
+              type={k === 'email' ? 'email' : k === 'telephone' ? 'tel' : 'text'}
+              autocomplete={
+                { nom: 'name', role: 'organization-title', email: 'email', telephone: 'tel' }[k]
+              }
+            />
+          </label>
+        ))
+      }
+    </div>
+    <div class="badges-zone">
+      <ul class="badges" data-badges></ul>
+      <p class="texte">{t.badges.texte}</p>
+    </div>
+  </div>
+
+  <!-- The sending: the request becomes a letter, an envelope, a postcard (see Envoi.astro). -->
+  <div class="envoi-cadre" data-envoi-cadre hidden><Envoi t={c.envoi} demo={demo} /></div>
+
+  <!-- The team bar: always in view at the bottom of the screen, it gathers the agents as they
+       are stamped and carries the way forward. -->
+  <div class="barre">
+    <button type="button" class="retour" data-retour hidden aria-label={t.barre.retour}>←</button>
+    <div class="equipe" aria-live="polite">
+      <span class="equipe-visages" data-equipe></span>
+      <span class="equipe-txt">
+        <b data-equipe-nb>{t.barre.vide}</b>
+        <span class="aide" data-aide>{t.barre.aide}</span>
+      </span>
+    </div>
+    <span data-suivant
+      ><Button type="button" variant="orange"><span data-l>{t.barre.suivant[0]}</span></Button
+      ></span
+    >
+    <span data-fin hidden><Button type="button" variant="orange">{t.barre.fin}</Button></span>
+  </div>
+</div>
+
+<script>
+  import { construire, jouer, pluriel, DUREE, ETAPES } from './envoi';
+  import type { TarifsFormulaire } from '../../content/schemas/tarifsFormulaire';
+  type Agent = { id: string; nom: string; photo: string; pitch: string };
+  type T = TarifsFormulaire['recrutement'];
+  type Textes = {
+    locale: string;
+    demo: string;
+    titres: T['titres'];
+    titreEnvoye: string;
+    tampons: T['tampons'];
+    etablissements: T['etablissements'];
+    barre: T['barre'];
+    badges: T['badges'];
+    envoi: TarifsFormulaire['envoi'];
+    notes: TarifsFormulaire['notes'];
+    socle: string[];
+  };
+  const OFFRES = ['socle', 'finch', 'pecker', 'sparrow'] as const;
+  const calme = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  for (const w of document.querySelectorAll<HTMLElement>('[data-g]')) {
+    const parId: Record<string, Agent> = Object.fromEntries(
+      (JSON.parse(w.dataset.agents!) as Agent[]).map((a) => [a.id, a]),
+    );
+    const T: Textes = JSON.parse(w.dataset.textes!);
+    const B = T.barre;
+    const MEMBRES: Record<string, string[]> = {
+      socle: T.socle,
+      finch: ['finch'],
+      pecker: ['pecker'],
+      sparrow: ['sparrow'],
+    };
+    const membres = () => OFFRES.filter((id) => recrues.has(id)).flatMap((id) => MEMBRES[id]);
+    const recrues = new Set<string>();
+    const q = <T extends Element = HTMLElement>(s: string) => w.querySelector<T>(s)!;
+    const val = (k: string) => q<HTMLInputElement>(`[data-champ="${k}"]`).value.trim();
+    const carte = (id: string) => q(`[data-carte="${id}"]`);
+
+    const repondre = (id: string) => {
+      if (calme) return;
+      carte(id)
+        .querySelectorAll<HTMLVideoElement>('.photos video')
+        .forEach((v, k) =>
+          setTimeout(
+            () => {
+              v.currentTime = 0;
+              v.play().catch(() => {});
+            },
+            200 + k * 180,
+          ),
+        );
+    };
+    const boite = (id: string) => q<HTMLInputElement>(`[data-case="${id}"]`);
+    const date = new Date().toLocaleDateString(T.locale, {
+      day: '2-digit',
+      month: '2-digit',
+      year: '2-digit',
+    });
+
+    // The print: lands where the stamp came down, or near the box when ticked from the keyboard.
+    type Pt = { x: number; y: number };
+    // The print: round, « Embauché » on a band across the circle, the date and « Recrutement »
+    // along the rim. Its angle changes with every stroke, within a believable range.
+    const encre = (id: string, mot: string, haut: string) =>
+      `<svg viewBox="0 0 100 100"><defs><path id="arc-h-${id}" d="M17 50a33 33 0 0 1 66 0"/><path id="arc-b-${id}" d="M10 50a40 40 0 0 0 80 0"/></defs><g filter="url(#g-encre)"><circle cx="50" cy="50" r="47" class="e-ring"/><circle cx="50" cy="50" r="42" class="e-ring e-fin"/><text class="e-bord"><textPath href="#arc-h-${id}" startOffset="50%" text-anchor="middle">${haut}</textPath></text><text class="e-bord"><textPath href="#arc-b-${id}" startOffset="50%" text-anchor="middle">${date}</textPath></text><rect x="6" y="39" width="88" height="22" rx="2" class="e-bande"/><text x="50" y="55" text-anchor="middle" class="e-mot">${mot}</text></g></svg>`;
+    const imprimer = (id: string, ou: Pt | null, t = 96) => {
+      const f = carte(id);
+      const zone = f.querySelector('[data-encres]')!;
+      zone.querySelector('.empreinte')?.remove();
+      const p = ou ?? { x: f.offsetWidth - t * 0.7, y: f.offsetHeight - t * 0.65 };
+      const e = document.createElement('span');
+      e.className = 'empreinte';
+      e.style.cssText = `--t:${t}px;left:${p.x}px;top:${p.y}px;--r:${Math.round(Math.random() * 30 - 15)}deg`;
+      e.innerHTML = encre(
+        id,
+        id.startsWith('vol') ? T.tampons.retenu : T.tampons.embauche,
+        T.tampons.bord,
+      );
+      zone.append(e);
+    };
+    const effacer = (id: string) => {
+      const e = carte(id).querySelector<HTMLElement>('.empreinte');
+      if (!e) return;
+      e.classList.add('part');
+      setTimeout(() => e.remove(), calme ? 0 : 250);
+    };
+    // The bar: one face per hired agent, in hiring order, popping in as they are stamped.
+    const visages = q('[data-equipe]');
+    const aide = q('[data-aide]');
+    const equipe = () => {
+      const ids = membres();
+      const deja = new Set([...visages.children].map((e) => (e as HTMLElement).dataset.id));
+      [...visages.children].forEach((e) => {
+        if (!ids.includes((e as HTMLElement).dataset.id!)) e.remove();
+      });
+      ids.forEach((id, k) => {
+        if (deja.has(id)) return;
+        const img = document.createElement('img');
+        img.src = parId[id].photo;
+        img.alt = '';
+        img.dataset.id = id;
+        img.style.setProperty('--k', String(k));
+        visages.append(img);
+      });
+      [...visages.children]
+        .sort(
+          (a, b) =>
+            ids.indexOf((a as HTMLElement).dataset.id!) -
+            ids.indexOf((b as HTMLElement).dataset.id!),
+        )
+        .forEach((e) => visages.append(e));
+      const n = ids.length;
+      const nb = q('[data-equipe-nb]');
+      if (n) {
+        const long = document.createElement('span');
+        long.className = 'long';
+        long.textContent = ` ${pluriel(B.embauches, n)}`;
+        nb.replaceChildren(pluriel(B.agents, n), long);
+      } else nb.textContent = B.vide;
+      aide.textContent = n ? ids.map((id) => parId[id].nom).join(', ') : B.aide;
+    };
+    const rendre = () => {
+      for (const id of Object.keys(MEMBRES)) {
+        boite(id).checked = recrues.has(id);
+        carte(id).classList.toggle('recrute', recrues.has(id));
+      }
+      equipe();
+    };
+
+    // The stamp that follows the pointer (fine pointers only, never with reduced motion).
+    const curseur = q('[data-curseur]');
+    const suivre = matchMedia('(pointer: fine)').matches && !calme;
+    let ou: Pt | null = null;
+    // Inertia, no distortion: the shadow sits on the paper, right under the pointer; the stamp is
+    // held above it and trails the hand a little, so moving fast opens a gap between the two (the
+    // parallax of its height) and the stamp sways slightly, like a hand-held object.
+    const outil = q('[data-outil]');
+    let px = 0;
+    let py = 0;
+    let sx = 0;
+    let sy = 0;
+    let rot = 0;
+    let boucle = 0;
+    const suivreMain = () => {
+      const dx = px - sx;
+      const dy = py - sy;
+      sx += dx * 0.32;
+      sy += dy * 0.32;
+      rot += (Math.max(-7, Math.min(7, dx * 0.35)) - rot) * 0.2;
+      outil.style.translate = `${sx - px}px ${sy - py}px`;
+      outil.style.rotate = `${rot}deg`;
+      boucle =
+        Math.abs(dx) + Math.abs(dy) + Math.abs(rot) > 0.1 ? requestAnimationFrame(suivreMain) : 0;
+    };
+    const bouger = (e: PointerEvent) => {
+      px = e.clientX;
+      py = e.clientY;
+      curseur.style.translate = `${px}px ${py}px`;
+      if (!boucle) boucle = requestAnimationFrame(suivreMain);
+    };
+    // Press: down onto the paper (smaller, seen from above), a squash, then back up.
+    const ombre = q('[data-ombre]');
+    const levee = q('[data-levee]');
+    const appuyer = () => {
+      const o = { duration: 460, easing: 'cubic-bezier(0.45, 0, 0.25, 1)' };
+      levee.animate(
+        [
+          { scale: '1' },
+          { scale: '0.82', offset: 0.32 },
+          { scale: '0.84 0.8', offset: 0.42 },
+          { scale: '0.83', offset: 0.55 },
+          { scale: '1' },
+        ],
+        o,
+      );
+      ombre.animate(
+        [
+          { opacity: 0.55, scale: '1', filter: 'blur(9px)' },
+          { opacity: 0.9, scale: '0.78', filter: 'blur(2px)', offset: 0.35 },
+          { opacity: 0.9, scale: '0.78', filter: 'blur(2px)', offset: 0.55 },
+          { opacity: 0.55, scale: '1', filter: 'blur(9px)' },
+        ],
+        o,
+      );
+    };
+    // Sparrow's pace (act 2) is stamped too: one picture per pace. Stamping one picks it; stamping
+    // it again lifts the print; another one moves the print there.
+    const cases = [...w.querySelectorAll<HTMLElement>('[data-vol]')];
+    const radio = (c: HTMLElement) => c.querySelector('input')!;
+    const viderVolume = () =>
+      cases.forEach((c) => {
+        c.classList.remove('recrute');
+        radio(c).checked = false;
+        effacer(c.dataset.carte!);
+      });
+    const volume = (cell: HTMLElement, pt: Pt | null) => {
+      if (cell.classList.contains('recrute')) return viderVolume();
+      viderVolume();
+      radio(cell).checked = true;
+      cell.classList.add('recrute');
+      q('[data-ouvertures]').classList.remove('manque');
+      if (pt && suivre) appuyer();
+      // The print lands beside the pace, never on the picture, so it stays readable.
+      const ici = { x: cell.offsetWidth - 46, y: cell.offsetHeight - 30 };
+      setTimeout(() => imprimer(cell.dataset.carte!, ici, 72), pt && suivre ? 150 : 0);
+    };
+    cases.forEach((cell) => {
+      cell.addEventListener('click', (e) => {
+        e.preventDefault();
+        const r = cell.getBoundingClientRect();
+        const pt = (e as PointerEvent).pointerType
+          ? { x: e.clientX - r.left, y: e.clientY - r.top }
+          : null;
+        volume(cell, pt);
+      });
+      // Arrow keys move the choice: the radio changes first, the print follows.
+      radio(cell).addEventListener('change', () => {
+        if (!cell.classList.contains('recrute')) volume(cell, null);
+      });
+    });
+    const suivreSur = (f: HTMLElement) => {
+      f.classList.add('suivie');
+      f.addEventListener('pointermove', (e) => {
+        const libre = !!(e.target as Element).closest('[data-libre]');
+        if (!curseur.classList.contains('vu')) {
+          sx = e.clientX;
+          sy = e.clientY;
+        }
+        curseur.classList.toggle('vu', !libre);
+        f.classList.toggle('libre', libre);
+        bouger(e);
+      });
+      f.addEventListener('pointerleave', () => curseur.classList.remove('vu'));
+    };
+    if (suivre) cases.forEach(suivreSur);
+    for (const id of Object.keys(MEMBRES)) {
+      const f = carte(id);
+      const b = boite(id);
+      if (suivre) suivreSur(f);
+      f.addEventListener('click', (e) => {
+        const t = e.target as Element;
+        if (t.closest('[data-libre]')) return;
+        const r = f.getBoundingClientRect();
+        // A keyboard « click » has no pointer type: the print then goes to its default spot.
+        const pt = (e as PointerEvent).pointerType
+          ? { x: e.clientX - r.left, y: e.clientY - r.top }
+          : null;
+        if (t === b) {
+          ou ??= pt;
+          return;
+        }
+        ou = pt;
+        if (t.closest('label')) return; // the label forwards the click to its box
+        b.click();
+      });
+      b.addEventListener('change', () => {
+        const ici = ou;
+        ou = null;
+        if (suivre && ici) {
+          appuyer();
+        }
+        // The rules: a stamp always reads « Embauché », no form is ever locked. Finch and Pecker
+        // need the socle: hiring one brings it in, removing the socle takes them with it.
+        // Removing Finch or Pecker never touches the socle.
+        if (!b.checked) {
+          const lies = id === 'socle' ? ['finch', 'pecker'].filter((x) => recrues.has(x)) : [];
+          const partis = [id, ...lies];
+          partis.forEach((x) => {
+            recrues.delete(x);
+            effacer(x);
+          });
+          if (id === 'sparrow') viderVolume();
+          rendre();
+          return;
+        }
+        const avecSocle = (id === 'finch' || id === 'pecker') && !recrues.has('socle');
+        recrues.add(id);
+        setTimeout(() => imprimer(id, ici), suivre && ici ? 150 : 0);
+        repondre(id);
+        if (avecSocle) {
+          recrues.add('socle');
+          // The second stroke lands just after the first, so the eye follows it.
+          setTimeout(() => imprimer('socle', null), calme ? 0 : 550);
+          repondre('socle');
+        }
+        rendre();
+      });
+    }
+    // Act 2: the town. All the shops are in the render, greyed; « n establishments » lights the n
+    // nearest to the head office. Clicking a shop lights it or puts it out, and the number follows.
+    // Past the number of shops in the town, all are lit and only the number goes on.
+    const champNb = q<HTMLInputElement>('[data-champ="etablissements"]');
+    const liens = q('[data-liens]');
+    const lieux = [...w.querySelectorAll<HTMLButtonElement>('[data-lieu]')];
+    const NS = 'http://www.w3.org/2000/svg';
+    const SIEGE = { x: 715, y: 42 }; // the head office's roof, in the render's units (1440 × 592)
+    const allumes: number[] = []; // in lighting order, so « − » puts out the last one lit
+    // A link: a faint arc from the head office to the shop's roof, with a spark kept for the pulse.
+    const lien = (k: number) => {
+      const r = lieux[k];
+      const x = ((parseFloat(r.style.left) + parseFloat(r.style.width) / 2) / 100) * 1440;
+      const y = ((parseFloat(r.style.top) + parseFloat(r.style.height) * 0.28) / 100) * 592;
+      const cx = (SIEGE.x + x) / 2;
+      // Lifted over the roofs, but kept inside the frame (the head office sits near its top).
+      const cy = Math.max(6, (SIEGE.y + y) / 2 - 40 - Math.abs(x - SIEGE.x) * 0.08);
+      const g = document.createElementNS(NS, 'g');
+      g.dataset.lien = String(k);
+      for (const c of ['fil', 'etincelle']) {
+        const p = document.createElementNS(NS, 'path');
+        p.setAttribute('d', `M${SIEGE.x} ${SIEGE.y} Q${cx} ${cy} ${x} ${y}`);
+        p.setAttribute('pathLength', '1');
+        p.setAttribute('class', c);
+        g.append(p);
+      }
+      return g;
+    };
+    const allumer = (k: number, on: boolean) => {
+      const r = lieux[k];
+      r.classList.toggle('allume', on);
+      if (on) {
+        liens.append(lien(k));
+        allumes.push(k);
+      } else {
+        allumes.splice(allumes.indexOf(k), 1);
+        liens.querySelector(`[data-lien="${k}"]`)?.remove();
+      }
+    };
+    // The pulse: on every change, a wave leaves the head office and a spark runs every link,
+    // the far shops reached last. It plays even when no shop is added.
+    const onde = q('[data-onde]');
+    const pulser = () => {
+      if (calme) return;
+      onde.getAnimations().forEach((a) => a.cancel());
+      onde.animate(
+        [
+          { scale: 0.2, opacity: 0.5 },
+          { scale: 1.6, opacity: 0 },
+        ],
+        { duration: 1100, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)' },
+      );
+      liens.querySelectorAll<SVGPathElement>('.etincelle').forEach((p) => {
+        p.getAnimations().forEach((a) => a.cancel());
+        p.animate(
+          [
+            { strokeDashoffset: 0.08, opacity: 0 },
+            { opacity: 0.55, offset: 0.2 },
+            { opacity: 0.55, offset: 0.75 },
+            { strokeDashoffset: -1, opacity: 0 },
+          ],
+          { duration: 900, delay: 120 + p.getTotalLength() * 0.35, easing: 'ease-in-out' },
+        );
+      });
+    };
+    // Bring the lit shops to n: add the nearest unlit ones, or put out the last lit.
+    const regler = (n: number) => {
+      const cible = Math.min(n, lieux.length);
+      let k = 0;
+      while (allumes.length < cible) {
+        while (allumes.includes(k)) k++;
+        allumer(k, true);
+      }
+      while (allumes.length > cible) allumer(allumes.at(-1)!, false);
+    };
+    const nombre = () => Math.max(0, Math.min(999, Math.floor(Number(champNb.value) || 0)));
+    champNb.addEventListener('input', () => {
+      regler(nombre());
+      pulser();
+    });
+    w.querySelectorAll<HTMLButtonElement>('[data-pas]').forEach((b) =>
+      b.addEventListener('click', () => {
+        champNb.value = String(Math.max(1, Math.min(999, nombre() + Number(b.dataset.pas))));
+        regler(nombre());
+        pulser();
+      }),
+    );
+    lieux.forEach((r, k) =>
+      r.addEventListener('click', () => {
+        const on = !r.classList.contains('allume');
+        allumer(k, on);
+        // Past the town's size, a click changes which shops are lit, not the number.
+        const n = nombre();
+        if (n <= lieux.length || !on) champNb.value = String(allumes.length || '');
+        pulser();
+      }),
+    );
+
+    // Act 3: the badges.
+    const badges = q('[data-badges]');
+    const distribuer = () => {
+      const ids = membres();
+      badges.replaceChildren(
+        ...ids.map((id, k) => {
+          const a = parId[id];
+          const li = document.createElement('li');
+          li.className = 'badge';
+          li.style.setProperty('--k', String(k));
+          li.innerHTML = `<button type="button" class="badge-carte" aria-label="${T.badges.aide.replace('{nom}', a.nom)}">
+            <span class="face recto"><span class="badge-fente"></span><img src="${a.photo}" alt=""><b>${a.nom}</b><span class="badge-metier">${T.badges.postes[id as keyof T['badges']['postes']]}</span><span class="badge-ens" data-b-ens></span></span>
+            <span class="face verso"><span class="badge-fente"></span><span class="badge-filet"></span><span class="badge-pitch">${a.pitch}</span><span class="badge-pied"><span data-b-ens></span><span data-b-nb></span></span></span>
+          </button><span class="laniere" aria-hidden="true"></span>`;
+          const carteB = li.querySelector('button')!;
+          // Touch screens have no hover: a tap turns the badge over.
+          carteB.addEventListener('click', () => {
+            if (!survol) li.classList.toggle('retourne');
+          });
+          // It swings on its lanyard when the pointer reaches it.
+          li.addEventListener('pointerenter', () => {
+            if (calme) return;
+            li.getAnimations().forEach((x) => x.cancel());
+            li.animate(
+              [0, 4, -3, 1.5, -0.6, 0].map((d) => ({
+                rotate: `${d}deg`,
+                easing: 'cubic-bezier(0.45, 0, 0.55, 1)',
+              })),
+              { duration: 1100 },
+            );
+          });
+          return li;
+        }),
+      );
+      signer();
+    };
+    const survol = matchMedia('(hover: hover)').matches;
+    // What the badges carry: the enseigne, the network's size on the back, and the person who
+    // fills the form, written live as « Responsable ».
+    const signer = () => {
+      const ens = val('enseigne') || T.badges.enseigneVide;
+      const nb = nombre();
+      badges.querySelectorAll('[data-b-ens]').forEach((e) => (e.textContent = ens));
+      badges
+        .querySelectorAll('[data-b-nb]')
+        .forEach((e) => (e.textContent = nb ? pluriel(T.etablissements, nb) : ''));
+    };
+
+    // Steps.
+    let n = 1;
+    const aller = (k: number) => {
+      n = k;
+      aide.classList.remove('alerte');
+      equipe(); // the bar's line back to the team, no stale « Il manque »
+      if (n < 3) q('[data-l]').textContent = B.suivant[n - 1];
+      w.querySelectorAll<HTMLElement>('[data-panneau]').forEach(
+        (p) => (p.hidden = p.dataset.panneau !== String(n)),
+      );
+      w.querySelectorAll<HTMLElement>('[data-acte]').forEach((s) => {
+        s.classList.toggle('actif', Number(s.dataset.acte) === n);
+        s.classList.toggle('fait', Number(s.dataset.acte) < n);
+      });
+      q('[data-titre]').textContent = T.titres[n - 1];
+      q('[data-retour]').hidden = n === 1;
+      q('[data-suivant]').hidden = n === 3;
+      q('[data-fin]').hidden = n !== 3;
+      (q('[data-ouvertures]') as HTMLElement).hidden = !recrues.has('sparrow');
+      if (n === 3) distribuer();
+    };
+    // Refused: the old « wrong password » shake, but springy: a fast swing that dies down in a few
+    // smooth swings, each eased, the missing fields one after the other.
+    const refuser = (e: Element, i = 0) => {
+      if (calme) return;
+      const k = (x: number, r = 0) => ({
+        transform: `translateX(${x}px) rotate(${r}deg)`,
+        easing: 'cubic-bezier(0.45, 0, 0.55, 1)',
+      });
+      e.getAnimations().forEach((a) => a.cancel());
+      e.animate([k(0), k(-11, -0.5), k(9, 0.4), k(-6, -0.2), k(3.5), k(-1.5), k(0)], {
+        duration: 680,
+        delay: i * 70,
+      });
+    };
+    q('[data-suivant]').addEventListener('click', () => {
+      if (n === 1 && !recrues.size) {
+        aide.textContent = B.alerte;
+        aide.classList.add('alerte');
+        return;
+      }
+      if (n === 2) {
+        // Step 2 needs the name, the number, and Sparrow's pace if Sparrow was hired.
+        const nom = q('[data-champ="enseigne"]').closest('.ligne')!;
+        const nb = q('[data-champ="etablissements"]').closest('.ligne')!;
+        const ouv = q('[data-ouvertures]');
+        const manques: [Element, boolean][] = [
+          [nom, !val('enseigne')],
+          [nb, !(Number(val('etablissements')) > 0)],
+          [ouv, recrues.has('sparrow') && !w.querySelector('input[name="g-ouv"]:checked')],
+        ];
+        let i = 0;
+        manques.forEach(([e, m]) => {
+          e.classList.remove('manque');
+          if (!m) return;
+          void (e as HTMLElement).offsetWidth; // restart the ring's flash
+          e.classList.add('manque');
+          // The field itself shakes (the number with its − and +); the four pictures, each its own.
+          const champ = e.querySelector('input:not([type="radio"])');
+          if (champ) refuser(champ.closest('.pas') ?? champ, i++);
+          else e.querySelectorAll('.pile-ouv').forEach((v) => refuser(v, i++));
+        });
+        const quoi = [
+          manques[0][1] && B.champs.enseigne,
+          manques[1][1] && B.champs.etablissements,
+          manques[2][1] && B.champs.ouvertures,
+        ].filter(Boolean) as string[];
+        if (quoi.length) {
+          aide.textContent = `${B.manque} ${quoi.join(', ')}.`;
+          aide.classList.add('alerte');
+          return;
+        }
+      }
+      aller(n + 1);
+    });
+    // A field is no longer missing once filled.
+    w.querySelectorAll<HTMLInputElement>(
+      '[data-champ="enseigne"], [data-champ="etablissements"]',
+    ).forEach((i) =>
+      i.addEventListener('input', () => i.closest('.ligne')!.classList.remove('manque')),
+    );
+    w.querySelectorAll('[data-pas]').forEach((b) =>
+      b.addEventListener('click', () => b.closest('.ligne')!.classList.remove('manque')),
+    );
+    w.querySelectorAll('input[name="g-ouv"]').forEach((i) =>
+      i.addEventListener('change', () => q('[data-ouvertures]').classList.remove('manque')),
+    );
+    q('[data-retour]').addEventListener('click', () => aller(n - 1));
+    // « Réserver une démo »: all four fields are needed (a valid email, a phone of 8 digits or
+    // more); then the request leaves, and the postcard leads to the prefilled booking.
+    q('[data-fin]').addEventListener('click', () => {
+      const ligne = (k: string) => q(`[data-champ="${k}"]`).closest('.ligne')!;
+      const manques: [Element, boolean, string][] = [
+        [ligne('nom'), !val('nom'), B.champs.nom],
+        [ligne('role'), !val('role'), B.champs.role],
+        [ligne('email'), !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(val('email')), B.champs.email],
+        [ligne('telephone'), val('telephone').replace(/\D/g, '').length < 8, B.champs.telephone],
+      ];
+      let i = 0;
+      manques.forEach(([e, m]) => {
+        e.classList.remove('manque');
+        if (!m) return;
+        void (e as HTMLElement).offsetWidth;
+        e.classList.add('manque');
+        refuser(e.querySelector('input')!, i++);
+      });
+      const quoi = manques.filter(([, m]) => m).map(([, , t]) => t);
+      if (quoi.length) {
+        aide.textContent = `${B.manque} ${quoi.join(', ')}.`;
+        aide.classList.add('alerte');
+        return;
+      }
+      aide.classList.remove('alerte');
+      transmettre();
+      envoyer();
+    });
+    // The sending: the scene (envoi.ts) played once, in place of the form.
+    const cadreEnvoi = q('[data-envoi-cadre]');
+    // The answers for the booking page: name and email prefill Cal.com, the rest goes in its
+    // notes, in the page's language. Personal data stays in this tab's sessionStorage, never in
+    // the URL; /demo reads it once and clears it.
+    const transmettre = () => {
+      const N = T.notes;
+      const offres = OFFRES.filter((id) => recrues.has(id)).map((id) =>
+        id === 'socle' ? N.socle : parId[id].nom,
+      );
+      const ouv = w.querySelector<HTMLInputElement>('input[name="g-ouv"]:checked');
+      const lignes = [`${N.agents} ${offres.join(', ')}`];
+      if (recrues.has('sparrow') && ouv) lignes.push(`${N.ouvertures} ${ouv.value}`);
+      lignes.push(
+        `${N.enseigne} ${val('enseigne')}`,
+        `${N.etablissements} ${nombre()}`,
+        `${N.role} ${val('role')}`,
+        `${N.telephone} ${val('telephone')}`,
+      );
+      try {
+        sessionStorage.setItem(
+          'hatch-demo',
+          JSON.stringify({ name: val('nom'), email: val('email'), notes: lignes.join('\n') }),
+        );
+      } catch {
+        // Storage unavailable (private mode, blocked): the booking page simply starts empty.
+      }
+    };
+    const envoyer = async () => {
+      const ids = membres();
+      const acte = q('[data-panneau="3"]');
+      q('[data-retour]').hidden = true;
+      q('[data-fin]').hidden = true;
+      aide.textContent = B.envoi;
+      if (!calme)
+        await acte.animate([{ opacity: 1 }, { opacity: 0, scale: 0.98 }], {
+          duration: 250,
+          fill: 'forwards',
+        }).finished;
+      acte.hidden = true;
+      cadreEnvoi.hidden = false;
+      const { regler } = construire(cadreEnvoi.querySelector('[data-envoi]')!, {
+        date,
+        photos: ids.map((id) => parId[id].photo),
+        noms: ids.map((id) => parId[id].nom),
+        enseigne: val('enseigne'),
+        etablissements: nombre(),
+        nom: val('nom'),
+        role: val('role'),
+        email: val('email'),
+        telephone: val('telephone'),
+        textes: {
+          etablissements: T.etablissements,
+          merci: T.envoi.merci,
+          tampon: T.envoi.tampon,
+          reponse: T.envoi.reponse,
+        },
+      });
+      // The form was taller: bring the stage into view if it ended up above the screen.
+      if (cadreEnvoi.getBoundingClientRect().top < 0)
+        cadreEnvoi.scrollIntoView({ block: 'center', behavior: calme ? 'auto' : 'smooth' });
+      const fini = () => {
+        aide.textContent = B.fini;
+        q('[data-titre]').textContent = T.titreEnvoye;
+      };
+      if (calme) {
+        regler(DUREE);
+        fini();
+        return;
+      }
+      const frappe = ETAPES.find((e) => e.id === 'frappe')!.a;
+      await jouer(regler, (ms) => {
+        if (ms >= frappe && aide.textContent === B.envoi) aide.textContent = B.envoye;
+      });
+      fini();
+    };
+    // Once every missing field is filled, the bar goes back to the team.
+    w.querySelectorAll<HTMLInputElement>('.acte3 input').forEach((i) =>
+      i.addEventListener('input', () => {
+        i.closest('.ligne')!.classList.remove('manque');
+        if (aide.classList.contains('alerte') && !w.querySelector('.acte3 .manque')) {
+          aide.classList.remove('alerte');
+          equipe();
+        }
+      }),
+    );
+    aller(1);
+  }
+</script>
+
+<style>
+  /* exception: throwaway prototype (variant G of /_choix). Modern skeuomorphism: flat cards, and a
+     few realistic objects (the stamp, the shops, the badges) with soft relief. */
+  .g {
+    --encre: var(--color-orange);
+    --ombre: color-mix(in srgb, var(--color-ink) 14%, transparent);
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+  .defs {
+    position: absolute;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  .texte {
+    font-size: var(--text-caption);
+    line-height: 1.45;
+    color: var(--color-soft);
+  }
+  .tete {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .actes {
+    display: flex;
+    gap: 24px;
+    font-size: var(--text-caption);
+    font-weight: 600;
+    color: var(--color-muted);
+  }
+  .actes li {
+    position: relative;
+    padding-bottom: 8px;
+    transition: color 0.3s;
+  }
+  .actes li span {
+    font: 400 var(--text-source) / 1 var(--font-mono);
+    margin-right: 4px;
+  }
+  .actes li::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--color-orange);
+    scale: 0 1;
+    transform-origin: left;
+    transition: scale 0.4s var(--ease-hatch);
+  }
+  .actes li.actif,
+  .actes li.fait {
+    color: var(--color-ink);
+  }
+  .actes li.actif::after {
+    scale: 1 1;
+  }
+
+  /* Act 1: the forms. White paper, like the panel they rest on, set apart by a hairline and a soft
+     shadow; a second sheet peeks under each one. The socle spans two columns, its two add-ons sit
+     under it, Sparrow stands apart on the right. */
+  .acte1 {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .consigne {
+    margin-top: -18px;
+  }
+  /* Two blocks on a light tray each: the socle and its add-ons, then Sparrow. Everything is laid
+     out flat and wide so the whole step fits on one screen. */
+  .bureau {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .bloc {
+    padding: 30px 20px 20px;
+    border-radius: var(--radius-card);
+    corner-shape: squircle;
+    background: var(--color-cream);
+  }
+  .bloc-socle {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      'socle socle'
+      'finch pecker';
+    align-items: stretch;
+    gap: 34px 16px;
+  }
+  .pile-socle {
+    grid-area: socle;
+  }
+  .pile-finch {
+    grid-area: finch;
+  }
+  .pile-pecker {
+    grid-area: pecker;
+  }
+  .pile .fiche {
+    height: 100%;
+    padding: 20px 22px;
+  }
+  /* The socle: its name on the left, its four agents pinned along the top on the right. */
+  .pile-socle .fiche {
+    display: grid;
+    grid-template-columns: minmax(0, 13rem) minmax(0, 1fr);
+    grid-template-areas:
+      'titre photos'
+      'texte photos';
+    align-content: start;
+    column-gap: 24px;
+    row-gap: 12px;
+  }
+  .pile-socle .titre {
+    grid-area: titre;
+  }
+  .pile-socle .fiche .texte {
+    grid-area: texte;
+    font-size: var(--text-caption);
+    line-height: 1.45;
+  }
+  .pile-socle .photos {
+    grid-area: photos;
+  }
+  .pile-socle .tirage {
+    width: 100%;
+    max-width: 72px;
+  }
+  /* The others: photo on the left, name and job beside it. */
+  .pile:not(.pile-socle) .fiche {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-content: start;
+    column-gap: 18px;
+    row-gap: 6px;
+  }
+  .pile:not(.pile-socle) .photos {
+    grid-row: span 2;
+  }
+  .pile:not(.pile-socle) .tirage {
+    width: 72px;
+  }
+  .pile:not(.pile-socle) .texte {
+    font-size: var(--text-caption);
+    line-height: 1.45;
+  }
+
+  /* Each card is its own stacking context, so the back of a clip goes behind this card only. */
+  .pile {
+    position: relative;
+    isolation: isolate;
+  }
+  /* The prints live in their own layer, clipped by the card; the clips may stick out of it. */
+  .encres {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    mix-blend-mode: multiply;
+    overflow: clip;
+    border-radius: inherit;
+    corner-shape: squircle;
+    pointer-events: none;
+  }
+  /* The cards of the original form: soft beige, a hairline, a squircle; hired, peach and orange. */
+  .fiche {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 24px;
+    border-radius: var(--radius-card);
+    corner-shape: squircle;
+    background: var(--color-surface-2);
+    box-shadow: inset 0 0 0 1px var(--color-line);
+    cursor: pointer;
+    transition:
+      box-shadow 0.2s,
+      background 0.2s;
+  }
+  .fiche:hover {
+    box-shadow: inset 0 0 0 1px var(--color-stone);
+  }
+  .fiche.recrute {
+    background: var(--color-peach-2);
+    box-shadow: inset 0 0 0 2px var(--color-orange);
+  }
+  .fiche:has(input[type='checkbox']:focus-visible) {
+    outline: 3px solid var(--color-orange-txt);
+    outline-offset: 3px;
+  }
+  .fiche.suivie {
+    cursor: none;
+  }
+  .fiche.suivie.libre {
+    cursor: auto;
+  }
+  /* The employee file: a small mono label, ID photos held by a paperclip, the name, the job. */
+  .titre {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .metier {
+    font: 400 var(--text-source) / 1.3 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-orange-txt);
+  }
+  .photos {
+    position: relative;
+    display: flex;
+    align-self: flex-start;
+    gap: 14px;
+    margin: -10px 0 0;
+  }
+  .photos-equipe {
+    align-self: stretch;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .photo {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+  }
+  .tirage {
+    display: block;
+    width: 88px;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border: 3px solid var(--color-surface);
+    border-radius: 4px;
+    background: var(--color-cream-2);
+    box-shadow:
+      0 1px 2px var(--ombre),
+      0 6px 14px -8px color-mix(in srgb, var(--color-ink) 35%, transparent);
+    rotate: -2.5deg;
+  }
+  .photos-equipe .tirage {
+    width: 100%;
+    max-width: 88px;
+  }
+  .photo:nth-child(2n) .tirage {
+    rotate: 1.8deg;
+  }
+  .photo:nth-child(3) .tirage {
+    rotate: -1deg;
+  }
+  .tirage video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(0.7);
+    transition: filter 0.4s;
+  }
+  .recrute .tirage video {
+    filter: none;
+  }
+  .photo figcaption {
+    display: flex;
+    flex-direction: column;
+    font-size: var(--text-caption);
+    line-height: 1.3;
+    color: var(--color-soft);
+  }
+  .photo figcaption b {
+    font: 600 var(--text-body) / 1.2 var(--font-display);
+    color: var(--color-ink);
+  }
+  /* A real clip, pinning each photo to the card's top edge: the inner tongue runs in front of
+     the photo, the outer loop behind the card, so only its top shows above the edge. */
+  .trombone {
+    position: absolute;
+    top: -26px;
+    left: 16px;
+    width: 17px;
+    height: 48px;
+    rotate: 4deg;
+    overflow: visible;
+    fill: none;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+  }
+  .trombone-dos {
+    z-index: -1;
+    stroke: color-mix(in srgb, var(--color-muted) 75%, var(--color-ink));
+  }
+  .trombone-face {
+    z-index: 1;
+    stroke: var(--color-muted);
+    filter: drop-shadow(1px 2px 1px color-mix(in srgb, var(--color-ink) 30%, transparent));
+  }
+  .photo:nth-child(2) .trombone {
+    left: 46px;
+    rotate: -5deg;
+  }
+  .photo:nth-child(3) .trombone {
+    left: 24px;
+    rotate: 7deg;
+  }
+  .photo:nth-child(4) .trombone {
+    left: 50px;
+    rotate: -3deg;
+  }
+  .nom {
+    font: 600 var(--text-card) / 1.2 var(--font-display);
+    color: var(--color-ink);
+  }
+  .fiche .texte {
+    font-size: var(--text-body);
+    line-height: 1.5;
+  }
+  .pile-socle .texte {
+    max-width: 34rem;
+  }
+  /* What Finch and Pecker come with, written where the need is. */
+  .avec {
+    margin-top: 2px;
+    font: var(--text-source) / 1.4 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-soft);
+  }
+  /* The print, in ink, where the stamp came down. */
+  .g :global(.empreinte) {
+    position: absolute;
+    width: var(--t);
+    height: var(--t);
+    margin: calc(var(--t) / -2) 0 0 calc(var(--t) / -2);
+    color: var(--encre);
+    opacity: 0.9;
+    rotate: var(--r);
+    pointer-events: none;
+    animation: pose 0.22s cubic-bezier(0.2, 1.6, 0.5, 1) both;
+  }
+  .g :global(.empreinte.part) {
+    animation: part 0.25s ease-in both;
+  }
+  @keyframes pose {
+    from {
+      opacity: 0;
+      scale: 1.15;
+    }
+  }
+  @keyframes part {
+    to {
+      opacity: 0;
+      scale: 0.96;
+    }
+  }
+  .g :global(.empreinte svg) {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .g :global(.e-ring) {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 3.4;
+  }
+  .g :global(.e-fin) {
+    stroke-width: 1.4;
+  }
+  .g :global(.e-mot) {
+    fill: currentColor;
+    font: 800 12px var(--font-sans);
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+  }
+  .g :global(.e-bande) {
+    fill: var(--color-peach-2);
+    stroke: currentColor;
+    stroke-width: 2.4;
+  }
+  .g :global(.e-bord) {
+    fill: currentColor;
+    font: 400 8.5px var(--font-mono);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+  }
+
+  /* The stamp in the hand, from above. The pointer sits on the rubber's centre, so the print lands
+     right under it. The shadow is a soft disc below and to the right: the light comes from the
+     top left, as in the render. */
+  .curseur {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 60;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .curseur.vu {
+    opacity: 1;
+  }
+  /* The stamp seen from above: the pointer sits on the centre of the disc, so the print lands
+     right under it. The shadow is a soft square below and to the right (light from the top left). */
+  .c-ombre {
+    position: absolute;
+    left: -29px;
+    top: -27px;
+    width: 76px;
+    height: 72px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--color-ink) 45%, transparent);
+    opacity: 0.55;
+    filter: blur(9px);
+  }
+  .c-outil {
+    position: absolute;
+    left: -42px;
+    top: -46px;
+    width: 84px;
+    transform-origin: 50% 54%;
+    will-change: translate, rotate;
+  }
+  .c-levee {
+    display: block;
+    transform-origin: 50% 54%;
+  }
+  .c-levee :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* Act 2 */
+  .affectation {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .champs {
+    display: grid;
+    grid-template-columns: 1fr 14rem;
+    gap: 12px;
+  }
+  .champs-col {
+    grid-template-columns: 1fr;
+    align-content: start;
+    gap: 18px;
+  }
+  .pas {
+    display: flex;
+    gap: 6px;
+  }
+  .pas input {
+    flex: 1;
+    text-align: center;
+    font-weight: 700;
+    -moz-appearance: textfield;
+  }
+  .pas input::-webkit-inner-spin-button {
+    display: none;
+  }
+  .touche {
+    flex: none;
+    width: 46px;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(180deg, var(--color-surface), var(--color-cream-2));
+    box-shadow:
+      0 1px 0 var(--color-white) inset,
+      0 0 0 1px var(--color-line),
+      0 1px 2px var(--ombre);
+    font: 600 18px/1 var(--font-sans);
+    cursor: pointer;
+  }
+  .touche:active {
+    background: var(--color-cream-2);
+    box-shadow: inset 0 1px 3px var(--ombre);
+  }
+  .touche:focus-visible {
+    outline: 3px solid var(--color-orange-txt);
+    outline-offset: 2px;
+  }
+  /* The network: the two fields on a line, the town under them, full width, clipped by the card. */
+  .plan {
+    position: relative;
+    overflow: clip;
+    border-radius: var(--radius-card);
+    corner-shape: squircle;
+    background: var(--color-surface-2);
+    box-shadow: inset 0 0 0 1px var(--color-line);
+  }
+  .plan-champs {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 14rem;
+    align-items: end;
+    gap: 24px;
+    padding: 12px 24px 10px;
+  }
+  .ligne {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font: var(--text-source) / 1.4 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-soft);
+  }
+  /* A line to write on, as on the forms of step 1. */
+  /* A real field: a white box on the cream sheet, so there is no doubt where to write. */
+  .ligne input {
+    min-width: 0;
+    height: 44px;
+    padding: 0 14px;
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    box-shadow:
+      inset 0 0 0 1px var(--color-stone),
+      inset 0 1px 2px var(--ombre);
+    font: 600 var(--text-body) / 1.2 var(--font-sans);
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--color-ink);
+    transition: box-shadow 0.2s;
+  }
+  .ligne input::placeholder {
+    font-weight: 400;
+    color: var(--color-muted);
+  }
+  .ligne input:hover {
+    box-shadow:
+      inset 0 0 0 1px var(--color-soft),
+      inset 0 1px 2px var(--ombre);
+  }
+  .ligne input:focus-visible {
+    outline: none;
+    box-shadow:
+      inset 0 0 0 2px var(--color-orange),
+      0 0 0 4px var(--color-orange-tint);
+  }
+  /* Missing when « next » was pressed: the shake (script), and an orange ring that snaps in from
+     a little way out, holds a beat, then fades: the field does not stay flagged. The ring is the
+     outline, so it never fights the field's own shadows. */
+  .ligne.manque input,
+  .ouvertures.manque .vignette {
+    animation: anneau 1.8s var(--ease-hatch);
+  }
+  @keyframes anneau {
+    from {
+      outline: 2px solid transparent;
+      outline-offset: 8px;
+    }
+    20%,
+    70% {
+      outline: 2px solid var(--color-orange);
+      outline-offset: 2px;
+    }
+    to {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
+  }
+  .ligne .pas {
+    align-items: center;
+    gap: 10px;
+  }
+  .ligne .pas input {
+    text-align: center;
+  }
+  .ligne .touche {
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    transition:
+      background 0.15s,
+      box-shadow 0.15s,
+      scale 0.1s;
+  }
+  .ligne .touche:hover {
+    background: var(--color-surface);
+    box-shadow:
+      0 0 0 1px var(--color-soft),
+      var(--shadow-1);
+  }
+  .ligne .touche:active {
+    scale: 0.92;
+  }
+  /* exception: the scene's staging, its ratio is the render's */
+  .scene {
+    position: relative;
+    overflow: clip; /* the pulse stays inside the picture */
+    aspect-ratio: 1440 / 592;
+  }
+  .terrain {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .liens {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+  }
+  /* The link: a faint thread, drawn once, then a spark runs it every few seconds. */
+  .liens :global(path) {
+    fill: none;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+  }
+  .liens :global(.fil) {
+    stroke: var(--color-orange);
+    stroke-width: 1;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    opacity: 0.35;
+    animation: trace 0.5s var(--ease-hatch) forwards;
+  }
+  .liens :global(.etincelle) {
+    stroke: var(--color-orange);
+    stroke-width: 2;
+    stroke-dasharray: 0.08 1.2;
+    opacity: 0;
+  }
+  /* The pulse's wave, centred on the head office's roof (715, 42 in the render's units). */
+  .onde {
+    position: absolute;
+    left: calc(715 / 1440 * 100%);
+    top: calc(42 / 592 * 100%);
+    width: 22%;
+    aspect-ratio: 2 / 1;
+    translate: -50% -50%;
+    border: 1.5px solid var(--color-orange);
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+  }
+  @keyframes trace {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  /* A shop: its coloured cut-out, exactly over its grey self. Lit, it shows over a warm glow
+     and a faint ring pings once under it; hovered, it hints. */
+  .lieu {
+    position: absolute;
+    padding: 0;
+    cursor: pointer;
+  }
+  .lieu::before,
+  .lieu::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 4%;
+    width: 120%;
+    aspect-ratio: 2 / 1;
+    translate: -50% 30%;
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0;
+  }
+  .lieu::before {
+    background: var(--color-orange);
+    filter: blur(6px);
+    transition: opacity 0.4s 0.3s;
+  }
+  .lieu::after {
+    border: 1.5px solid var(--color-orange);
+  }
+  .lieu.allume::before {
+    opacity: 0.12;
+  }
+  .lieu.allume::after {
+    animation: ping 0.9s ease-out 0.45s;
+  }
+  @keyframes ping {
+    from {
+      opacity: 0.5;
+      scale: 0.5;
+    }
+    to {
+      opacity: 0;
+      scale: 1.3;
+    }
+  }
+  .lieu img {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.35s 0.3s;
+  }
+  .lieu:hover img {
+    opacity: 0.55;
+    transition-delay: 0s;
+  }
+  .lieu.allume img {
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .liens :global(.fil) {
+      animation: none;
+      stroke-dashoffset: 0;
+    }
+    .lieu.allume::after {
+      animation: none;
+      display: none;
+    }
+  }
+
+  /* Sparrow's pace: the question as a section title, four pictures to stamp. */
+  .ouvertures {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  .question {
+    padding: 0;
+    margin-bottom: 22px;
+    font: 600 var(--text-card) / 1.2 var(--font-display);
+    color: var(--color-ink);
+  }
+  .vignettes {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+  }
+  /* The picture on top, full width; the pace under it. */
+  .pile.pile-ouv .vignette {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 8px;
+    padding: 12px 12px 12px;
+    border-radius: var(--radius-card-sm);
+  }
+  .pile-ouv .photo {
+    flex-basis: 100%;
+    margin: -4px 0 8px;
+  }
+  .pile-ouv .vignette .tirage {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    rotate: -1.2deg;
+  }
+  .pile-ouv:nth-child(2n) .vignette .tirage {
+    rotate: 1.4deg;
+  }
+  .vignette .tirage :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(0.6);
+    transition: filter 0.4s;
+  }
+  .vignette.recrute .tirage :global(img),
+  .vignette:hover .tirage :global(img) {
+    filter: none;
+  }
+  .valeur {
+    font: 600 var(--text-body) / 1.2 var(--font-display);
+    color: var(--color-ink);
+  }
+  .vignette:has(input:focus-visible) {
+    outline: 3px solid var(--color-orange-txt);
+    outline-offset: 3px;
+  }
+
+  /* Act 3 */
+  .acte3 {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: 24px;
+  }
+  /* The board the badges are pinned to: a darker frame, slightly sunk. */
+  .badges-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 22px;
+    border-radius: var(--radius-card-sm);
+    background: var(--color-cream-2);
+    box-shadow:
+      inset 0 0 0 6px var(--color-sand),
+      inset 0 0 0 7px var(--color-line),
+      inset 0 3px 10px 6px var(--ombre);
+  }
+  .badges {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px 14px;
+    padding-top: 6px;
+  }
+  /* A badge hangs by a cord from a pin in the board: it swings from the pin, and turns over on
+     hover, or on a tap where there is no hover, to show what the agent will do for this network. */
+  .badges :global(.badge) {
+    position: relative;
+    display: grid; /* the card fills it: badges side by side share their height */
+    width: 128px;
+    padding-top: 34px; /* room for the strap */
+    transform-origin: 50% 7px;
+    perspective: 900px;
+    animation: donne 0.4s calc(var(--k) * 80ms) cubic-bezier(0.25, 1.4, 0.5, 1) both;
+  }
+  /* The pin: a small orange head, lit from the top left, its shadow cast on the board. The pin
+     and the cord are the badge's own (not the card's), so they stay put when the card turns. */
+  .badges :global(.badge)::after {
+    content: '';
+    position: absolute;
+    z-index: 3;
+    top: 0;
+    left: 50%;
+    width: 14px;
+    aspect-ratio: 1;
+    translate: -50% 0;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle at 35% 30%,
+      var(--color-peach) 0 18%,
+      var(--color-orange) 45%,
+      var(--color-copper) 100%
+    );
+    box-shadow:
+      2px 3px 3px -1px color-mix(in srgb, var(--color-ink) 35%, transparent),
+      0 0 0 0.5px color-mix(in srgb, var(--color-ink) 20%, transparent);
+    pointer-events: none;
+  }
+  /* The lanyard, a loop of orange strap through the badge's slot: the front strand comes down over
+     the badge and bends into the slot; the back strand, in shade, rises from behind the badge. */
+  .badges :global(.badge)::before {
+    content: '';
+    position: absolute;
+    top: 7px;
+    left: 50%;
+    width: 10px;
+    height: 44px;
+    margin-left: -5px;
+    border-radius: 2px;
+    background: color-mix(in srgb, var(--color-orange) 72%, var(--color-ink));
+    transform-origin: 50% 0;
+    rotate: -9deg;
+    pointer-events: none;
+  }
+  .badges :global(.laniere) {
+    position: absolute;
+    z-index: 2;
+    top: 7px;
+    left: 50%;
+    width: 10px;
+    height: 41px; /* its bend sinks into the slot */
+    margin-left: -5px;
+    border-radius: 2px 2px 6px 6px; /* the bend into the slot */
+    background: var(--color-orange);
+    box-shadow:
+      inset -3px 0 0 color-mix(in srgb, var(--color-ink) 12%, transparent),
+      inset 0 -5px 3px -2px color-mix(in srgb, var(--color-ink) 30%, transparent),
+      0 1px 2px var(--ombre);
+    transform-origin: 50% 0;
+    rotate: 4deg;
+    pointer-events: none;
+  }
+  @keyframes donne {
+    from {
+      opacity: 0;
+      translate: 0 -24px;
+      rotate: 6deg;
+    }
+  }
+  .badges :global(.badge-carte) {
+    position: relative;
+    z-index: 1; /* over the strap, under the pin */
+    display: grid;
+    width: 100%;
+    padding: 0;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform 0.7s cubic-bezier(0.3, 1.35, 0.5, 1);
+  }
+  @media (hover: hover) {
+    .badges :global(.badge:hover .badge-carte) {
+      transform: rotateY(180deg);
+    }
+  }
+  .badges :global(.badge.retourne .badge-carte),
+  .badges :global(.badge-carte:focus-visible) {
+    transform: rotateY(180deg);
+  }
+  .badges :global(.badge-carte:focus-visible) {
+    outline: none;
+  }
+  .badges :global(.badge-carte:focus-visible .face) {
+    outline: 3px solid var(--color-orange-txt);
+    outline-offset: 3px;
+  }
+  .badges :global(.face) {
+    grid-area: 1 / 1;
+    display: flex;
+    min-height: 192px; /* every badge the same size, the longest line on the back included */
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 12px 10px 12px;
+    border-radius: 12px;
+    background: var(--color-surface);
+    box-shadow:
+      0 1px 0 var(--color-white) inset,
+      0 0 0 1px var(--color-line),
+      0 8px 18px -8px var(--ombre);
+    backface-visibility: hidden;
+  }
+  .badges :global(.verso) {
+    transform: rotateY(180deg);
+    justify-content: space-between;
+  }
+  .badges :global(.badge-fente) {
+    position: relative;
+    width: 30px;
+    height: 6px;
+    margin-bottom: 14px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-cream-2) 70%, var(--color-ink)); /* the hole */
+    box-shadow: inset 0 1px 2px var(--ombre);
+  }
+  .badges :global(.badge-filet) {
+    align-self: stretch;
+    border-top: 1px solid var(--color-line);
+  }
+  .badges :global(img) {
+    width: 56px;
+    height: 56px;
+    border-radius: 999px;
+    object-fit: cover;
+  }
+  .badges :global(b) {
+    margin-top: 4px;
+    font: 600 var(--text-body) / 1.2 var(--font-display);
+  }
+  /* The front: name, job title, and the network right under it. */
+  .badges :global(.badge-metier) {
+    font-size: var(--text-source);
+    line-height: 1.3;
+    color: var(--color-soft);
+    text-align: center;
+    text-wrap: balance;
+  }
+  .badges :global(.recto .badge-ens) {
+    margin-top: 4px;
+    padding-top: 0;
+  }
+  /* The back: the agent's line in italics, then the network's details in a footer box. */
+  .badges :global(.badge-pitch) {
+    margin-block: auto;
+    padding: 0 2px 8px;
+    font: italic 400 var(--text-source) / 1.45 var(--font-sans);
+    color: var(--color-ink);
+    text-align: center;
+    text-wrap: balance;
+  }
+  .badges :global(.badge-pied) {
+    display: flex;
+    align-self: stretch;
+    flex-direction: column;
+    gap: 2px;
+    padding: 6px 4px;
+    border-radius: var(--radius-sm);
+    background: var(--color-cream-2);
+    font: 400 var(--text-source) / 1.2 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-orange-txt);
+    text-align: center;
+  }
+  .badges :global(.badge-pied :empty) {
+    display: none;
+  }
+  /* The size, in running text: « 40 ÉTABLISSEMENTS » in mono capitals does not fit a badge. */
+  .badges :global([data-b-nb]) {
+    font-family: var(--font-sans);
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--color-soft);
+  }
+  .badges :global(.badge-ens) {
+    margin-top: auto;
+    padding-top: 8px;
+    font: 400 var(--text-source) / 1.2 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-orange-txt);
+    text-align: center;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .badges :global(.badge-carte) {
+      transition: none;
+    }
+  }
+
+  /* The team bar, stuck to the bottom of the screen while the form is in view. */
+  .barre {
+    position: sticky;
+    bottom: 16px;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 10px 10px 14px;
+    border-radius: 999px;
+    background: var(--color-surface);
+    box-shadow:
+      0 0 0 1px var(--color-line),
+      var(--shadow-2);
+  }
+  /* Nothing on the left yet: the text needs the pill's own inset. */
+  .barre:has(.retour[hidden]):has(.equipe-visages:empty) {
+    padding-left: 28px;
+  }
+  .retour {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1px var(--color-line);
+    font-size: var(--text-body);
+    font-weight: 600;
+    color: var(--color-ink);
+    cursor: pointer;
+  }
+  .retour:focus-visible {
+    outline: 3px solid var(--color-orange-txt);
+    outline-offset: 2px;
+  }
+  .equipe {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    align-items: center;
+    gap: 12px;
+  }
+  .equipe-visages {
+    display: flex;
+    flex: none;
+  }
+  .equipe-visages:empty {
+    display: none;
+  }
+  .equipe-visages :global(img) {
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    object-fit: cover;
+    box-shadow: 0 0 0 2px var(--color-surface);
+    animation: entre 0.35s cubic-bezier(0.3, 1.6, 0.6, 1) both;
+  }
+  .equipe-visages :global(img + img) {
+    margin-left: -10px;
+  }
+  @keyframes entre {
+    from {
+      opacity: 0;
+      scale: 0.4;
+      translate: 0 8px;
+    }
+  }
+  .equipe-txt {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    line-height: 1.3;
+  }
+  .equipe-txt b {
+    font-size: var(--text-caption);
+    color: var(--color-ink);
+  }
+  .aide {
+    overflow: hidden;
+    font-size: var(--text-caption);
+    color: var(--color-soft);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .aide.alerte {
+    color: var(--color-orange-txt);
+    font-weight: 600;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .actes li::after {
+      transition: none;
+    }
+    .rue :global(.boutique),
+    .badges :global(.badge),
+    .g :global(.empreinte) {
+      animation: none;
+      transition: none;
+    }
+    .fiche {
+      transition: none;
+    }
+  }
+  @media (max-width: 40rem) {
+    .photos-equipe {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      row-gap: 16px;
+    }
+    .bloc {
+      padding: 32px 12px 12px;
+    }
+    .bloc-socle {
+      grid-template-columns: 1fr;
+      grid-template-areas: 'socle' 'finch' 'pecker';
+      row-gap: 36px;
+    }
+    .pile-socle .fiche {
+      grid-template-columns: 1fr;
+      grid-template-areas: 'photos' 'titre' 'texte';
+    }
+    .pile-socle .photos {
+      margin-bottom: 4px;
+    }
+    .fiche {
+      padding: 20px;
+    }
+    .champs,
+    .acte3 {
+      grid-template-columns: 1fr;
+    }
+    .plan-champs {
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    .vignettes {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 28px 12px;
+    }
+    .actes {
+      gap: 14px;
+    }
+    .barre {
+      gap: 10px;
+      padding-left: 8px;
+    }
+    .equipe {
+      gap: 8px;
+    }
+    /* exception: sur mobile, la place va au nombre et au bouton */
+    .equipe-visages {
+      display: none;
+    }
+    .equipe-txt b {
+      white-space: nowrap;
+    }
+    /* From step 2 the back button takes the count's place: the team is settled by then. */
+    .barre:has(.retour:not([hidden])) .equipe-txt:not(:has(.alerte)) {
+      display: none;
+    }
+    .equipe-txt :global(.long),
+    .aide:not(.alerte) {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,727 @@
+---
+/**
+ * The sending scene of the pricing form (signature section): a letter folded in three, an
+ * envelope, the stamp, the send-off and the postcard that comes back. Markup and look only; the
+ * moves are laid on one clock by `construire()` in `envoi.ts`, played by `Recrutement`.
+ * Exception (signature moment): paper objects with their own sizes and paper textures; colours
+ * from the tokens. The postcard's scale (660 px) sets the scale of the whole scene.
+ */
+import { Image } from 'astro:assets';
+import Button from '../ui/Button.astro';
+import tamponImg from '../../assets/tarifs/tampon.png';
+import lark from '../../assets/portraits/lark.jpg';
+import type { TarifsFormulaire } from '../../content/schemas/tarifsFormulaire';
+
+interface Props {
+  /** The scene's words (the `envoi` block of the pricing form's content). */
+  t: TarifsFormulaire['envoi'];
+  /** The demo page in the page's language, where the postcard leads. */
+  demo: string;
+}
+const { t, demo } = Astro.props;
+---
+
+<div class="envoi" data-envoi>
+  <svg width="0" height="0" class="defs" aria-hidden="true">
+    <filter id="envoi-encre">
+      <feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" seed="7"></feTurbulence>
+      <feDisplacementMap in="SourceGraphic" scale="1.6"></feDisplacementMap>
+    </filter>
+    <!-- Paper grain, the usual recipe: fine monochrome fractal noise around mid-grey, blended
+         in soft-light (it only nudges the fill's own tones), kept inside the shape. -->
+    <filter
+      id="envoi-kraft"
+      x="0"
+      y="0"
+      width="100%"
+      height="100%"
+      color-interpolation-filters="sRGB"
+    >
+      <feTurbulence
+        type="fractalNoise"
+        baseFrequency="0.9"
+        numOctaves="3"
+        seed="3"
+        stitchTiles="stitch"></feTurbulence>
+      <feColorMatrix
+        values="0.24 0 0 0 0.38  0.24 0 0 0 0.38  0.24 0 0 0 0.38  0 0 0 0 1"
+        result="bruit"></feColorMatrix>
+      <feBlend in="bruit" in2="SourceGraphic" mode="soft-light" result="grain"></feBlend>
+      <feComposite in="grain" in2="SourceAlpha" operator="in"></feComposite>
+    </filter>
+    <filter id="envoi-flou" x="-10%" y="-30%" width="120%" height="160%">
+      <feGaussianBlur stdDeviation="2.2"></feGaussianBlur>
+    </filter>
+    <!-- The inside: a liner with a small orange dot pattern, deeper toward the bottom. -->
+    <linearGradient id="envoi-fond" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" class="fond-haut"></stop>
+      <stop offset="1" class="fond-bas"></stop>
+    </linearGradient>
+    <pattern
+      id="envoi-motif"
+      width="11"
+      height="11"
+      patternUnits="userSpaceOnUse"
+      patternTransform="rotate(45)"
+    >
+      <circle cx="5.5" cy="5.5" r="1.3" class="motif-point"></circle>
+    </pattern>
+  </svg>
+
+  <!-- The table: the letter and the envelope, in fixed units (shrunk as a whole on a phone). -->
+  <div class="plateau" aria-hidden="true">
+    <span class="sol-ombre" data-sol></span>
+    <div class="courrier" data-courrier>
+      <span class="env-dos" data-env>
+        <svg viewBox="0 0 560 250">
+          <g filter="url(#envoi-kraft)"
+            ><path class="k-corps" d="M0 0 H560 V242 Q560 250 552 250 H8 Q0 250 0 242 Z"></path></g
+          >
+          <rect class="k-doublure" x="14" width="532" height="250"></rect>
+          <rect class="k-motif" x="14" width="532" height="250"></rect>
+          <rect x="14" width="532" height="250" fill="url(#envoi-fond)"></rect>
+        </svg>
+      </span>
+
+      <div class="lettre" data-lettre>
+        <span class="lettre-ombre" data-lettre-ombre></span>
+        <!-- The fold's 3D context: kept apart from the letter's fade, which would flatten it. -->
+        <div class="feuille">
+          <div class="pli pli-1" data-pli="1">
+            <div class="pli-face">
+              <p class="l-tete"><span>{t.lettre}</span><span data-l-date></span></p>
+              <p class="l-visages" data-l-visages></p>
+              <span class="voile" data-voile="1-dedans"></span>
+            </div>
+            <!-- The outside of the top third: the address, seen once the last fold lands. -->
+            <div class="pli-face pli-dehors">
+              <span class="a-pour">{t.attention}</span>
+              <b class="a-nom">Hatch OS</b>
+              <span class="voile" data-voile="1-dehors"></span>
+            </div>
+          </div>
+          <div class="pli pli-2">
+            <div class="pli-face">
+              <b class="l-ens" data-l-ens></b>
+              <span class="l-detail" data-l-detail></span>
+              <span class="portee portee-bas" data-portee="2"></span>
+            </div>
+          </div>
+          <div class="pli pli-3" data-pli="3">
+            <div class="pli-face">
+              <span class="l-contact" data-l-contact></span>
+              <span class="voile" data-voile="3-dedans"></span>
+            </div>
+            <!-- The outside of the bottom third: blank paper, covered by the top third. -->
+            <div class="pli-face pli-dehors">
+              <span class="voile" data-voile="3-dehors"></span>
+              <span class="portee portee-haut" data-portee="3"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- The front of the envelope: the side flaps, then the bottom flap over them, all meeting
+           at one centre point. -->
+      <span class="env-poche" data-env>
+        <svg viewBox="0 0 560 250">
+          <path class="k-bord" filter="url(#envoi-flou)" d="M2 2 L280 129 L558 2"></path>
+          <g filter="url(#envoi-kraft)">
+            <path class="k-cote" d="M0 0 L280 128 L560 0 V242 Q560 250 552 250 H8 Q0 250 0 242 Z"
+            ></path>
+          </g>
+          <path class="k-bord" filter="url(#envoi-flou)" d="M0 247 L280 126 L560 247"></path>
+          <g filter="url(#envoi-kraft)">
+            <path class="k-bas" d="M0 250 L280 128 L560 250 Q560 250 552 250 H8 Z"></path>
+          </g>
+          <path class="k-arete" d="M0.5 249 L280 128.6 L559.5 249"></path>
+        </svg>
+      </span>
+
+      <!-- The flap: its inside (lined) shows while it stands open, its outside once shut. -->
+      <span class="env-rabat" data-rabat data-env>
+        <span class="rabat-face rabat-dehors" data-rabat-dehors>
+          <svg viewBox="0 0 560 175">
+            <path
+              class="k-ombre"
+              filter="url(#envoi-flou)"
+              d="M0 0 H560 L298 150 Q280 160 262 150 Z"
+              transform="translate(0 3)"></path>
+            <g filter="url(#envoi-kraft)">
+              <path class="k-rabat" d="M0 0 H560 L298 146 Q280 156 262 146 Z"></path>
+            </g>
+            <path class="k-arete" d="M0.5 0.5 L262 146 Q280 156 298 146 L559.5 0.5"></path>
+            <path
+              class="k-voile"
+              data-voile="rabat-dehors"
+              d="M0 0 H560 L298 146 Q280 156 262 146 Z"></path>
+          </svg>
+        </span>
+        <span class="rabat-face rabat-dedans" data-rabat-dedans>
+          <svg viewBox="0 0 560 175">
+            <g filter="url(#envoi-kraft)">
+              <path class="k-corps" d="M0 175 H560 L298 29 Q280 19 262 29 Z"></path>
+            </g>
+            <path class="k-doublure" d="M14 175 H546 L294 39 Q280 31 266 39 Z"></path>
+            <path class="k-motif" d="M14 175 H546 L294 39 Q280 31 266 39 Z"></path>
+            <path class="k-voile" data-voile="rabat-dedans" d="M0 175 H560 L298 29 Q280 19 262 29 Z"
+            ></path>
+          </svg>
+        </span>
+      </span>
+
+      <span class="env-empreinte" data-empreinte></span>
+      <span class="env-tampon" data-env-tampon>
+        <Image src={tamponImg} alt="" width={110} densities={[1, 2]} loading="eager" />
+      </span>
+    </div>
+  </div>
+
+  <article class="carte-postale" data-reponse>
+    <div class="cp-mot">
+      <p class="cp-titre" data-cp-titre></p>
+      <p class="cp-texte">{t.texte}</p>
+      <Button href={demo} variant="orange" size="lg" data-cp-bouton>{t.bouton}</Button>
+      <p class="cp-signe">{t.signature}</p>
+    </div>
+    <div class="cp-adresse" aria-hidden="true">
+      <span class="cp-entete">{t.entete}</span>
+      <span class="cp-timbre-pose">
+        <span class="cp-timbre">
+          <span class="cp-vignette"><img src={lark.src} alt="" /></span>
+          <span class="cp-valeur">Hatch OS</span>
+        </span>
+      </span>
+      <span class="cp-oblit">
+        <svg viewBox="0 0 150 46"
+          ><g filter="url(#envoi-encre)"
+            ><path
+              d="M0 6 q9.4 -6 18.75 0 t18.75 0 t18.75 0 t18.75 0 t18.75 0 t18.75 0 t18.75 0 t18.75 0"
+            ></path><path
+              d="M0 17 q9.4 -6 18.75 0 t18.75 0 t18.75 0 t18.75 0 t18.75 0 t18.75 0 t18.75 0 t18.75 0"
+            ></path><path
+              d="M0 28 q9.4 -6 18.75 0 t18.75 0 t18.75 0 t18.75 0 t18.75 0 t18.75 0 t18.75 0 t18.75 0"
+            ></path><path
+              d="M0 39 q9.4 -6 18.75 0 t18.75 0 t18.75 0 t18.75 0 t18.75 0 t18.75 0 t18.75 0 t18.75 0"
+            ></path></g
+          ></svg
+        >
+      </span>
+      <span class="cp-cachet" data-cp-cachet></span>
+      <span class="cp-ligne" data-cp-nom></span>
+      <span class="cp-ligne" data-cp-ens></span>
+      <span class="cp-ligne"></span>
+    </div>
+  </article>
+</div>
+
+<style>
+  .defs {
+    position: absolute;
+  }
+  .envoi {
+    --ombre: color-mix(in srgb, var(--color-shadow) 16%, transparent);
+    --ombre-fort: color-mix(in srgb, var(--color-shadow) 30%, transparent);
+    /* Fine monochrome noise around mid-grey, drawn at twice the density and blended in soft-light
+       with the paper colour (background-blend-mode): it nudges the paper's tones, never adds dots. */
+    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='g' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='.2 0 0 0 .4 .2 0 0 0 .4 .2 0 0 0 .4 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E")
+      0 0 / 120px 120px;
+    --env-corps: color-mix(in srgb, var(--color-cream-2) 70%, var(--color-sand));
+    --env-cote: color-mix(in srgb, var(--color-cream-2) 82%, var(--color-sand));
+    --env-bas: color-mix(in srgb, var(--color-cream-2) 55%, var(--color-cream));
+    --env-rabat: color-mix(in srgb, var(--color-cream-2) 40%, var(--color-cream));
+    display: grid;
+    grid-template-columns: 100%;
+    place-items: center;
+    /* Room for the shadows inside the clip, which hides the envelope once it has flown away. */
+    margin-block: -48px;
+    padding-block: 48px;
+    overflow: clip;
+    container-type: inline-size;
+    perspective: 1600px;
+  }
+  .envoi > .plateau,
+  .envoi > .carte-postale {
+    grid-area: 1 / 1;
+  }
+
+  /* exception: the stage keeps its own units; on a narrow column it shrinks as a whole. */
+  .plateau {
+    --z: 1;
+    position: relative;
+    width: 660px;
+    height: 600px;
+    margin: calc((var(--z) - 1) * 300px) calc((var(--z) - 1) * 330px);
+    scale: var(--z);
+    perspective: 1400px;
+  }
+  @container (max-width: 700px) {
+    .plateau {
+      --z: 0.8;
+    }
+  }
+  @container (max-width: 560px) {
+    .plateau {
+      --z: 0.62;
+    }
+  }
+  @container (max-width: 440px) {
+    .plateau {
+      --z: 0.52;
+    }
+  }
+  @container (max-width: 380px) {
+    .plateau {
+      --z: 0.46;
+    }
+  }
+  @container (max-width: 320px) {
+    .plateau {
+      --z: 0.4;
+    }
+  }
+  .sol-ombre {
+    position: absolute;
+    top: 350px;
+    left: 90px;
+    width: 480px;
+    height: 200px;
+    border-radius: 40px;
+    background: var(--ombre-fort);
+    filter: blur(22px);
+    opacity: 0;
+  }
+  .courrier {
+    position: absolute;
+    inset: 0;
+  }
+  .courrier > * {
+    position: absolute;
+  }
+
+  /* The letter: a sheet in three thirds, each a 3D panel with its paper back. */
+  .lettre {
+    z-index: 2;
+    top: 15px;
+    left: 60px;
+    width: 540px;
+    perspective: 900px;
+    perspective-origin: 50% 50%;
+  }
+  .feuille {
+    position: relative;
+    transform-style: preserve-3d;
+  }
+  .lettre-ombre {
+    position: absolute;
+    inset: 0;
+    border-radius: 4px;
+    box-shadow:
+      0 1px 2px var(--ombre),
+      0 22px 34px -18px var(--ombre-fort);
+  }
+  .pli {
+    position: relative;
+    height: 190px;
+    transform-style: preserve-3d;
+  }
+  .pli-1 {
+    transform-origin: 50% 100% 0.5px; /* folds down onto the middle, toward the viewer */
+  }
+  .pli-2 {
+    transform: translateZ(-2px);
+  }
+  .pli-3 {
+    transform-origin: 50% 0 -0.5px; /* folds up first, under the top third */
+  }
+  .pli-face {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+    padding: 18px 40px;
+    overflow: clip;
+    background: var(--grain), var(--color-paper);
+    background-blend-mode: soft-light;
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-line) 70%, transparent);
+    backface-visibility: hidden;
+  }
+  .pli-1 > .pli-face:first-child {
+    border-radius: 4px 4px 0 0;
+  }
+  .pli-3 > .pli-face:first-child {
+    border-radius: 0 0 4px 4px;
+  }
+  .pli-dehors {
+    align-items: center;
+    gap: 6px;
+    transform: rotateX(180deg);
+  }
+  .pli-1 > .pli-dehors {
+    border-radius: 0 0 4px 4px; /* once folded, its free edge is at the bottom */
+  }
+  /* Light on the moving thirds, and the shadow they cast on what they cover. */
+  .voile,
+  .portee {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+  }
+  .voile {
+    background: var(--color-shadow);
+  }
+  .portee-bas {
+    background: linear-gradient(to top, var(--ombre-fort), transparent 70%);
+  }
+  .portee-haut {
+    background: linear-gradient(to bottom, var(--ombre-fort), transparent 70%);
+  }
+  .a-pour {
+    font: var(--text-caption) / 1.3 var(--font-mono);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .a-nom {
+    padding: 0 28px 6px;
+    border-bottom: 1px solid var(--color-line);
+    font: italic 500 var(--text-section) / 1.15 var(--font-display);
+    color: color-mix(in srgb, var(--color-ink) 70%, var(--color-copper));
+  }
+  .l-tete {
+    display: flex;
+    justify-content: space-between;
+    font: var(--text-kicker) / 1.3 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-orange-txt);
+  }
+  .l-visages {
+    display: flex;
+  }
+  .l-visages :global(img) {
+    width: 52px;
+    height: 52px;
+    margin-right: -10px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px var(--color-paper);
+  }
+  .l-ens {
+    font: 600 var(--text-section) / 1.1 var(--font-display);
+  }
+  .l-detail,
+  .l-contact {
+    font-size: var(--text-body);
+    line-height: 1.5;
+    color: var(--color-soft);
+  }
+  .l-contact :global(b) {
+    display: block;
+    font: 600 var(--text-card) / 1.3 var(--font-display);
+    color: var(--color-ink);
+  }
+
+  /* The envelope: its back, the letter, the front with its flaps, the top flap. */
+  .env-dos,
+  .env-poche,
+  .env-rabat {
+    top: 330px;
+    left: 50px;
+    width: 560px;
+    height: 250px;
+  }
+  .courrier svg,
+  .cp-oblit svg {
+    display: block;
+    overflow: visible;
+  }
+  .env-dos svg,
+  .env-poche svg,
+  .rabat-face svg {
+    width: 100%;
+    height: 100%;
+  }
+  .env-dos {
+    z-index: 1;
+    filter: drop-shadow(0 1px 1px var(--ombre)) drop-shadow(0 16px 18px var(--ombre));
+  }
+  /* Ivory paper: the side flaps a shade under the body, the bottom flap and the closed flap a
+     shade over it, as the light falls from above. The liner is the brand's orange tint. */
+  .k-corps {
+    fill: var(--env-corps);
+  }
+  .k-cote {
+    fill: var(--env-cote);
+  }
+  .k-bas {
+    fill: var(--env-bas);
+  }
+  .k-rabat {
+    fill: var(--env-rabat);
+  }
+  .k-doublure {
+    fill: var(--color-orange-tint);
+  }
+  .k-motif {
+    fill: url(#envoi-motif);
+  }
+  .motif-point {
+    fill: color-mix(in srgb, var(--color-orange) 30%, transparent);
+  }
+  .fond-haut {
+    stop-color: var(--color-shadow);
+    stop-opacity: 0;
+  }
+  .fond-bas {
+    stop-color: var(--color-shadow);
+    stop-opacity: 0.2;
+  }
+  .env-poche {
+    z-index: 3;
+  }
+  .k-bord,
+  .k-ombre {
+    fill: none;
+    stroke: var(--color-shadow);
+    stroke-width: 3;
+    opacity: 0.12;
+  }
+  .k-ombre {
+    fill: var(--color-shadow);
+    stroke: none;
+    opacity: 0.14;
+  }
+  .k-arete {
+    fill: none;
+    stroke: var(--color-surface);
+    stroke-width: 1;
+    stroke-linejoin: round;
+    opacity: 0.8;
+  }
+  .k-voile {
+    fill: var(--color-shadow);
+    opacity: 0;
+  }
+  .env-rabat {
+    z-index: 0;
+    height: 175px;
+    transform-origin: 50% 0;
+    transform-style: preserve-3d;
+  }
+  .rabat-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+  }
+  .rabat-dedans {
+    transform: rotateX(180deg);
+  }
+  .env-empreinte {
+    z-index: 5;
+    top: 430px;
+    left: 455px;
+    width: 116px;
+    height: 116px;
+    color: var(--color-orange-txt);
+    rotate: var(--r);
+    mix-blend-mode: multiply;
+  }
+  .env-tampon {
+    z-index: 6;
+    top: 427px;
+    left: 458px;
+    width: 110px;
+    pointer-events: none;
+    filter: drop-shadow(8px 14px 10px var(--ombre));
+  }
+
+  /* The prints: the hiring stamp's drawing. */
+  .envoi :global([data-empreinte] svg),
+  .envoi :global([data-cp-cachet] svg) {
+    width: 100%;
+    height: 100%;
+  }
+  .envoi :global(.e-ring) {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 3.4;
+  }
+  .envoi :global(.e-fin) {
+    stroke-width: 1.4;
+  }
+  .envoi :global(.e-mot) {
+    fill: currentColor;
+    font: 800 12px var(--font-sans);
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+  }
+  .envoi :global(.e-bande) {
+    fill: var(--env-corps);
+    stroke: currentColor;
+    stroke-width: 2.4;
+  }
+  .envoi :global(.e-bord) {
+    fill: currentColor;
+    font: 400 8.5px var(--font-mono);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+  }
+
+  /* The answer: a postcard on card stock, message on the left, stamp and address on the right. */
+  .carte-postale {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    width: min(100% - 20px, 660px);
+    padding: 34px;
+    gap: 28px;
+    border-radius: 6px;
+    background: var(--grain), var(--color-surface-2);
+    background-blend-mode: soft-light;
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--color-line) 80%, transparent),
+      inset 0 0 0 8px var(--color-surface-2),
+      inset 0 0 0 9px color-mix(in srgb, var(--color-line) 60%, transparent),
+      0 1px 2px var(--ombre),
+      var(--shadow-3);
+  }
+  .cp-mot {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding-right: 28px;
+    border-right: 1px solid var(--color-line);
+  }
+  .cp-titre {
+    font: 600 var(--text-section) / 1.1 var(--font-display);
+  }
+  .cp-texte {
+    font-size: var(--text-body);
+    line-height: 1.5;
+    color: var(--color-soft);
+  }
+  .cp-signe {
+    font: italic var(--text-body) / 1.4 var(--font-display);
+    color: var(--color-soft);
+  }
+  .cp-adresse {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 16px;
+    padding-top: 150px;
+  }
+  .cp-entete {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font: var(--text-source) / 1.2 var(--font-mono);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  /* The stamp: perforated edge cut by a mask, its shadow on a wrapper (the mask would clip it). */
+  .cp-timbre-pose {
+    position: absolute;
+    top: -6px;
+    right: -4px;
+    rotate: 3deg;
+    filter: drop-shadow(0 1px 1px var(--ombre)) drop-shadow(0 3px 4px var(--ombre));
+  }
+  .cp-timbre {
+    --pas: 8px;
+    --trou: 2.6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 96px;
+    height: 120px;
+    padding: 9px;
+    background: var(--color-surface);
+    mask:
+      linear-gradient(black 0 0) center / calc(100% - 2 * var(--trou) - 2px)
+        calc(100% - 2 * var(--trou) - 2px) no-repeat,
+      radial-gradient(circle var(--trou), transparent 96%, black) calc(var(--pas) / -2)
+        calc(var(--pas) / -2) / var(--pas) var(--pas);
+  }
+  .cp-vignette {
+    flex: 1;
+    overflow: clip;
+    background: var(--color-peach);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-copper) 50%, transparent);
+  }
+  .cp-vignette img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    mix-blend-mode: multiply;
+  }
+  .cp-valeur {
+    font: var(--text-source) / 1 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-align: center;
+    text-transform: uppercase;
+    color: var(--color-orange-txt);
+  }
+  .cp-cachet {
+    position: absolute;
+    top: 50px;
+    right: 82px;
+    width: 100px;
+    height: 100px;
+    color: var(--color-orange-txt);
+    opacity: 0.85;
+    rotate: -12deg;
+    mix-blend-mode: multiply;
+  }
+  .cp-cachet :global(.e-bande) {
+    fill: var(--color-surface-2);
+  }
+  .cp-oblit {
+    position: absolute;
+    top: 60px;
+    right: -18px;
+    width: 120px;
+    color: var(--color-orange-txt);
+    opacity: 0.7;
+    rotate: -12deg;
+    mix-blend-mode: multiply;
+  }
+  .cp-oblit path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+  }
+  .cp-ligne {
+    min-height: 28px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-soft) 35%, transparent);
+    font: italic var(--text-body) / 1.3 var(--font-display);
+  }
+  @media (max-width: 40rem) {
+    .carte-postale {
+      grid-template-columns: 1fr;
+      width: calc(100% - 36px);
+      padding: 26px;
+      /* A shorter shadow: the stage's clip is close on a phone. */
+      box-shadow:
+        inset 0 0 0 1px color-mix(in srgb, var(--color-line) 80%, transparent),
+        inset 0 0 0 8px var(--color-surface-2),
+        inset 0 0 0 9px color-mix(in srgb, var(--color-line) 60%, transparent),
+        0 1px 2px var(--ombre),
+        0 10px 16px -6px var(--ombre-fort);
+    }
+    .cp-mot {
+      padding-right: 0;
+      border-right: 0;
+    }
+    .cp-adresse {
+      display: none;
+    }
+  }
+</style>

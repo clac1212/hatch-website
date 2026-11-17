@@ -1,11 +1,6 @@
 titre: "Composez votre équipe d'agents."
 intro: 'Chaque réseau est différent. Dites-nous ce qui vous intéresse : on vous présente un tarif adapté à vos agents et à la taille de votre réseau, pendant la démo.'
 
-etapes:
-  agents: 'Quels agents vous intéressent ?'
-  reseau: 'Votre réseau'
-  contact: 'Vos coordonnées'
-
 offres:
   - id: socle
     nom: 'Le socle'
@@ -50,19 +45,66 @@ champs:
   email: { label: 'Email professionnel', placeholder: 'camille@bunbun.fr' }
   telephone: { label: 'Téléphone', placeholder: '06 12 34 56 78' }
 
-decisionnaire: 'Je suis décisionnaire pour ce projet'
+recrutement:
+  actes: ['Candidatures', 'Affectation', 'Badges']
+  actesNom: 'Étapes'
+  titres: ['Qui recrutez-vous ?', 'Où vont-ils travailler ?', 'Leurs badges sont prêts']
+  titreEnvoye: 'Votre demande est partie'
+  consigne: 'Tamponnez la fiche de chaque agent que vous embauchez.'
+  socleTexte: 'Répond à vos équipes, en salle comme en cuisine, et tient vos documents à jour.'
+  avecSocle: 'Avec le socle'
+  embaucher: 'Embaucher {agents}'
+  et: 'et'
+  exemple: 'ex.'
+  moins: 'Un de moins'
+  plus: 'Un de plus'
+  tampons: { embauche: 'Embauché', retenu: 'Retenu', bord: 'Recrutement' }
+  etablissements: { un: '{n} établissement', plusieurs: '{n} établissements' }
+  barre:
+    retour: 'Étape précédente'
+    vide: 'Votre équipe'
+    aide: 'Tamponnez au moins un agent.'
+    alerte: 'Tamponnez au moins un agent pour continuer.'
+    agents: { un: '{n} agent', plusieurs: '{n} agents' }
+    embauches: { un: 'embauché', plusieurs: 'embauchés' }
+    suivant: ["Affecter l'équipe", 'Préparer les badges']
+    fin: 'Réserver une démo'
+    manque: 'Il manque :'
+    champs:
+      enseigne: 'enseigne'
+      etablissements: 'établissements'
+      ouvertures: 'ouvertures'
+      nom: 'nom'
+      role: 'rôle'
+      email: 'email'
+      telephone: 'téléphone'
+    envoi: 'Envoi en cours…'
+    envoye: 'Envoyé à Hatch OS.'
+    fini: 'Demande envoyée.'
+  badges:
+    aide: '{nom} : ce que je ferai pour vous'
+    enseigneVide: 'Votre enseigne'
+    postes:
+      peep: 'Animateur réseau'
+      owl: "Assistant d'établissement"
+      jay: 'Documentaliste'
+      lark: 'Bras droit de la direction'
+      finch: 'Auditeur qualité'
+      pecker: 'Formateur'
+      sparrow: 'Chargé de développement'
+    texte: "Votre équipe vous attend en démo. Sans engagement, le tarif sera présenté pendant l'entretien."
+  sansJs: "Le recrutement a besoin de JavaScript. Réservez directement votre démo : on vous présente le tarif pendant l'entretien."
 
-reste:
-  initial: 'Étape suivante : vous choisissez un créneau, vos réponses sont jointes à la réservation.'
-  pret: 'Tout est prêt : vous choisissez un créneau, vos réponses sont jointes à la réservation.'
-  manque: 'Encore à compléter :'
-  etape: 'étape'
-  noms:
-    agents: 'choisir au moins un agent'
-    reseau: 'votre réseau'
-    contact: 'vos coordonnées'
-
-envoi: 'Choisir un créneau de démo'
+envoi:
+  lettre: 'Demande de démo'
+  attention: "À l'attention de"
+  tampon: 'Envoyé'
+  reponse: 'Réponse'
+  merci: 'Bien reçu, {prenom}.'
+  texte: "On revient vers vous très vite. D'ici là, choisissez votre créneau pour rencontrer votre équipe."
+  bouton: 'Choisir un créneau'
+  signature: "L'équipe Hatch OS"
+  entete: 'Carte postale'
 
 deroule:
   kicker: 'Comment ça se passe'
@@ -83,6 +125,3 @@ notes:
   etablissements: 'Établissements :'
   role: 'Rôle :'
   telephone: 'Téléphone :'
-  decisionnaire: 'Décisionnaire :'
-  oui: 'oui'
-  non: 'non'
