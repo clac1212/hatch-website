@@ -32,6 +32,14 @@ export default defineConfig({
         access: 'secret',
         optional: true,
       }),
+      // The pricing form's demo request (/api/demande-demo): a Lead in the CRM's Deals database
+      // (same Notion integration, shared with that database) + a Slack alert.
+      NOTION_DEALS_DB: envField.string({ context: 'server', access: 'secret', optional: true }),
+      SLACK_WEBHOOK_DEMANDES: envField.string({
+        context: 'server',
+        access: 'secret',
+        optional: true,
+      }),
     },
   },
 

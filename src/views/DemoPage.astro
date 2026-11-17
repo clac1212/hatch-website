@@ -12,6 +12,7 @@ import pecker from '../assets/portraits/pecker.jpg';
 import sparrow from '../assets/portraits/sparrow.jpg';
 import { section } from '../content/section';
 import { routes, type Locale } from '../i18n/ui';
+import { CAL_LINK as calLink } from '../scripts/cal';
 
 /**
  * Demo booking page with the inline Cal.com agenda, shared by /demo and /en/demo. Above the
@@ -27,7 +28,6 @@ const { locale } = Astro.props;
 const entry = await getEntry('demoPage', locale);
 if (!entry) throw new Error(`Missing src/content/pages/demo/${locale}.yaml`);
 const d = entry.data;
-const calLink = 'patrick-rakotondrajao-bjremk/presentation-hatch';
 
 /** The four offers of the pricing form (the Core, then Finch, Pecker, Sparrow), with its copy. */
 const c = await section('tarifsFormulaire', locale);
@@ -145,12 +145,7 @@ const portraits = { peep, owl, jay, lark, finch, pecker, sparrow };
           >
             {d.agents.verrou}
           </p>
-          <div
-            id="cal-inline"
-            data-cal-link={calLink}
-            class="relative w-full overflow-hidden rounded-card"
-          >
-          </div>
+          <div id="cal-inline" class="relative w-full overflow-hidden rounded-card"></div>
         </div>
         <p id="cal-lien" class="px-2 pt-3 text-caption">
           <a
@@ -330,105 +325,41 @@ const portraits = { peep, owl, jay, lark, finch, pecker, sparrow };
 
 <script>
   import { suivre } from '../scripts/suivi';
+  import { preparerCal } from '../scripts/cal';
 
-  // Cal.com inline embed (official loader snippet, typed). Only bundled on this page.
-  type CalApi = ((...args: unknown[]) => void) & {
-    loaded?: boolean;
-    ns?: Record<string, unknown>;
-    q?: unknown[][];
-  };
-  const w = window as unknown as { Cal?: CalApi };
+  const attente = document.getElementById('cal-attente')!;
+  let charge = false; // the agenda loaded once: no more « loading » line over it
+  const monterCal = preparerCal({
+    pret: () => {
+      charge = true;
+      attente.hidden = true;
+    },
+    reserve: () => suivre('demo_reservee', { emplacement: 'demo' }),
+  });
 
-  function loadCal(src: string) {
-    const push = (api: CalApi, args: unknown[]) => api.q!.push(args);
-    w.Cal =
-      w.Cal ??
-      (function (this: unknown, ...args: unknown[]) {
-        const cal = w.Cal!;
-        if (!cal.loaded) {
-          cal.ns = {};
-          cal.q = cal.q ?? [];
-          const s = document.createElement('script');
-          s.src = src;
-          document.head.appendChild(s);
-          cal.loaded = true;
-        }
-        if (args[0] === 'init') {
-          const api: CalApi = (...a: unknown[]) => push(api, a);
-          api.q = [];
-          const namespace = args[1];
-          if (typeof namespace === 'string') {
-            cal.ns![namespace] = api;
-            push(api, args);
-          } else push(cal, args);
-          return;
-        }
-        push(cal, args);
-      } as CalApi);
-    return w.Cal;
-  }
-
-  const el = document.getElementById('cal-inline')!;
-  const Cal = loadCal('https://app.cal.com/embed/embed.js');
-  // Brand the booker with the design tokens (read at runtime, so no colour is duplicated here).
-  const token = (name: string) =>
-    getComputedStyle(document.documentElement).getPropertyValue(`--color-${name}`).trim();
-
-  Cal('init', { origin: 'https://cal.com' });
-  // Answers of the network page's pricing form (TarifsFormulaire), handed over in sessionStorage
-  // (never in the URL): they prefill the booking's name, email and notes, then are cleared.
-  let prefill: { name?: string; email?: string; notes?: string } = {};
-  try {
-    prefill = JSON.parse(sessionStorage.getItem('hatch-demo') ?? '{}') ?? {};
-    sessionStorage.removeItem('hatch-demo');
-  } catch {
-    prefill = {};
-  }
-  const base: Record<string, string> = { layout: 'month_view', theme: 'light' };
-  for (const key of ['name', 'email', 'notes'] as const) {
-    const value = prefill[key];
-    if (typeof value === 'string' && value.trim()) base[key] = value.trim();
-  }
-
-  // The agents step. The pricing form already sent its agents in the notes: the step is skipped.
   const choix = document.getElementById('choix-agents') as HTMLFieldSetElement;
-  if (base.notes) choix.hidden = true;
   const cases = [...choix.querySelectorAll<HTMLInputElement>('input[name="agents"]')];
   const inconnu = choix.querySelector<HTMLInputElement>('input[name="agents-inconnu"]')!;
-  // A hidden step adds nothing: the pricing form already sent its choice in the notes.
   const choisis = () =>
-    choix.hidden
-      ? []
-      : inconnu.checked
-        ? [inconnu.value]
-        : cases.filter((c) => c.checked).map((c) => c.value);
+    inconnu.checked ? [inconnu.value] : cases.filter((c) => c.checked).map((c) => c.value);
 
   /** (Re)draws the agenda with the current answers: Cal.com reads its prefill only on load. */
-  const attente = document.getElementById('cal-attente')!;
   const verrouAgenda = document.getElementById('cal-verrou')!;
   const lienAgenda = document.getElementById('cal-lien')!;
   const zone = document.getElementById('cal-zone')!;
-  let charge = false; // the agenda loaded once: no more « loading » line over it
   const monter = () => {
-    const config = { ...base };
     const liste = choisis().join(', ');
-    // No choice yet (and the step is shown): the agenda stays closed, so nobody books blind.
-    const ferme = !choix.hidden && !liste;
+    // No choice yet: the agenda stays closed, so nobody books blind.
+    const ferme = !liste;
     verrouAgenda.hidden = !ferme;
     zone.classList.toggle('min-h-[650px]', !ferme);
     lienAgenda.hidden = ferme;
     attente.hidden = ferme || charge;
     if (ferme) {
-      el.replaceChildren();
+      document.getElementById('cal-inline')!.replaceChildren();
       return;
     }
-    if (liste) {
-      config.agents = liste;
-      const ligne = `${choix.dataset.note} ${liste}`;
-      config.notes = base.notes ? `${base.notes}\n${ligne}` : ligne;
-    }
-    el.replaceChildren();
-    Cal('inline', { elementOrSelector: '#cal-inline', calLink: el.dataset.calLink, config });
+    monterCal('#cal-inline', { agents: liste, notes: `${choix.dataset.note} ${liste}` });
   };
   // Same rule as the pricing form: Finch or Pecker need the Core, which then gets checked and
   // locked (it can't be unchecked); it unlocks when neither is checked.
@@ -499,50 +430,14 @@ const portraits = { peep, owl, jay, lark, finch, pecker, sparrow };
       carte.addEventListener('mouseenter', () => geste(carte));
     }
     // On arrival, the checked team waves once, then keeps moving on its own.
-    if (!choix.hidden) {
-      const io = new IntersectionObserver(
-        ([e]) => {
-          if (!e.isIntersecting) return;
-          io.disconnect();
-          cartes.forEach((carte) => carte.querySelector('input')!.checked && geste(carte));
-        },
-        { threshold: 0.4 },
-      );
-      io.observe(choix);
-    }
-  }
-  Cal('ui', {
-    theme: 'light',
-    hideEventTypeDetails: false,
-    layout: 'month_view',
-    cssVarsPerTheme: {
-      light: {
-        'cal-brand': token('orange'),
-        'cal-brand-emphasis': token('orange-hover'),
-        'cal-brand-text': token('white'),
-        'cal-text-emphasis': token('ink'),
-        'cal-text': token('soft'),
-        'cal-text-subtle': token('muted'),
-        'cal-bg': token('surface'),
-        'cal-bg-subtle': token('surface-2'),
-        'cal-bg-emphasis': token('orange-tint'),
-        'cal-bg-muted': token('cream'),
-        'cal-border': token('line'),
-        'cal-border-subtle': token('line'),
-        'cal-border-booker': token('line'),
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting) return;
+        io.disconnect();
+        cartes.forEach((carte) => carte.querySelector('input')!.checked && geste(carte));
       },
-    },
-  });
-  Cal('on', {
-    action: 'linkReady',
-    callback: () => {
-      charge = true;
-      attente.hidden = true;
-    },
-  });
-  // The site's conversion: Cal.com confirmed the booking.
-  Cal('on', {
-    action: 'bookingSuccessfulV2',
-    callback: () => suivre('demo_reservee'),
-  });
+      { threshold: 0.4 },
+    );
+    io.observe(choix);
+  }
 </script>

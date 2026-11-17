@@ -46,10 +46,10 @@ champs:
   telephone: { label: 'Téléphone', placeholder: '06 12 34 56 78' }
 
 recrutement:
-  actes: ['Candidatures', 'Affectation', 'Badges']
+  actes: ['Candidatures', 'Affectation', 'Badges', 'Rendez-vous']
   actesNom: 'Étapes'
   titres: ['Qui recrutez-vous ?', 'Où vont-ils travailler ?', 'Leurs badges sont prêts']
-  titreEnvoye: 'Votre demande est partie'
+  titreEnvoye: 'Dernière étape : choisissez votre créneau'
   consigne: 'Tamponnez la fiche de chaque agent que vous embauchez.'
   socleTexte: 'Répond à vos équipes, en salle comme en cuisine, et tient vos documents à jour.'
   avecSocle: 'Avec le socle'
@@ -80,7 +80,6 @@ recrutement:
       telephone: 'téléphone'
     envoi: 'Envoi en cours…'
     envoye: 'Envoyé à Hatch OS.'
-    fini: 'Demande envoyée.'
   badges:
     aide: '{nom} : ce que je ferai pour vous'
     enseigneVide: 'Votre enseigne'
@@ -101,8 +100,8 @@ envoi:
   tampon: 'Envoyé'
   reponse: 'Réponse'
   merci: 'Bien reçu, {prenom}.'
-  texte: "On revient vers vous très vite. D'ici là, choisissez votre créneau pour rencontrer votre équipe."
-  bouton: 'Choisir un créneau'
+  texte: 'Votre demande est bien arrivée. Dernière étape : réservez votre démo juste en dessous, on vous y présente votre tarif.'
+  bouton: 'Choisir mon créneau'
   signature: "L'équipe Hatch OS"
   entete: 'Carte postale'
 

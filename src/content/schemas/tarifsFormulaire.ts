@@ -63,10 +63,10 @@ export const schema = z.strictObject({
   }),
   /** The hiring, act by act. */
   recrutement: z.strictObject({
-    /** Labels of the three acts, and the name of their list for screen readers. */
-    actes: z.tuple([txt, txt, txt]),
+    /** Labels of the four acts (the fourth: the booking), and their list's name for screen readers. */
+    actes: z.tuple([txt, txt, txt, txt]),
     actesNom: txt,
-    /** Title of each act, then once the request has left. */
+    /** Title of each act, then of act 4, the agenda, once the request has left. */
     titres: z.tuple([txt, txt, txt]),
     titreEnvoye: txt,
     /** Act 1. */
@@ -110,7 +110,6 @@ export const schema = z.strictObject({
       }),
       envoi: txt,
       envoye: txt,
-      fini: txt,
     }),
     /** Act 3: the badges. `aide` names the button, `{nom}` replaced. */
     badges: z.strictObject({ aide: txt, enseigneVide: txt, postes, texte: txt }),

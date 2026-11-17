@@ -46,10 +46,10 @@ champs:
   telephone: { label: 'Phone', placeholder: '+33 6 12 34 56 78' }
 
 recrutement:
-  actes: ['Applications', 'Assignment', 'Badges']
+  actes: ['Applications', 'Assignment', 'Badges', 'Meeting']
   actesNom: 'Steps'
   titres: ['Who are you hiring?', 'Where will they work?', 'Their badges are ready']
-  titreEnvoye: 'Your request is on its way'
+  titreEnvoye: 'Last step: pick your slot'
   consigne: 'Stamp the file of each agent you hire.'
   socleTexte: 'Answers your teams, front of house and in the kitchen, and keeps your documents up to date.'
   avecSocle: 'With the Core'
@@ -80,7 +80,6 @@ recrutement:
       telephone: 'phone'
     envoi: 'Sending…'
     envoye: 'Sent to Hatch OS.'
-    fini: 'Request sent.'
   badges:
     aide: '{nom}: what I will do for you'
     enseigneVide: 'Your brand'
@@ -101,8 +100,8 @@ envoi:
   tampon: 'Sent'
   reponse: 'Reply'
   merci: 'Got it, {prenom}.'
-  texte: 'We will get back to you very soon. In the meantime, pick a slot to meet your team.'
-  bouton: 'Pick a slot'
+  texte: 'Your request is in. Last step: book your demo just below, that is where we present your pricing.'
+  bouton: 'Pick my slot'
   signature: 'The Hatch OS team'
   entete: 'Postcard'
 

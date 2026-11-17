@@ -15,10 +15,10 @@ import type { TarifsFormulaire } from '../../content/schemas/tarifsFormulaire';
 interface Props {
   /** The scene's words (the `envoi` block of the pricing form's content). */
   t: TarifsFormulaire['envoi'];
-  /** The demo page in the page's language, where the postcard leads. */
-  demo: string;
+  /** Where the postcard's button leads: the agenda, act 4. */
+  agenda: string;
 }
-const { t, demo } = Astro.props;
+const { t, agenda } = Astro.props;
 ---
 
 <div class="envoi" data-envoi>
@@ -181,7 +181,7 @@ const { t, demo } = Astro.props;
     <div class="cp-mot">
       <p class="cp-titre" data-cp-titre></p>
       <p class="cp-texte">{t.texte}</p>
-      <Button href={demo} variant="orange" size="lg" data-cp-bouton>{t.bouton}</Button>
+      <Button href={agenda} variant="orange" size="lg" data-cp-bouton>{t.bouton}</Button>
       <p class="cp-signe">{t.signature}</p>
     </div>
     <div class="cp-adresse" aria-hidden="true">
