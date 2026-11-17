@@ -82,7 +82,7 @@ const champs = [
   title={seo.title}
   description={seo.description}
 >
-  <!-- --debord: how far the evening iPad hangs over the next section (half of it, roughly). -->
+  <!-- exception: --debord, how far the evening iPad hangs over the next section (half of it, roughly). -->
   <div class="nuit bg-night text-cream [--debord:clamp(120px,19vw,300px)]">
     <!-- 1 · Hero: Robin floats above the title (dots), one big centred sentence (muse.ai).
          exception: the top padding clears the floating nav. -->
@@ -91,6 +91,7 @@ const champs = [
         <!-- Robin flies into his circle, waves, takes notes, checks a receipt, gives a thumbs up,
            then flies off (15 s loop; reduced motion: the portrait stays still). -->
         <div class="mb-8 flex flex-col items-center gap-2" data-vol>
+          <!-- exception: Robin's portrait circle, sized to his flight animation -->
           <div class="size-[132px] overflow-hidden rounded-full bg-cream-2 lg:size-[156px]">
             <video
               class="size-full object-cover"
@@ -148,7 +149,8 @@ const champs = [
       </div>
     </Section>
 
-    <!-- 3 · What Robin does: alternating rows, a WhatsApp situation in a tinted card -->
+    <!-- 3 · What Robin does: alternating rows, a WhatsApp situation in a tinted card.
+         exception: the top padding adds the iPad's overhang to the section rhythm (py-section). -->
     <Section id="fait" ton="cream" class="pt-[calc(var(--debord)+clamp(4rem,2.6rem+4.4vw,7rem))]">
       <div class="flex flex-col gap-12 lg:gap-16">
         <EnTete titre={fait.titre} align="centre" />

@@ -227,20 +227,6 @@
   background-blend-mode: soft-light;
 }
 
-/* Container of the agent pages: 1280 px of content at 1440, as in the Pencil mock-ups. */
-@utility wrap-agent {
-  width: 100%;
-  max-width: 1440px;
-  margin-inline: auto;
-  padding-inline: 24px;
-  @media (min-width: 48rem) {
-    padding-inline: 48px;
-  }
-  @media (min-width: 80rem) {
-    padding-inline: 80px;
-  }
-}
-
 /* Font families point at the variables injected by Astro's <Font /> (see astro.config.mjs). */
 @theme inline {
   --font-display: var(--font-fraunces);

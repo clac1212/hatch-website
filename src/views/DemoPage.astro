@@ -1,6 +1,8 @@
 ---
 import { getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
+import Section from '../components/layout/Section.astro';
+import Carte from '../components/ui/Carte.astro';
 import peep from '../assets/portraits/peep.jpg';
 import owl from '../assets/portraits/owl.jpg';
 import jay from '../assets/portraits/jay.jpg';
@@ -37,153 +39,144 @@ const portraits = { peep, owl, jay, lark, finch, pecker, sparrow };
 ---
 
 <Base locale={locale} paths={routes.demo} title={d.seo.title} description={d.seo.description}>
-  <div class="mx-auto max-w-[1440px] px-6 pt-32 pb-20 md:px-12 md:pt-40 xl:px-24">
+  <!-- exception: the top padding clears the floating nav. -->
+  <Section ton="cream" rythme="aucun" class="pt-32 pb-20 md:pt-40">
     <header class="flex flex-col items-start gap-5">
-      <h1 class="font-display text-h1 font-semibold text-ink">
+      <h1 class="font-display text-h1 font-semibold">
         {d.title}
         <em class="text-orange-txt">{d.titleAccent}</em>
       </h1>
-      <p
-        class="max-w-[760px] text-[17px] leading-[27px] text-soft md:text-[19px] md:leading-[29px]"
-      >
+      <p class="max-w-lead text-punch text-(--doux)">
         {d.lead}
       </p>
     </header>
 
-    <fieldset
-      id="choix-agents"
-      class="mt-12 rounded-card bg-surface p-5 shadow-1 outline outline-1 -outline-offset-1 outline-line md:mt-14 md:p-8"
-      data-note={d.agents.note}
-    >
-      <legend class="sr-only">{d.agents.titre}</legend>
-      <div class="flex items-start justify-between gap-4 px-1">
-        <div class="flex flex-col gap-1" aria-hidden="true">
-          <p class="font-display text-[24px] leading-tight font-bold text-ink md:text-[28px]">
-            {d.agents.titre}
-          </p>
-          <p class="text-caption text-soft">{d.agents.aide}</p>
+    <Carte class="mt-12 p-5 md:mt-14 md:p-8">
+      <fieldset id="choix-agents" data-note={d.agents.note}>
+        <legend class="sr-only">{d.agents.titre}</legend>
+        <div class="flex items-start justify-between gap-4 px-1">
+          <div class="flex flex-col gap-1" aria-hidden="true">
+            <p class="font-display text-card font-semibold">
+              {d.agents.titre}
+            </p>
+            <p class="text-caption text-soft">{d.agents.aide}</p>
+          </div>
+          <button
+            type="button"
+            class="anim-pause"
+            data-anim-pause
+            data-label-pause={c.pause.pause}
+            data-label-reprendre={c.pause.reprendre}
+            aria-pressed="false"
+            hidden
+          >
+            <span class="ap-ico" aria-hidden="true"></span>
+            <span class="sr-only" data-anim-label>{c.pause.pause}</span>
+          </button>
         </div>
-        <button
-          type="button"
-          class="anim-pause"
-          data-anim-pause
-          data-label-pause={c.pause.pause}
-          data-label-reprendre={c.pause.reprendre}
-          aria-pressed="false"
-          hidden
-        >
-          <span class="ap-ico" aria-hidden="true"></span>
-          <span class="sr-only" data-anim-label>{c.pause.pause}</span>
-        </button>
-      </div>
-      <div class="mt-5 grid gap-3 sm:grid-cols-3" data-equipe>
-        {
-          c.offres.map((o) => (
-            <label class:list={['choix', o.id === 'socle' && 'socle sm:col-span-3']}>
-              <input
-                type="checkbox"
-                id={`d-${o.id}`}
-                name="agents"
-                value={valeur(o)}
-                class="sr-only"
-              />
-              <span class="troupe" aria-hidden="true">
-                {o.agents.map((ag, k) => (
-                  <span class="membre" style={`--k:${k}`}>
-                    <span class="rond">
-                      <video
-                        src={`/anim/${ag.id}-geste.mp4`}
-                        poster={portraits[ag.id].src}
-                        muted
-                        playsinline
-                        preload="none"
-                      />
-                    </span>
-                    {o.id === 'socle' && (
-                      <span class="membre-nom">
-                        <b>{ag.nom}</b> {ag.role}
+        <div class="mt-5 grid gap-3 sm:grid-cols-3" data-equipe>
+          {
+            c.offres.map((o) => (
+              <label class:list={['choix', o.id === 'socle' && 'socle sm:col-span-3']}>
+                <input
+                  type="checkbox"
+                  id={`d-${o.id}`}
+                  name="agents"
+                  value={valeur(o)}
+                  class="sr-only"
+                />
+                <span class="troupe" aria-hidden="true">
+                  {o.agents.map((ag, k) => (
+                    <span class="membre" style={`--k:${k}`}>
+                      <span class="rond">
+                        <video
+                          src={`/anim/${ag.id}-geste.mp4`}
+                          poster={portraits[ag.id].src}
+                          muted
+                          playsinline
+                          preload="none"
+                        />
                       </span>
-                    )}
-                  </span>
-                ))}
-              </span>
-              <span class="flex min-w-0 flex-col gap-1">
-                {(o.id === 'finch' || o.id === 'pecker') && (
-                  <span class="avec-socle">
-                    <span aria-hidden="true">+</span> {c.avecSocle}
-                  </span>
-                )}
-                <span class="flex flex-wrap items-baseline gap-x-3 pr-8">
-                  <b class="font-display text-[20px] text-ink">{o.nom}</b>
-                  <span class="font-mono text-[11px] tracking-[0.14em] text-orange-txt uppercase">
-                    {o.tag}
-                  </span>
+                      {o.id === 'socle' && (
+                        <span class="membre-nom">
+                          <b>{ag.nom}</b> {ag.role}
+                        </span>
+                      )}
+                    </span>
+                  ))}
                 </span>
-                <span class="text-[14px] leading-5 text-soft">{o.texte}</span>
-                {o.id === 'socle' && <span class="requis">{c.requis}</span>}
-              </span>
-              <span class="coche" aria-hidden="true">
-                ✓
-              </span>
-            </label>
-          ))
-        }
-        <label class="choix sm:col-span-3">
-          <input type="checkbox" name="agents-inconnu" value={d.agents.inconnu} class="sr-only" />
-          <b class="pr-8 font-display text-[17px] leading-tight text-ink">{d.agents.inconnu}</b>
-          <span class="coche" aria-hidden="true"> ✓ </span>
-        </label>
-      </div>
-    </fieldset>
-
-    <section
-      aria-labelledby="agenda-titre"
-      class="mt-6 rounded-card bg-surface p-4 shadow-1 outline outline-1 -outline-offset-1 outline-line md:p-8"
-    >
-      <div class="flex flex-col gap-1 px-2 pt-2 md:flex-row md:items-baseline md:justify-between">
-        <h2
-          id="agenda-titre"
-          class="font-display text-[24px] leading-tight font-bold text-ink md:text-[28px]"
-        >
-          {d.agendaTitle}
-        </h2>
-        <p class="text-caption text-muted">{d.agendaHint}</p>
-      </div>
-      <div id="cal-zone" class="relative mt-4 min-h-[650px]">
-        <p
-          id="cal-attente"
-          class="absolute inset-x-0 top-24 text-center font-mono text-caption text-muted uppercase"
-          aria-live="polite"
-        >
-          {d.agendaFallback}
-        </p>
-        <!-- Until something is ticked above, no slot can be booked. -->
-        <p
-          id="cal-verrou"
-          class="mx-auto max-w-[420px] px-4 py-14 text-center text-body text-soft"
-          hidden
-        >
-          {d.agents.verrou}
-        </p>
-        <div
-          id="cal-inline"
-          data-cal-link={calLink}
-          class="relative w-full overflow-hidden rounded-card"
-        >
+                <span class="flex min-w-0 flex-col gap-1">
+                  {(o.id === 'finch' || o.id === 'pecker') && (
+                    <span class="avec-socle">
+                      <span aria-hidden="true">+</span> {c.avecSocle}
+                    </span>
+                  )}
+                  <span class="flex flex-wrap items-baseline gap-x-3 pr-8">
+                    <b class="font-display text-card font-semibold">{o.nom}</b>
+                    <span class="font-mono text-source text-orange-txt uppercase">{o.tag}</span>
+                  </span>
+                  <span class="text-caption text-soft">{o.texte}</span>
+                  {o.id === 'socle' && <span class="requis">{c.requis}</span>}
+                </span>
+                <span class="coche" aria-hidden="true">
+                  ✓
+                </span>
+              </label>
+            ))
+          }
+          <label class="choix sm:col-span-3">
+            <input type="checkbox" name="agents-inconnu" value={d.agents.inconnu} class="sr-only" />
+            <b class="pr-8 font-display text-body font-semibold">{d.agents.inconnu}</b>
+            <span class="coche" aria-hidden="true"> ✓ </span>
+          </label>
         </div>
-      </div>
-      <p id="cal-lien" class="px-2 pt-3 text-caption">
-        <a
-          href={`https://cal.com/${calLink}`}
-          target="_blank"
-          rel="noopener"
-          class="text-orange-txt underline underline-offset-2 hover:text-orange-hover"
-        >
-          {d.agendaFallbackLink}
-        </a>
-      </p>
-    </section>
-  </div>
+      </fieldset>
+    </Carte>
+
+    <Carte class="mt-6 p-4 md:p-8">
+      <section aria-labelledby="agenda-titre">
+        <div class="flex flex-col gap-1 px-2 pt-2 md:flex-row md:items-baseline md:justify-between">
+          <h2 id="agenda-titre" class="font-display text-card font-semibold">
+            {d.agendaTitle}
+          </h2>
+          <p class="text-caption text-muted">{d.agendaHint}</p>
+        </div>
+        <div id="cal-zone" class="relative mt-4 min-h-[650px]">
+          <p
+            id="cal-attente"
+            class="absolute inset-x-0 top-24 text-center font-mono text-caption text-muted uppercase"
+            aria-live="polite"
+          >
+            {d.agendaFallback}
+          </p>
+          <!-- Until something is ticked above, no slot can be booked. -->
+          <p
+            id="cal-verrou"
+            class="mx-auto max-w-lead px-4 py-14 text-center text-body text-soft"
+            hidden
+          >
+            {d.agents.verrou}
+          </p>
+          <div
+            id="cal-inline"
+            data-cal-link={calLink}
+            class="relative w-full overflow-hidden rounded-card"
+          >
+          </div>
+        </div>
+        <p id="cal-lien" class="px-2 pt-3 text-caption">
+          <a
+            href={`https://cal.com/${calLink}`}
+            target="_blank"
+            rel="noopener"
+            class="text-orange-txt underline underline-offset-2 hover:text-orange-hover"
+          >
+            {d.agendaFallbackLink}
+          </a>
+        </p>
+      </section>
+    </Carte>
+  </Section>
 </Base>
 
 <style>

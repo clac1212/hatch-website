@@ -3,7 +3,10 @@ import { getEntry } from 'astro:content';
 import { Picture } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import Base from '../layouts/Base.astro';
+import Section from '../components/layout/Section.astro';
 import Button from '../components/ui/Button.astro';
+import Carte from '../components/ui/Carte.astro';
+import EnTete from '../components/ui/EnTete.astro';
 import Ipad from '../components/ui/Ipad.astro';
 import jay from '../assets/securite/jay.png';
 import owl from '../assets/securite/owl.png';
@@ -33,7 +36,6 @@ const t = useTranslations(locale);
 const entry = await getEntry('securityPage', locale);
 if (!entry) throw new Error(`Missing src/content/pages/security/${locale}.yaml`);
 const { seo, hero, sections, screen, contact } = entry.data;
-const wrap = 'mx-auto w-full max-w-site px-6 md:px-12';
 const AGENTS: Record<'jay' | 'owl' | 'finch', ImageMetadata> = { jay, owl, finch };
 /** Tint behind each agent, from the warm side of the palette (as the agent cards of the home). */
 const TEINTES = { jay: 'bg-sand', owl: 'bg-stone', finch: 'bg-peach' };
@@ -42,13 +44,12 @@ const num = (i: number) => String(i + 1).padStart(2, '0');
 ---
 
 <Base locale={locale} paths={routes.security} title={seo.title} description={seo.description}>
-  <header class="fond-grain pt-32 pb-16 md:pt-40 md:pb-20">
-    <div class:list={[wrap, 'flex flex-col items-start gap-6']} data-rv-groupe>
-      <p class="font-mono text-kicker text-night uppercase" data-rv>{hero.kicker}</p>
-      <h1 class="max-w-[16ch] font-display text-h1 font-semibold text-night" data-rv>
-        {hero.title}
-      </h1>
-      <p class="max-w-[36rem] text-body text-night" data-rv>{hero.lead}</p>
+  <!-- exception: the top padding clears the floating nav. -->
+  <Section ton="orange" rythme="aucun" class="pt-32 pb-16 md:pt-40 md:pb-20">
+    <div class="flex flex-col items-start gap-6" data-rv-groupe>
+      <div data-rv>
+        <EnTete niveau="h1" kicker={hero.kicker} titre={hero.title} intro={hero.lead} />
+      </div>
       <ul
         class="mt-4 grid w-full gap-px overflow-hidden rounded-card bg-night/15 sm:grid-cols-2 lg:grid-cols-4"
         data-rv
@@ -58,7 +59,7 @@ const num = (i: number) => String(i + 1).padStart(2, '0');
             <li>
               <a href={`#${ancre(p.section)}`} class="ancre">
                 <span class="font-mono text-kicker text-night/70 uppercase">{num(p.section)}</span>
-                <span class="flex items-center justify-between gap-3 font-display text-card font-bold text-night">
+                <span class="flex items-center justify-between gap-3 font-display text-card font-semibold text-night">
                   {p.label}
                   <svg
                     viewBox="0 0 24 24"
@@ -75,30 +76,22 @@ const num = (i: number) => String(i + 1).padStart(2, '0');
         }
       </ul>
     </div>
-  </header>
+  </Section>
 
   {
     sections.map((sec, i) =>
       sec.visual === 'ecran' ? (
-        <section
-          id={ancre(i)}
-          aria-labelledby={`secu-${i}`}
-          class="scroll-mt-24 bg-night py-20 text-white md:py-28"
-        >
-          <div
-            class:list={[wrap, 'grid items-center gap-12 md:grid-cols-[0.9fr_1.1fr]']}
-            data-rv-groupe
-          >
+        <Section id={ancre(i)} ton="night" aria-labelledby={`secu-${i}`} class="scroll-mt-24">
+          <div class="grid items-center gap-12 md:grid-cols-[0.9fr_1.1fr]" data-rv-groupe>
             <div class="flex flex-col items-start gap-5">
-              <p class="font-mono text-kicker text-white/60 uppercase" data-rv>
-                {num(i)} · {sec.kicker}
-              </p>
-              <h2 id={`secu-${i}`} class="font-display text-section font-bold" data-rv>
-                {sec.title}
-              </h2>
-              <p class="text-body text-white/75" data-rv>
-                {sec.subtitle}
-              </p>
+              <div data-rv>
+                <EnTete
+                  id={`secu-${i}`}
+                  kicker={`${num(i)} · ${sec.kicker}`}
+                  titre={sec.title}
+                  intro={sec.subtitle}
+                />
+              </div>
               <ol class="points points-nuit flex w-full flex-col" data-rv>
                 {sec.items.map((it, j) => (
                   <li>
@@ -153,21 +146,17 @@ const num = (i: number) => String(i + 1).padStart(2, '0');
               </Ipad>
             </div>
           </div>
-        </section>
+        </Section>
       ) : (
-        <section
+        <Section
           id={ancre(i)}
+          ton="cream"
+          rythme="aucun"
           aria-labelledby={`secu-${i}`}
-          class:list={[wrap, 'scroll-mt-24 py-10 md:py-14', i === 0 && 'pt-20 md:pt-24']}
+          class:list={['scroll-mt-24 py-10 md:py-14', i === 0 && 'pt-20 md:pt-24']}
           data-rv-groupe
         >
-          <div
-            class:list={[
-              'bloc grid overflow-hidden rounded-card bg-surface md:grid-cols-2',
-              i % 2 === 1 && 'inverse',
-            ]}
-            data-rv
-          >
+          <Carte class:list={['bloc grid md:grid-cols-2', i % 2 === 1 && 'inverse']} data-rv>
             <div class:list={['tuile grid place-items-center', TEINTES[sec.visual]]}>
               <Picture
                 src={AGENTS[sec.visual]}
@@ -182,7 +171,7 @@ const num = (i: number) => String(i + 1).padStart(2, '0');
               <p class="font-mono text-kicker text-orange-txt uppercase">
                 {num(i)} · {sec.kicker}
               </p>
-              <h2 id={`secu-${i}`} class="font-display text-section font-bold text-ink">
+              <h2 id={`secu-${i}`} class="font-display text-section font-semibold">
                 {sec.title}
               </h2>
               <p class="text-body text-soft">{sec.subtitle}</p>
@@ -198,23 +187,27 @@ const num = (i: number) => String(i + 1).padStart(2, '0');
                 ))}
               </ol>
             </div>
-          </div>
-        </section>
+          </Carte>
+        </Section>
       ),
     )
   }
 
-  <section aria-labelledby="secu-contact" class="py-20 md:py-28" data-rv-groupe>
-    <div class:list={[wrap, 'flex flex-col items-start gap-5 md:items-center md:text-center']}>
-      <h2 id="secu-contact" class="font-display text-section font-bold text-ink" data-rv>
-        {contact.title}
-      </h2>
-      <p class="max-w-[36rem] text-body text-soft" data-rv>{contact.text}</p>
+  <Section ton="cream" aria-labelledby="secu-contact" data-rv-groupe>
+    <div class="flex flex-col items-start gap-5 md:items-center md:text-center">
+      <div data-rv>
+        <EnTete
+          id="secu-contact"
+          titre={contact.title}
+          intro={contact.text}
+          class="md:mx-auto md:items-center md:text-center"
+        />
+      </div>
       <div data-rv>
         <Button href={routes.demo[locale]} size="lg">{t('cta.demo')}</Button>
       </div>
     </div>
-  </section>
+  </Section>
 </Base>
 
 <style>
@@ -249,9 +242,6 @@ const num = (i: number) => String(i + 1).padStart(2, '0');
   }
 
   /* A theme: the agent on its tint, the text beside; every other block puts the agent right. */
-  .bloc {
-    box-shadow: inset 0 0 0 1px var(--color-line);
-  }
   .tuile {
     min-height: 320px;
     padding: 40px;

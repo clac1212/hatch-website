@@ -2,7 +2,9 @@
 import { Image } from 'astro:assets';
 import { section } from '../../content/section';
 import { routes, useTranslations, type Locale } from '../../i18n/ui';
+import Section from '../layout/Section.astro';
 import Button from '../ui/Button.astro';
+import EnTete from '../ui/EnTete.astro';
 import Logo from '../ui/Logo.astro';
 import srcGoogleDrive from '../../assets/miseEnPlace/src-google-drive.png';
 import srcNotion from '../../assets/miseEnPlace/src-notion.png';
@@ -80,14 +82,35 @@ const trails = [
   { l: 48.61, t: 94.9, w: 55.56, h: 3, r: -9, o: 0.5, c: 'bg-orange' },
 ];
 
+/*
+ * Inside the app windows, sizes and radii are the mockup's own (v4 window, product UI scale), not the
+ * page's type scale: each such class string below is a named exception.
+ */
+// exception: app mockup, section label of the window
 const label = 'font-mono text-[13px] tracking-[0.4px] text-gray-500 md:text-[12px]';
 const avatar = 'relative shrink-0 overflow-hidden rounded-full bg-peach-2';
+// exception: app mockup, chat bubble text
 const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowrap';
+// exception: app mockup, chat bubble tails (agent on the left, user on the right, thread)
+const bulleAgent = 'rounded-[14px_14px_14px_4px] bg-gray-100/80';
+// exception: app mockup, chat bubble tail
+const bulleMoi = 'rounded-[14px_14px_4px_14px] bg-orange text-ink';
+const bulleFil =
+  'rounded-[4px_14px_14px_14px] bg-white px-[13px] py-[9px] text-[14px] max-md:leading-snug md:whitespace-nowrap'; // exception: app mockup, chat bubble tail
+const recherche =
+  'flex items-center gap-2.5 rounded-lg bg-gray-100/70 px-3.5 py-[11px] text-[14px] text-gray-500'; // exception: app mockup, search field
+// exception: app mockup, migration counter
+const valeur = 'font-mono text-[13px] whitespace-nowrap text-gray-700 md:w-20 md:text-right';
+// exception: app mockup, window footer text
+const pied = 'flex-1 text-[14px] text-gray-700';
+const suivant =
+  'btn-vif inline-flex cursor-pointer items-center gap-2 rounded-[4px] bg-orange px-[18px] py-2.5 text-[14px] font-semibold text-ink'; // exception: app mockup, the app's own "next" button (square app style, not a site CTA)
 ---
 
-<section
+<Section
   id="mise-en-place"
-  class="mep relative overflow-x-clip bg-night"
+  ton="night"
+  class="mep relative overflow-x-clip"
   aria-labelledby="mep-titre"
 >
   <div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
@@ -101,32 +124,29 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
     }
   </div>
 
-  <div class="relative px-4 py-20 md:px-8 md:py-24">
+  <div class="relative">
     <div class="halo" aria-hidden="true"></div>
 
-    <h2
-      id="mep-titre"
-      class="relative text-center font-sans text-[clamp(2.125rem,1.4rem+3vw,3.75rem)] leading-[1.08] font-semibold tracking-[-0.033em] text-balance text-white"
-    >
-      {data.title}
-    </h2>
+    <EnTete id="mep-titre" titre={data.title} align="centre" class="relative" />
 
-    <div class="mep-scene mx-auto mt-12 max-w-[760px] md:mt-16">
+    <div class="mep-scene mx-auto mt-12 max-w-prose md:mt-16">
       <div class="mep-etats relative flex flex-col gap-14 md:gap-20">
         {
           [sources.title, agents.title, channels.title].map((windowTitle, i) => (
             <div class="mep-etat" id={`mep-etat-${i}`} data-mep-etat={i} data-d={i}>
-              <h3 class="mep-etat-titre mb-4 flex items-center gap-2.5 text-[15px] font-medium text-white">
-                <span class="grid size-6 shrink-0 place-items-center rounded-full bg-orange font-mono text-[13px] text-ink">
+              <h3 class="mep-etat-titre mb-4 flex items-center gap-2.5 text-caption font-medium text-white">
+                <span class="grid size-6 shrink-0 place-items-center rounded-full bg-orange font-mono text-kicker text-ink">
                   {i + 1}
                 </span>
                 {data.steps[i]}
               </h3>
 
+              {/* exception: app mockup, the window's own UI scale (v4) */}
               <div class="fenetre w-full overflow-hidden leading-[normal] rounded-[10px] bg-white font-sans text-ink">
                 <div class="flex items-center gap-3 px-4 py-4 md:px-7 md:py-5">
                   <div class="flex flex-1 items-center gap-3">
                     <Logo class="w-16 shrink-0" />
+                    {/* exception: app mockup, the window's own UI scale (v4) */}
                     <p class="text-[16px] font-semibold md:text-[18px]">{windowTitle}</p>
                   </div>
                   <svg
@@ -141,10 +161,7 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
                 <div class="corps flex flex-col gap-[18px] px-4 pt-1 pb-6 md:px-7">
                   {i === 0 && (
                     <>
-                      <div
-                        class="flex items-center gap-2.5 rounded-lg bg-gray-100/70 px-3.5 py-[11px] text-[14px] text-gray-500"
-                        aria-hidden="true"
-                      >
+                      <div class={recherche} aria-hidden="true">
                         <svg
                           viewBox="0 0 24 24"
                           class="size-4 shrink-0"
@@ -177,7 +194,9 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
                                 densities={[1, 2]}
                                 class="size-7 object-contain"
                               />
+                              {/* exception: app mockup, the window's own UI scale (v4) */}
                               <p class="text-[13px] font-semibold">{src.name}</p>
+                              {/* exception: app mockup, the window's own UI scale (v4) */}
                               <p class="flex items-center gap-1.5 text-[13px] md:text-[12px]">
                                 <span
                                   class:list={[
@@ -210,7 +229,9 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
                                   <path d={icons[tool.icon]} fill="currentColor" />
                                 </svg>
                               </span>
+                              {/* exception: app mockup, the window's own UI scale (v4) */}
                               <p class="text-[13px] font-semibold">{tool.name}</p>
+                              {/* exception: app mockup, the window's own UI scale (v4) */}
                               <p class="flex items-center gap-1.5 text-[13px] md:text-[12px]">
                                 <span class="size-[7px] shrink-0 rounded-full bg-orange" />
                                 {sources.tools.state}
@@ -239,25 +260,11 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
                                     class="absolute top-0 left-0 size-[28.16px] object-contain"
                                   />
                                 </span>
-                                <p
-                                  class:list={[
-                                    bubble,
-                                    'rounded-[14px_14px_14px_4px] bg-gray-100/80',
-                                  ]}
-                                >
-                                  {m.text}
-                                </p>
+                                <p class:list={[bubble, bulleAgent]}>{m.text}</p>
                               </li>
                             ) : (
                               <li class="anim flex justify-end" data-bulle>
-                                <p
-                                  class:list={[
-                                    bubble,
-                                    'rounded-[14px_14px_4px_14px] bg-orange text-ink',
-                                  ]}
-                                >
-                                  {m.text}
-                                </p>
+                                <p class:list={[bubble, bulleMoi]}>{m.text}</p>
                               </li>
                             ),
                           )}
@@ -285,23 +292,21 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
                                     class="absolute top-0 left-0 size-[24.64px] object-contain"
                                   />
                                 </span>
+                                {/* exception: app mockup, the window's own UI scale (v4) */}
                                 <p class="min-w-0 flex-1 text-[14px] font-semibold md:w-[170px] md:flex-none">
                                   {row.name}
                                 </p>
-                                <span class="relative order-last h-1 basis-full rounded-[2px] bg-gray-100 md:order-none md:flex-1 md:basis-auto">
+                                <span class="relative order-last h-1 basis-full rounded-full bg-gray-100 md:order-none md:flex-1 md:basis-auto">
                                   <span
                                     class:list={[
-                                      'barre absolute inset-y-0 left-0 rounded-[2px]',
+                                      'barre absolute inset-y-0 left-0 rounded-full',
                                       complete ? 'bg-success' : 'bg-orange',
                                     ]}
                                     style={`width:${(row.done / row.total) * 100}%`}
                                     data-barre
                                   />
                                 </span>
-                                <p
-                                  class="font-mono text-[13px] whitespace-nowrap text-gray-700 md:w-20 md:text-right"
-                                  data-valeur
-                                >
+                                <p class={valeur} data-valeur>
                                   {row.done} / {row.total}
                                 </p>
                                 <span
@@ -355,7 +360,9 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
                                 )}
                               </span>
                               <span class="flex flex-col gap-1">
+                                {/* exception: app mockup, the window's own UI scale (v4) */}
                                 <span class="text-[14px] font-semibold">{ch.name}</span>
+                                {/* exception: app mockup, the window's own UI scale (v4) */}
                                 <span class="flex items-center gap-1.5 text-[13px] md:text-[12px]">
                                   <span class="size-[7px] shrink-0 rounded-full bg-success" />
                                   {channels.active}
@@ -370,16 +377,16 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
                         <p class={label}>{channels.thread.label}</p>
                         <div class="flex flex-col gap-3 rounded-lg bg-paper p-4 md:p-[18px]">
                           <div class="anim flex items-start gap-2.5" data-fil>
+                            {/* exception: app mockup, the window's own UI scale (v4) */}
                             <span class="grid size-8 shrink-0 place-items-center rounded-full bg-stone text-[13px] font-semibold text-ink md:text-[12px]">
                               {channels.thread.question.initials}
                             </span>
                             <div class="flex min-w-0 flex-col gap-1">
+                              {/* exception: app mockup, the window's own UI scale (v4) */}
                               <p class="text-[13px] font-semibold text-soft md:text-[12px]">
                                 {channels.thread.question.who}
                               </p>
-                              <p class="rounded-[4px_14px_14px_14px] bg-white px-[13px] py-[9px] text-[14px] max-md:leading-snug md:whitespace-nowrap">
-                                {channels.thread.question.text}
-                              </p>
+                              <p class={bulleFil}>{channels.thread.question.text}</p>
                             </div>
                           </div>
                           <div class="anim flex items-start gap-2.5" data-fil>
@@ -393,12 +400,11 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
                               />
                             </span>
                             <div class="flex min-w-0 flex-col gap-1">
+                              {/* exception: app mockup, the window's own UI scale (v4) */}
                               <p class="text-[13px] font-semibold text-orange-txt md:text-[12px]">
                                 {channels.thread.answer.who}
                               </p>
-                              <p class="rounded-[4px_14px_14px_14px] bg-white px-[13px] py-[9px] text-[14px] max-md:leading-snug md:whitespace-nowrap">
-                                {channels.thread.answer.text}
-                              </p>
+                              <p class={bulleFil}>{channels.thread.answer.text}</p>
                             </div>
                           </div>
                         </div>
@@ -409,7 +415,7 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
 
                 <div class="flex flex-wrap items-center gap-3 border-t border-gray-100 bg-gray-50 px-4 py-4 md:px-7">
                   <p
-                    class="flex-1 text-[14px] text-gray-700"
+                    class={pied}
                     data-compteur={i === 0 ? '' : undefined}
                     data-one={i === 0 ? sources.counter.one : undefined}
                     data-other={i === 0 ? sources.counter.other : undefined}
@@ -417,11 +423,7 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
                     {i === 0 ? counterText : i === 1 ? agents.footer : channels.footer}
                   </p>
                   {i < 2 ? (
-                    <button
-                      type="button"
-                      class="btn-vif inline-flex cursor-pointer items-center gap-2 rounded-[4px] bg-orange px-[18px] py-2.5 text-[14px] font-semibold text-ink"
-                      data-mep-suivant={i}
-                    >
+                    <button type="button" class={suivant} data-mep-suivant={i}>
                       {data.next}
                       <svg viewBox="0 0 24 24" class="size-4" aria-hidden="true">
                         <path d={icons.arrow} fill="currentColor" />
@@ -466,12 +468,12 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
               </span>
               <span class="flex items-start gap-2.5">
                 <span
-                  class="num grid size-6 shrink-0 place-items-center rounded-full font-mono text-[12px]"
+                  class="num grid size-6 shrink-0 place-items-center rounded-full font-mono text-kicker"
                   aria-hidden="true"
                 >
                   {i + 1}
                 </span>
-                <span class="lib pt-0.5 text-[15px] font-medium text-balance">{step}</span>
+                <span class="lib pt-0.5 text-caption font-medium text-balance">{step}</span>
               </span>
             </button>
           ))
@@ -479,7 +481,7 @@ const bubble = 'px-3.5 py-2.5 text-[14px] max-md:leading-snug md:whitespace-nowr
       </div>
     </div>
   </div>
-</section>
+</Section>
 
 <script>
   import '../../scripts/miseEnPlace';

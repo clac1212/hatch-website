@@ -4,6 +4,8 @@ import type { AgentSlug } from '../../content/schemas/agents';
 import { avatars } from '../pages/agent-visuels';
 import { richText } from '../pages/format';
 import { centres } from './visuels';
+import Section from '../layout/Section.astro';
+import EnTete from '../ui/EnTete.astro';
 import Icone from './Icone.astro';
 import LogoWhatsapp from './LogoWhatsapp.astro';
 
@@ -40,12 +42,14 @@ const colonnes = [
 ];
 ---
 
-<section aria-labelledby="agent-avec" class="relais-section">
-  <div class="wrap-agent flex flex-col gap-6" data-rv-groupe>
-    <h2 id="agent-avec" class="font-display text-section font-bold text-ink" data-rv>{titre}</h2>
+<Section ton="surface" aria-labelledby="agent-avec">
+  <div class="flex flex-col gap-6" data-rv-groupe>
+    <div data-rv>
+      <EnTete id="agent-avec" titre={titre} />
+    </div>
     {
       intro && (
-        <p class="intro" data-rv>
+        <p class="intro max-w-prose text-punch text-(--doux)" data-rv>
           {richText(intro).map((r) => (r.bold ? <b>{r.text}</b> : r.text))}
         </p>
       )
@@ -99,7 +103,7 @@ const colonnes = [
       }
     </div>
   </div>
-</section>
+</Section>
 
 <script>
   const calme = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -176,15 +180,6 @@ const colonnes = [
 </script>
 
 <style>
-  .relais-section {
-    padding: 96px 0 112px;
-  }
-  .intro {
-    max-width: 52rem;
-    font-size: 18px;
-    line-height: 1.6;
-    color: var(--color-soft);
-  }
   .intro b {
     font-weight: 600;
     color: var(--color-ink);
@@ -423,9 +418,6 @@ const colonnes = [
 
   /* Below 1024 px: the agent on top, the nodes listed under it on a rule, no threads. */
   @media (max-width: 63.99rem) {
-    .relais-section {
-      padding: 72px 0 88px;
-    }
     .centre {
       flex-direction: row;
       justify-self: start;
