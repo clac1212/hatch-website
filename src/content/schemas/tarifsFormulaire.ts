@@ -32,8 +32,6 @@ export const schema = z.strictObject({
   intro: txt,
   /** Legends of the three steps (fieldsets). */
   etapes: z.strictObject({ agents: txt, reseau: txt, contact: txt }),
-  /** Labels of the animation pause button (WCAG 2.2.2), while playing and while paused. */
-  pause: z.strictObject({ pause: txt, reprendre: txt }),
   /** The core (checked by default), then Finch, Pecker, Sparrow. */
   offres: z.tuple([offre('socle'), offre('finch'), offre('pecker'), offre('sparrow')]),
   /** Badge on Finch and Pecker: they add to the core. */

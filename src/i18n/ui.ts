@@ -71,8 +71,6 @@ const fr = {
   'nav.robin.whatsapp': 'Sur WhatsApp',
   'cta.waitlist': "Rejoindre la liste d'attente",
   /** Pause control of the animated Europe map (network page hero). */
-  'hero.mapPause': "Mettre l'animation de la carte en pause",
-  'hero.mapPlay': "Relancer l'animation de la carte",
   'lang.switch': 'English',
   'footer.product': 'Produit',
   'footer.company': 'Hatch OS',
@@ -112,8 +110,6 @@ const en: Record<keyof typeof fr, string> = {
   'nav.robin.daily': 'Day to day',
   'nav.robin.whatsapp': 'On WhatsApp',
   'cta.waitlist': 'Join the waitlist',
-  'hero.mapPause': 'Pause the map animation',
-  'hero.mapPlay': 'Play the map animation',
   'lang.switch': 'Français',
   'footer.product': 'Product',
   'footer.company': 'Hatch OS',

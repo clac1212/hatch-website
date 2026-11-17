@@ -6,10 +6,6 @@ etapes:
   reseau: 'Your network'
   contact: 'Your contact details'
 
-pause:
-  pause: 'Pause animations'
-  reprendre: 'Resume animations'
-
 offres:
   - id: socle
     nom: 'The Core'

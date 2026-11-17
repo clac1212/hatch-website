@@ -6,10 +6,6 @@ etapes:
   reseau: 'Votre réseau'
   contact: 'Vos coordonnées'
 
-pause:
-  pause: 'Mettre les animations en pause'
-  reprendre: 'Relancer les animations'
-
 offres:
   - id: socle
     nom: 'Le socle'

@@ -61,18 +61,6 @@ const portraits = { peep, owl, jay, lark, finch, pecker, sparrow };
             </p>
             <p class="text-caption text-soft">{d.agents.aide}</p>
           </div>
-          <button
-            type="button"
-            class="anim-pause"
-            data-anim-pause
-            data-label-pause={c.pause.pause}
-            data-label-reprendre={c.pause.reprendre}
-            aria-pressed="false"
-            hidden
-          >
-            <span class="ap-ico" aria-hidden="true"></span>
-            <span class="sr-only" data-anim-label>{c.pause.pause}</span>
-          </button>
         </div>
         <div class="mt-5 grid gap-3 sm:grid-cols-3" data-equipe>
           {
@@ -283,45 +271,6 @@ const portraits = { peep, owl, jay, lark, finch, pecker, sparrow };
       font-size: 12.5px;
     }
   }
-  /* Discreet pause for the waves, icon only (its label is for screen readers), like the
-     pricing form's. */
-  .anim-pause {
-    display: inline-flex;
-    flex: none;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 30px;
-    border-radius: 999px;
-    box-shadow: inset 0 0 0 1px var(--color-line);
-    color: var(--color-soft);
-    cursor: pointer;
-  }
-  .anim-pause[hidden] {
-    display: none;
-  }
-  .anim-pause:hover,
-  .anim-pause:focus-visible {
-    color: var(--color-ink);
-  }
-  .anim-pause:focus-visible {
-    outline: 2px solid var(--color-orange-txt);
-    outline-offset: 2px;
-  }
-  .ap-ico {
-    width: 8px;
-    height: 9px;
-    border-left: 3px solid currentColor;
-    border-right: 3px solid currentColor;
-  }
-  .anim-pause[aria-pressed='true'] .ap-ico {
-    width: 0;
-    height: 0;
-    border-left: 8px solid currentColor;
-    border-right: 0;
-    border-top: 5px solid transparent;
-    border-bottom: 5px solid transparent;
-  }
   /* Finch and Pecker add to the Core; the locked Core says so. */
   .avec-socle {
     display: inline-flex;
@@ -509,19 +458,15 @@ const portraits = { peep, owl, jay, lark, finch, pecker, sparrow };
   monter();
 
   // The team feels alive, as in the pricing form: checking (or hovering) an offer plays its agents'
-  // wave, then each checked agent waves again now and then (6 to 10 s). Since it repeats, a button
-  // pauses everything (WCAG 2.2.2). Reduced motion: no wave, no button.
+  // wave, then each checked agent waves again now and then (6 to 10 s). No pause button (César 17/11):
+  // reduced motion means no wave at all.
   if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    const bouton = choix.querySelector<HTMLButtonElement>('[data-anim-pause]')!;
-    const label = choix.querySelector<HTMLElement>('[data-anim-label]')!;
     const cartes = [...choix.querySelectorAll<HTMLLabelElement>('[data-equipe] .choix')].filter(
       (carte) => carte.querySelector('video'),
     );
     const minuteurs = new Map<HTMLVideoElement, number>();
-    let enPause = false;
     const arreter = (v: HTMLVideoElement) => clearTimeout(minuteurs.get(v));
     const jouer = (v: HTMLVideoElement) => {
-      if (enPause) return;
       arreter(v);
       v.currentTime = 0;
       v.play().catch(() => {});
@@ -543,7 +488,7 @@ const portraits = { peep, owl, jay, lark, finch, pecker, sparrow };
         // Wave over: if still checked, the agent does it again a bit later.
         v.addEventListener('ended', () => {
           arreter(v);
-          if (!input.checked || enPause) return;
+          if (!input.checked) return;
           minuteurs.set(
             v,
             window.setTimeout(() => input.checked && jouer(v), rythme + Math.random() * 1500),
@@ -553,19 +498,6 @@ const portraits = { peep, owl, jay, lark, finch, pecker, sparrow };
       input.addEventListener('change', () => input.checked && geste(carte));
       carte.addEventListener('mouseenter', () => geste(carte));
     }
-    bouton.hidden = false;
-    bouton.addEventListener('click', () => {
-      enPause = !enPause;
-      bouton.setAttribute('aria-pressed', String(enPause));
-      label.textContent = bouton.dataset[enPause ? 'labelReprendre' : 'labelPause'] ?? '';
-      for (const carte of cartes) {
-        videos(carte).forEach((v) => {
-          arreter(v);
-          if (enPause) v.pause();
-        });
-        if (!enPause && carte.querySelector('input')!.checked) geste(carte);
-      }
-    });
     // On arrival, the checked team waves once, then keeps moving on its own.
     if (!choix.hidden) {
       const io = new IntersectionObserver(
