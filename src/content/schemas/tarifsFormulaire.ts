@@ -124,22 +124,11 @@ export const schema = z.strictObject({
     reponse: txt,
     merci: txt,
     texte: txt,
-    bouton: txt,
     signature: txt,
     entete: txt,
   }),
-  /** The "how it works" aside. */
-  deroule: z.strictObject({
-    kicker: txt,
-    etapes: z.tuple([
-      z.strictObject({ titre: txt, texte: txt }),
-      z.strictObject({ titre: txt, texte: txt }),
-      z.strictObject({ titre: txt, texte: txt }),
-    ]),
-    mention: txt,
-  }),
   /**
-   * Line labels of the summary attached to the demo booking (stored in sessionStorage for /demo).
+   * Line labels of the summary written in the notes of the demo booking (prefilled on the postcard).
    * Labels carry their own colon, so each locale keeps its typography ("Enseigne :" / "Brand:").
    */
   notes: z.strictObject({

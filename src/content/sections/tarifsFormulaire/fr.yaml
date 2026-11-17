@@ -100,21 +100,9 @@ envoi:
   tampon: 'Envoyé'
   reponse: 'Réponse'
   merci: 'Bien reçu, {prenom}.'
-  texte: 'Votre demande est bien arrivée. Dernière étape : réservez votre démo juste en dessous, on vous y présente votre tarif.'
-  bouton: 'Choisir mon créneau'
+  texte: 'Votre demande est bien arrivée. Dernière étape : choisissez votre créneau ci-dessous, on vous y présente votre tarif.'
   signature: "L'équipe Hatch OS"
   entete: 'Carte postale'
-
-deroule:
-  kicker: 'Comment ça se passe'
-  etapes:
-    - titre: 'Vous choisissez vos agents'
-      texte: "Et vous nous dites combien d'établissements compte votre réseau."
-    - titre: 'Vous réservez un créneau'
-      texte: 'Vos réponses sont jointes à la réservation, pas besoin de tout répéter.'
-    - titre: 'On vous présente votre tarif'
-      texte: 'Calé sur vos agents et la taille de votre réseau, pendant la démo.'
-  mention: 'Sans engagement. Vos données servent uniquement à préparer la démo.'
 
 notes:
   agents: 'Agents :'

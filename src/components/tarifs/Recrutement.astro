@@ -6,8 +6,8 @@
  * included). Act 2: the network, a town whose shops light up with the number of establishments,
  * and Sparrow's pace of openings. Act 3: the team's badges and the contact details. Then the
  * request is saved (/api/demande-demo: a Lead in Notion and a Slack alert, booked or not) and
- * leaves as a letter (Envoi); the postcard that comes back opens act 4, the Cal.com agenda right
- * below, prefilled with the answers.
+ * leaves as a letter (Envoi); the postcard that comes back opens into act 4, the Cal.com agenda
+ * written on the card, prefilled with the answers.
  */
 import { getCollection, getEntry } from 'astro:content';
 import { Image } from 'astro:assets';
@@ -15,7 +15,6 @@ import Button from '../ui/Button.astro';
 import Envoi from './Envoi.astro';
 import { section } from '../../content/section';
 import { insecable, type Locale } from '../../i18n/ui';
-import { CAL_LINK } from '../../scripts/cal';
 import peep from '../../assets/portraits/peep.jpg';
 import owl from '../../assets/portraits/owl.jpg';
 import jay from '../../assets/portraits/jay.jpg';
@@ -289,25 +288,14 @@ const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, o
 
   <!-- The sending: the request becomes a letter, an envelope, a postcard (see Envoi.astro). -->
   <div class="envoi-cadre" data-envoi-cadre hidden>
-    <Envoi t={c.envoi} agenda="#tarifs-agenda" />
-  </div>
-
-  <!-- Act 4, the last step: the booking, prefilled with the answers. -->
-  <div id="tarifs-agenda" class="agenda" data-agenda hidden>
-    <p class="text-caption text-muted">{demo.agendaHint}</p>
-    <div class="agenda-zone">
-      <p class="agenda-attente" data-cal-attente aria-live="polite">{demo.agendaFallback}</p>
-      <div id="tarifs-cal" class="agenda-cal rounded-interieur"></div>
-    </div>
-    <p class="text-caption">
-      <a
-        href={`https://cal.com/${CAL_LINK}`}
-        target="_blank"
-        rel="noopener"
-        class="text-orange-txt underline underline-offset-2 hover:text-orange-hover"
-        >{demo.agendaFallbackLink}</a
-      >
-    </p>
+    <Envoi
+      t={c.envoi}
+      agenda={{
+        aide: demo.agendaHint,
+        attente: demo.agendaFallback,
+        lien: demo.agendaFallbackLink,
+      }}
+    />
   </div>
 
   <!-- The team bar: always in view at the bottom of the screen, it gathers the agents as they
@@ -913,9 +901,8 @@ const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, o
         }),
       }).catch(() => {});
     };
-    // Act 4: the Cal.com agenda, under the postcard. Name and email prefill the booking, the rest
+    // Act 4: the Cal.com agenda, on the postcard. Name and email prefill the booking, the rest
     // goes in its notes, in the page's language. Cal's script starts loading with the letter.
-    const agenda = q('[data-agenda]');
     const attente = q('[data-cal-attente]');
     let monterCal: ReturnType<typeof preparerCal>;
     const prefill = () => {
@@ -947,7 +934,7 @@ const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, o
         }).finished;
       acte.hidden = true;
       cadreEnvoi.hidden = false;
-      const { regler } = construire(cadreEnvoi.querySelector('[data-envoi]')!, {
+      const { regler, ouvrir } = construire(cadreEnvoi.querySelector('[data-envoi]')!, {
         date,
         photos: ids.map((id) => parId[id].photo),
         noms: ids.map((id) => parId[id].nom),
@@ -975,7 +962,7 @@ const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, o
           s.classList.toggle('fait', s.dataset.acte !== '4');
         });
         q('.barre').hidden = true;
-        agenda.hidden = false;
+        ouvrir(calme);
         monterCal('#tarifs-cal', prefill());
       };
       if (calme) {
@@ -989,11 +976,6 @@ const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, o
       });
       fini();
     };
-    // The postcard's button: down to the agenda.
-    q('[data-cp-bouton]').addEventListener('click', (ev) => {
-      ev.preventDefault();
-      agenda.scrollIntoView({ block: 'start', behavior: calme ? 'auto' : 'smooth' });
-    });
     // Once every missing field is filled, the bar goes back to the team.
     w.querySelectorAll<HTMLInputElement>('.acte3 input').forEach((i) =>
       i.addEventListener('input', () => {
@@ -2020,31 +2002,6 @@ const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, o
   }
 
   /* The team bar, stuck to the bottom of the screen while the form is in view. */
-  /* Act 4: the agenda, full width under the postcard. The slot grid is tall: room is kept for it
-     while it loads, so the page doesn't jump. */
-  .agenda {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    scroll-margin-top: 112px; /* exception: clears the floating nav */
-  }
-  .agenda-zone {
-    position: relative;
-    min-height: 650px; /* exception: Cal.com's month view */
-  }
-  .agenda-attente {
-    position: absolute;
-    inset: 96px 0 auto;
-    text-align: center;
-    font: 400 var(--text-caption) / 1.4 var(--font-mono);
-    text-transform: uppercase;
-    color: var(--color-muted);
-  }
-  .agenda-cal {
-    position: relative;
-    overflow: clip;
-  }
-  .agenda[hidden],
   .barre[hidden] {
     display: none;
   }

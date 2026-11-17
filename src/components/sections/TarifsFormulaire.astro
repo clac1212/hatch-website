@@ -9,9 +9,9 @@ import Recrutement from '../tarifs/Recrutement.astro';
 /**
  * Pricing as a hiring (signature section): the visitor stamps the agents they hire, places them in
  * their network, meets their badges and leaves their contact details (components/tarifs/). The
- * request then leaves as a letter, and the postcard that comes back leads to /demo, which prefills
- * the Cal.com booking from sessionStorage. Nothing is ever posted and no personal data goes in the
- * URL. Without JS the hiring cannot run: a line and the demo button take its place.
+ * request is saved (/api/demande-demo) and leaves as a letter; the postcard that comes back opens
+ * into the Cal.com agenda, prefilled. Without JS the hiring cannot run: a line and the demo button
+ * take its place.
  */
 interface Props {
   locale: Locale;
@@ -25,43 +25,16 @@ const t = useTranslations(locale);
 <Section id="tarifs" ton="cream">
   <EnTete titre={c.titre} intro={c.intro} align="centre" class="mb-10 lg:mb-14" />
 
-  <div class="grid grid-cols-[minmax(0,1fr)] items-start gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
-    <div class="min-w-0 rounded-panneau bg-surface p-5 shadow-carte sm:p-8 lg:p-10">
-      <div class="avec-js">
-        <Recrutement locale={locale} />
-      </div>
-      <noscript>
-        <div class="flex flex-col items-start gap-5">
-          <p class="max-w-lead text-body text-soft">{c.recrutement.sansJs}</p>
-          <Button href={routes.demo[locale]} size="lg">{t('cta.demo')}</Button>
-        </div>
-      </noscript>
+  <div class="rounded-panneau bg-surface p-5 shadow-carte sm:p-8 lg:p-10">
+    <div class="avec-js">
+      <Recrutement locale={locale} />
     </div>
-
-    <!-- How it works -->
-    <aside
-      class="flex flex-col gap-6 rounded-panneau bg-night p-7 text-cream lg:sticky lg:top-28 lg:p-8"
-    >
-      <span class="font-mono text-kicker text-peach uppercase">{c.deroule.kicker}</span>
-      <ol class="flex flex-col gap-5">
-        {
-          c.deroule.etapes.map(({ titre, texte }, i) => (
-            <li class="flex gap-4">
-              <span class="flex size-8 flex-none items-center justify-center rounded-full bg-orange font-mono text-kicker text-ink">
-                {i + 1}
-              </span>
-              <span class="flex flex-col gap-1">
-                <b class="text-caption">{titre}</b>
-                <span class="text-caption text-cream/75">{texte}</span>
-              </span>
-            </li>
-          ))
-        }
-      </ol>
-      <p class="border-t border-line-night pt-5 text-caption text-cream/75">
-        {c.deroule.mention}
-      </p>
-    </aside>
+    <noscript>
+      <div class="flex flex-col items-start gap-5">
+        <p class="max-w-lead text-body text-soft">{c.recrutement.sansJs}</p>
+        <Button href={routes.demo[locale]} size="lg">{t('cta.demo')}</Button>
+      </div>
+    </noscript>
   </div>
 </Section>
 

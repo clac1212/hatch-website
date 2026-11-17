@@ -100,21 +100,9 @@ envoi:
   tampon: 'Sent'
   reponse: 'Reply'
   merci: 'Got it, {prenom}.'
-  texte: 'Your request is in. Last step: book your demo just below, that is where we present your pricing.'
-  bouton: 'Pick my slot'
+  texte: 'Your request is in. Last step: pick your slot below, that is when we present your pricing.'
   signature: 'The Hatch OS team'
   entete: 'Postcard'
-
-deroule:
-  kicker: 'How it works'
-  etapes:
-    - titre: 'You pick your agents'
-      texte: 'And tell us how many locations your network has.'
-    - titre: 'You book a slot'
-      texte: 'Your answers are attached to the booking, no need to repeat anything.'
-    - titre: 'We present your pricing'
-      texte: 'Based on your agents and the size of your network, during the demo.'
-  mention: 'No commitment. Your data is only used to prepare the demo.'
 
 notes:
   agents: 'Agents:'

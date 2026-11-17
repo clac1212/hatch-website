@@ -5,9 +5,11 @@
  * moves are laid on one clock by `construire()` in `envoi.ts`, played by `Recrutement`.
  * Exception (signature moment): paper objects with their own sizes and paper textures; colours
  * from the tokens. The postcard's scale (660 px) sets the scale of the whole scene.
+ * Once it has landed, the postcard opens (`ouvrir()`): it straightens, takes the full width and
+ * unfolds its last part, the Cal.com agenda (act 4).
  */
 import { Image } from 'astro:assets';
-import Button from '../ui/Button.astro';
+import { CAL_LINK } from '../../scripts/cal';
 import tamponImg from '../../assets/tarifs/tampon.png';
 import lark from '../../assets/portraits/lark.jpg';
 import type { TarifsFormulaire } from '../../content/schemas/tarifsFormulaire';
@@ -15,8 +17,8 @@ import type { TarifsFormulaire } from '../../content/schemas/tarifsFormulaire';
 interface Props {
   /** The scene's words (the `envoi` block of the pricing form's content). */
   t: TarifsFormulaire['envoi'];
-  /** Where the postcard's button leads: the agenda, act 4. */
-  agenda: string;
+  /** The agenda's lines, shared with /demo: time-zone hint, loading line, fallback link. */
+  agenda: { aide: string; attente: string; lien: string };
 }
 const { t, agenda } = Astro.props;
 ---
@@ -181,7 +183,6 @@ const { t, agenda } = Astro.props;
     <div class="cp-mot">
       <p class="cp-titre" data-cp-titre></p>
       <p class="cp-texte">{t.texte}</p>
-      <Button href={agenda} variant="orange" size="lg" data-cp-bouton>{t.bouton}</Button>
       <p class="cp-signe">{t.signature}</p>
     </div>
     <div class="cp-adresse" aria-hidden="true">
@@ -211,6 +212,23 @@ const { t, agenda } = Astro.props;
       <span class="cp-ligne" data-cp-nom></span>
       <span class="cp-ligne" data-cp-ens></span>
       <span class="cp-ligne"></span>
+    </div>
+    <!-- Act 4, written on the card itself: the booking, prefilled with the answers. Folded away
+         until the card opens. -->
+    <div class="cp-agenda" data-agenda>
+      <div class="cp-agenda-pli">
+        <p class="cp-agenda-aide">{agenda.aide}</p>
+        <div class="cp-agenda-zone">
+          <p class="cp-agenda-attente" data-cal-attente aria-live="polite">{agenda.attente}</p>
+          <div id="tarifs-cal" class="cp-agenda-cal"></div>
+        </div>
+        <a
+          class="cp-agenda-lien"
+          href={`https://cal.com/${CAL_LINK}`}
+          target="_blank"
+          rel="noopener">{agenda.lien}</a
+        >
+      </div>
     </div>
   </article>
 </div>
@@ -697,6 +715,96 @@ const { t, agenda } = Astro.props;
     stroke: currentColor;
     stroke-width: 2.2;
   }
+  /* The open card: straight, full width, the agenda unfolded under the message and the address. */
+  .carte-postale {
+    grid-template-areas: 'mot adresse' 'agenda agenda';
+    transition: width 0.6s var(--ease-hatch);
+  }
+  .cp-mot {
+    grid-area: mot;
+  }
+  .cp-adresse {
+    grid-area: adresse;
+  }
+  .envoi.ouverte .plateau {
+    display: none;
+  }
+  /* Lying flat on the panel now: a short shadow, the long one would spill out of the stage. */
+  .envoi.ouverte .carte-postale {
+    width: 100%;
+    row-gap: 0;
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--color-line) 80%, transparent),
+      inset 0 0 0 8px var(--color-surface-2),
+      inset 0 0 0 9px color-mix(in srgb, var(--color-line) 60%, transparent),
+      0 1px 2px var(--ombre),
+      0 10px 16px -6px var(--ombre-fort);
+  }
+  .cp-agenda {
+    display: grid;
+    grid-area: agenda;
+    grid-template-rows: 0fr;
+    visibility: hidden;
+    transition:
+      grid-template-rows 0.7s var(--ease-hatch) 0.35s,
+      visibility 0s 1.05s;
+  }
+  .envoi.ouverte .cp-agenda {
+    grid-template-rows: 1fr;
+    visibility: visible;
+    transition:
+      grid-template-rows 0.7s var(--ease-hatch) 0.35s,
+      visibility 0s 0.35s;
+  }
+  .cp-agenda-pli {
+    display: flex;
+    min-height: 0;
+    flex-direction: column;
+    gap: 12px;
+    overflow: clip;
+  }
+  .cp-agenda-aide {
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px dashed color-mix(in srgb, var(--color-soft) 35%, transparent);
+    font: var(--text-source) / 1.2 var(--font-mono);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .cp-agenda-zone {
+    position: relative;
+    min-height: 600px; /* exception: Cal.com's month view, kept while it loads */
+  }
+  .cp-agenda-attente {
+    position: absolute;
+    inset: 96px 0 auto;
+    text-align: center;
+    font: var(--text-caption) / 1.4 var(--font-mono);
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  /* Cal.com draws its own frame: the agenda lies on the card as it comes. */
+  .cp-agenda-cal {
+    position: relative;
+  }
+  .cp-agenda-lien {
+    align-self: flex-start;
+    font-size: var(--text-caption);
+    color: var(--color-orange-txt);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .cp-agenda-lien:hover {
+    color: var(--color-orange-hover);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .carte-postale,
+    .cp-agenda,
+    .envoi.ouverte .cp-agenda {
+      transition: none;
+    }
+  }
   .cp-ligne {
     min-height: 28px;
     padding-bottom: 4px;
@@ -722,6 +830,16 @@ const { t, agenda } = Astro.props;
     }
     .cp-adresse {
       display: none;
+    }
+    .carte-postale {
+      grid-template-areas: 'mot' 'agenda';
+    }
+    .envoi.ouverte .carte-postale {
+      width: calc(100% - 8px);
+      padding: 22px 14px;
+    }
+    .envoi.ouverte .cp-mot {
+      padding-inline: 8px;
     }
   }
 </style>

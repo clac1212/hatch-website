@@ -344,7 +344,26 @@ export const construire = (racine: HTMLElement, d: Donnees) => {
   anims.forEach((a) => a.pause());
   const regler = (ms: number) => anims.forEach((a) => (a.currentTime = ms));
   regler(0);
-  return { regler, prenom };
+
+  // Act 4: the card opens. The letter's table goes, the card straightens and takes the full width
+  // (FLIP: it starts from where it lay, tilted), then its agenda unfolds (CSS, Envoi.astro).
+  const ouvrir = (calme: boolean) => {
+    const avant = carte.getBoundingClientRect();
+    carte.getAnimations().forEach((a) => a.cancel());
+    racine.classList.add('ouverte');
+    if (calme) return;
+    const apres = carte.getBoundingClientRect();
+    carte.animate(
+      [
+        {
+          transform: `translate(${avant.left - apres.left}px, ${avant.top - apres.top}px) rotate(-1.5deg)`,
+        },
+        { transform: 'none' },
+      ],
+      { duration: 600, easing: doux },
+    );
+  };
+  return { regler, prenom, ouvrir };
 };
 
 /** Plays the scene once in real time; `aMs` is called on every frame with the clock. */
