@@ -1,9 +1,9 @@
 ---
-title: "In food service, a crew member's training starts on their first day"
+title: 'Training new crew members across a restaurant network'
 seoTitle: 'Training restaurant crews with high turnover'
 description: 'High turnover and staff who do not all read the local language: how to train restaurant crews with short mobile modules, translation and follow-up.'
 kicker: 'Guide'
-chapeau: 'A restaurant network that hires all year round needs to train every new crew member quickly, in a language they understand, and to know at any time who can work which station. This page sets out a method: short modules on the phone, one French version translated for each person, an assessment at the station, and follow-up that chases people so the manager does not have to.'
+chapeau: 'To train every new crew member quickly, split training into five-minute modules on their phone, translated into their language, then check at the station that they can do the job. Tracking per crew member shows who can work which station and reminds those who have not finished.'
 essentiel:
   - 'With teams that change often, training is a path that starts with every new hire.'
   - 'A module covers one task and takes a few minutes on the phone, with no account to create.'

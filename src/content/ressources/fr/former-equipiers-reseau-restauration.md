@@ -1,9 +1,9 @@
 ---
-title: "En restauration, la formation d'un équipier commence le jour de son arrivée"
+title: "Former les nouveaux équipiers d'un réseau de restaurants"
 seoTitle: 'Former les équipiers en restauration'
 description: 'Turnover élevé, équipiers qui lisent mal le français : former en modules courts sur mobile, traduire les contenus et suivre qui a validé quoi.'
 kicker: 'Guide'
-chapeau: "Un réseau de restaurants qui recrute en continu doit former chaque nouvel équipier vite, dans une langue qu'il comprend, et savoir à tout moment qui maîtrise quel poste. Cette page décrit une méthode : des modules courts sur le téléphone, une seule version française traduite pour chacun, une évaluation au poste et un suivi qui relance sans que le manager ait à le faire."
+chapeau: "Pour former vite chaque nouvel équipier, découpez la formation en modules de cinq minutes sur son téléphone, traduits dans sa langue, puis vérifiez au poste qu'il sait faire. Un suivi par équipier montre qui maîtrise quel poste et relance ceux qui n'ont pas terminé."
 essentiel:
   - 'Avec des équipes qui changent souvent, la formation est un parcours qui part à chaque arrivée.'
   - 'Un module couvre un geste et se suit en quelques minutes sur le téléphone, sans compte à créer.'

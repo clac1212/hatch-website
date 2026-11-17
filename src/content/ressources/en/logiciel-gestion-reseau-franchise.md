@@ -1,9 +1,9 @@
 ---
-title: 'Network software only works if the field opens it'
+title: 'Choosing franchise network management software'
 seoTitle: 'Franchise network software for restaurant brands'
 description: 'All-in-one platforms, everyday tools, ChatGPT or agents on WhatsApp: what each option does for a restaurant network, and how to choose.'
 kicker: 'Guide'
-chapeau: 'To get know-how from the head office to every restaurant, a franchisor today can choose between four families of tools. They do not solve the same problem, and the right choice depends first on how your teams work during service.'
+chapeau: 'To get know-how from the head office to every restaurant, a franchisor can choose between four families of tools: franchise management platforms, the tools already in place, general-purpose AI assistants and specialised AI agents. The right choice depends first on what your teams can open during service.'
 essentiel:
   - 'All-in-one platforms keep everything in one place, royalty billing included, but field teams have to open one more app or intranet.'
   - 'For a founder looking for an answer for themselves, general-purpose AI assistants are often enough. To get fifty restaurants working from the same information, the network layer is missing.'
@@ -108,7 +108,7 @@ This is the newest family, and often the first one franchisors try. You load the
 It is powerful and cheap for the head office. For the field, three limits keep coming up:
 
 - Everyone has their own access. To query the manual loaded into a GPT, a Project or a Gem, you need an account and the vendor's app. ChatGPT has been reachable on WhatsApp again in the European Union since July 2026, after a European Commission decision against Meta's policy, but each team member chats with the assistant alone: the head office cannot send anything through it.
-- They are personal assistants, not network tools. They do not send targeted announcements, track who read them, or run audits.
+- They are personal assistants: they do not send targeted announcements, track who read them, or run audits.
 - In everyday use, the head office cannot see the questions asked, so it does not know where the manual has gaps. And documents are usually copied into the assistant, so every manual update means uploading them again. A Gem linked to Google Drive files is the exception: it follows their latest version.
 
 For a founder looking for an answer for themselves, these tools are often enough. To get fifty restaurants working from the same information, the network layer is missing.

@@ -1,13 +1,13 @@
 ---
-title: 'Le ratio matière se calcule avec un inventaire, pas avec les factures seules'
+title: "Calculer le ratio matière d'un restaurant"
 seoTitle: 'Ratio matière en restauration : calcul et repères'
 description: "Calculez votre ratio matière à partir du stock et des achats, lisez-le avec des repères sourcés et trouvez où le faire baisser, exemple chiffré à l'appui."
 kicker: 'Guide'
-chapeau: "Le ratio matière est la part de votre chiffre d'affaires HT qui part en ingrédients. On le calcule chaque mois à partir de ce que vous avez réellement consommé : stock de début, plus achats, moins stock de fin. Avec les factures seules, le chiffre change selon le jour de la livraison, et il ne dit plus rien."
+chapeau: "Le ratio matière est la part de votre chiffre d'affaires HT qui part en ingrédients. On le calcule chaque mois avec un inventaire : stock de début, plus achats, moins stock de fin, divisé par le chiffre d'affaires HT."
 essentiel:
   - "Ratio matière = consommation de matières ÷ chiffre d'affaires HT × 100, et consommation = stock initial + achats HT − stock final."
   - "La presse professionnelle situe ce ratio entre 25 % et 35 % ; dans les comptes des restaurants traditionnels, nourriture et boissons pèsent en moyenne autour de 31 % du chiffre d'affaires. Votre cible dépend de votre concept et de vos autres charges."
-  - "L'information la plus utile est l'écart entre le ratio réel et le ratio théorique de vos fiches techniques : c'est là que se cachent les pertes."
+  - "L'écart entre le ratio réel et le ratio théorique de vos fiches techniques mesure les pertes : portions trop généreuses, produits jetés, erreurs de livraison."
 public: independant
 metier: 'Achats et gestion'
 readingMinutes: 7
@@ -85,11 +85,11 @@ Si vous aviez pris les achats seuls, vous auriez trouvé 11 800 ÷ 38 500 = 30,6
 | Boissons (beverage cost)                                                                                   | 20 % à 30 %                                         | Keobiz                                                                                       |
 | Nourriture et boissons ensemble                                                                            | idéalement sous 35 %                                | Keobiz                                                                                       |
 
-Sauf la première ligne, tirée des comptes, ces chiffres sont des repères de métier, pas des statistiques officielles. La presse professionnelle le dit elle-même : en dehors des chaînes, chaque établissement doit trouver sa propre norme. Une chaîne compare chaque restaurant aux autres de l'enseigne. Un indépendant n'a pas ce point de comparaison : sa référence, ce sont ses propres mois. Un ratio de 33 % peut être sain dans une petite salle avec un loyer bas, et trop haut ailleurs.
+Sauf la première ligne, tirée des comptes, ces chiffres sont des repères de métier, publiés par la presse professionnelle et un cabinet comptable. La presse professionnelle le dit elle-même : en dehors des chaînes, chaque établissement doit trouver sa propre norme. Une chaîne compare chaque restaurant aux autres de l'enseigne. Un indépendant n'a pas ce point de comparaison : sa référence, ce sont ses propres mois. Un ratio de 33 % peut être sain dans une petite salle avec un loyer bas, et trop haut ailleurs.
 
-Le bon usage du repère, c'est la tendance. Calculez votre ratio chaque mois, au même jour, et regardez son évolution sur six mois. Une hausse de deux points sans changement de carte mérite une explication.
+Comparez-vous d'abord à vous-même : calculez votre ratio chaque mois, au même jour, et regardez son évolution sur six mois. Une hausse de deux points sans changement de carte a une cause à trouver : portions, prix d'achat ou pertes.
 
-## Ratio réel et ratio théorique : où se cachent les pertes
+## Ratio réel et ratio théorique : mesurer les pertes
 
 Si vos [fiches techniques](/ressources/cout-de-revient-plat) sont à jour, vous pouvez calculer un ratio théorique : pour chaque plat, le coût de la fiche multiplié par le nombre de portions vendues, rapporté au chiffre d'affaires. C'est ce que vous auriez consommé si tout se passait comme prévu.
 

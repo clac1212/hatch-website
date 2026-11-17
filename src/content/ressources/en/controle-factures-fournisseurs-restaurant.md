@@ -1,9 +1,9 @@
 ---
-title: 'A delivery error is proved on the delivery note, before you sign'
+title: 'Checking a delivery and getting a credit note from the supplier'
 seoTitle: 'Checking supplier deliveries and invoices'
 description: 'Check every delivery, match order, delivery note and invoice, write a valid reservation and get your credit note: the method and the French rules.'
 kicker: 'Guide'
-chapeau: "To avoid paying for what you did not receive, check the delivery in front of the driver, write any discrepancy on the delivery note, then match that note against your order and the invoice. The supplier's credit note then corrects the invoice. Here is the method, and the rules that apply in France."
+chapeau: 'Check the delivery in front of the driver, write every discrepancy on the delivery note before signing it, then match that note against your order and the invoice. The supplier then corrects the invoice with a credit note.'
 essentiel:
   - 'Three documents to compare: what you ordered, what was delivered (the delivery note) and what is invoiced.'
   - 'A discrepancy not written on the delivery note is hard to get recognised later: write a precise, quantified, signed reservation.'

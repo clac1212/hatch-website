@@ -1,9 +1,9 @@
 ---
-title: "Le prix d'un plat se calcule à partir de sa fiche technique"
+title: "Calculer le coût de revient d'un plat et fixer son prix de vente"
 seoTitle: "Coût de revient d'un plat et prix de vente"
 description: "Calculez le coût de revient d'un plat avec une fiche technique, un exemple chiffré pas à pas, puis fixez son prix de vente avec le bon coefficient."
 kicker: 'Guide'
-chapeau: "Pour fixer le prix d'un plat, on calcule le coût des ingrédients d'une portion sur une fiche technique, puis on le multiplie par un coefficient tiré du ratio matière visé. Sans ce calcul, un plat vendu trop peu cher perd de l'argent à chaque assiette, et personne ne le voit. Voici la méthode, avec un exemple complet."
+chapeau: "Le coût de revient d'un plat est le coût des ingrédients d'une portion, calculé sur une fiche technique au grammage réel et au prix d'achat HT. Multiplié par un coefficient tiré du ratio matière visé, il donne un premier prix de vente, à comparer ensuite aux prix du quartier."
 essentiel:
   - "Le coût de revient d'un plat, c'est le coût des ingrédients d'une portion, pesés net, au prix d'achat HT."
   - 'Le prix de vente HT se calcule en multipliant ce coût par un coefficient, puis on ajoute la TVA (10 % pour un plat servi sur place).'
@@ -110,7 +110,7 @@ Attention aux menus avec une boisson alcoolisée : l'alcool est taxé à 20 %, i
 
 ## Vérifier le prix face au marché
 
-Le coefficient donne un prix de départ, pas le prix final. Comparez avec les cartes de votre quartier et avec ce que vos clients acceptent de payer pour ce plat. Si le prix calculé est trop haut, jouez sur la recette (grammage, garniture, morceau moins cher) plutôt que sur le coefficient de ce seul plat. Si un plat très vendu dégage une petite marge, compensez sur un autre plat de la carte.
+Le coefficient donne un prix de départ. Comparez avec les cartes de votre quartier et avec ce que vos clients acceptent de payer pour ce plat. Si le prix calculé est trop haut, jouez sur la recette (grammage, garniture, morceau moins cher) plutôt que sur le coefficient de ce seul plat. Si un plat très vendu dégage une petite marge, compensez sur un autre plat de la carte.
 
 ## Mettre la fiche à jour quand un prix bouge
 

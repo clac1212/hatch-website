@@ -1,9 +1,9 @@
 ---
-title: "Une grille d'audit ne vaut que par les corrections qu'elle déclenche"
+title: "Construire une grille d'audit hygiène pondérée"
 seoTitle: "Grille d'audit hygiène restaurant : pondération"
 description: "Construire une grille d'audit pondérée pour un réseau de restaurants : points de contrôle, poids, score sur 100, actions correctives et fréquence."
 kicker: 'Guide'
-chapeau: "Un réseau de restaurants a besoin d'une grille d'audit qui mesure les mêmes points partout, pèse plus lourd sur ce qui met un client en danger et se termine par des corrections vérifiées. Cette page décrit comment choisir les points de contrôle, les pondérer, calculer un score, suivre les actions correctives et fixer la fréquence des visites."
+chapeau: "Une grille d'audit hygiène de réseau reprend les points que contrôle l'administration, donne à chacun un niveau de gravité et un poids, et calcule un score sur 100. Chaque écart relevé devient une action, avec un responsable, un délai et une preuve."
 essentiel:
   - "Partez des points que contrôlent les services de l'État, puis ajoutez vos standards de marque."
   - "Donnez à chaque point un niveau de gravité (critique, majeure, mineure) et un poids, et prévoyez qu'un écart critique déclenche une action quel que soit le score."

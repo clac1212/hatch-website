@@ -1,9 +1,9 @@
 ---
-title: 'Entre la signature et le premier service, chaque démarche a son propre délai'
+title: 'Ouvrir un restaurant en franchise : le rétroplanning'
 seoTitle: 'Ouvrir un restaurant en franchise : rétroplanning'
 description: 'Travaux, autorisation ERP, déclaration DDPP, formation hygiène, licence, embauches : les étapes et délais de la signature au premier service.'
 kicker: 'Guide'
-chapeau: "Entre la signature du contrat de franchise et le premier service, un restaurant passe par des travaux, des autorisations, des déclarations, des embauches et des formations. Plusieurs de ces étapes ont un délai fixé par la loi. Un rétroplanning part de la date d'ouverture et remonte jusqu'à la signature, étape par étape."
+chapeau: "Entre la signature du contrat de franchise et le premier service, plusieurs démarches ont un délai légal, comme la déclaration de licence 15 jours avant l'ouverture. Un rétroplanning part de la date d'ouverture et remonte jusqu'à la signature, pour lancer chaque étape à temps."
 essentiel:
   - "Les travaux d'un restaurant ouvert au public demandent une autorisation préalable, qui vérifie l'accessibilité et la sécurité incendie."
   - "La licence restaurant se déclare en mairie (à la préfecture à Paris et en Alsace-Moselle) au moins 15 jours avant l'ouverture, après une formation au permis d'exploitation."
@@ -134,6 +134,6 @@ Le tableau ne montre que les démarches dont le délai est fixé par un texte. L
 
 ## Ce qui fait glisser une date
 
-Une ouverture glisse rarement à cause d'une seule tâche. Elle glisse quand une tâche en attend une autre sans que personne ne le voie : un plan reçu tard qui retarde le dépôt, une formation à l'hygiène réservée trop près de l'ouverture, une déclaration de licence faite à 10 jours au lieu de 15. Revoyez le rétroplanning chaque semaine avec le franchisé, et décalez tout ce qui dépend d'une date qui bouge.
+Une ouverture glisse rarement à cause d'une seule tâche. Elle glisse quand une tâche en attend une autre et que ce lien n'est noté nulle part : un plan reçu tard qui retarde le dépôt, une formation à l'hygiène réservée trop près de l'ouverture, une déclaration de licence faite à 10 jours au lieu de 15. Revoyez le rétroplanning chaque semaine avec le franchisé, et décalez tout ce qui dépend d'une date qui bouge.
 
 _Cet article présente les règles en vigueur au 10 novembre 2026. Il ne constitue pas un conseil juridique : les règles locales et la nature des travaux peuvent changer les démarches._

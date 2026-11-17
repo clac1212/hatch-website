@@ -2,7 +2,7 @@ seo:
   title: 'Restaurant and franchise glossary | Hatch OS'
   description: 'Plate cost, food cost ratio, HACCP, disclosure document, royalty, forward flow: the terms of the restaurant and franchise trades, from A to Z.'
 kicker: 'Glossary'
-titre: 'The words of the trade, simply defined.'
+titre: 'Restaurant and franchise glossary'
 chapeau: 'The terms that come up in the kitchen, with suppliers, in a franchise agreement and in the life of a network, from A to Z.'
 lettres: 'Jump to letter'
 # Anchors are stable: never change one once published (links point at them).
@@ -97,7 +97,7 @@ termes:
     public: tous
     ancre: hcr-collective-agreement
   - mot: 'Quick service collective agreement'
-    definition: 'The French national collective agreement for quick service restaurants of 18 March 1988 (IDCC 1501). The main activity actually carried out, not the NAF code alone, decides whether a site falls under it or under the HCR agreement.'
+    definition: 'The French national collective agreement for quick service restaurants of 18 March 1988 (IDCC 1501). The main activity actually carried out decides whether a site falls under it or under the HCR agreement; the NAF code is only an indication.'
     public: tous
     ancre: quick-service-collective-agreement
   - mot: 'Rush'
@@ -301,7 +301,7 @@ termes:
     public: tous
     ancre: prime-cost
   - mot: 'Food cost ratio'
-    definition: 'The cost of ingredients consumed divided by the matching revenue excluding VAT, as a percentage. Consumption comes from stock counts (opening stock, plus purchases, minus closing stock), not from purchases alone. Also called food cost.'
+    definition: 'The cost of ingredients consumed divided by the matching revenue excluding VAT, as a percentage. Consumption comes from stock counts: opening stock, plus purchases, minus closing stock. Also called food cost.'
     public: independant
     ancre: food-cost-ratio
   - mot: 'Royalty'
@@ -329,7 +329,7 @@ termes:
     public: tous
     ancre: table-turnover
   - mot: 'Know-how'
-    definition: 'A package of non-patented practical information, resulting from the franchisor’s experience and testing, that must be secret, substantial and identified (Regulation (EU) 2022/720, article 1). Passing it on is what sets a franchise apart from a mere trademark licence.'
+    definition: 'A package of non-patented practical information, resulting from the franchisor’s experience and testing, that must be secret, substantial and identified (Regulation (EU) 2022/720, article 1). Passing it on sets a franchise apart from a mere trademark licence.'
     public: reseau
     ancre: know-how
   - mot: 'Break-even point'

@@ -1,5 +1,5 @@
 ---
-title: 'Chaque restaurant doit tenir un plan de maîtrise sanitaire'
+title: "Le plan de maîtrise sanitaire (PMS) d'un restaurant"
 seoTitle: 'Plan de maîtrise sanitaire (PMS) en restaurant'
 description: "Ce que contient un plan de maîtrise sanitaire, ce que l'inspecteur vérifie et qui doit suivre la formation hygiène de 14 heures dans un petit restaurant."
 kicker: 'Guide'

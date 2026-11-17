@@ -1,9 +1,9 @@
 ---
-title: 'An operations manual only works if it answers staff at their station'
+title: 'Writing an operations manual staff use during service'
 seoTitle: 'Restaurant operations manual: how to write one'
 description: 'How to write a restaurant operations manual crews actually open: structure, one-page cards, languages, updates and follow-up for franchise networks.'
 kicker: 'Guide'
-chapeau: 'A restaurant franchisor needs a manual that crew members open during service and that gives them the right answer the first time. Often the manual exists, but it sleeps in a binder in the office or in a shared folder nobody opens in the kitchen. This page explains how to write it, split it and keep it current so it works at the station.'
+chapeau: 'For crew members to use the operations manual during service, split it into short cards, one per task, readable on a phone at the station. Keep one reference version, translated and updated in one place.'
 essentiel:
   - 'Separate the franchisee manual, which explains the concept and the business, from station cards, which describe one task on one page.'
   - 'Keep one French master version, with a date and an owner for each card. Translations derive from it.'

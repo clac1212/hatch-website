@@ -1,9 +1,9 @@
 ---
-title: 'An audit checklist is only worth the corrections it triggers'
+title: 'Building a weighted hygiene audit checklist'
 seoTitle: 'Weighted restaurant quality audit checklist'
 description: 'How to build a weighted hygiene and quality audit checklist for a restaurant network: control points, weights, scoring, corrective actions, frequency.'
 kicker: 'Guide'
-chapeau: 'A restaurant network needs an audit checklist that measures the same points everywhere, weighs more heavily on what puts a customer at risk and ends with verified corrections. This page explains how to choose control points, weight them, calculate a score, track corrective actions and set visit frequency.'
+chapeau: "A network's hygiene audit checklist takes the points that official inspectors check, gives each one a severity level and a weight, and calculates a score out of 100. Every gap found becomes an action, with an owner, a deadline and proof."
 essentiel:
   - 'Start from the points that government inspectors check, then add your brand standards.'
   - 'Give each point a severity level (critical, major, minor) and a weight, and make sure a critical gap triggers an action whatever the score.'

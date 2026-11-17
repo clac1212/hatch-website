@@ -1,5 +1,5 @@
 ---
-title: 'Un candidat franchisé reçoit le DIP au moins 20 jours avant de signer'
+title: 'Le DIP en franchise : contenu, délai de 20 jours, sanctions'
 seoTitle: 'DIP en franchise de restauration'
 description: "Le DIP en franchise : délai de 20 jours, contenu obligatoire de l'article R330-1, sanctions et erreurs fréquentes des réseaux de restauration."
 kicker: 'Guide'
@@ -116,7 +116,7 @@ Si vous demandez une somme, le DIP doit avoir été remis 20 jours avant ce vers
 
 ### Un DIP qui n'est pas à jour
 
-Les comptes doivent être ceux des deux derniers exercices. Le nombre de sorties porte sur l'année précédant la remise. Un DIP réutilisé d'une année sur l'autre devient faux sans que personne ne le remarque.
+Les comptes doivent être ceux des deux derniers exercices. Le nombre de sorties porte sur l'année précédant la remise. Un DIP réutilisé d'une année sur l'autre garde les chiffres de l'année précédente.
 
 ### La même liste de restaurants pour tous
 

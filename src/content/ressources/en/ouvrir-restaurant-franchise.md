@@ -1,9 +1,9 @@
 ---
-title: 'Between signing and first service, every step has its own deadline'
+title: 'Opening a franchise restaurant: the backward plan'
 seoTitle: 'Opening a franchise restaurant: the timeline'
 description: 'Works approval, food safety declaration, hygiene training, alcohol licence, hiring: the steps and deadlines from signing to first service.'
 kicker: 'Guide'
-chapeau: 'Between the signing of a franchise agreement and the first service, a restaurant goes through works, approvals, declarations, hiring and training. Several of these steps have a deadline set by French law. A backward plan starts from the opening date and works back to the signing, step by step.'
+chapeau: 'Between signing the franchise agreement and the first service, several steps have a legal deadline under French law, such as declaring the alcohol licence 15 days before opening. A backward plan starts from the opening date and works back to the signing, so that each step starts in time.'
 essentiel:
   - 'Works in a restaurant open to the public need prior approval, which checks accessibility and fire safety.'
   - 'The restaurant alcohol licence is declared at the town hall (at the prefecture in Paris and Alsace-Moselle) at least 15 days before opening, after the operating permit training.'
@@ -134,6 +134,6 @@ The table only shows the steps whose deadline is set by law. The network's openi
 
 ## What makes a date slip
 
-An opening rarely slips because of a single task. It slips when one task waits on another and nobody sees it: a plan received late that delays the application, hygiene training booked too close to opening, a licence declaration made 10 days ahead instead of 15. Review the plan with the franchisee every week, and move everything that depends on a date that changes.
+An opening rarely slips because of a single task. It slips when one task waits on another and that link is written down nowhere: a plan received late that delays the application, hygiene training booked too close to opening, a licence declaration made 10 days ahead instead of 15. Review the plan with the franchisee every week, and move everything that depends on a date that changes.
 
 _This article describes the rules in force on 10 November 2026. It is not legal advice: local rules and the type of works can change the steps._

@@ -16,8 +16,8 @@ hero:
 
 modeles:
   kicker: 'Templates'
-  titre: 'Templates ready to fill in.'
-  texte: 'Download, fill in, adapt to your place. No form, no email.'
+  titre: 'Templates to download'
+  texte: 'Costing sheets, checklists and outlines in Sheets, Docs or PDF, to adapt to your restaurant.'
   telecharger: 'Download the template'
   liste:
     - public: independant
@@ -54,8 +54,8 @@ modeles:
 
 guides:
   kicker: 'Guides'
-  titre: 'Guides, one trade at a time.'
-  texte: 'One practical method per topic, and a source for every number.'
+  titre: 'Practical guides'
+  texte: 'Invoices, dish costing, hygiene, franchising: every guide gives a method and cites its sources.'
   une: 'Featured'
   tous: 'All guides'
   themes: 'Filter by topic'
@@ -64,7 +64,7 @@ guides:
 
 glossaire:
   kicker: 'Glossary'
-  titre: 'The words of the trade.'
+  titre: 'Restaurant and franchise glossary'
   texte: 'The terms that come up in the kitchen, with suppliers and in a franchise agreement.'
   lien: 'See the full glossary'
 

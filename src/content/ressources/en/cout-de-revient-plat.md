@@ -1,9 +1,9 @@
 ---
-title: "A dish's price is worked out from its recipe costing sheet"
+title: 'Costing a dish and setting its menu price'
 seoTitle: 'Plate cost: how to cost a dish and price it'
 description: 'Work out the cost of a dish with a recipe costing sheet, follow a worked example step by step, then set its menu price with the right multiplier.'
 kicker: 'Guide'
-chapeau: 'To price a dish, you work out the cost of the ingredients in one portion on a recipe costing sheet, then multiply it by a multiplier taken from your target food cost ratio. Without that calculation, a dish sold too cheaply loses money on every plate, and nobody notices. Here is the method, with a complete example.'
+chapeau: "A dish's plate cost is the cost of the ingredients in one portion, worked out on a recipe costing sheet at real weights and net purchase prices. Multiplied by a factor taken from your target food cost ratio, it gives a first menu price, which you then compare with prices in your area."
 essentiel:
   - 'The cost of a dish is the cost of the ingredients in one portion, weighed net, at the purchase price excluding VAT.'
   - 'The menu price excluding VAT is that cost multiplied by a multiplier; then you add VAT (10% in France for a dish served on site).'
@@ -110,7 +110,7 @@ Watch out for set menus that include an alcoholic drink: alcohol is taxed at 20%
 
 ## Check the price against the market
 
-The multiplier gives a starting price, not the final price. Compare with menus in your area and with what your guests are willing to pay for that dish. If the calculated price is too high, work on the recipe (portion size, side, a cheaper cut) rather than on that one dish's multiplier. If a best-seller brings in a thin margin, make up for it on another dish.
+The multiplier gives a starting price. Compare with menus in your area and with what your guests are willing to pay for that dish. If the calculated price is too high, work on the recipe (portion size, side, a cheaper cut) rather than on that one dish's multiplier. If a best-seller brings in a thin margin, make up for it on another dish.
 
 ## Update the sheet when a price moves
 
