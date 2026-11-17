@@ -905,7 +905,11 @@ const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, o
           enseigne: val('enseigne'),
           etablissements: nombre(),
           agents: OFFRES.filter((id) => recrues.has(id)),
-          ouvertures: recrues.has('sparrow') && ouv ? ouv.value : '',
+          // Sent as the index of the choice: the endpoint reads the range in its own words.
+          ouvertures:
+            recrues.has('sparrow') && ouv
+              ? [...w.querySelectorAll('input[name="g-ouv"]')].indexOf(ouv)
+              : undefined,
         }),
       }).catch(() => {});
     };
