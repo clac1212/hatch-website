@@ -15,7 +15,7 @@ import { fill } from '../components/pages/format';
 import { BRAND, breadcrumbList } from '../seo/jsonld';
 import robin from '../assets/portraits/robin.jpg';
 import lark from '../assets/portraits/lark.jpg';
-import { entryRoutes, routes, type Locale } from '../i18n/ui';
+import { entryRoutes, insecable, routes, type Locale } from '../i18n/ui';
 
 /**
  * /ressources (/en/resources): the guides first, for both audiences, independents (Robin) and
@@ -182,7 +182,7 @@ const jsonLd = [
           </span>
         </span>
       </h1>
-      <p class="max-w-lead text-punch text-(--doux)">{hero.chapeau}</p>
+      <p class="max-w-lead text-punch text-(--doux)">{insecable(hero.chapeau)}</p>
     </div>
   </Section>
 
@@ -207,8 +207,10 @@ const jsonLd = [
               <span class="font-mono text-kicker text-orange-txt uppercase">{ui.guides.une}</span>
               <Badge locale={locale} public={une.public} />
             </span>
-            <b class="font-display text-section font-semibold text-balance">{une.title}</b>
-            <span class="line-clamp-3 text-body text-soft">{une.chapeau}</span>
+            <b class="font-display text-section font-semibold text-balance">
+              {insecable(une.title)}
+            </b>
+            <span class="line-clamp-3 text-body text-soft">{insecable(une.chapeau)}</span>
             <span class="flex items-center gap-5 pt-1">
               <span class="lien">
                 {ui.guides.lire}{' '}
@@ -230,8 +232,16 @@ const jsonLd = [
   {
     autres.length > 0 && (
       <Section data-filtre-section aria-labelledby="tous">
-        <div class="grid gap-10 lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-16">
-          <nav class="themes-col" aria-label={ui.guides.themes}>
+        {/* On a phone the title comes first, then the theme pills, then the guides; from lg the
+            themes run down a column on the left of the guides. */}
+        <div class="guides grid gap-8 lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-x-16">
+          <EnTete
+            id="tous"
+            titre={ui.guides.titre}
+            intro={ui.guides.texte}
+            class="[grid-area:titre]"
+          />
+          <nav class="themes-col [grid-area:themes]" aria-label={ui.guides.themes}>
             <div
               class="themes flex flex-wrap gap-2 lg:sticky lg:top-28 lg:flex-col lg:items-start lg:gap-1"
               role="group"
@@ -251,33 +261,32 @@ const jsonLd = [
               ))}
             </div>
           </nav>
-          <div class="flex flex-col gap-8">
-            <EnTete id="tous" titre={ui.guides.titre} intro={ui.guides.texte} />
-            <ul class="grid gap-5 md:grid-cols-2" data-filtre-groupe>
-              {autres.map((g) => (
-                <li class="contents" data-public={g.public} data-metier={g.metier}>
-                  <Carte href={g.href} class="flex flex-col">
-                    <span class="block aspect-3/2 overflow-clip bg-scene">
-                      <Image
-                        src={g.image}
-                        alt={g.imageAlt}
-                        widths={[400, 640, 800]}
-                        sizes="(min-width: 768px) 480px, 100vw"
-                        class="carte-zoom size-full object-cover"
-                      />
+          <ul class="grid gap-5 [grid-area:liste] md:grid-cols-2" data-filtre-groupe>
+            {autres.map((g) => (
+              <li class="contents" data-public={g.public} data-metier={g.metier}>
+                <Carte href={g.href} class="flex flex-col">
+                  <span class="block aspect-3/2 overflow-clip bg-scene">
+                    <Image
+                      src={g.image}
+                      alt={g.imageAlt}
+                      widths={[400, 640, 800]}
+                      sizes="(min-width: 768px) 480px, 100vw"
+                      class="carte-zoom size-full object-cover"
+                    />
+                  </span>
+                  <span class="flex flex-1 flex-col items-start gap-3 p-6">
+                    <Badge locale={locale} public={g.public} />
+                    <b class="font-display text-card font-semibold text-balance">
+                      {insecable(g.title)}
+                    </b>
+                    <span class="mt-auto pt-1 text-caption text-soft">
+                      {g.metier} · {fill(ui.guide.lecture, { n: String(g.readingMinutes) })}
                     </span>
-                    <span class="flex flex-1 flex-col items-start gap-3 p-6">
-                      <Badge locale={locale} public={g.public} />
-                      <b class="font-display text-card font-semibold text-balance">{g.title}</b>
-                      <span class="mt-auto pt-1 text-caption text-soft">
-                        {g.metier} · {fill(ui.guide.lecture, { n: String(g.readingMinutes) })}
-                      </span>
-                    </span>
-                  </Carte>
-                </li>
-              ))}
-            </ul>
-          </div>
+                  </span>
+                </Carte>
+              </li>
+            ))}
+          </ul>
         </div>
       </Section>
     )
@@ -415,6 +424,14 @@ const jsonLd = [
 
   /* The picker: under the sentence, as wide as its choices, in the nav's glass (nearly transparent,
      blurred), one audience under the other. It slides in from just above with a soft spring. */
+  .guides {
+    grid-template-areas: 'titre' 'themes' 'liste';
+  }
+  @media (min-width: 64rem) {
+    .guides {
+      grid-template-areas: '. titre' 'themes liste';
+    }
+  }
   .menu {
     position: absolute;
     left: 50%;
@@ -424,7 +441,9 @@ const jsonLd = [
     flex-direction: column;
     gap: 0.25rem;
     width: max-content;
-    min-width: 36rem;
+    /* the screen's width minus its gutters on a phone: closed, the picker still takes up room */
+    min-width: min(36rem, 100vw - 2.5rem);
+    max-width: calc(100vw - 2.5rem);
     padding: 0.375rem;
     border-radius: var(--radius-card-sm);
     /* tinted with night: the picker can overlap the cream section below, its cream text stays legible */

@@ -135,6 +135,10 @@ export function useTranslations(locale: Locale) {
   return (key: keyof typeof fr): string => ui[locale][key];
 }
 
+/** French spacing: a no-break space before « ? », « ! », « : », « ; », so they never start a line
+ * (a title wrapping before its colon). Harmless on English copy, which has no space there. */
+export const insecable = (s: string) => s.replace(/ ([?!:;])/g, '\u00a0$1');
+
 export function otherLocale(locale: Locale): Locale {
   return locale === 'fr' ? 'en' : 'fr';
 }

@@ -11,7 +11,7 @@ import { avatars } from '../components/pages/agent-visuels';
 import { centres } from '../components/agents/visuels';
 import { fill, longDate } from '../components/pages/format';
 import { BRAND, breadcrumbList, languageTag, organizationId } from '../seo/jsonld';
-import { entryRoutes, routes, type Locale } from '../i18n/ui';
+import { entryRoutes, insecable, routes, type Locale } from '../i18n/ui';
 import { guideSlug, publishedGuides } from '../content/pages/guides';
 
 /**
@@ -131,14 +131,13 @@ const jsonLd = [
           <Badge locale={locale} public={g.public} />
           <span class="font-mono text-source text-soft uppercase">{g.metier}</span>
         </div>
-        <h1 class="font-display text-h1 font-semibold text-balance">{g.title}</h1>
-        <p class="text-punch text-soft">{g.chapeau}</p>
+        <h1 class="font-display text-h1 font-semibold text-balance">{insecable(g.title)}</h1>
+        <p class="text-punch text-soft">{insecable(g.chapeau)}</p>
         <p class="flex flex-wrap gap-x-4 gap-y-1 font-mono text-source text-soft uppercase">
           <span>{fill(l.lecture, { n: String(g.readingMinutes) })}</span>
-          <span>
-            {l.majLe}
-            <time datetime={g.updatedAt}>{longDate(g.updatedAt, locale)}</time>
-          </span>
+          {
+            /* No visible update date nor author on any page (César): it stays in the JSON-LD `dateModified`. */
+          }
         </p>
       </header>
 
