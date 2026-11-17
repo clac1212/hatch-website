@@ -8,12 +8,13 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "node scripts/check-ds.mjs && astro build",
     "preview": "astro preview",
     "astro": "astro",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "seo:audit": "node scripts/seo-audit.mjs"
+    "seo:audit": "node scripts/seo-audit.mjs",
+    "check:ds": "node scripts/check-ds.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.2",
