@@ -15,7 +15,8 @@
  * - `<WhatsAppHeure>` inside a bubble: the time (and the blue read ticks on `.out`);
  * - `.wa-apercu`: a link preview; `.wa-doc`: a document row (`.wa-doc-ico.pdf | .xls`);
  * - `.wa-choix`: reply buttons under a bubble (the bubble gets `.avec-choix`), `.fait` once tapped.
- * - `[data-tete]` on the header: add `.ecrit` to show the typing status.
+ * - `[data-tete]` on the header: add `.ecrit` to show the typing status;
+ * - `.wa-tape`: the three-dot « typing » bubble, added and removed by `ecrire()` (src/scripts/whatsapp.ts).
  * With `nu`, only the wallpaper and the chat (no status bar, header or input bar).
  */
 import Statut from './WhatsAppStatut.astro';
@@ -441,6 +442,51 @@ const Retour = retour ? 'button' : 'span';
   .wai :global(.b.in.fin::after) {
     left: -0.42em;
     scale: -1 1;
+  }
+
+  /* The contact is typing: three dots that rise in turn, in a bubble that pops in. */
+  .wai :global(.b.wa-tape) {
+    display: flex;
+    gap: 0.22em;
+    padding: 0.62em 0.75em;
+    animation: wa-tape-entre 0.2s ease-out;
+  }
+  .wai :global(.wa-tape span) {
+    width: 0.42em;
+    height: 0.42em;
+    border-radius: 999px;
+    background: var(--color-whatsapp-meta);
+    animation: wa-tape-point 1.2s ease-in-out infinite;
+  }
+  .wai :global(.wa-tape span:nth-child(2)) {
+    animation-delay: 0.15s;
+  }
+  .wai :global(.wa-tape span:nth-child(3)) {
+    animation-delay: 0.3s;
+  }
+  @keyframes wa-tape-entre {
+    from {
+      opacity: 0;
+      scale: 0.8;
+    }
+  }
+  @keyframes wa-tape-point {
+    0%,
+    60%,
+    100% {
+      opacity: 0.45;
+      translate: 0 0;
+    }
+    30% {
+      opacity: 1;
+      translate: 0 -0.2em;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wai :global(.b.wa-tape),
+    .wai :global(.wa-tape span) {
+      animation: none;
+    }
   }
 
   /* Time and read ticks, tucked at the end of the last line. */

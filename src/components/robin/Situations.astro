@@ -289,6 +289,8 @@ const onde = [4, 9, 6, 12, 8, 14, 5, 10, 7, 13, 6, 9, 11, 5, 8, 12, 6, 10, 4, 7,
 </div>
 
 <script>
+  import { ecrire } from '../../scripts/whatsapp';
+
   // Each scene is a list of steps { t: ms, on: [states to turn on, 'name' or 'name:class'],
   // off: [states to turn off], tap: the target the thumb taps }. 'tete' is the chat's header.
   // Fast on purpose (César 09/11): the whole chat is on screen within ~4 s, then it is read.
@@ -347,7 +349,7 @@ const SCENARIOS: Record<string, Etape[]> = {
   const scene = (fil: HTMLElement) => {
     const etapes = SCENARIOS[fil.dataset.situ ?? ''] ?? [];
     const ecran = fil.closest<HTMLElement>('.wai-zone')!;
-    // The bare chat has no header: the « typing » steps then do nothing.
+    // The bare chat has no header: « typing » shows only as the dots bubble.
     const tete = fil.closest('.wai')!.querySelector<HTMLElement>('[data-tete]');
     const doigt = ecran.querySelector<HTMLElement>('.doigt');
     const el = (nom: string) =>
@@ -370,6 +372,8 @@ const SCENARIOS: Record<string, Etape[]> = {
     };
     const basculer = (spec: string, oui: boolean) => {
       const [nom, cls = 'on'] = spec.split(':');
+      // « Typing »: the three dots at the bottom of the chat (the bare chat has no header to tell it).
+      if (nom === 'tete' && cls === 'ecrit') ecrire(fil, oui);
       const e = el(nom);
       if (!e) return;
       e.classList.toggle(cls, oui);
