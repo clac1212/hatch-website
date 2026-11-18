@@ -830,4 +830,15 @@ const textes = JSON.stringify({ quand: tel.quand, horloge: tel.horloge });
       bottom: var(--bas, 150px);
     }
   }
+  /* Phones (film): the phone at 80 % of the stage, so it keeps a margin on both sides, its bottom cut
+     by the section's edge with no fade, as if it went under the next one (César 18/11); its layout
+     box shrinks with it. Kept in sync with ECHELLE_FILM in probleme.ts. */
+  .pb.film .scene {
+    mask-image: none;
+  }
+  .pb.film .iphone {
+    scale: 0.8;
+    transform-origin: top center;
+    margin-bottom: -160px;
+  }
 </style>

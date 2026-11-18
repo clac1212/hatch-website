@@ -40,6 +40,8 @@ const t = useTranslations(locale);
   .formulaire {
     max-width: 952px;
     margin-inline: auto;
+    /* Below the floating nav when a step brings the card's top back into view. */
+    scroll-margin-top: 6rem;
   }
   /* Without JS the hiring cannot run: it gives way to the line and button of the <noscript>. */
   :global(.no-js) .avec-js {
