@@ -25,7 +25,7 @@ const t = useTranslations(locale);
 <Section id="tarifs" ton="cream">
   <EnTete titre={c.titre} intro={c.intro} align="centre" class="mb-10 lg:mb-14" />
 
-  <div class="rounded-panneau bg-surface p-5 shadow-carte sm:p-8 lg:p-10">
+  <div class="formulaire rounded-panneau bg-surface p-5 shadow-carte sm:p-8 lg:p-10">
     <div class="avec-js">
       <Recrutement locale={locale} />
     </div>
@@ -39,6 +39,12 @@ const t = useTranslations(locale);
 </Section>
 
 <style>
+  /* exception: the hiring reads as one object in the middle of the section, not as a full-width
+     band; 952 px is the width it had beside the former « Comment ça se passe » aside. */
+  .formulaire {
+    max-width: 952px;
+    margin-inline: auto;
+  }
   /* Without JS the hiring cannot run: it gives way to the line and button of the <noscript>. */
   :global(.no-js) .avec-js {
     display: none;
