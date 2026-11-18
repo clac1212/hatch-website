@@ -112,7 +112,7 @@ const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, o
       {
         t.actes.map((a, i) => (
           <li data-acte={i + 1}>
-            <span>{String(i + 1).padStart(2, '0')}</span> {a}
+            <span>{String(i + 1).padStart(2, '0')}</span> <b class="acte-nom">{a}</b>
           </li>
         ))
       }
@@ -763,7 +763,10 @@ const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, o
         .forEach((e) => (e.textContent = nb ? pluriel(T.etablissements, nb) : ''));
     };
 
-    // Steps.
+    // Steps. The card changes height from one step to the next: each change brings its top back
+    // into view, smoothly, so the step is read from its title (César 18/11). Recrutement is only
+    // ever rendered inside Formulaire, whose card is `.formulaire`.
+    const carteFormulaire = w.closest<HTMLElement>('.formulaire')!;
     let n = 1;
     const aller = (k: number) => {
       n = k;
@@ -783,6 +786,7 @@ const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, o
       q('[data-fin]').hidden = n !== 3;
       (q('[data-ouvertures]') as HTMLElement).hidden = !recrues.has('sparrow');
       if (n === 3) distribuer();
+      carteFormulaire.scrollIntoView({ block: 'start', behavior: calme ? 'auto' : 'smooth' });
     };
     // Refused: the old « wrong password » shake, but springy: a fast swing that dies down in a few
     // smooth swings, each eased, the missing fields one after the other.
@@ -1057,6 +1061,9 @@ const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, o
   .actes li span {
     font: 400 var(--text-source) / 1 var(--font-mono);
     margin-right: 4px;
+  }
+  .acte-nom {
+    font-weight: inherit;
   }
   .actes li::after {
     content: '';
@@ -2134,28 +2141,119 @@ const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, o
       transition: none;
     }
   }
+  /* Phones (César 18/11: the step was too tall). The files sit straight on the form, without the
+     tray; the core's four agents line up on one row, named only (its text says what they do); the
+     others keep their photo beside the name, their text running under both. */
   @media (max-width: 40rem) {
-    .photos-equipe {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      row-gap: 16px;
+    .acte1 {
+      gap: 28px;
+    }
+    .bureau {
+      gap: 28px;
     }
     .bloc {
-      padding: 32px 12px 12px;
+      padding: 0;
+      background: none;
     }
     .bloc-socle {
       grid-template-columns: 1fr;
       grid-template-areas: 'socle' 'finch' 'pecker';
-      row-gap: 36px;
+      row-gap: 28px;
+    }
+    .pile .fiche {
+      padding: 16px;
     }
     .pile-socle .fiche {
       grid-template-columns: 1fr;
       grid-template-areas: 'photos' 'titre' 'texte';
+      row-gap: 8px;
     }
     .pile-socle .photos {
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
-    .fiche {
-      padding: 20px;
+    .photos-equipe {
+      gap: 10px;
+    }
+    .photos-equipe .tirage {
+      max-width: 64px;
+    }
+    .photo {
+      gap: 6px;
+    }
+    .photo figcaption span {
+      display: none;
+    }
+    .photo figcaption b {
+      font-size: var(--text-caption);
+    }
+    .photo:nth-child(n) .trombone {
+      left: 12px;
+    }
+    .pile:not(.pile-socle) .fiche {
+      column-gap: 14px;
+      row-gap: 8px;
+    }
+    .pile:not(.pile-socle) .photos {
+      grid-row: auto;
+    }
+    .pile:not(.pile-socle) .tirage {
+      width: 52px;
+    }
+    .pile:not(.pile-socle) .titre {
+      align-self: center;
+    }
+    .pile:not(.pile-socle) .texte {
+      grid-column: 1 / -1;
+    }
+    /* The badges three by row (César 18/11): a smaller board margin, photo and name. */
+    .badges-zone {
+      padding: 14px 12px;
+    }
+    /* Still a centred wrap, so an incomplete last row stays centred. */
+    .badges {
+      gap: 12px 6px;
+    }
+    .badges :global(.badge),
+    .badges :global(.badge-carte) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .badges :global(.badge) {
+      width: calc((100% - 12px) / 3);
+    }
+    .badges :global(.face) {
+      overflow-wrap: break-word;
+    }
+    /* Narrow badges: the agent's line on the back breaks words at their syllables; the network's
+       name (one long word in mono capitals, typed by the visitor) anywhere. */
+    .badges :global(.badge-pitch),
+    .badges :global([data-b-nb]) {
+      hyphens: auto;
+    }
+    .badges :global(.badge-ens) {
+      overflow-wrap: anywhere;
+    }
+    .badges :global(.face) {
+      min-height: 0;
+      padding: 10px 4px;
+    }
+    .badges :global(.badge-fente) {
+      margin-bottom: 10px;
+    }
+    .badges :global(img) {
+      width: 40px;
+      height: 40px;
+    }
+    .badges :global(b) {
+      font-size: var(--text-caption);
+    }
+    /* The steps: the current one named, the others by their number (the names stay for readers). */
+    .actes li:not(.actif) .acte-nom {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
     }
     .champs,
     .acte3 {

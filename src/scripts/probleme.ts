@@ -61,13 +61,19 @@ function animer(section: HTMLElement) {
   const portrait = matchMedia('(max-aspect-ratio: 1/1), (max-width: 639.98px)');
   const HAUT_TELEPHONE = 88 + 160 + 12; // padding-top + .texte + margin-top
   const FONDU = 40;
-  /** Film: a fixed design height, the block being as tall as the scaled stage (not the screen). */
-  const HAUTEUR_FILM = 960;
+  /** Film: a fixed design height, the block being as tall as the scaled stage (not the screen). Short
+   * of the whole phone: its bottom slides under the next section, cut clean (César 18/11). */
+  const HAUTEUR_FILM = 800;
+  /** Film: the phone drawn smaller than the stage (César 18/11: margins on both sides). Kept in sync
+   * with `.pb.film .iphone` in Probleme.astro. */
+  const ECHELLE_FILM = 0.8;
   const dimensionner = () => {
     if (portrait.matches) {
       const h = (collant.clientHeight * 440) / collant.clientWidth;
       const hauteur = film ? HAUTEUR_FILM : Math.round(Math.max(880, Math.min(h, 1100)));
-      const visible = hauteur - HAUT_TELEPHONE - FONDU; // phone px above the fade
+      // Phone px above the fade.
+      // Film: no fade, the phone is cut by the section's edge.
+      const visible = (hauteur - HAUT_TELEPHONE - (film ? 0 : FONDU)) / (film ? ECHELLE_FILM : 1);
       cadre.dataset.largeur = '440';
       cadre.dataset.hauteur = String(hauteur);
       // Screen bottom is at 18 + 763 px in the phone; 104 px is the desktop stack offset.
