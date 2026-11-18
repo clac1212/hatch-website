@@ -31,11 +31,13 @@ import ouv4 from '../../assets/tarifs/ouv-4.jpg';
 
 interface Props {
   locale: Locale;
+  /** Where the form sits, for the analytics of the booking (`demo_reservee`). */
+  emplacement: 'tarifs' | 'demo';
 }
-const { locale } = Astro.props;
+const { locale, emplacement } = Astro.props;
 const c = await section('tarifsFormulaire', locale);
 const t = c.recrutement;
-const demo = (await getEntry('demoPage', locale))!.data; // the agenda's lines, shared with /demo
+const demo = (await getEntry('demoPage', locale))!.data; // the agenda's lines (pages/demo)
 const portraits = { peep, owl, jay, lark, finch, pecker, sparrow };
 type Id = keyof typeof portraits;
 const infos = Object.fromEntries(
@@ -97,7 +99,7 @@ const placesVille = PLACES.flatMap(([x, y, l, h], k) =>
 const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, ouv4][k] }));
 ---
 
-<div class="g" data-g data-agents={agents} data-textes={textes}>
+<div class="g" data-g data-agents={agents} data-textes={textes} data-emplacement={emplacement}>
   <svg width="0" height="0" class="defs" aria-hidden="true">
     <filter id="g-encre">
       <feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" seed="7"></feTurbulence>
@@ -878,7 +880,7 @@ const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, o
       monterCal = preparerCal({
         // The agenda shows only once drawn: no loader of Cal's own, it fades in on the card.
         pret: () => zoneCal.classList.add('prete'),
-        reserve: () => suivre('demo_reservee', { emplacement: 'tarifs' }),
+        reserve: () => suivre('demo_reservee', { emplacement: w.dataset.emplacement! }),
       });
       envoyer();
     });

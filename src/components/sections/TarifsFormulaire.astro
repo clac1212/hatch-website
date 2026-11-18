@@ -1,17 +1,14 @@
 ---
 import { section } from '../../content/section';
-import { routes, useTranslations, type Locale } from '../../i18n/ui';
+import type { Locale } from '../../i18n/ui';
 import Section from '../layout/Section.astro';
 import EnTete from '../ui/EnTete.astro';
-import Button from '../ui/Button.astro';
-import Recrutement from '../tarifs/Recrutement.astro';
+import Formulaire from '../tarifs/Formulaire.astro';
 
 /**
  * Pricing as a hiring (signature section): the visitor stamps the agents they hire, places them in
- * their network, meets their badges and leaves their contact details (components/tarifs/). The
- * request is saved (/api/demande-demo) and leaves as a letter; the postcard that comes back opens
- * into the Cal.com agenda, prefilled. Without JS the hiring cannot run: a line and the demo button
- * take its place.
+ * their network, meets their badges and leaves their contact details. The form itself is
+ * tarifs/Formulaire, shared with /demo.
  */
 interface Props {
   locale: Locale;
@@ -19,34 +16,9 @@ interface Props {
 
 const { locale } = Astro.props;
 const c = await section('tarifsFormulaire', locale);
-const t = useTranslations(locale);
 ---
 
 <Section id="tarifs" ton="cream">
   <EnTete titre={c.titre} intro={c.intro} align="centre" class="mb-10 lg:mb-14" />
-
-  <div class="formulaire rounded-panneau bg-surface p-5 shadow-carte sm:p-8 lg:p-10">
-    <div class="avec-js">
-      <Recrutement locale={locale} />
-    </div>
-    <noscript>
-      <div class="flex flex-col items-start gap-5">
-        <p class="max-w-lead text-body text-soft">{c.recrutement.sansJs}</p>
-        <Button href={routes.demo[locale]} size="lg">{t('cta.demo')}</Button>
-      </div>
-    </noscript>
-  </div>
+  <Formulaire locale={locale} emplacement="tarifs" />
 </Section>
-
-<style>
-  /* exception: the hiring reads as one object in the middle of the section, not as a full-width
-     band; 952 px is the width it had beside the former « Comment ça se passe » aside. */
-  .formulaire {
-    max-width: 952px;
-    margin-inline: auto;
-  }
-  /* Without JS the hiring cannot run: it gives way to the line and button of the <noscript>. */
-  :global(.no-js) .avec-js {
-    display: none;
-  }
-</style>
