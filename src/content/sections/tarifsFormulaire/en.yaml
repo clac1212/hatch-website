@@ -105,10 +105,7 @@ envoi:
   entete: 'Postcard'
 
 notes:
-  agents: 'Agents:'
   socle: 'Core'
   ouvertures: 'Openings per year:'
-  enseigne: 'Brand:'
-  etablissements: 'Locations:'
   role: 'Role:'
   telephone: 'Phone:'

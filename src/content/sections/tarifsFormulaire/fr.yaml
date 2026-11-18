@@ -105,10 +105,7 @@ envoi:
   entete: 'Carte postale'
 
 notes:
-  agents: 'Agents :'
   socle: 'Socle'
   ouvertures: 'Ouvertures par an :'
-  enseigne: 'Enseigne :'
-  etablissements: 'Établissements :'
   role: 'Rôle :'
   telephone: 'Téléphone :'

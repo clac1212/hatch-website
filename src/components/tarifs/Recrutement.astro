@@ -79,12 +79,20 @@ const fiches = c.offres.map((o) => ({
 // Two blocks: the core with its two add-ons, and Sparrow on its own.
 const blocs = [fiches.slice(0, 3), fiches.slice(3)];
 // The town of act 2: one render, greyed, and each shop cut out of the coloured render at its exact
-// place (box in % of the scene: left, top, width, height), nearest to the head office first.
+// place (box in % of the full 1440 × 592 render: left, top, width, height), nearest to the head
+// office first. The scene shows only the render's top band, 1440 × 430 (gris.jpg is cropped to
+// it), to keep the act short: the shops below it are left out, the others re-placed in it.
 const boutiquesVille = Object.values(
   import.meta.glob<{ default: ImageMetadata }>('../../assets/tarifs/ville/b*.png', { eager: true }),
 ).map((m) => m.default);
 // prettier-ignore
-const placesVille = [[54.17, 23.35, 5.93, 16.51], [39.46, 23.58, 5.93, 16.51], [65.47, 6.84, 5.93, 16.51], [27.9, 7.45, 5.93, 16.51], [34.85, 30.57, 5.93, 16.13], [70.58, 13.75, 5.93, 16.51], [22.79, 14.44, 5.93, 16.51], [41.7, 40.86, 5.93, 16.51], [79.73, 0.84, 5.93, 16.51], [12.44, 1.08, 5.93, 16.51], [27.02, 41.01, 5.93, 16.51], [15.21, 25.27, 5.93, 16.51], [68.94, 43.63, 5.93, 16.51], [79.77, 26.5, 5.93, 16.51], [62.63, 55.07, 5.93, 16.51], [57.13, 61.29, 5.93, 16.51], [50.66, 71.97, 5.93, 16.51], [22.82, 66.82, 5.93, 16.51], [3.35, 42.32, 5.9, 16.44], [65.25, 72.27, 5.93, 16.51], [45.2, 79.65, 5.78, 16.51], [81.94, 61.67, 5.93, 16.51], [92.55, 44.09, 5.93, 16.51], [7.35, 68.82, 5.93, 16.51], [89.02, 71.51, 5.93, 16.51]];
+const PLACES = [[54.17, 23.35, 5.93, 16.51], [39.46, 23.58, 5.93, 16.51], [65.47, 6.84, 5.93, 16.51], [27.9, 7.45, 5.93, 16.51], [34.85, 30.57, 5.93, 16.13], [70.58, 13.75, 5.93, 16.51], [22.79, 14.44, 5.93, 16.51], [41.7, 40.86, 5.93, 16.51], [79.73, 0.84, 5.93, 16.51], [12.44, 1.08, 5.93, 16.51], [27.02, 41.01, 5.93, 16.51], [15.21, 25.27, 5.93, 16.51], [68.94, 43.63, 5.93, 16.51], [79.77, 26.5, 5.93, 16.51], [62.63, 55.07, 5.93, 16.51], [57.13, 61.29, 5.93, 16.51], [50.66, 71.97, 5.93, 16.51], [22.82, 66.82, 5.93, 16.51], [3.35, 42.32, 5.9, 16.44], [65.25, 72.27, 5.93, 16.51], [45.2, 79.65, 5.78, 16.51], [81.94, 61.67, 5.93, 16.51], [92.55, 44.09, 5.93, 16.51], [7.35, 68.82, 5.93, 16.51], [89.02, 71.51, 5.93, 16.51]];
+const HAUT = 430;
+const placesVille = PLACES.flatMap(([x, y, l, h], k) =>
+  ((y + h) / 100) * 592 <= HAUT
+    ? [{ x, y: (y * 592) / HAUT, l, h: (h * 592) / HAUT, img: boutiquesVille[k] }]
+    : [],
+);
 // Sparrow's question: one voxel picture per pace, from one opening to a whole town.
 const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, ouv4][k] }));
 ---
@@ -203,10 +211,10 @@ const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, o
            clicked, on or off; the number follows. -->
       <div class="scene" data-scene aria-hidden="true">
         <Image src={villeGris} alt="" class="terrain" width={1440} densities={[1, 2]} />
-        <svg class="liens" data-liens viewBox="0 0 1440 592" preserveAspectRatio="none"></svg>
+        <svg class="liens" data-liens viewBox="0 0 1440 430" preserveAspectRatio="none"></svg>
         <span class="onde" data-onde></span>
         {
-          placesVille.map(([x, y, l, h], k) => (
+          placesVille.map(({ x, y, l, h, img }, k) => (
             <button
               type="button"
               tabindex="-1"
@@ -214,7 +222,7 @@ const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, o
               data-lieu={k}
               style={`left:${x}%;top:${y}%;width:${l}%;height:${h}%`}
             >
-              <Image src={boutiquesVille[k]} alt="" width={96} densities={[1, 2]} />
+              <Image src={img} alt="" width={96} densities={[1, 2]} />
             </button>
           ))
         }
@@ -614,13 +622,13 @@ const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, o
     const liens = q('[data-liens]');
     const lieux = [...w.querySelectorAll<HTMLButtonElement>('[data-lieu]')];
     const NS = 'http://www.w3.org/2000/svg';
-    const SIEGE = { x: 715, y: 42 }; // the head office's roof, in the render's units (1440 × 592)
+    const SIEGE = { x: 715, y: 42 }; // the head office's roof, in the scene's units (1440 × 430)
     const allumes: number[] = []; // in lighting order, so « − » puts out the last one lit
     // A link: a faint arc from the head office to the shop's roof, with a spark kept for the pulse.
     const lien = (k: number) => {
       const r = lieux[k];
       const x = ((parseFloat(r.style.left) + parseFloat(r.style.width) / 2) / 100) * 1440;
-      const y = ((parseFloat(r.style.top) + parseFloat(r.style.height) * 0.28) / 100) * 592;
+      const y = ((parseFloat(r.style.top) + parseFloat(r.style.height) * 0.28) / 100) * 430;
       const cx = (SIEGE.x + x) / 2;
       // Lifted over the roofs, but kept inside the frame (the head office sits near its top).
       const cy = Math.max(6, (SIEGE.y + y) / 2 - 40 - Math.abs(x - SIEGE.x) * 0.08);
@@ -868,7 +876,8 @@ const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, o
       aide.classList.remove('alerte');
       enregistrer();
       monterCal = preparerCal({
-        pret: () => (attente.hidden = true),
+        // The agenda shows only once drawn: no loader of Cal's own, it fades in on the card.
+        pret: () => zoneCal.classList.add('prete'),
         reserve: () => suivre('demo_reservee', { emplacement: 'tarifs' }),
       });
       envoyer();
@@ -901,25 +910,40 @@ const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, o
         }),
       }).catch(() => {});
     };
-    // Act 4: the Cal.com agenda, on the postcard. Name and email prefill the booking, the rest
-    // goes in its notes, in the page's language. Cal's script starts loading with the letter.
-    const attente = q('[data-cal-attente]');
+    // Act 4: the Cal.com agenda, on the postcard. Every question of the booking is prefilled
+    // with the answers (the keys are the event's field identifiers, set in Cal.com), so the
+    // visitor only picks a slot and confirms; what Cal has no field for goes in its notes.
+    // Cal's script starts loading with the letter.
+    const zoneCal = q('[data-cal-zone]');
     let monterCal: ReturnType<typeof preparerCal>;
+    /** The phone in international form, as Cal's phone field wants it; '' if unsure. */
+    const international = (v: string) => {
+      const n = v.replace(/[^\d+]/g, '');
+      if (n.startsWith('+')) return n;
+      if (n.startsWith('00')) return `+${n.slice(2)}`;
+      // A French national number (0X XX XX XX XX), on the French page only.
+      if (T.locale.startsWith('fr') && /^0\d{9}$/.test(n)) return `+33${n.slice(1)}`;
+      return '';
+    };
     const prefill = () => {
       const N = T.notes;
-      const offres = OFFRES.filter((id) => recrues.has(id)).map((id) =>
+      const agents = OFFRES.filter((id) => recrues.has(id)).map((id) =>
         id === 'socle' ? N.socle : parId[id].nom,
       );
       const ouv = w.querySelector<HTMLInputElement>('input[name="g-ouv"]:checked');
-      const lignes = [`${N.agents} ${offres.join(', ')}`];
+      const tel = international(val('telephone'));
+      const lignes = [`${N.role} ${val('role')}`];
       if (recrues.has('sparrow') && ouv) lignes.push(`${N.ouvertures} ${ouv.value}`);
-      lignes.push(
-        `${N.enseigne} ${val('enseigne')}`,
-        `${N.etablissements} ${nombre()}`,
-        `${N.role} ${val('role')}`,
-        `${N.telephone} ${val('telephone')}`,
-      );
-      return { name: val('nom'), email: val('email'), notes: lignes.join('\n') };
+      if (!tel) lignes.push(`${N.telephone} ${val('telephone')}`);
+      return {
+        name: val('nom'),
+        email: val('email'),
+        ...(tel && { attendeePhoneNumber: tel }),
+        Enseigne: val('enseigne'),
+        'Combien-d--tablissements-votre-enseigne-compte-t-elle': String(nombre()),
+        agents: agents.join(', '),
+        notes: lignes.join('\n'),
+      };
     };
     const envoyer = async () => {
       const ids = membres();
@@ -1072,7 +1096,7 @@ const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, o
     gap: 12px;
   }
   .bloc {
-    padding: 30px 20px 20px;
+    padding: 24px 16px 16px;
     border-radius: var(--radius-card);
     corner-shape: squircle;
     background: var(--color-cream);
@@ -1084,7 +1108,7 @@ const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, o
       'socle socle'
       'finch pecker';
     align-items: stretch;
-    gap: 34px 16px;
+    gap: 26px 16px;
   }
   .pile-socle {
     grid-area: socle;
@@ -1097,7 +1121,7 @@ const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, o
   }
   .pile .fiche {
     height: 100%;
-    padding: 20px 22px;
+    padding: 16px 20px;
   }
   /* The socle: its name on the left, its four agents pinned along the top on the right. */
   .pile-socle .fiche {
@@ -1123,7 +1147,7 @@ const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, o
   }
   .pile-socle .tirage {
     width: 100%;
-    max-width: 72px;
+    max-width: 60px;
   }
   /* The others: photo on the left, name and job beside it. */
   .pile:not(.pile-socle) .fiche {
@@ -1137,7 +1161,7 @@ const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, o
     grid-row: span 2;
   }
   .pile:not(.pile-socle) .tirage {
-    width: 72px;
+    width: 60px;
   }
   .pile:not(.pile-socle) .texte {
     font-size: var(--text-caption);
@@ -1582,11 +1606,11 @@ const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, o
   .ligne .touche:active {
     scale: 0.92;
   }
-  /* exception: the scene's staging, its ratio is the render's */
+  /* exception: the scene's staging, its ratio is the render's top band (gris.jpg) */
   .scene {
     position: relative;
     overflow: clip; /* the pulse stays inside the picture */
-    aspect-ratio: 1440 / 592;
+    aspect-ratio: 1440 / 430;
   }
   .terrain {
     display: block;
@@ -1621,11 +1645,11 @@ const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, o
     stroke-dasharray: 0.08 1.2;
     opacity: 0;
   }
-  /* The pulse's wave, centred on the head office's roof (715, 42 in the render's units). */
+  /* The pulse's wave, centred on the head office's roof (715, 42 in the scene's units). */
   .onde {
     position: absolute;
     left: calc(715 / 1440 * 100%);
-    top: calc(42 / 592 * 100%);
+    top: calc(42 / 430 * 100%);
     width: 22%;
     aspect-ratio: 2 / 1;
     translate: -50% -50%;
@@ -1743,7 +1767,7 @@ const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, o
   }
   .pile-ouv .vignette .tirage {
     width: 100%;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 16 / 9;
     rotate: -1.2deg;
   }
   .pile-ouv:nth-child(2n) .vignette .tirage {

@@ -218,8 +218,8 @@ const { t, agenda } = Astro.props;
     <div class="cp-agenda" data-agenda>
       <div class="cp-agenda-pli">
         <p class="cp-agenda-aide">{agenda.aide}</p>
-        <div class="cp-agenda-zone">
-          <p class="cp-agenda-attente" data-cal-attente aria-live="polite">{agenda.attente}</p>
+        <div class="cp-agenda-zone" data-cal-zone>
+          <p class="cp-agenda-attente">{agenda.attente}</p>
           <div id="tarifs-cal" class="cp-agenda-cal"></div>
         </div>
         <a
@@ -718,7 +718,6 @@ const { t, agenda } = Astro.props;
   /* The open card: straight, full width, the agenda unfolded under the message and the address. */
   .carte-postale {
     grid-template-areas: 'mot adresse' 'agenda agenda';
-    transition: width 0.6s var(--ease-hatch);
   }
   .cp-mot {
     grid-area: mot;
@@ -740,28 +739,28 @@ const { t, agenda } = Astro.props;
       0 1px 2px var(--ombre),
       0 10px 16px -6px var(--ombre-fort);
   }
+  /* The agenda is laid out at once (envoi.ts grows the stage to its height, so nothing jumps), its
+     content rising in as the card settles. */
   .cp-agenda {
-    display: grid;
+    display: none;
     grid-area: agenda;
-    grid-template-rows: 0fr;
-    visibility: hidden;
-    transition:
-      grid-template-rows 0.7s var(--ease-hatch) 0.35s,
-      visibility 0s 1.05s;
   }
   .envoi.ouverte .cp-agenda {
-    grid-template-rows: 1fr;
-    visibility: visible;
-    transition:
-      grid-template-rows 0.7s var(--ease-hatch) 0.35s,
-      visibility 0s 0.35s;
+    display: block;
   }
   .cp-agenda-pli {
     display: flex;
-    min-height: 0;
     flex-direction: column;
     gap: 12px;
-    overflow: clip;
+  }
+  .envoi.ouverte .cp-agenda-pli {
+    animation: monte 0.5s var(--ease-hatch) 0.3s both;
+  }
+  @keyframes monte {
+    from {
+      opacity: 0;
+      translate: 0 12px;
+    }
   }
   .cp-agenda-aide {
     margin-top: 28px;
@@ -776,9 +775,14 @@ const { t, agenda } = Astro.props;
     position: relative;
     min-height: 600px; /* exception: Cal.com's month view, kept while it loads */
   }
+  /* While Cal draws, a quiet line holds its place; drawn, the agenda fades in over it. The zone
+     then takes the agenda's own height. */
   .cp-agenda-attente {
     position: absolute;
     inset: 96px 0 auto;
+    transition:
+      opacity 0.3s,
+      visibility 0s 0.3s;
     text-align: center;
     font: var(--text-caption) / 1.4 var(--font-mono);
     text-transform: uppercase;
@@ -787,6 +791,18 @@ const { t, agenda } = Astro.props;
   /* Cal.com draws its own frame: the agenda lies on the card as it comes. */
   .cp-agenda-cal {
     position: relative;
+    opacity: 0;
+    transition: opacity 0.5s var(--ease-hatch) 0.1s;
+  }
+  .prete {
+    min-height: 0;
+  }
+  .prete .cp-agenda-attente {
+    opacity: 0;
+    visibility: hidden;
+  }
+  .prete .cp-agenda-cal {
+    opacity: 1;
   }
   .cp-agenda-lien {
     align-self: flex-start;
@@ -799,9 +815,11 @@ const { t, agenda } = Astro.props;
     color: var(--color-orange-hover);
   }
   @media (prefers-reduced-motion: reduce) {
-    .carte-postale,
-    .cp-agenda,
-    .envoi.ouverte .cp-agenda {
+    .envoi.ouverte .cp-agenda-pli {
+      animation: none;
+    }
+    .cp-agenda-attente,
+    .cp-agenda-cal {
       transition: none;
     }
   }

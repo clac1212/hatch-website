@@ -128,16 +128,14 @@ export const schema = z.strictObject({
     entete: txt,
   }),
   /**
-   * Line labels of the summary written in the notes of the demo booking (prefilled on the postcard).
-   * Labels carry their own colon, so each locale keeps its typography ("Enseigne :" / "Brand:").
+   * The demo booking's prefill (the postcard's agenda): the name of the core in Cal's agents
+   * field, and the labels of the lines written in its notes, for what Cal has no field for (the
+   * phone only when it could not be put in international form). Labels carry their own colon, so
+   * each locale keeps its typography ("Rôle :" / "Role:").
    */
   notes: z.strictObject({
-    agents: txt,
-    /** Name of the core in the agents list. */
     socle: txt,
     ouvertures: txt,
-    enseigne: txt,
-    etablissements: txt,
     role: txt,
     telephone: txt,
   }),

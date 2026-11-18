@@ -346,21 +346,33 @@ export const construire = (racine: HTMLElement, d: Donnees) => {
   regler(0);
 
   // Act 4: the card opens. The letter's table goes, the card straightens and takes the full width
-  // (FLIP: it starts from where it lay, tilted), then its agenda unfolds (CSS, Envoi.astro).
+  // with its agenda under it. One movement, measured (FLIP): the card goes from where it lay,
+  // tilted, to its open place and width, while the stage grows from its height to the open one
+  // (it clips, so the agenda is uncovered rather than pushed in, and the page never collapses);
+  // the agenda's content then rises in (CSS, Envoi.astro).
   const ouvrir = (calme: boolean) => {
+    // The card stays centred in the stage, its top on the stage's top: it moves from its centre
+    // line and its top edge (the rect is the tilted card's box, close enough at 1.5°).
     const avant = carte.getBoundingClientRect();
+    const lAvant = carte.offsetWidth;
+    const hAvant = racine.offsetHeight;
     carte.getAnimations().forEach((a) => a.cancel());
     racine.classList.add('ouverte');
     if (calme) return;
     const apres = carte.getBoundingClientRect();
+    const dx = avant.left + avant.width / 2 - (apres.left + apres.width / 2);
+    const temps = { duration: 700, easing: doux };
+    racine.animate([{ height: `${hAvant}px` }, { height: `${racine.offsetHeight}px` }], temps);
     carte.animate(
       [
         {
-          transform: `translate(${avant.left - apres.left}px, ${avant.top - apres.top}px) rotate(-1.5deg)`,
+          width: `${lAvant}px`,
+          transformOrigin: '50% 0',
+          transform: `translate(${dx}px, ${avant.top - apres.top}px) rotate(-1.5deg)`,
         },
-        { transform: 'none' },
+        { width: `${carte.offsetWidth}px`, transformOrigin: '50% 0', transform: 'none' },
       ],
-      { duration: 600, easing: doux },
+      temps,
     );
   };
   return { regler, prenom, ouvrir };
