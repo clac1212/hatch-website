@@ -91,6 +91,23 @@ const structuredData = serializeJsonLd([
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script is:inline>
       document.documentElement.classList.remove('no-js');
+      // --ecran: the screen height, for heights that shape the page (hero, pinned tracks). Set
+      // once and only updated when the width changes or the height by more than a toolbar: a
+      // browser that shows or hides its toolbar while scrolling resizes the viewport (and every
+      // vh/svh/dvh unit) by ~20-100 px, which reflowed the page above the reader and made it jump.
+      (function () {
+        var r = document.documentElement,
+          w = 0,
+          h = 0;
+        function fixer() {
+          if (innerWidth === w && Math.abs(innerHeight - h) < 150) return;
+          w = innerWidth;
+          h = innerHeight;
+          r.style.setProperty('--ecran', h + 'px');
+        }
+        fixer();
+        addEventListener('resize', fixer);
+      })();
     </script>
     <title>{title}</title>
     <meta name="description" content={description} />

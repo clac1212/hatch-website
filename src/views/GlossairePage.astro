@@ -1,6 +1,7 @@
 ---
 import { getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
+import Section from '../components/layout/Section.astro';
 import Badge from '../components/ressources/Badge.astro';
 import Sorties from '../components/ressources/Sorties.astro';
 import { piedRessources } from '../components/ressources/pied';
@@ -71,88 +72,119 @@ const jsonLd = [
   pied={pied}
   jsonLd={jsonLd}
 >
-  <div class="px-4 pt-32 pb-20 sm:px-6 lg:pt-40">
-    <header class="mx-auto flex max-w-prose flex-col gap-5">
-      <a href={routes.ressources[locale]} class="retour w-max text-caption font-semibold text-soft">
-        ‹ {ui.guide.retour}
-      </a>
-      <span class="font-mono text-kicker text-orange-txt uppercase">{g.kicker}</span>
-      <h1
-        class="font-mono text-[clamp(1.875rem,1.3rem+2.2vw,3rem)] leading-[1.12] text-balance text-ink"
-      >
-        {g.titre}
-      </h1>
-      <p class="text-punch text-soft">{g.chapeau}</p>
-    </header>
+  <!-- The same reading layout as a guide: the text column centred, the A-Z index on its left from
+       1024 px, staying in view; above it on smaller screens, as a strip under the nav. -->
+  <Section rythme="bas" class="pt-32 lg:pt-40">
+    <div class="lecture">
+      <header class="col-texte flex flex-col items-start gap-5">
+        <a href={routes.ressources[locale]} class="retour text-caption font-semibold text-soft">
+          <span aria-hidden="true">←</span>
+          {ui.guide.retour}
+        </a>
+        <h1 class="font-display text-h1 font-semibold text-balance">{g.titre}</h1>
+        <p class="text-punch text-soft">{g.chapeau}</p>
+      </header>
 
-    <nav aria-label={g.lettres} class="lettres mx-auto mt-10 max-w-prose">
-      <ul class="flex flex-wrap gap-1">
+      <nav aria-label={g.lettres} class="lettres">
+        <ul>
+          {
+            alphabet.map((l) => (
+              <li>
+                {presentes.has(l) ? (
+                  <a href={`#lettre-${l}`} class="lettre">
+                    {l}
+                  </a>
+                ) : (
+                  <span class="lettre vide" aria-hidden="true">
+                    {l}
+                  </span>
+                )}
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <div class="col-texte">
         {
-          alphabet.map((l) => (
-            <li>
-              {presentes.has(l) ? (
-                <a href={`#lettre-${l}`} class="lettre">
-                  {l}
-                </a>
-              ) : (
-                <span class="lettre vide" aria-hidden="true">
-                  {l}
-                </span>
-              )}
-            </li>
+          groupes.map((gr) => (
+            <section id={`lettre-${gr.lettre}`} class="groupe" aria-labelledby={`t-${gr.lettre}`}>
+              <h2
+                id={`t-${gr.lettre}`}
+                class="font-display text-section font-semibold text-orange-txt"
+              >
+                {gr.lettre}
+              </h2>
+              <dl class="mt-2">
+                {gr.termes.map((x) => (
+                  <div id={x.ancre} class="terme">
+                    <dt class="flex flex-wrap items-center gap-3">
+                      <a href={`#${x.ancre}`} class="font-display text-card font-semibold">
+                        {x.mot}
+                      </a>
+                      <Badge locale={locale} public={x.public} />
+                    </dt>
+                    <dd class="mt-2 text-soft">{x.definition}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
           ))
         }
-      </ul>
-    </nav>
-
-    <div class="mx-auto mt-10 max-w-prose">
-      {
-        groupes.map((gr) => (
-          <section id={`lettre-${gr.lettre}`} class="groupe" aria-labelledby={`t-${gr.lettre}`}>
-            <h2 id={`t-${gr.lettre}`} class="font-mono text-[1.75rem] leading-none text-orange-txt">
-              {gr.lettre}
-            </h2>
-            <dl class="mt-3 border-t border-line">
-              {gr.termes.map((x) => (
-                <div id={x.ancre} class="terme">
-                  <dt class="flex flex-wrap items-center gap-3">
-                    <a
-                      href={`#${x.ancre}`}
-                      class="font-display text-[1.375rem] font-semibold text-ink"
-                    >
-                      {x.mot}
-                    </a>
-                    <Badge locale={locale} public={x.public} />
-                  </dt>
-                  <dd class="mt-2 text-soft">{x.definition}</dd>
-                </div>
-              ))}
-            </dl>
-          </section>
-        ))
-      }
+      </div>
     </div>
-  </div>
+  </Section>
 
-  <section class="px-4 pb-24 sm:px-6 lg:pb-32">
-    <div class="mx-auto max-w-site">
-      <Sorties locale={locale} public="tous" />
-    </div>
-  </section>
+  <Section rythme="bas">
+    <Sorties locale={locale} public="tous" />
+  </Section>
 </Base>
 
 <style>
-  /* The A to Z bar stays under the fixed nav while scrolling, from tablet width up (on a phone it
-     wraps to three rows, too tall to keep on screen). */
+  .lecture {
+    display: grid;
+    grid-template-columns: minmax(0, var(--container-prose));
+    justify-content: center;
+  }
+  .col-texte {
+    grid-column: 1;
+  }
+  /* The index: a strip under the nav on small screens, a column of its own from 1024 px. */
   .lettres {
+    position: sticky;
+    /* exception: just under the floating nav */
+    top: 5rem;
+    z-index: 10;
+    margin-top: 2.5rem;
     padding: 0.5rem 0;
     background: var(--color-cream);
   }
-  @media (min-width: 40rem) {
+  .lettres ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+  @media (width >= 64rem) {
+    .lecture {
+      /* exception: the index column, the same as a guide's contents */
+      grid-template-columns: 14rem minmax(0, var(--container-prose)) 14rem;
+      column-gap: 3rem;
+    }
+    .col-texte {
+      grid-column: 2;
+    }
     .lettres {
-      position: sticky;
-      top: 4.5rem;
-      z-index: 10;
+      grid-column: 1;
+      grid-row: 2;
+      align-self: start;
+      top: 7rem;
+      margin-top: 2rem;
+      padding: 0;
+      background: none;
+    }
+    .lettres ul {
+      display: grid;
+      grid-template-columns: repeat(6, 2rem);
     }
   }
   .lettre {
@@ -161,26 +193,30 @@ const jsonLd = [
     height: 2rem;
     align-items: center;
     justify-content: center;
-    border-radius: var(--radius-btn);
+    border-radius: var(--radius-sm);
     font-family: var(--font-mono);
-    font-size: 0.9375rem;
+    font-size: var(--text-caption);
     color: var(--color-ink);
-    box-shadow: inset 0 0 0 1px var(--color-line);
+    transition:
+      background-color 0.2s var(--ease-hatch),
+      color 0.2s var(--ease-hatch);
   }
   a.lettre:hover {
+    background: var(--color-orange-tint);
     color: var(--color-orange-txt);
-    box-shadow: inset 0 0 0 1px var(--color-orange-txt);
   }
-  a.lettre:focus-visible {
-    outline: 2px solid var(--color-orange-txt);
+  a.lettre:focus-visible,
+  .terme a:focus-visible,
+  .retour:focus-visible {
+    outline: 2px solid var(--color-orange);
     outline-offset: 2px;
+    border-radius: var(--radius-sm);
   }
   .lettre.vide {
     color: var(--color-line);
-    box-shadow: none;
   }
   .groupe {
-    padding-top: 2rem;
+    padding-top: 2.5rem;
     scroll-margin-top: 8.5rem;
   }
   .terme {
@@ -188,7 +224,7 @@ const jsonLd = [
     border-bottom: 1px solid var(--color-line);
     scroll-margin-top: 8.5rem;
   }
-  /* The term reached through its anchor stands out. */
+  /* The term reached by a link: a soft tint the width of the column. */
   .terme:target {
     background: var(--color-orange-tint);
     box-shadow:
@@ -199,9 +235,9 @@ const jsonLd = [
   .retour:hover {
     color: var(--color-orange-txt);
   }
-  .terme a:focus-visible,
-  .retour:focus-visible {
-    outline: 2px solid var(--color-orange-txt);
-    outline-offset: 3px;
+  @media (prefers-reduced-motion: reduce) {
+    .lettre {
+      transition: none;
+    }
   }
 </style>

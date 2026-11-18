@@ -1,6 +1,8 @@
 ---
 import { Image, Picture } from 'astro:assets';
 import Button from '../ui/Button.astro';
+import Carte from '../ui/Carte.astro';
+import Section from '../layout/Section.astro';
 import LisierePixel from '../ui/LisierePixel.astro';
 import { section } from '../../content/section';
 import { routes, useTranslations, type Locale } from '../../i18n/ui';
@@ -120,6 +122,14 @@ const steps = events.map((e, i) => {
 /** Seconds per event (wave, card running, card done, exit). */
 const STEP = 5.6;
 
+/* Staging of the glass title card over the map (signature section). */
+const carteHero =
+  // exception: the card's width and inner spacing follow the map (v3 hero), not a DS card size
+  'md:max-w-[600px] lg:w-[clamp(520px,47.2vw,680px)] lg:max-w-none gap-[18px] px-5 pt-6 pb-6 sm:gap-6 sm:px-8 sm:pt-8 sm:pb-9 lg:gap-[26px] lg:px-[clamp(36px,3.334vw,48px)] lg:pt-[clamp(34px,3.195vw,46px)] lg:pb-[clamp(38px,3.473vw,50px)]';
+const titreHero =
+  // exception: a long sentence inside the glass card over the map, so a smaller H1 than text-h1 (CLAUDE.md)
+  'text-[32px] leading-[1.06] tracking-[-0.018em] sm:text-[38px] md:text-[44px] lg:text-[clamp(40px,3.5vw,50px)]';
+
 /** Europe map: les trois chantiers (cadre 3840 × 2143 de l'image) et les nuages. */
 const GRUES = [
   { id: 'de', x: `${(2640 / 3840) * 100}%`, y: `${(180 / 2143) * 100}%` },
@@ -140,11 +150,12 @@ const tick =
   'M10 18H8v-2h2v2Zm-2-2H6v-2h2v2Zm4-2v2h-2v-2h2Zm-6 0H4v-2h2v2Zm8 0h-2v-2h2v2Zm2-2h-2v-2h2v2Zm2-2h-2V8h2v2Zm2-2h-2V6h2v2Z';
 ---
 
-<section
-  class:list={[
-    'hero relative h-dvh min-h-[640px] overflow-hidden bg-night [container-type:size]',
-    europe && 'hero-europe',
-  ]}
+<!-- exception: min-h-[640px], the shortest screen the map and the glass card still fit -->
+<Section
+  ton="night"
+  rythme="aucun"
+  pleine
+  class={`hero relative h-ecran min-h-[640px] overflow-hidden [container-type:size]${europe ? ' hero-europe' : ''}`}
   aria-labelledby="hero-titre"
   data-rv-groupe
   data-nav-fond="clair"
@@ -163,7 +174,8 @@ const tick =
     />
     {
       /* Europe map: les grues des trois chantiers pivotent (vidéos en boucle posées sur
-         l'image) et des nuages traversent la carte. Un bouton met tout en pause. */
+         l'image) et des nuages traversent la carte. Pas de bouton pause (César 17/11) :
+         prefers-reduced-motion fige tout. */
       europe && (
         <>
           <div class="h-grues">
@@ -238,7 +250,7 @@ const tick =
   }
 
   <div
-    class="relative z-1 mx-auto flex h-full max-w-[1440px] flex-col justify-end gap-2 px-4 pt-24 pb-4 sm:px-6 sm:pb-6 lg:static lg:justify-center lg:gap-0 lg:px-14 lg:pt-36 lg:pb-12"
+    class="conteneur relative z-1 flex h-full flex-col justify-end gap-2 pt-24 pb-4 sm:pb-6 lg:static lg:justify-center lg:gap-0 lg:pt-36 lg:pb-12"
   >
     <div class="h-piles" aria-hidden="true" data-pas={STEP}>
       {
@@ -288,22 +300,20 @@ const tick =
       }
     </div>
 
-    <div
-      class="carte-hero vitre z-2 flex flex-col items-start gap-[18px] rounded-panneau px-5 pt-6 pb-6 sm:gap-6 sm:px-8 sm:pt-8 sm:pb-9 md:max-w-[600px] lg:w-[clamp(520px,47.2vw,680px)] lg:max-w-none lg:gap-[26px] lg:px-[clamp(36px,3.334vw,48px)] lg:pt-[clamp(34px,3.195vw,46px)] lg:pb-[clamp(38px,3.473vw,50px)]"
+    <Carte
+      variante="verre"
+      taille="panneau"
+      class={`carte-hero z-2 flex flex-col items-start ${carteHero}`}
       data-rv
       style="--rd: 0.2s"
     >
-      <!-- exception: a long sentence inside the glass card over the map, so a smaller H1 than text-h1 -->
-      <h1
-        id="hero-titre"
-        class="font-display text-[32px] leading-[1.06] font-semibold tracking-[-0.018em] text-ink sm:text-[38px] md:text-[44px] lg:text-[clamp(40px,3.5vw,50px)]"
-      >
+      <h1 id="hero-titre" class={`font-display font-semibold text-ink ${titreHero}`}>
         {data.title.join(' ')}
       </h1>
       <!-- Lighter and grey under the title, for hierarchy (César, 01/10). On the liquid glass the plain
            `soft` grey fell to 4.3:1 on its darkest spots: a quarter of ink brings it back above AA. -->
       <p
-        class="lead text-[15px] leading-6 font-normal text-[color-mix(in_srgb,var(--color-soft)_75%,var(--color-ink))] lg:text-base lg:leading-[26px]"
+        class="lead text-punch font-normal text-[color-mix(in_srgb,var(--color-soft)_75%,var(--color-ink))]"
       >
         {data.lead}
       </p>
@@ -312,50 +322,23 @@ const tick =
       <div class="flex flex-wrap gap-3">
         <Button href={routes.demo[locale]} variant="orange">{t('cta.demo')}</Button>
       </div>
-    </div>
+    </Carte>
   </div>
-  {
-    europe && (
-      <button
-        type="button"
-        class="h-pause"
-        data-hero-pause
-        data-pause={t('hero.mapPause')}
-        data-play={t('hero.mapPlay')}
-        aria-pressed="false"
-      >
-        <span class="sr-only" data-hero-pause-label>
-          {t('hero.mapPause')}
-        </span>
-        <span class="h-pause-ico" aria-hidden="true" />
-      </button>
-    )
-  }
-</section>
-<!-- The Europe map: its own loop of task cards, the pause button and the cranes (no-op elsewhere). -->
+</Section>
+<!-- The Europe map: its own loop of task cards and the cranes (no-op elsewhere). -->
 <script is:inline>
   (function () {
     var hero = document.querySelector('.hero-europe');
     if (!hero) return;
-    var bouton = hero.querySelector('[data-hero-pause]');
-    var label = hero.querySelector('[data-hero-pause-label]');
-    var videos = [].slice.call(hero.querySelectorAll('.h-grue'));
-    function regler(pause) {
-      hero.classList.toggle('h-en-pause', pause);
-      bouton.setAttribute('aria-pressed', pause ? 'true' : 'false');
-      label.textContent = bouton.getAttribute(pause ? 'data-play' : 'data-pause');
-      videos.forEach(function (v) {
-        if (pause) v.pause();
-        else v.play().catch(function () {});
+    // Reduced motion: the cranes stand still (the clouds stop in CSS, the task cards below).
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches)
+      [].slice.call(hero.querySelectorAll('.h-grue')).forEach(function (v) {
+        v.removeAttribute('autoplay');
+        v.pause();
       });
-    }
-    bouton.addEventListener('click', function () {
-      regler(!hero.classList.contains('h-en-pause'));
-    });
-    regler(matchMedia('(prefers-reduced-motion: reduce)').matches);
 
     // Boucle des cartes de tâche (même rythme que la carte de France : onde, carte en cours,
-    // terminé, sortie, puis l'agent suivant). Suspendue par le bouton pause.
+    // terminé, sortie, puis l'agent suivant).
     var piles = [].slice.call(hero.querySelectorAll('.h-pile'));
     var pings = [].slice.call(hero.querySelectorAll('.h-ping'));
     var STEP = Number(hero.querySelector('.h-piles').dataset.pas);
@@ -415,8 +398,7 @@ const tick =
       avant = null,
       images = 0;
     function boucle(maintenant) {
-      if (avant !== null && !hero.classList.contains('h-en-pause'))
-        t += Math.min(maintenant - avant, 100) / 1000;
+      if (avant !== null) t += Math.min(maintenant - avant, 100) / 1000;
       avant = maintenant;
       rendu(t);
       if (++images % 30 === 0) caler();
@@ -505,21 +487,23 @@ const tick =
 </script>
 
 <style>
-  /* Europe map: grues, nuages, pause. */
+  /* exception: signature section (the networks hero map). Positions, timings, the task cards over the
+     map and their type sizes are the scene's staging, sized against the map, not the page's DS scale. */
+
+  /* Europe map: grues, nuages. */
   .h-grue {
     position: absolute;
     width: 12.5%;
     height: 22.4%;
     object-fit: cover;
-    -webkit-mask-image: radial-gradient(circle at 55% 45%, #000 38%, transparent 62%);
-    mask-image: radial-gradient(circle at 55% 45%, #000 38%, transparent 62%);
+    -webkit-mask-image: radial-gradient(circle at 55% 45%, var(--color-black) 38%, transparent 62%);
+    mask-image: radial-gradient(circle at 55% 45%, var(--color-black) 38%, transparent 62%);
   }
   .h-nuages {
     position: absolute;
     inset: 0;
     overflow: hidden;
     pointer-events: none;
-    opacity: 0.92;
   }
   .h-nuage {
     position: absolute;
@@ -539,48 +523,6 @@ const tick =
       left: 105%;
       top: calc(var(--y0) - 120%);
     }
-  }
-  .h-pause {
-    position: absolute;
-    right: max(16px, 2vw);
-    bottom: 28px;
-    z-index: 3;
-    display: grid;
-    place-items: center;
-    width: 36px;
-    height: 36px;
-    border-radius: 999px;
-    background: color-mix(in srgb, var(--color-night) 70%, transparent);
-    color: var(--color-cream);
-    cursor: pointer;
-  }
-  /* Phone and tablet: the title card fills the bottom, so the pause sits top right, under the nav. */
-  @media (max-width: 63.999rem) {
-    .h-pause {
-      top: 96px;
-      bottom: auto;
-    }
-  }
-  .h-pause:focus-visible {
-    outline: 2px solid var(--color-cream);
-    outline-offset: 2px;
-  }
-  .h-pause-ico {
-    width: 10px;
-    height: 12px;
-    border-left: 3px solid currentColor;
-    border-right: 3px solid currentColor;
-  }
-  .h-en-pause .h-pause-ico {
-    width: 0;
-    height: 0;
-    border-left: 11px solid currentColor;
-    border-right: 0;
-    border-top: 6px solid transparent;
-    border-bottom: 6px solid transparent;
-  }
-  .h-en-pause .h-nuage {
-    animation-play-state: paused;
   }
   @media (prefers-reduced-motion: reduce) {
     .h-nuage {

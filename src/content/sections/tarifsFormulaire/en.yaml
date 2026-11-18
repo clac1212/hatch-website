@@ -1,15 +1,6 @@
 titre: 'Build your team of agents.'
 intro: 'Every network is different. Tell us what you are interested in: we present pricing tailored to your agents and the size of your network, during the demo.'
 
-etapes:
-  agents: 'Which agents are you interested in?'
-  reseau: 'Your network'
-  contact: 'Your contact details'
-
-pause:
-  pause: 'Pause animations'
-  reprendre: 'Resume animations'
-
 offres:
   - id: socle
     nom: 'The Core'
@@ -54,39 +45,67 @@ champs:
   email: { label: 'Work email', placeholder: 'camille@bunbun.com' }
   telephone: { label: 'Phone', placeholder: '+33 6 12 34 56 78' }
 
-decisionnaire: 'I am a decision maker for this project'
+recrutement:
+  actes: ['Applications', 'Assignment', 'Badges', 'Meeting']
+  actesNom: 'Steps'
+  titres: ['Who are you hiring?', 'Where will they work?', 'Their badges are ready']
+  titreEnvoye: 'Last step: pick your slot'
+  consigne: 'Stamp the file of each agent you hire.'
+  socleTexte: 'Answers your teams, front of house and in the kitchen, and keeps your documents up to date.'
+  avecSocle: 'With the Core'
+  embaucher: 'Hire {agents}'
+  et: 'and'
+  exemple: 'e.g.'
+  moins: 'One less'
+  plus: 'One more'
+  tampons: { embauche: 'Hired', retenu: 'Picked', bord: 'Recruitment' }
+  etablissements: { un: '{n} location', plusieurs: '{n} locations' }
+  barre:
+    retour: 'Previous step'
+    vide: 'Your team'
+    aide: 'Stamp at least one agent.'
+    alerte: 'Stamp at least one agent to continue.'
+    agents: { un: '{n} agent', plusieurs: '{n} agents' }
+    embauches: { un: 'hired', plusieurs: 'hired' }
+    suivant: ['Assign the team', 'Print the badges']
+    fin: 'Book a demo'
+    manque: 'Missing:'
+    champs:
+      enseigne: 'brand'
+      etablissements: 'locations'
+      ouvertures: 'openings'
+      nom: 'name'
+      role: 'role'
+      email: 'email'
+      telephone: 'phone'
+    envoi: 'Sending…'
+    envoye: 'Sent to Hatch OS.'
+  badges:
+    aide: '{nom}: what I will do for you'
+    enseigneVide: 'Your brand'
+    postes:
+      peep: 'Network coordinator'
+      owl: 'Restaurant assistant'
+      jay: 'Archivist'
+      lark: 'Right hand to management'
+      finch: 'Quality auditor'
+      pecker: 'Trainer'
+      sparrow: 'Development officer'
+    texte: 'Your team is waiting for you in the demo. No commitment: pricing is presented during the call.'
+  sansJs: 'The hiring needs JavaScript. Book your demo directly: we present the pricing during the call.'
 
-reste:
-  initial: 'Next step: you pick a slot, and your answers are attached to the booking.'
-  pret: 'All set: you pick a slot, and your answers are attached to the booking.'
-  manque: 'Still to complete:'
-  etape: 'step'
-  noms:
-    agents: 'pick at least one agent'
-    reseau: 'your network'
-    contact: 'your contact details'
-
-envoi: 'Pick a demo slot'
-
-deroule:
-  kicker: 'How it works'
-  etapes:
-    - titre: 'You pick your agents'
-      texte: 'And tell us how many locations your network has.'
-    - titre: 'You book a slot'
-      texte: 'Your answers are attached to the booking, no need to repeat anything.'
-    - titre: 'We present your pricing'
-      texte: 'Based on your agents and the size of your network, during the demo.'
-  mention: 'No commitment. Your data is only used to prepare the demo.'
+envoi:
+  lettre: 'Demo request'
+  attention: 'For the attention of'
+  tampon: 'Sent'
+  reponse: 'Reply'
+  merci: 'Got it, {prenom}.'
+  texte: 'Your request is in. Last step: pick your slot below, that is when we present your pricing.'
+  signature: 'The Hatch OS team'
+  entete: 'Postcard'
 
 notes:
-  agents: 'Agents:'
   socle: 'Core'
   ouvertures: 'Openings per year:'
-  enseigne: 'Brand:'
-  etablissements: 'Locations:'
   role: 'Role:'
   telephone: 'Phone:'
-  decisionnaire: 'Decision maker:'
-  oui: 'yes'
-  non: 'no'

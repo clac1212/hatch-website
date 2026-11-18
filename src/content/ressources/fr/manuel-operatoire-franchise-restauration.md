@@ -1,9 +1,9 @@
 ---
-title: "Un manuel opératoire ne sert que s'il répond à l'équipier à son poste"
+title: "Rédiger un manuel opératoire que l'équipe consulte en service"
 seoTitle: 'Manuel opératoire de franchise en restauration'
 description: "Comment écrire un manuel opératoire que les équipes de restaurant ouvrent vraiment : structure, fiches d'une page, langues, mises à jour et suivi."
 kicker: 'Guide'
-chapeau: "Un franchiseur en restauration a besoin d'un manuel que l'équipier consulte pendant le service et qui lui donne la bonne réponse du premier coup. Souvent, le manuel existe, mais il dort dans un classeur au bureau ou dans un dossier partagé que personne n'ouvre en cuisine. Cette page décrit comment l'écrire, le découper et le tenir à jour pour qu'il serve au poste."
+chapeau: "Pour que l'équipier consulte le manuel opératoire pendant le service, découpez-le en fiches courtes, une par tâche, lisibles sur un téléphone au poste. Tenez une seule version de référence, traduite et mise à jour au même endroit."
 essentiel:
   - 'Séparez la bible du franchisé, qui explique le concept et la gestion, des fiches de poste, qui décrivent un geste en une page.'
   - 'Gardez une seule version française qui fait foi, avec une date et un responsable par fiche. Les traductions en découlent.'

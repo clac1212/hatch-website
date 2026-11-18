@@ -1,9 +1,9 @@
 ---
-title: "Un logiciel de réseau ne sert que si le terrain l'ouvre"
+title: 'Choisir un logiciel de gestion de réseau de franchise'
 seoTitle: 'Logiciel de gestion de réseau de franchise'
 description: 'Plateformes tout-en-un, outils du quotidien, ChatGPT ou agents sur WhatsApp : ce que fait chaque option pour un réseau de restaurants, et comment choisir.'
 kicker: 'Guide'
-chapeau: "Pour faire circuler le savoir-faire du siège jusqu'aux restaurants, un franchiseur a aujourd'hui quatre familles d'outils devant lui. Elles ne règlent pas le même problème, et le bon choix dépend d'abord de la façon dont vos équipes travaillent pendant le service."
+chapeau: "Pour diffuser le savoir-faire du siège jusqu'aux restaurants, un franchiseur peut choisir entre quatre familles d'outils : les plateformes de gestion de réseau, les outils déjà en place, les assistants IA généralistes et les agents IA spécialisés. Le bon choix dépend d'abord de ce que vos équipes peuvent ouvrir pendant le service."
 essentiel:
   - "Les plateformes tout-en-un mettent tout au même endroit, y compris la facturation des redevances, mais demandent aux équipes terrain d'ouvrir une application ou un intranet de plus."
   - 'Pour un fondateur qui cherche une réponse pour lui-même, les assistants IA généralistes suffisent souvent. Pour faire travailler cinquante restaurants sur la même information, il manque la couche réseau.'
@@ -108,7 +108,7 @@ C'est la famille la plus récente, et souvent la première que les franchiseurs 
 C'est puissant et peu coûteux pour le siège. Pour le terrain, trois limites reviennent :
 
 - Chaque personne a son propre accès. Pour interroger le manuel chargé dans un GPT, un Projet ou un Gem, il faut un compte et l'application de l'éditeur. ChatGPT est de nouveau joignable sur WhatsApp dans l'Union européenne depuis juillet 2026, après une décision de la Commission européenne contre la politique de Meta, mais chaque équipier y converse seul avec l'assistant : le siège n'y diffuse rien.
-- Ce sont des assistants individuels, pas des outils de réseau. Ils ne diffusent pas d'annonce ciblée par région, ne suivent pas qui a lu, ne font pas passer d'audit.
+- Ce sont des assistants individuels : ils ne diffusent pas d'annonce ciblée par région, ne suivent pas qui a lu, ne font pas passer d'audit.
 - En usage courant, le siège ne voit pas les questions posées, donc ne sait pas où son manuel a des trous. Et les documents sont le plus souvent copiés dans l'assistant : à chaque mise à jour du manuel, il faut les recharger. Un Gem relié à des fichiers Google Drive fait exception, il suit leur dernière version.
 
 Pour un fondateur qui cherche une réponse pour lui-même, ces outils suffisent souvent. Pour faire travailler cinquante restaurants sur la même information, il manque la couche réseau.

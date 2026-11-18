@@ -2,6 +2,7 @@
 import { getEntry } from 'astro:content';
 import { Image, getImage } from 'astro:assets';
 import { section } from '../../content/section';
+import Section from '../layout/Section.astro';
 import type { Locale } from '../../i18n/ui';
 import cadre from '../../assets/probleme/iphone-cadre.png';
 import fondEcran from '../../assets/probleme/fond-ecran-bunbun.jpg';
@@ -68,7 +69,10 @@ const ecran = await getImage({ src: fondEcran, format: 'webp', width: 851, quali
 const textes = JSON.stringify({ quand: tel.quand, horloge: tel.horloge });
 ---
 
-<section
+<Section
+  ton="night"
+  rythme="aucun"
+  pleine
   class="piste pb"
   data-piste="probleme"
   data-longueurs="50,90,80"
@@ -258,11 +262,8 @@ const textes = JSON.stringify({ quand: tel.quand, horloge: tel.horloge });
     </div>
 
     <!-- Final state as plain content: shown without JS / with reduced motion, read by assistive tech otherwise. -->
-    <div class="statique mx-auto max-w-[1200px] px-5 py-24 text-paper md:px-10 lg:py-32">
-      <h2
-        id="probleme-titre"
-        class="font-display text-[clamp(2.5rem,1.6rem+3.6vw,4.5rem)] leading-none font-bold tracking-[-0.03em]"
-      >
+    <div class="statique conteneur py-section text-paper">
+      <h2 id="probleme-titre" class="font-display text-section font-semibold">
         {
           data.titreApres.map((l) => (
             <>
@@ -274,6 +275,7 @@ const textes = JSON.stringify({ quand: tel.quand, horloge: tel.horloge });
       <ol aria-label={data.listeLabel} class="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {
           data.notifications.map((n) => (
+            // exception: an iOS lock-screen notification (mockup), its own radius and type sizes
             <li class="ios flex flex-col gap-3 rounded-[22px] bg-gray-50/90 p-3.5 text-black">
               <div class="flex gap-[11px]">
                 <div class={`app app-${n.app}`}>
@@ -286,6 +288,7 @@ const textes = JSON.stringify({ quand: tel.quand, horloge: tel.horloge });
                     <path d={glyphes[n.app][0]} />
                   </svg>
                 </div>
+                {/* exception: iOS notification text (mockup) */}
                 <p class="min-w-0 text-[15px] leading-[1.25]">
                   <span class="sr-only">{tel.apps[n.app]} · </span>
                   <strong class="block font-semibold">{n.de}</strong>
@@ -296,11 +299,13 @@ const textes = JSON.stringify({ quand: tel.quand, horloge: tel.horloge });
                 <div class="app agent">
                   <Image src={avatars[n.agent]} alt="" width={34} densities={[2]} />
                 </div>
+                {/* exception: iOS notification text (mockup) */}
                 <p class="min-w-0 text-[15px] leading-[1.25]">
                   <span class="flex items-center justify-between gap-2">
                     <strong class="font-semibold">
                       {agents[n.agent]} → {n.a}
                     </strong>
+                    {/* exception: the WhatsApp « handled » badge inside the notification (mockup) */}
                     <span class="rounded-full bg-whatsapp px-2 py-0.5 text-[12px] font-semibold text-success">
                       {data.regle} ✓
                     </span>
@@ -312,12 +317,12 @@ const textes = JSON.stringify({ quand: tel.quand, horloge: tel.horloge });
           ))
         }
       </ol>
-      <p class="mt-8 font-mono text-[13px] tracking-[0.06em] text-paper/75 uppercase">
+      <p class="mt-8 font-mono text-kicker text-paper/75 uppercase">
         {data.resume.message}
       </p>
     </div>
   </div>
-</section>
+</Section>
 
 <script>
   import '../../scripts/probleme';
@@ -364,7 +369,9 @@ const textes = JSON.stringify({ quand: tel.quand, horloge: tel.horloge });
     }
   }
 
-  /* ---------- Scene, desktop (1240 × 980 design px, scaled by the engine) ---------- */
+  /* ---------- Scene, desktop (1240 × 980 design px, scaled by the engine) ----------
+     exception: pinned scroll scene and its iPhone mockup, staged in design px (positions, type sizes,
+     radii); scaled as a whole by the engine, so the DS tokens do not apply inside. */
   .scene {
     color: var(--color-paper);
     font-family: var(--font-sans);
@@ -381,7 +388,8 @@ const textes = JSON.stringify({ quand: tel.quand, horloge: tel.horloge });
   .titre-scene {
     margin: 0;
     font-family: var(--font-display);
-    font-weight: 700;
+    font-weight: 600;
+    /* exception: the scene's title, staged at 72 design px and scaled with the 1240 px stage */
     font-size: 72px;
     line-height: 1;
     letter-spacing: -2px;

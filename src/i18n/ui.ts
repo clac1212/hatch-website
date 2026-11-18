@@ -71,8 +71,6 @@ const fr = {
   'nav.robin.whatsapp': 'Sur WhatsApp',
   'cta.waitlist': "Rejoindre la liste d'attente",
   /** Pause control of the animated Europe map (network page hero). */
-  'hero.mapPause': "Mettre l'animation de la carte en pause",
-  'hero.mapPlay': "Relancer l'animation de la carte",
   'lang.switch': 'English',
   'footer.product': 'Produit',
   'footer.company': 'Hatch OS',
@@ -112,8 +110,6 @@ const en: Record<keyof typeof fr, string> = {
   'nav.robin.daily': 'Day to day',
   'nav.robin.whatsapp': 'On WhatsApp',
   'cta.waitlist': 'Join the waitlist',
-  'hero.mapPause': 'Pause the map animation',
-  'hero.mapPlay': 'Play the map animation',
   'lang.switch': 'Français',
   'footer.product': 'Product',
   'footer.company': 'Hatch OS',
@@ -134,6 +130,10 @@ const ui = { fr, en } satisfies Record<Locale, Record<keyof typeof fr, string>>;
 export function useTranslations(locale: Locale) {
   return (key: keyof typeof fr): string => ui[locale][key];
 }
+
+/** French spacing: a no-break space before « ? », « ! », « : », « ; », so they never start a line
+ * (a title wrapping before its colon). Harmless on English copy, which has no space there. */
+export const insecable = (s: string) => s.replace(/ ([?!:;])/g, '\u00a0$1');
 
 export function otherLocale(locale: Locale): Locale {
   return locale === 'fr' ? 'en' : 'fr';

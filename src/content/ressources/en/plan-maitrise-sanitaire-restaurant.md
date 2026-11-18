@@ -1,5 +1,5 @@
 ---
-title: 'Every restaurant must keep a food safety plan'
+title: "A restaurant's food safety plan (PMS)"
 seoTitle: 'Restaurant food safety plan (PMS): a guide'
 description: 'What a French food safety plan (PMS) contains, what inspectors check and who must take the 14-hour hygiene training in a small restaurant.'
 kicker: 'Guide'

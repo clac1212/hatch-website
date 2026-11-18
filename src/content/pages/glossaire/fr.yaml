@@ -2,7 +2,7 @@ seo:
   title: 'Glossaire de la restauration et de la franchise | Hatch OS'
   description: 'Coût de revient, ratio matière, HACCP, DIP, redevance, marche en avant : les termes de la restauration et de la franchise, classés de A à Z.'
 kicker: 'Glossaire'
-titre: 'Les mots du métier, définis simplement.'
+titre: 'Glossaire de la restauration et de la franchise'
 chapeau: 'Les termes qui reviennent en cuisine, chez le fournisseur, dans un contrat de franchise et dans la vie d’un réseau, classés de A à Z.'
 lettres: 'Aller à la lettre'
 # Les ancres sont stables : ne jamais les changer une fois publiées (des liens pointent dessus).
@@ -97,7 +97,7 @@ termes:
     public: tous
     ancre: convention-collective-hcr
   - mot: 'Convention collective de la restauration rapide'
-    definition: 'La convention collective nationale de la restauration rapide du 18 mars 1988 (IDCC 1501). C’est l’activité principale réellement exercée, et non le seul code NAF, qui détermine si un établissement relève de celle-ci ou de la convention HCR.'
+    definition: 'La convention collective nationale de la restauration rapide du 18 mars 1988 (IDCC 1501). L’activité principale réellement exercée détermine si un établissement relève de celle-ci ou de la convention HCR ; le code NAF n’en est qu’un indice.'
     public: tous
     ancre: convention-collective-restauration-rapide
   - mot: 'Coup de feu'
@@ -301,7 +301,7 @@ termes:
     public: tous
     ancre: prime-cost
   - mot: 'Ratio matière'
-    definition: 'Le coût des matières consommées divisé par le chiffre d’affaires hors taxes correspondant, exprimé en pourcentage. La consommation se calcule avec les inventaires (stock initial, plus achats, moins stock final), pas avec les seuls achats. On dit aussi food cost.'
+    definition: 'Le coût des matières consommées divisé par le chiffre d’affaires hors taxes correspondant, exprimé en pourcentage. La consommation se calcule avec les inventaires : stock initial, plus achats, moins stock final. On dit aussi food cost.'
     public: independant
     ancre: ratio-matiere
   - mot: 'Redevance'
@@ -329,7 +329,7 @@ termes:
     public: tous
     ancre: rotation-des-tables
   - mot: 'Savoir-faire'
-    definition: 'Un ensemble d’informations pratiques non brevetées, issues de l’expérience et testées par le franchiseur, qui doit être secret, substantiel et identifié (règlement (UE) 2022/720, article 1er). C’est sa transmission qui distingue une franchise d’une simple licence de marque.'
+    definition: 'Un ensemble d’informations pratiques non brevetées, issues de l’expérience et testées par le franchiseur, qui doit être secret, substantiel et identifié (règlement (UE) 2022/720, article 1er). Sa transmission distingue une franchise d’une simple licence de marque.'
     public: reseau
     ancre: savoir-faire
   - mot: 'Seuil de rentabilité'

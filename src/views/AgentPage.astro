@@ -2,7 +2,10 @@
 import { getEntry } from 'astro:content';
 import { Image, Picture } from 'astro:assets';
 import Base from '../layouts/Base.astro';
+import Section from '../components/layout/Section.astro';
 import Button from '../components/ui/Button.astro';
+import Carte from '../components/ui/Carte.astro';
+import EnTete from '../components/ui/EnTete.astro';
 import Mur from '../components/agents/Mur.astro';
 import Exemple from '../components/agents/Exemple.astro';
 import Probleme from '../components/agents/probleme/Probleme.astro';
@@ -124,183 +127,187 @@ const jsonLd = [
   jsonLd={jsonLd}
   noindex={p.brouillon}
 >
-  <div class="bg-white">
-    <header class="pt-32 pb-16 md:pt-44 md:pb-20">
-      <div class="wrap-agent grid items-center gap-12 lg:grid-cols-[1fr_500px] lg:gap-20">
-        <div class="flex flex-col items-start gap-8" data-rv-groupe>
-          <h1 class="titre font-display font-semibold text-ink" data-rv>{p.title}</h1>
-          <p class="max-w-[36rem] text-body text-soft" data-rv>{p.lead}</p>
-          <div data-rv>
-            <Button href={routes.demo[locale]} size="lg">{t('cta.demo')}</Button>
-          </div>
-        </div>
-        <div
-          class="mx-auto aspect-[500/620] w-full max-w-[500px] overflow-hidden rounded-card"
-          style={`background-color:${photo.fond}`}
-        >
-          <Picture
-            src={photo.src}
-            alt=""
-            formats={['avif', 'webp']}
-            widths={[500, 760, 1000]}
-            sizes="(min-width: 1024px) 500px, 92vw"
-            loading="eager"
-            fetchpriority="high"
-            class="size-full object-cover"
-            style={`object-position:${photo.position}`}
-          />
+  <!-- exception: the top padding clears the floating nav. -->
+  <Section ton="surface" rythme="aucun" class="pt-32 pb-16 md:pt-44 md:pb-20">
+    <div class="grid items-center gap-12 lg:grid-cols-[1fr_500px] lg:gap-20">
+      <div class="flex flex-col items-start gap-8" data-rv-groupe>
+        <h1 class="titre font-display font-semibold" data-rv>{p.title}</h1>
+        <p class="max-w-lead text-punch text-(--doux)" data-rv>{p.lead}</p>
+        <div data-rv>
+          <Button href={routes.demo[locale]} size="lg">{t('cta.demo')}</Button>
         </div>
       </div>
-    </header>
-
-    <Probleme titre={p.problem.titre} texte={p.problem.texte} objets={probleme?.data} />
-
-    <section aria-labelledby="agent-actions" class="bg-mur py-24 md:py-28">
-      <div class="wrap-agent flex flex-col gap-12" data-rv-groupe>
-        <h2 id="agent-actions" class="font-display text-section font-bold text-ink" data-rv>
-          {fill(ui.actions, vars)}
-        </h2>
-        <Mur slug={slug} name={name} locale={locale} actions={p.actions} />
+      <!-- The agent's render, on its own backdrop colour. -->
+      <div
+        style={`background-color:${photo.fond}` /* exception: the render is 500 px wide, its column in the Pencil mock-up */}
+        class="mx-auto aspect-[500/620] w-full max-w-[500px] overflow-hidden rounded-card"
+      >
+        <Picture
+          src={photo.src}
+          alt=""
+          formats={['avif', 'webp']}
+          widths={[500, 760, 1000]}
+          sizes="(min-width: 1024px) 500px, 92vw"
+          loading="eager"
+          fetchpriority="high"
+          class="size-full object-cover"
+          style={`object-position:${photo.position}`}
+        />
       </div>
-    </section>
+    </div>
+  </Section>
 
-    <section aria-labelledby="agent-main" class="py-24 md:py-28">
-      <div class="wrap-agent flex flex-col gap-12" data-rv-groupe>
-        <h2 id="agent-main" class="font-display text-section font-bold text-ink" data-rv>
-          {ui.control.title}
-        </h2>
-        <div class="grid gap-5 md:grid-cols-2" data-rv>
-          <div class="main" style={`background-color:${teinte}`}>
-            <p class="main-tete">
-              <Image src={avatars[slug]} alt="" width={44} densities={[1, 2]} class="size-11" />
-              <b>{fill(ui.control.agent, vars)}</b>
-            </p>
-            <ul>
-              {
-                p.control.agent.map((item) => (
-                  <li>
-                    <Icone nom="check" taille={15} class="text-orange-txt" />
-                    {item}
-                  </li>
-                ))
-              }
-            </ul>
-          </div>
-          <div class="main bg-mur">
-            <p class="main-tete">
-              <span class="main-vous">
-                <Icone nom="user" taille={18} />
-              </span>
-              <b>{ui.control.you}</b>
-            </p>
-            <ul>
-              {
-                p.control.you.map((item) => (
-                  <li>
-                    <Icone nom="user-check" taille={15} class="text-soft" />
-                    {item}
-                  </li>
-                ))
-              }
-            </ul>
-          </div>
-        </div>
+  <Probleme titre={p.problem.titre} texte={p.problem.texte} objets={probleme?.data} />
+
+  <!-- exception: the feature wall's light grey (Pencil "Page agent" v4), not a page tone -->
+  <Section ton="surface" aria-labelledby="agent-actions" style="background-color:var(--color-mur)">
+    <div class="flex flex-col gap-12" data-rv-groupe>
+      <div data-rv>
+        <EnTete id="agent-actions" titre={fill(ui.actions, vars)} />
       </div>
-    </section>
+      <Mur slug={slug} name={name} locale={locale} actions={p.actions} />
+    </div>
+  </Section>
 
-    <Exemple
-      titre={ui.example}
-      intro={p.exemple.intro}
-      agent={name}
-      contexte={p.exemple.contexte}
-      avatar={avatars[slug]}
-      etapes={p.exemple.etapes}
-      scene={scene?.data}
-    />
-
-    <Relais
-      titre={ui.with}
-      intro={'texte' in p.with ? p.with.texte : undefined}
-      centre={{ slug, name }}
-      liens={liens}
-    />
-
-    <section aria-labelledby="agent-faq" class="bg-faq py-24 md:py-28">
-      <div class="wrap-agent grid gap-10 lg:grid-cols-[460px_1fr]" data-rv-groupe>
-        <h2 id="agent-faq" class="font-display text-section font-bold text-ink" data-rv>
-          {ui.faq}
-        </h2>
-        <div class="faq" data-rv>
-          {
-            p.faq.map((f) => (
-              <details>
-                <summary>
-                  <h3>{f.q}</h3>
-                  <Icone nom="x" taille={18} class="signe" />
-                </summary>
-                <p>{f.a}</p>
-              </details>
-            ))
-          }
-        </div>
+  <Section ton="surface" aria-labelledby="agent-main">
+    <div class="flex flex-col gap-12" data-rv-groupe>
+      <div data-rv>
+        <EnTete id="agent-main" titre={ui.control.title} />
       </div>
-    </section>
-
-    <section aria-labelledby="agent-suite" class="pt-24 pb-14 md:pt-28 md:pb-16">
-      <div class="wrap-agent flex flex-col gap-12" data-rv-groupe>
-        <h2 id="agent-suite" class="font-display text-section font-bold text-ink" data-rv>
-          {ui.related.title}
-        </h2>
-        <div class="grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[520px_1fr]" data-rv>
-          <ul class="flex flex-col gap-3">
+      <div class="grid gap-5 md:grid-cols-2" data-rv>
+        <!-- exception: the agent's own tint behind its card (agents/visuels.ts) -->
+        <Carte class="main" style={`background-color:${teinte}`}>
+          <p class="main-tete">
+            <Image src={avatars[slug]} alt="" width={44} densities={[1, 2]} class="size-11" />
+            <b class="font-display text-card font-semibold">{fill(ui.control.agent, vars)}</b>
+          </p>
+          <ul class="text-body">
             {
-              p.related.map((r) => {
-                const a = agents[r.agent];
-                const Tag = a.href ? 'a' : 'div';
-                return (
-                  <li>
-                    <Tag href={a.href} class="suite">
-                      <span class="suite-av" style={`background-color:${centres[r.agent].fond}`}>
-                        <Image
-                          src={avatars[r.agent]}
-                          alt=""
-                          width={64}
-                          densities={[1, 2]}
-                          class="size-16 object-contain"
-                        />
-                      </span>
-                      <span class="flex flex-1 flex-col gap-1">
-                        <b class="suite-nom">{a.name}</b>
-                        <span class="suite-texte">{r.texte}</span>
-                      </span>
-                      {a.href && (
-                        <span class="suite-fleche" aria-hidden="true">
-                          <Icone nom="arrow-right" taille={18} />
-                        </span>
-                      )}
-                    </Tag>
-                  </li>
-                );
-              })
+              p.control.agent.map((item) => (
+                <li>
+                  <Icone nom="check" taille={15} class="text-orange-txt" />
+                  {item}
+                </li>
+              ))
             }
           </ul>
-          <div class="demo">
-            <Image
-              src={avatars[slug]}
-              alt=""
-              width={100}
-              densities={[1, 2]}
-              class="size-[100px] object-contain"
-            />
-            <p class="demo-titre">{ui.related.demo}</p>
-            <div class="mt-auto pt-6">
-              <Button href={routes.demo[locale]} size="lg">{t('cta.demo')}</Button>
-            </div>
-          </div>
-        </div>
+        </Carte>
+        <!-- exception: the agent pages' light grey (Pencil "Page agent" v4) -->
+        <Carte class="main" style="background-color:var(--color-mur)">
+          <p class="main-tete">
+            <span class="main-vous">
+              <Icone nom="user" taille={18} />
+            </span>
+            <b class="font-display text-card font-semibold">{ui.control.you}</b>
+          </p>
+          <ul class="text-body">
+            {
+              p.control.you.map((item) => (
+                <li>
+                  <Icone nom="user-check" taille={15} class="text-soft" />
+                  {item}
+                </li>
+              ))
+            }
+          </ul>
+        </Carte>
       </div>
-    </section>
-  </div>
+    </div>
+  </Section>
+
+  <Exemple
+    titre={ui.example}
+    intro={p.exemple.intro}
+    agent={name}
+    contexte={p.exemple.contexte}
+    avatar={avatars[slug]}
+    etapes={p.exemple.etapes}
+    scene={scene?.data}
+  />
+
+  <Relais
+    titre={ui.with}
+    intro={'texte' in p.with ? p.with.texte : undefined}
+    centre={{ slug, name }}
+    liens={liens}
+  />
+
+  <!-- exception: the FAQ's light grey (Pencil "Page agent" v4), not a page tone -->
+  <Section ton="surface" aria-labelledby="agent-faq" style="background-color:var(--color-faq)">
+    <div class="grid gap-10 lg:grid-cols-[460px_1fr]" data-rv-groupe>
+      <div data-rv>
+        <EnTete id="agent-faq" titre={ui.faq} />
+      </div>
+      <div class="faq" data-rv>
+        {
+          p.faq.map((f) => (
+            <details>
+              <summary>
+                <h3>{f.q}</h3>
+                <Icone nom="x" taille={18} class="signe" />
+              </summary>
+              <p>{f.a}</p>
+            </details>
+          ))
+        }
+      </div>
+    </div>
+  </Section>
+
+  <Section ton="surface" rythme="haut" aria-labelledby="agent-suite" class="pb-14 md:pb-16">
+    <div class="flex flex-col gap-12" data-rv-groupe>
+      <div data-rv>
+        <EnTete id="agent-suite" titre={ui.related.title} />
+      </div>
+      <div class="grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[520px_1fr]" data-rv>
+        <ul class="flex flex-col gap-3">
+          {
+            p.related.map((r) => {
+              const a = agents[r.agent];
+              return (
+                <li>
+                  {/* exception: the "Pour aller plus loin" cards' grey (Pencil "Page agent" v4) */}
+                  <Carte href={a.href} class="suite" style="background-color:var(--color-galet)">
+                    <span class="suite-av" style={`background-color:${centres[r.agent].fond}`}>
+                      <Image
+                        src={avatars[r.agent]}
+                        alt=""
+                        width={64}
+                        densities={[1, 2]}
+                        class="size-16 object-contain"
+                      />
+                    </span>
+                    <span class="flex flex-1 flex-col gap-1">
+                      <b class="font-display text-card font-semibold">{a.name}</b>
+                      <span class="suite-texte">{r.texte}</span>
+                    </span>
+                    {a.href && (
+                      <span class="suite-fleche" aria-hidden="true">
+                        <Icone nom="arrow-right" taille={18} />
+                      </span>
+                    )}
+                  </Carte>
+                </li>
+              );
+            })
+          }
+        </ul>
+        <Carte variante="nuit" class="demo">
+          <Image
+            src={avatars[slug]}
+            alt=""
+            width={100}
+            densities={[1, 2]}
+            class="size-[100px] object-contain"
+          />
+          <p class="demo-titre font-display font-semibold">{ui.related.demo}</p>
+          <div class="mt-auto pt-6">
+            <Button href={routes.demo[locale]} size="lg">{t('cta.demo')}</Button>
+          </div>
+        </Carte>
+      </div>
+    </div>
+  </Section>
 </Base>
 
 <style>
@@ -316,18 +323,12 @@ const jsonLd = [
   /* Vous gardez la main: the agent's card (its tint, its avatar), and yours. */
   .main {
     padding: 32px 36px 28px;
-    border-radius: var(--radius-card);
-    corner-shape: squircle;
   }
   .main-tete {
     display: flex;
     align-items: center;
     gap: 14px;
     margin-bottom: 12px;
-  }
-  .main-tete b {
-    font: 700 22px/1.2 var(--font-display);
-    color: var(--color-ink);
   }
   .main-vous {
     display: grid;
@@ -343,7 +344,6 @@ const jsonLd = [
     align-items: center;
     gap: 14px;
     padding: 20px 0;
-    font-size: 16px;
     color: var(--color-ink);
   }
   .main li + li {
@@ -402,15 +402,6 @@ const jsonLd = [
     align-items: center;
     gap: 20px;
     padding: 20px 24px 20px 20px;
-    border-radius: var(--radius-card);
-    corner-shape: squircle;
-    background: var(--color-galet);
-    transition: box-shadow 0.3s var(--ease-doux);
-  }
-  a.suite:hover,
-  a.suite:focus-visible {
-    box-shadow: inset 0 0 0 2px var(--color-orange);
-    outline: none;
   }
   .suite-av {
     display: grid;
@@ -419,10 +410,6 @@ const jsonLd = [
     width: 88px;
     height: 88px;
     border-radius: 20px;
-  }
-  .suite-nom {
-    font: 700 24px/1.15 var(--font-display);
-    color: var(--color-ink);
   }
   .suite-texte {
     font-size: 14px;
@@ -450,14 +437,15 @@ const jsonLd = [
     gap: 24px;
     min-height: 420px;
     padding: 48px 56px;
-    border-radius: 32px;
     background:
       radial-gradient(55% 60% at 80% 100%, rgb(248 122 1 / 0.42), transparent 70%),
       var(--color-night);
   }
+  /* exception: the closing call, larger than a section title, as in the Pencil mock-up */
   .demo-titre {
     max-width: 8em;
-    font: 700 clamp(40px, 4vw, 56px) / 1.02 var(--font-display);
+    font-size: clamp(40px, 4vw, 56px);
+    line-height: 1.02;
     letter-spacing: -0.02em;
     color: var(--color-white);
   }
@@ -469,7 +457,6 @@ const jsonLd = [
   }
   @media (prefers-reduced-motion: reduce) {
     .faq :global(.signe),
-    .suite,
     .suite-fleche {
       transition: none;
     }

@@ -1,5 +1,7 @@
 ---
 import type { Probleme as ProblemeData } from '../../../content/schemas/agent-probleme';
+import Section from '../../layout/Section.astro';
+import EnTete from '../../ui/EnTete.astro';
 import Peep from './Peep.astro';
 import Owl from './Owl.astro';
 import Pecker from './Pecker.astro';
@@ -23,11 +25,10 @@ interface Props {
 const { titre, texte, objets } = Astro.props;
 ---
 
-<section aria-labelledby="agent-probleme" class="probleme" data-probleme>
-  <div class="wrap-agent grille" data-rv-groupe>
-    <div class="flex flex-col gap-5" data-rv>
-      <h2 id="agent-probleme" class="titre font-display font-bold text-ink">{titre}</h2>
-      <p class="texte">{texte}</p>
+<Section ton="surface" aria-labelledby="agent-probleme" data-probleme>
+  <div class="grille" data-rv-groupe>
+    <div data-rv>
+      <EnTete id="agent-probleme" titre={titre} intro={texte} />
     </div>
     {
       objets && (
@@ -43,7 +44,7 @@ const { titre, texte, objets } = Astro.props;
       )
     }
   </div>
-</section>
+</Section>
 
 <script>
   if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -63,9 +64,6 @@ const { titre, texte, objets } = Astro.props;
 </script>
 
 <style>
-  .probleme {
-    padding: 80px 0 112px;
-  }
   .grille {
     display: grid;
     gap: 48px;
@@ -84,17 +82,6 @@ const { titre, texte, objets } = Astro.props;
     .objets {
       max-width: none;
     }
-  }
-  .titre {
-    font-size: clamp(34px, 3.6vw, 52px);
-    line-height: 1.08;
-    letter-spacing: -0.02em;
-    text-wrap: balance;
-  }
-  .texte {
-    max-width: 34em;
-    font: 400 19px/1.55 var(--font-sans);
-    color: var(--color-soft);
   }
 
   /* Objects arrive in turn, then the last beat lands (a stamp: big, then pressed). */
@@ -123,14 +110,6 @@ const { titre, texte, objets } = Astro.props;
     }
     to {
       opacity: 1;
-    }
-  }
-  @media (max-width: 47.99rem) {
-    .probleme {
-      padding: 56px 0 80px;
-    }
-    .texte {
-      font-size: 17px;
     }
   }
 </style>

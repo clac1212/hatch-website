@@ -71,12 +71,15 @@ const survol = 'hover:bg-current/10';
     id="nav"
     aria-label={t('a11y.mainNav')}
     class:list={[
+      // exception: the scroll shadow is a filter (drop-shadow), the glass rim already uses box-shadow
       'vitre pointer-events-auto flex w-full max-w-max items-center gap-1.5 rounded-full py-2 pr-2 pl-5 transition-[filter] duration-500 max-sm:justify-between md:pl-6 [&.defile]:drop-shadow-[0_10px_24px_rgb(20_10_0/0.18)]',
     ]}
     data-ton={sombre ? 'sombre' : 'clair'}
   >
     <a href={home} aria-label={t('a11y.home')} class="shrink-0">
+      {/* exception: the logo's width in the nav pill (Pencil), 80 px then 92 px */}
       <Logo class="n-logo-jour w-[80px] md:w-[92px]" />
+      {/* exception: same width for the night logo */}
       <Logo tone="night" class="n-logo-nuit w-[80px] md:w-[92px]" />
     </a>
     <div class="n-pli n-liens ml-4 hidden items-center lg:flex" data-pli>
@@ -103,13 +106,13 @@ const survol = 'hover:bg-current/10';
       </ul>
     </div>
 
-    {/* exception: a smaller button below 640 px so the pill fits a 360 px screen */}
     {
       cta && (
         <Button
           href={cta.href}
           variant={cta.variant}
           class:list={[
+            // exception: a smaller button below 640 px so the pill fits a 360 px screen
             'max-sm:px-4 max-sm:text-[0.8125rem]',
             cta.variant === 'ink' && 'n-cta-inverse',
             cta.variant === 'orange' && 'n-cta-orange',

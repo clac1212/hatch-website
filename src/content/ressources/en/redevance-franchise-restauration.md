@@ -1,5 +1,5 @@
 ---
-title: "A franchisee's royalty pays for the franchisor's support"
+title: 'Entry fees and royalties in restaurant franchising'
 seoTitle: 'Franchise fees and royalties for restaurants'
 description: 'Entry fee, operating royalty, advertising fee: what each one pays for, how it is calculated and what French law requires around them.'
 kicker: 'Guide'

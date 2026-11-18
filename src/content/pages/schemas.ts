@@ -7,31 +7,20 @@ import { z } from 'astro/zod';
  */
 const seo = z.strictObject({ title: z.string(), description: z.string() });
 
-/** /demo — booking page with the inline Cal.com agenda. */
+/**
+ * /demo: its title and lead above the demo request (tarifs/Formulaire), and the lines of the
+ * Cal.com agenda that request ends on (the postcard's act 4).
+ */
 export const demoPage = z.strictObject({
   seo,
   title: z.string(),
   titleAccent: z.string(),
   lead: z.string(),
-  agendaTitle: z.string(),
+  /** Above the agenda: the slots' time zone. */
   agendaHint: z.string(),
-  /** Shown inside the agenda frame until Cal.com has loaded (and when JS is off). */
+  /** Shown in the agenda's place until Cal.com has drawn it. */
   agendaFallback: z.string(),
   agendaFallbackLink: z.string(),
-  /**
-   * The agents the visitor is interested in, picked before the agenda: the choice is handed to the
-   * Cal.com booking (field `agents`, and the notes). Hidden when the pricing form already sent it.
-   */
-  agents: z.strictObject({
-    titre: z.string(),
-    aide: z.string(),
-    /** « Not sure yet »: exclusive with the agents. */
-    inconnu: z.string(),
-    /** Line written in the booking notes, followed by the picked agents. */
-    note: z.string(),
-    /** Shown in place of the agenda until at least one choice is ticked. */
-    verrou: z.string(),
-  }),
 });
 
 /**
@@ -230,9 +219,13 @@ export const ressourcesPage = z.strictObject({
     kicker: texte,
     titre: texte,
     chapeau: texte,
-    /** aria-label of the filter's button group. */
+    /** The H1 is a sentence whose ending is the audience choice: `titre` is its start, each of
+     * `filtres` an ending (`tout`: nothing chosen, everything shown). `filtre`: the picker's label. */
     filtre: texte,
     filtres: z.strictObject({ tout: texte, independant: texte, reseau: texte }),
+    /** What each choice holds: `{n}` guides, `{n}` templates. */
+    compteGuides: texte,
+    compteModeles: texte,
   }),
   modeles: z.strictObject({
     kicker: texte,

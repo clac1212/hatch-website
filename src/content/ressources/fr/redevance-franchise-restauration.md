@@ -1,5 +1,5 @@
 ---
-title: "La redevance du franchisé rémunère l'assistance du franchiseur"
+title: "Droit d'entrée et redevances en franchise de restauration"
 seoTitle: "Droit d'entrée et redevance en franchise"
 description: "Droit d'entrée, redevance d'exploitation, redevance publicitaire : à quoi sert chaque somme, comment elle se calcule et ce que la loi encadre."
 kicker: 'Guide'

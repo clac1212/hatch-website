@@ -1,13 +1,13 @@
 ---
-title: 'Food cost ratio is calculated from a stock count, not from invoices alone'
+title: "Calculating a restaurant's food cost ratio"
 seoTitle: 'Food cost ratio: how to calculate and lower it'
 description: 'Calculate your food cost ratio from stock counts and purchases, read it against sourced benchmarks and find where to bring it down, with a worked example.'
 kicker: 'Guide'
-chapeau: 'The food cost ratio is the share of your sales excluding VAT that goes on ingredients. You calculate it every month from what you actually used: opening stock, plus purchases, minus closing stock. With invoices alone, the figure shifts with delivery dates and stops meaning anything.'
+chapeau: 'The food cost ratio is the share of your sales excluding VAT that goes on ingredients. You calculate it every month with a stock count: opening stock, plus purchases, minus closing stock, divided by sales excluding VAT.'
 essentiel:
   - 'Food cost ratio = food consumed ÷ sales excluding VAT × 100, where consumption = opening stock + purchases excluding VAT − closing stock.'
   - 'The French trade press puts this ratio between 25% and 35%; in the accounts of French traditional restaurants, food and drinks weigh around 31% of sales on average. Your target depends on your concept and your other costs.'
-  - 'The most useful figure is the gap between your actual ratio and the theoretical ratio from your costing sheets: that is where losses hide.'
+  - 'The gap between your actual ratio and the theoretical ratio from your costing sheets measures your losses: generous portions, waste, delivery errors.'
 public: independant
 metier: 'Purchasing and margins'
 readingMinutes: 7
@@ -85,11 +85,11 @@ Using purchases alone, you would have found 11,800 ÷ 38,500 = 30.6%. Most of th
 | Drinks (beverage cost)                                                                                   | 20% to 30%                                        | Keobiz                                                                         |
 | Food and drinks combined                                                                                 | ideally under 35%                                 | Keobiz                                                                         |
 
-Apart from the first row, taken from company accounts, these are trade benchmarks, not official statistics. The trade press says so itself: outside chains, each restaurant has to find its own norm. A chain compares each restaurant with the others in the brand. An independent has no such comparison: their reference is their own past months. A 33% ratio can be healthy in a small room with low rent and too high elsewhere.
+Apart from the first row, taken from company accounts, these are trade benchmarks, published by the trade press and an accounting firm. The trade press says so itself: outside chains, each restaurant has to find its own norm. A chain compares each restaurant with the others in the brand. An independent has no such comparison: their reference is their own past months. A 33% ratio can be healthy in a small room with low rent and too high elsewhere.
 
-The right way to use a benchmark is to watch the trend. Calculate your ratio every month, on the same day, and look at how it moves over six months. A two-point rise with no menu change needs an explanation.
+Compare yourself with yourself first: calculate your ratio every month, on the same day, and look at how it moves over six months. A two-point rise with no menu change has a cause to find: portions, purchase prices or waste.
 
-## Actual and theoretical ratio: where losses hide
+## Actual and theoretical ratio: measuring losses
 
 If your [costing sheets](/en/resources/cout-de-revient-plat) are up to date, you can calculate a theoretical ratio: for each dish, the sheet cost times the number of portions sold, divided by sales. That is what you would have used if everything went to plan.
 

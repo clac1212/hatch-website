@@ -1,6 +1,8 @@
 ---
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
+import Section from '../layout/Section.astro';
+import EnTete from '../ui/EnTete.astro';
 import Icone from './Icone.astro';
 import Scene from './scenes/Scene.astro';
 import type { Scene as SceneData } from '../../content/schemas/scenes';
@@ -44,112 +46,111 @@ const { titre, intro, agent, contexte, avatar, etapes, scene } = Astro.props;
 const rang = (i: number) => String(i + 1).padStart(2, '0');
 ---
 
-<section aria-labelledby="agent-exemple" class="exemple">
-  <div class="wrap-agent">
-    <h2 id="agent-exemple" class="font-display text-section font-bold text-white">{titre}</h2>
-    {intro && <p class="intro">{intro}</p>}
-    <div class="corps" data-exemple>
-      <ol class="etapes">
-        {
-          etapes.map((e, i) => (
-            <li>
-              <button type="button" class="etape" aria-current={i === 0 ? 'step' : undefined}>
-                <span class="barre" aria-hidden="true">
-                  <span />
-                </span>
-                <span class="rang">{rang(i)}</span>
-                <span class="etape-texte">{e.texte}</span>
-              </button>
-            </li>
-          ))
-        }
-      </ol>
-      <div class="scene" aria-hidden="true">
-        {
-          scene ? (
-            <Scene d={scene} />
-          ) : (
-            <div class="fenetre">
-              <div class="fenetre-barre">
-                <span class="feux">
-                  <span />
-                  <span />
-                  <span />
-                </span>
-                <Image src={avatar} alt="" width={26} densities={[1, 2]} class="size-[26px]" />
-                <span class="flex flex-col">
-                  <b class="fenetre-nom">{agent}</b>
-                  <span class="fenetre-contexte">{contexte}</span>
-                </span>
-              </div>
-              <div class="ecrans">
-                {etapes.map((e, i) => (
-                  <div class:list={['ecran', { on: i === 0 }]}>
-                    <div class="demande">
-                      <span class="demande-qui">{e.demande.qui}</span>
-                      <span>{e.demande.texte}</span>
-                    </div>
-                    <div class="reponse">
-                      <Image
-                        src={avatar}
-                        alt=""
-                        width={22}
-                        densities={[1, 2]}
-                        class="size-[22px] shrink-0"
-                      />
-                      <div class="flex flex-col gap-3">
-                        <div class="carte">
-                          {e.carte.icone && e.carte.libelle && (
-                            <p class="carte-libelle">
-                              <Icone nom={e.carte.icone} taille={13} />
-                              {e.carte.libelle}
-                            </p>
-                          )}
-                          {e.carte.titre && <p class="carte-titre">{e.carte.titre}</p>}
-                          {e.carte.banniere && <p class="banniere">{e.carte.banniere}</p>}
-                          {e.carte.texte && <p class="carte-texte">{e.carte.texte}</p>}
-                          {e.carte.lignes.length > 0 && (
-                            <ul class="carte-lignes">
-                              {e.carte.lignes.map((l, j) => (
-                                <li style={`--j:${j}`}>
-                                  <span>{l.texte}</span>
-                                  <span class={`etat etat-${l.ton}`}>{l.etat}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          )}
-                          {e.carte.pastilles.length > 0 && (
-                            <p class="pastilles">
-                              {e.carte.pastilles.map((p) => (
-                                <span class:list={['pastille', { sombre: p.sombre }]}>
-                                  <Icone nom={p.icone} taille={11} />
-                                  {p.texte}
-                                </span>
-                              ))}
-                            </p>
-                          )}
-                        </div>
-                        {e.carte.boutons && (
-                          <p class="boutons">
-                            <span class="bouton">{e.carte.boutons[0]}</span>
-                            <span class="bouton bouton-orange">
-                              {e.carte.boutons[1]}
-                              <Icone nom="arrow-right" taille={12} />
-                            </span>
+<Section ton="night" aria-labelledby="agent-exemple" class="overflow-x-clip">
+  <EnTete id="agent-exemple" titre={titre} intro={intro} />
+  <div class="corps" data-exemple>
+    <ol class="etapes">
+      {
+        etapes.map((e, i) => (
+          <li>
+            <button type="button" class="etape" aria-current={i === 0 ? 'step' : undefined}>
+              <span class="barre" aria-hidden="true">
+                <span />
+              </span>
+              <span class="rang">{rang(i)}</span>
+              <span class="etape-texte">{e.texte}</span>
+            </button>
+          </li>
+        ))
+      }
+    </ol>
+    <div class="scene" aria-hidden="true">
+      {
+        scene ? (
+          <Scene d={scene} />
+        ) : (
+          <div class="fenetre">
+            <div class="fenetre-barre">
+              <span class="feux">
+                <span />
+                <span />
+                <span />
+              </span>
+              {/* exception: the avatar's size in the window's bar, the mock-up's own */}
+              <Image src={avatar} alt="" width={26} densities={[1, 2]} class="size-[26px]" />
+              <span class="flex flex-col">
+                <b class="fenetre-nom">{agent}</b>
+                <span class="fenetre-contexte">{contexte}</span>
+              </span>
+            </div>
+            <div class="ecrans">
+              {etapes.map((e, i) => (
+                <div class:list={['ecran', { on: i === 0 }]}>
+                  <div class="demande">
+                    <span class="demande-qui">{e.demande.qui}</span>
+                    <span>{e.demande.texte}</span>
+                  </div>
+                  <div class="reponse">
+                    {/* exception: the answer's avatar, the mock-up's own size */}
+                    <Image
+                      src={avatar}
+                      alt=""
+                      width={22}
+                      densities={[1, 2]}
+                      class="size-[22px] shrink-0"
+                    />
+                    <div class="flex flex-col gap-3">
+                      <div class="carte">
+                        {e.carte.icone && e.carte.libelle && (
+                          <p class="carte-libelle">
+                            <Icone nom={e.carte.icone} taille={13} />
+                            {e.carte.libelle}
+                          </p>
+                        )}
+                        {e.carte.titre && <p class="carte-titre">{e.carte.titre}</p>}
+                        {e.carte.banniere && <p class="banniere">{e.carte.banniere}</p>}
+                        {e.carte.texte && <p class="carte-texte">{e.carte.texte}</p>}
+                        {e.carte.lignes.length > 0 && (
+                          <ul class="carte-lignes">
+                            {e.carte.lignes.map((l, j) => (
+                              <li style={`--j:${j}`}>
+                                <span>{l.texte}</span>
+                                <span class={`etat etat-${l.ton}`}>{l.etat}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                        {e.carte.pastilles.length > 0 && (
+                          <p class="pastilles">
+                            {e.carte.pastilles.map((p) => (
+                              <span class:list={['pastille', { sombre: p.sombre }]}>
+                                <Icone nom={p.icone} taille={11} />
+                                {p.texte}
+                              </span>
+                            ))}
                           </p>
                         )}
                       </div>
+                      {e.carte.boutons && (
+                        <p class="boutons">
+                          <span class="bouton">{e.carte.boutons[0]}</span>
+                          <span class="bouton bouton-orange">
+                            {e.carte.boutons[1]}
+                            <Icone nom="arrow-right" taille={12} />
+                          </span>
+                        </p>
+                      )}
                     </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
-          )
-        }
-      </div>
+          </div>
+        )
+      }
     </div>
   </div>
-</section>
+</Section>
 
 <script>
   /** Seconds a step stays on screen before the next one. */
@@ -251,16 +252,6 @@ const rang = (i: number) => String(i + 1).padStart(2, '0');
 </script>
 
 <style>
-  .exemple {
-    padding: 112px 0 104px;
-    background: var(--color-night);
-    overflow-x: clip;
-  }
-  .intro {
-    margin-top: 20px;
-    font: 400 20px/1.5 var(--font-sans);
-    color: color-mix(in srgb, var(--color-white) 75%, transparent);
-  }
   .corps {
     display: grid;
     gap: 48px;

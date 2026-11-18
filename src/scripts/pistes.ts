@@ -38,7 +38,9 @@ function lire(el: HTMLElement): Piste {
     ? el.dataset.longueurs.split(',').map(Number)
     : Array<number>(n0 + 1).fill(pas);
   const cumul = longueurs.reduce<number[]>((a, l) => [...a, a[a.length - 1] + l], [0]);
-  el.style.height = `${((cumul[cumul.length - 1] + 100) / 100) * 100}dvh`;
+  // In screens of --ecran (Base.astro), not dvh: the track must not change length when the
+  // browser's toolbar comes and goes, or the whole page below it jumps.
+  el.style.height = `calc(${(cumul[cumul.length - 1] + 100) / 100} * var(--ecran, 100svh))`;
   const col = el.querySelector<HTMLElement>('.collant');
   if (!col) throw new Error(`.piste[data-piste="${el.dataset.piste}"] needs a .collant child`);
   return {

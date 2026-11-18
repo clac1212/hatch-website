@@ -1,9 +1,9 @@
 ---
-title: 'Une erreur de livraison se prouve sur le bon, avant de signer'
+title: 'Contrôler une livraison et obtenir un avoir du fournisseur'
 seoTitle: "Facture fournisseur : contrôle et demande d'avoir"
 description: 'Contrôlez chaque livraison, rapprochez commande, bon de livraison et facture, écrivez une réserve valable et obtenez votre avoir : méthode et règles.'
 kicker: 'Guide'
-chapeau: "Pour ne pas payer ce que vous n'avez pas reçu, il faut contrôler la livraison devant le livreur, écrire les écarts sur le bon de livraison, puis rapprocher ce bon de la commande et de la facture. L'avoir du fournisseur vient ensuite corriger la facture. Voici la méthode, et les règles à connaître en France."
+chapeau: 'Contrôlez la livraison devant le livreur, notez chaque écart sur le bon de livraison avant de le signer, puis rapprochez ce bon de la commande et de la facture. Le fournisseur corrige ensuite la facture par un avoir.'
 essentiel:
   - 'Trois documents à comparer : ce que vous avez commandé, ce qui a été livré (le bon de livraison) et ce qui est facturé.'
   - 'Un écart non écrit sur le bon de livraison est difficile à faire reconnaître ensuite : écrivez une réserve précise, chiffrée, signée.'

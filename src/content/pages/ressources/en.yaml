@@ -4,18 +4,20 @@ seo:
 
 hero:
   kicker: 'Resources'
-  titre: 'What restaurant owners actually use, free to access.'
-  chapeau: 'Templates, guides and a glossary, whether you run a bistro or a network of 50 restaurants. Read and download everything with no form and no email.'
-  filtre: 'Filter the resources'
+  titre: 'Resources for those who'
+  chapeau: 'Templates, guides and a glossary, free to access: read and download everything with no form and no email.'
+  filtre: 'Choose what applies to you'
   filtres:
-    tout: 'All'
-    independant: 'I run a restaurant'
-    reseau: 'I run a network'
+    tout: 'run a restaurant or a network'
+    independant: 'run a restaurant'
+    reseau: 'run a network'
+  compteGuides: '{n} guides'
+  compteModeles: '{n} templates'
 
 modeles:
   kicker: 'Templates'
-  titre: 'Templates ready to fill in.'
-  texte: 'Download, fill in, adapt to your place. No form, no email.'
+  titre: 'Templates to download'
+  texte: 'Costing sheets, checklists and outlines in Sheets, Docs or PDF, to adapt to your restaurant.'
   telecharger: 'Download the template'
   liste:
     - public: independant
@@ -52,8 +54,8 @@ modeles:
 
 guides:
   kicker: 'Guides'
-  titre: 'Guides, one trade at a time.'
-  texte: 'One practical method per topic, and a source for every number.'
+  titre: 'Practical guides'
+  texte: 'Invoices, dish costing, hygiene, franchising: every guide gives a method and cites its sources.'
   une: 'Featured'
   tous: 'All guides'
   themes: 'Filter by topic'
@@ -62,7 +64,7 @@ guides:
 
 glossaire:
   kicker: 'Glossary'
-  titre: 'The words of the trade.'
+  titre: 'Restaurant and franchise glossary'
   texte: 'The terms that come up in the kitchen, with suppliers and in a franchise agreement.'
   lien: 'See the full glossary'
 

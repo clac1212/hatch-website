@@ -1,5 +1,5 @@
 ---
-title: 'A franchise candidate receives the DIP at least 20 days before signing'
+title: 'The French franchise disclosure document (DIP): content, 20-day period, penalties'
 seoTitle: 'French franchise disclosure document (DIP)'
 description: "France's franchise disclosure document (DIP): the 20-day rule, the content required by article R330-1, penalties and common mistakes."
 kicker: 'Guide'
@@ -116,7 +116,7 @@ If you ask for a sum, the DIP must have been delivered 20 days before that payme
 
 ### An outdated DIP
 
-The accounts must be those of the last two financial years. The number of departures covers the year before delivery. A DIP reused from one year to the next becomes wrong without anyone noticing.
+The accounts must be those of the last two financial years. The number of departures covers the year before delivery. A DIP reused from one year to the next keeps the previous year's figures.
 
 ### The same restaurant list for everyone
 

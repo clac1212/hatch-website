@@ -128,6 +128,8 @@ const nonLuesSauf = (id: string) => discussions.filter((d) => d.id !== id && d.n
 </div>
 
 <script>
+  import { ecrire } from '../../scripts/whatsapp';
+
   const racine = document.querySelector<HTMLElement>('[data-telephone]');
   if (racine) {
     const reduit = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -205,8 +207,10 @@ const nonLuesSauf = (id: string) => discussions.filter((d) => d.id !== id && d.n
           for (const b of bulles) {
             if (b.classList.contains('in')) {
               tete.classList.add('ecrit');
+              ecrire(fil, true);
               await pause(1300);
               tete.classList.remove('ecrit');
+              ecrire(fil, false);
             } else await pause(900);
             b.classList.remove('attend');
             fil.scrollTop = fil.scrollHeight;

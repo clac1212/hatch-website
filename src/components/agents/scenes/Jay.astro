@@ -4,6 +4,7 @@ import type { SceneDe } from '../../../content/schemas/scenes';
 import IphoneReel from '../IphoneReel.astro';
 import Icone from '../Icone.astro';
 import { avatars } from '../../pages/agent-visuels';
+import { insecable } from '../../../i18n/ui';
 
 /**
  * Jay's "Exemple d'usage" scene (César 11/10): each step shows the device of whoever acts, the
@@ -27,8 +28,6 @@ const etapes = [
   { a: 'drive', e: 0, d: 8.2 },
 ];
 const { siege, telephone: tel, drive } = d;
-/** French spacing: no line break before « ? », « : »… */
-const insecable = (s: string) => s.replace(/ ([?!:;])/g, ' $1');
 /** Words typed one by one, spread over `duree` seconds from `debut`. */
 const frappe = (s: string, debut: number, duree: number) => {
   const mots = insecable(s).split(' ');

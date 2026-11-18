@@ -1,0 +1,48 @@
+---
+/**
+ * The demo request, one component wherever it is offered: the networks page's pricing section
+ * (/reseaux#tarifs) and /demo. A centred card holding the hiring (Recrutement: the four acts, the
+ * request saved, the Cal.com agenda on the postcard); without JavaScript, a direct link to the
+ * agenda. Change it here, it changes everywhere.
+ */
+import { section } from '../../content/section';
+import { useTranslations, type Locale } from '../../i18n/ui';
+import { CAL_LINK } from '../../scripts/cal';
+import Button from '../ui/Button.astro';
+import Recrutement from './Recrutement.astro';
+
+interface Props {
+  locale: Locale;
+  emplacement: 'tarifs' | 'demo';
+  class?: string;
+}
+
+const { locale, emplacement, class: classe } = Astro.props;
+const c = await section('tarifsFormulaire', locale);
+const t = useTranslations(locale);
+---
+
+<div class:list={['formulaire rounded-panneau bg-surface p-5 shadow-carte sm:p-8 lg:p-10', classe]}>
+  <div class="avec-js">
+    <Recrutement locale={locale} emplacement={emplacement} />
+  </div>
+  <noscript>
+    <div class="flex flex-col items-start gap-5">
+      <p class="max-w-lead text-body text-soft">{c.recrutement.sansJs}</p>
+      <Button href={`https://cal.com/${CAL_LINK}`} size="lg">{t('cta.demo')}</Button>
+    </div>
+  </noscript>
+</div>
+
+<style>
+  /* exception: the hiring reads as one object in the middle of the page, not as a full-width
+     band; 952 px is the width it had beside the former « Comment ça se passe » aside. */
+  .formulaire {
+    max-width: 952px;
+    margin-inline: auto;
+  }
+  /* Without JS the hiring cannot run: it gives way to the line and button of the <noscript>. */
+  :global(.no-js) .avec-js {
+    display: none;
+  }
+</style>
