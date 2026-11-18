@@ -281,7 +281,8 @@ for (const l of lieux) {
 
 <style>
   .d2 {
-    --pas: 90svh;
+    /* In screens of --ecran (Base.astro): a stable length, see pistes.ts. */
+    --pas: calc(0.9 * var(--ecran, 100svh));
     /* The diorama's backdrop (scene palette) under the places, over the Section's cream. */
     background: var(--color-scene);
   }
@@ -290,7 +291,7 @@ for (const l of lieux) {
   .d2-bloc {
     --poids: 1;
     position: relative;
-    height: calc(var(--poids) * var(--pas) + 100svh);
+    height: calc(var(--poids) * var(--pas) + var(--ecran, 100svh));
   }
   .d2-ancre {
     position: absolute;

@@ -194,6 +194,11 @@
 }
 /* Something set inside a card, `--inset` away from its edge (12 px by default): its radius is the
    card's minus that gap, so both curves stay parallel. Never pick an inner radius by hand. */
+/* A screen high, stable while the browser's toolbar comes and goes (--ecran, set in Base.astro). */
+@utility h-ecran {
+  height: var(--ecran, 100svh);
+}
+
 @utility rounded-interieur {
   border-radius: max(calc(var(--r, var(--radius-card)) - var(--inset, 12px)), var(--radius-sm));
   corner-shape: squircle;
