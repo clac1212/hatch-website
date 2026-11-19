@@ -763,12 +763,13 @@ const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, o
         .forEach((e) => (e.textContent = nb ? pluriel(T.etablissements, nb) : ''));
     };
 
-    // Steps. The card changes height from one step to the next: each change brings its top back
-    // into view, smoothly, so the step is read from its title (César 18/11). Recrutement is only
-    // ever rendered inside Formulaire, whose card is `.formulaire`.
+    // Steps. The card changes height from one step to the next: a step change made by the visitor
+    // brings its top back into view, smoothly, so the step is read from its title (César 18/11);
+    // never the first render, which would scroll the page down to the form on load. Recrutement is
+    // only ever rendered inside Formulaire, whose card is `.formulaire`.
     const carteFormulaire = w.closest<HTMLElement>('.formulaire')!;
     let n = 1;
-    const aller = (k: number) => {
+    const aller = (k: number, defiler = true) => {
       n = k;
       aide.classList.remove('alerte');
       equipe(); // the bar's line back to the team, no stale « Il manque »
@@ -786,7 +787,8 @@ const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, o
       q('[data-fin]').hidden = n !== 3;
       (q('[data-ouvertures]') as HTMLElement).hidden = !recrues.has('sparrow');
       if (n === 3) distribuer();
-      carteFormulaire.scrollIntoView({ block: 'start', behavior: calme ? 'auto' : 'smooth' });
+      if (defiler)
+        carteFormulaire.scrollIntoView({ block: 'start', behavior: calme ? 'auto' : 'smooth' });
     };
     // Refused: the old « wrong password » shake, but springy: a fast swing that dies down in a few
     // smooth swings, each eased, the missing fields one after the other.
@@ -1016,7 +1018,7 @@ const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, o
         }
       }),
     );
-    aller(1);
+    aller(1, false);
   }
 </script>
 
@@ -2223,11 +2225,16 @@ const rythmes = c.ouvertures.choix.map((v, k) => ({ v, img: [ouv1, ouv2, ouv3, o
     .badges :global(.face) {
       overflow-wrap: break-word;
     }
-    /* Narrow badges: the agent's line on the back breaks words at their syllables; the network's
-       name (one long word in mono capitals, typed by the visitor) anywhere. */
-    .badges :global(.badge-pitch),
-    .badges :global([data-b-nb]) {
-      hyphens: auto;
+    /* Front only (César 19/11): the agent's line on the back made every badge too tall. The badge
+       no longer turns over; the network's name (one long word in mono capitals, typed by the
+       visitor) may break anywhere. */
+    .badges :global(.verso) {
+      display: none;
+    }
+    /* As specific as the turned-over and focused states, and later: it wins over both. */
+    .badges :global(.badge .badge-carte) {
+      transform: none;
+      pointer-events: none;
     }
     .badges :global(.badge-ens) {
       overflow-wrap: anywhere;
